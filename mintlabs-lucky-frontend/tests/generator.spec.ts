@@ -29,6 +29,7 @@ const mockGenerateResponse = {
 
 test.describe('Lucky Number Generator', () => {
   test.beforeEach(async ({ page }) => {
+    page.on('console', msg => console.log(`[console:${msg.type()}] ${msg.text()}`));
     await page.route('**/games', async route => {
       await route.fulfill({
         status: 200,
@@ -37,6 +38,7 @@ test.describe('Lucky Number Generator', () => {
       });
     });
     await page.route('**/generate', async route => {
+      console.log('[test] intercepted /generate');
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -53,10 +55,7 @@ test.describe('Lucky Number Generator', () => {
 
   test('submits form and shows result cards', async ({ page }) => {
     await page.goto('/');
-    await Promise.all([
-      page.waitForResponse('**/generate'),
-      page.getByRole('button', { name: 'Generate Numbers' }).click(),
-    ]);
+    await page.getByRole('button', { name: 'Generate Numbers' }).click();
     await expect(page.locator('#results .result-card').first()).toBeVisible();
     await expect(page.locator('#results .result-card').first()).toContainText('Bonus');
   });
