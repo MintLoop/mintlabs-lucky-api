@@ -1,0 +1,173 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - "phase-*"
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, test, coverage
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: mintlabs-lucky-api/requirements-dev.txt
+
+      - name: Install backend dependencies
+        run: pip install -r mintlabs-lucky-api/requirements-dev.txt
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mintlabs-lucky-frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: mintlabs-lucky-frontend
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        working-directory: mintlabs-lucky-frontend
+
+      - name: Run lint
+        run: make lint
+
+      - name: Run tests
+        env:
+          CI: "true"
+        run: make test
+
+      - name: Run coverage
+        env:
+          CI: "true"
+        run: make coverage
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: mintlabs-lucky-api/.coverage
+          if-no-files-found: warn
+
+  deploy_staging:
+    name: Deploy to staging
+    needs: quality
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_FRONTEND_PROJECT_ID: ${{ secrets.VERCEL_FRONTEND_PROJECT_ID || secrets.VERCEL_PROJECT_ID }}
+      VERCEL_API_PROJECT_ID: ${{ secrets.VERCEL_API_PROJECT_ID || '' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Validate Vercel secrets
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ]; then
+            echo "Missing Vercel credentials (VERCEL_TOKEN or VERCEL_ORG_ID)." >&2
+            exit 1
+          fi
+          if [ -z "$VERCEL_FRONTEND_PROJECT_ID" ]; then
+            echo "Provide VERCEL_FRONTEND_PROJECT_ID (or fallback VERCEL_PROJECT_ID)." >&2
+            exit 1
+          fi
+
+      - name: Deploy FastAPI backend (staging)
+        if: env.VERCEL_API_PROJECT_ID != ''
+        env:
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_API_PROJECT_ID }}
+        run: |
+          vercel pull --yes --environment=preview --cwd mintlabs-lucky-api
+          vercel build --cwd mintlabs-lucky-api
+          vercel deploy --prebuilt --cwd mintlabs-lucky-api
+
+      - name: Deploy Astro frontend (staging)
+        env:
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_FRONTEND_PROJECT_ID }}
+        run: |
+          vercel pull --yes --environment=preview --cwd mintlabs-lucky-frontend
+          vercel build --cwd mintlabs-lucky-frontend
+          vercel deploy --prebuilt --cwd mintlabs-lucky-frontend
+
+  deploy_production:
+    name: Deploy to production
+    needs: deploy_staging
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_FRONTEND_PROJECT_ID: ${{ secrets.VERCEL_FRONTEND_PROJECT_ID || secrets.VERCEL_PROJECT_ID }}
+      VERCEL_API_PROJECT_ID: ${{ secrets.VERCEL_API_PROJECT_ID || '' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Validate Vercel secrets
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ]; then
+            echo "Missing Vercel credentials (VERCEL_TOKEN or VERCEL_ORG_ID)." >&2
+            exit 1
+          fi
+          if [ -z "$VERCEL_FRONTEND_PROJECT_ID" ]; then
+            echo "Provide VERCEL_FRONTEND_PROJECT_ID (or fallback VERCEL_PROJECT_ID)." >&2
+            exit 1
+
+      - name: Deploy FastAPI backend (production)
+        if: env.VERCEL_API_PROJECT_ID != ''
+        env:
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_API_PROJECT_ID }}
+        run: |
+          vercel pull --yes --environment=production --cwd mintlabs-lucky-api
+          vercel build --prod --cwd mintlabs-lucky-api
+          vercel deploy --prebuilt --prod --cwd mintlabs-lucky-api
+
+      - name: Deploy Astro frontend (production)
+        env:
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_FRONTEND_PROJECT_ID }}
+        run: |
+          vercel pull --yes --environment=production --cwd mintlabs-lucky-frontend
+          vercel build --prod --cwd mintlabs-lucky-frontend
+          vercel deploy --prebuilt --prod --cwd mintlabs-lucky-frontend

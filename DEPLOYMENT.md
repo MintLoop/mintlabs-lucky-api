@@ -3,6 +3,26 @@
 ## Overview
 Deploy your FastAPI backend and Astro frontend to production with Supabase database integration.
 
+## CI/CD Pipeline
+
+Automated checks and deployments run through the `CI` GitHub Actions workflow:
+
+- **quality** – Installs Python 3.11 and Node.js 20, runs `make lint`, `make test`, and `make coverage`, and uploads the backend `.coverage` artifact.
+- **deploy_staging** – On pushes to `main`, builds both apps with `vercel build` and publishes preview deployments using `vercel deploy --prebuilt`. Targets the protected `staging` environment.
+- **deploy_production** – Requires a manual approval (configure in **Settings → Environments → production**). Rebuilds with `--prod` and executes `vercel deploy --prebuilt --prod` for both apps.
+
+### Required secrets
+
+Add the following repository or environment secrets before enabling the workflow:
+
+- `VERCEL_TOKEN` – Vercel CLI token with access to the projects.
+- `VERCEL_ORG_ID` – Organisation ID from Vercel.
+- `VERCEL_PROJECT_ID` – Default Vercel project ID; used for the frontend when a dedicated ID is not supplied.
+- `VERCEL_FRONTEND_PROJECT_ID` *(optional)* – Explicit frontend project ID if different from `VERCEL_PROJECT_ID`.
+- `VERCEL_API_PROJECT_ID` *(optional)* – Backend project ID. When omitted, backend deploy steps are skipped.
+
+The workflow runs `vercel pull --yes` in each app directory prior to `vercel build`/`vercel deploy`, ensuring environment variables are populated from the configured Vercel projects.
+
 ## Prerequisites
 - Vercel account (free tier available)
 - Supabase project
