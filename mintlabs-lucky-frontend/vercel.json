@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "framework": "astro",
+  "env": {
+    "PUBLIC_API_BASE": "@api_base_url",
+    "PUBLIC_ADSENSE_CLIENT": "@adsense_client"
+  }
+}

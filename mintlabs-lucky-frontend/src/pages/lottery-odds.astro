@@ -1,0 +1,94 @@
+---
+import InfoLayout from "../components/InfoLayout.astro";
+---
+
+<InfoLayout title="Lottery Odds, Simply Explained" subtitle="Independence, patterns, and filters.">
+  <div slot="teaser">
+    <strong class="text-emerald-400">Big idea:</strong>
+    Each lottery draw is independent. Past results do not change future odds.
+  </div>
+
+  <section class="rounded-2xl border border-slate-700 bg-gradient-to-r from-emerald-900/20 to-blue-900/20 p-8 shadow-xl backdrop-blur-sm">
+    <h2 class="mb-6 text-3xl font-semibold text-emerald-300">Quick summary</h2>
+    <div class="grid gap-4 md:grid-cols-1">
+      <div class="flex items-start gap-4 rounded-xl border border-slate-700 bg-slate-800 p-4">
+        <div class="mt-2 h-3 w-3 flex-shrink-0 rounded-full bg-emerald-400"></div>
+        <p class="text-gray-300">A draw has no memory.</p>
+      </div>
+      <div class="flex items-start gap-4 rounded-xl border border-slate-700 bg-slate-800 p-4">
+        <div class="mt-2 h-3 w-3 flex-shrink-0 rounded-full bg-blue-400"></div>
+        <p class="text-gray-300">Patterns you notice do not predict the next draw.</p>
+      </div>
+      <div class="flex items-start gap-4 rounded-xl border border-slate-700 bg-slate-800 p-4">
+        <div class="mt-2 h-3 w-3 flex-shrink-0 rounded-full bg-purple-400"></div>
+        <p class="text-gray-300">Filters change presentation, not your chance to win.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl">
+    <h2 class="mb-6 text-3xl font-semibold text-emerald-300">Key terms</h2>
+    <div class="grid gap-6 md:grid-cols-3">
+      <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+        <h3 class="mb-2 font-semibold text-emerald-300">Probability</h3>
+        <p class="text-gray-300">How likely something is to happen.</p>
+      </div>
+      <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+        <h3 class="mb-2 font-semibold text-blue-300">Independent events</h3>
+        <p class="text-gray-300">One result does not affect the next.</p>
+      </div>
+      <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+        <h3 class="mb-2 font-semibold text-purple-300">Filter</h3>
+        <p class="text-gray-300">Grouping numbers (even/odd, high/low, sums) without changing odds.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl backdrop-blur-sm">
+    <h2 class="mb-6 text-3xl font-semibold text-emerald-300">Independence of draws</h2>
+    <p class="mb-6 text-lg leading-relaxed text-gray-300">
+      Every draw stands alone. Even after a streak of results, the next one keeps the same probability.
+    </p>
+    <div class="rounded-lg border border-slate-700 bg-slate-900 p-4 text-center">
+      <code class="font-mono text-blue-300">P(A and B) = P(A) × P(B)</code>
+      <p class="mt-2 text-sm text-gray-400">Rule for independent events.</p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl">
+    <h2 class="mb-6 text-3xl font-semibold text-blue-300">Gambler’s fallacy</h2>
+    <p class="mb-4 text-gray-300">Common myths that mislead players:</p>
+    <ul class="space-y-2 list-inside list-disc text-gray-300">
+      <li>“7 hasn’t shown up, so it’s due.”</li>
+      <li>“We had five evens, so an odd is coming.”</li>
+      <li>“The jackpot is overdue.”</li>
+    </ul>
+    <p class="mt-4 text-sm text-gray-400">None of these change the odds.</p>
+  </section>
+
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl backdrop-blur-sm">
+    <h2 class="mb-6 text-3xl font-semibold text-purple-300">Patterns and filters</h2>
+    <p class="mb-6 text-lg leading-relaxed text-gray-300">
+      Filters like even/odd balances or hot/cold numbers reshape the look of your picks but cannot beat randomness. Use them for fun or structure, not prediction.
+    </p>
+    <div class="grid gap-6 md:grid-cols-2">
+      <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+        <h3 class="mb-2 font-semibold text-emerald-300">Even/Odd filters</h3>
+        <p class="text-gray-300">Limit how many evens you allow to make tickets feel balanced.</p>
+      </div>
+      <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+        <h3 class="mb-2 font-semibold text-blue-300">Hot/Cold filters</h3>
+        <p class="text-gray-300">Highlight frequently or rarely drawn numbers—without changing odds.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl">
+    <h2 class="mb-6 text-3xl font-semibold text-emerald-300">Takeaways</h2>
+    <ul class="space-y-2 list-inside list-disc text-gray-300">
+      <li>Each draw is independent.</li>
+      <li>Patterns are fun, not predictive.</li>
+      <li>Use filters to keep tickets organized, not to chase certainty.</li>
+    </ul>
+  </section>
+</InfoLayout>

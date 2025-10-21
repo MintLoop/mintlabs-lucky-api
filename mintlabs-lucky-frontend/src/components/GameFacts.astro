@@ -1,0 +1,44 @@
+---
+// src/components/GameFacts.astro
+// Accept a `game` prop but guard against it being undefined at build/runtime.
+const { game } = Astro.props ?? {};
+
+// If game is missing, render a simple fallback later. When present, derive ranges.
+// simple map of odds pages (single declaration)
+const oddsLinks = {
+  powerball: "https://www.powerball.com/odds",
+  megamillions: "https://www.megamillions.com/odds",
+  ca_superlotto: "https://www.calottery.com/en/draw-games/fantasy-5#section-content-4-3",
+  ca_fantasy5: "https://www.calottery.com/en/draw-games/fantasy-5#section-content-4-3",
+  ca_daily3: "https://www.calottery.com/en/draw-games/daily-3#section-content-4-3",
+  ca_daily4: "https://www.calottery.com/en/draw-games/daily-4#section-content-4-3",
+  ny_take5: "https://nylottery.ny.gov/draw-game?game=take5#odds_prizes",
+  lotto_texas: "https://www.texaslottery.com/games/lotto-texas/odds-prizes",
+  texas_lotto: "https://www.texaslottery.com/games/lotto-texas/",
+} as const;
+
+let whiteRange = null;
+let hasBonus = false;
+let bonusRange = null;
+let odds: string | null = null;
+if (game && typeof game === 'object') {
+  // derive ranges
+  whiteRange = `${game.white_min}–${game.white_max} × ${game.white_count}`;
+  hasBonus = Boolean(game.bonus_min && game.bonus_max && (game.bonus_count > 0));
+  bonusRange = hasBonus ? `${game.bonus_min}–${game.bonus_max} × ${game.bonus_count}` : null;
+  odds = oddsLinks[game.code as keyof typeof oddsLinks] || null;
+}
+---
+<div class="rounded-xl bg-slate-900/60 p-4 text-sm">
+  {game ? (
+    <>
+      <div><b>{game.name}</b></div>
+      <div>Whites: {whiteRange}</div>
+      {hasBonus && <div>Bonus: {bonusRange}</div>}
+      {odds && <a class="underline text-emerald-300" href={odds} target="_blank" rel="noopener">Odds & rules</a>}
+      {!odds && <span class="text-gray-500 text-xs">Odds info unavailable</span>}
+    </>
+  ) : (
+    <div class="text-gray-400">Game information unavailable.</div>
+  )}
+</div>

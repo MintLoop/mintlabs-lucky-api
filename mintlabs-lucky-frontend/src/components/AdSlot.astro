@@ -1,0 +1,10 @@
+---
+const { client, slot, class: klass = "" } = Astro.props;
+---
+{client && (
+  <>
+    <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`} crossorigin="anonymous"></script>
+    <ins class={`adsbygoogle block h-[90px] ${klass}`} data-ad-client={client} data-ad-slot={slot} data-full-width-responsive="true"></ins>
+    <script is:inline>try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){console.warn('AdSense failed:',e);}</script>
+  </>
+)}

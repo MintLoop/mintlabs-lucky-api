@@ -1,0 +1,53 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e293b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative elements -->
+  <circle cx="200" cy="150" r="100" fill="#10b981" opacity="0.1"/>
+  <circle cx="1000" cy="450" r="140" fill="#10b981" opacity="0.1"/>
+  <circle cx="1100" cy="250" r="70" fill="#10b981" opacity="0.1"/>
+
+  <!-- Mathematical symbols -->
+  <text x="150" y="120" fill="#64748b" font-family="Arial, sans-serif" font-size="60">∑</text>
+  <text x="1050" y="580" fill="#64748b" font-family="Arial, sans-serif" font-size="80">∞</text>
+  <text x="80" y="400" fill="#64748b" font-family="Arial, sans-serif" font-size="40">C(n,k)</text>
+
+  <!-- Main content -->
+  <text x="600" y="180" text-anchor="middle" fill="#f1f5f9" font-family="Arial, sans-serif" font-size="42" font-weight="bold">
+    Lottery Math
+  </text>
+
+  <text x="600" y="230" text-anchor="middle" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="28">
+    Combinations, Odds & Misconceptions
+  </text>
+
+  <!-- Formula display -->
+  <text x="600" y="320" text-anchor="middle" fill="#10b981" font-family="Arial, sans-serif" font-size="48" font-weight="bold">
+    C(n,k) = n! / (k! × (n−k)!)
+  </text>
+
+  <text x="600" y="370" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="20">
+    Binomial Coefficient Formula
+  </text>
+
+  <!-- Statistics -->
+  <text x="600" y="440" text-anchor="middle" fill="#f1f5f9" font-family="Arial, sans-serif" font-size="24">
+    Understanding the Mathematics Behind Lottery Odds
+  </text>
+
+  <!-- Bottom text -->
+  <text x="600" y="520" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="18">
+    MintLabs • Technical Analysis
+  </text>
+
+  <text x="600" y="550" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="16">
+    Educational • For Entertainment Only
+  </text>
+</svg>

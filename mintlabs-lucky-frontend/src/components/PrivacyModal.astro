@@ -1,0 +1,106 @@
+---
+// Privacy Modal Component
+---
+
+<div id="privacyModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+  <div class="fixed inset-4 md:inset-8 lg:inset-16 bg-slate-900 rounded-2xl shadow-2xl overflow-hidden">
+    <div class="flex flex-col h-full">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-slate-700">
+        <div>
+          <h2 class="text-2xl font-bold">Privacy Policy</h2>
+          <p class="text-slate-400 text-sm">Effective Date: September 9, 2025</p>
+        </div>
+        <button id="closePrivacyModal" class="text-slate-400 hover:text-white transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <div class="max-w-none space-y-6 text-slate-300">
+          <div class="bg-slate-800/60 p-6 rounded-lg mb-6">
+            <p class="text-slate-300 leading-relaxed">
+              MintLoop, LLC d/b/a MintLabs ("Company," "we," or "us") respects your privacy. This Privacy Policy explains how we collect, use, and protect information when you use the Lucky Number Generator (the "Service").
+            </p>
+          </div>
+
+          <section>
+            <h3 class="text-xl font-semibold mb-3">1. Information We Collect</h3>
+            <p>We do not collect personal information unless you provide it voluntarily (e.g., through a contact form).</p>
+            <p class="mt-3">We may automatically collect:</p>
+            <ul class="list-disc pl-6 space-y-2">
+              <li><strong>Usage data</strong> (pages viewed, clicks, time on site).</li>
+              <li><strong>Device and browser data</strong> (IP address, operating system, referral URL).</li>
+              <li><strong>Cookies and tracking technologies</strong> for analytics and advertising.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 class="text-xl font-semibold mb-3">2. Use of Information</h3>
+            <p>We use collected data to:</p>
+            <ul class="list-disc pl-6 space-y-2">
+              <li>Operate and improve the Service.</li>
+              <li>Monitor traffic and usage patterns.</li>
+              <li>Display relevant advertising (e.g., Google AdSense).</li>
+              <li>Comply with legal obligations.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 class="text-xl font-semibold mb-3">3. Advertising and Third Parties</h3>
+            <ul class="list-disc pl-6 space-y-2">
+              <li>We may display ads through Google AdSense or similar networks. These third parties may use cookies to serve personalized ads.</li>
+              <li>You can opt out of personalized advertising by visiting: <a href="https://www.google.com/settings/ads" class="text-emerald-400 hover:text-emerald-300" target="_blank" rel="noopener">https://www.google.com/settings/ads</a>.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 class="text-xl font-semibold mb-3">4. Data Sharing</h3>
+            <p>We do not sell or rent your personal data. We may share limited data with:</p>
+            <ul class="list-disc pl-6 space-y-2">
+              <li><strong>Service providers</strong> (analytics, hosting).</li>
+              <li><strong>Legal authorities</strong> if required by law.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 class="text-xl font-semibold mb-3">5. Cookies</h3>
+            <p>Cookies are small files stored on your device. You may block cookies in your browser, but some features may not function properly.</p>
+          </section>
+
+          <section>
+            <h3 class="text-xl font-semibold mb-3">6. Children's Privacy</h3>
+            <p>The Service is not directed to individuals under 18. We do not knowingly collect personal information from children.</p>
+          </section>
+
+          <section>
+            <h3 class="text-xl font-semibold mb-3">7. Data Security</h3>
+            <p>We use reasonable measures to protect information, but no system is completely secure. Use of the Service is at your own risk.</p>
+          </section>
+
+          <section>
+            <h3 class="text-xl font-semibold mb-3">8. International Use</h3>
+            <p>If you access the Service from outside the United States, you consent to the processing and storage of your information in the U.S.</p>
+          </section>
+
+          <section>
+            <h3 class="text-xl font-semibold mb-3">9. Changes to This Policy</h3>
+            <p>We may update this Privacy Policy from time to time. Changes are effective upon posting. Continued use of the Service indicates acceptance.</p>
+          </section>
+
+          <section>
+            <h3 class="text-xl font-semibold mb-3">10. Contact</h3>
+            <p>For privacy-related questions:</p>
+            <div class="bg-slate-800/60 p-4 rounded-lg mt-2">
+              <p class="font-semibold">MintLabs / MintLoop</p>
+              <p>Email: <a href="mailto:privacy@mintloop.dev" class="text-emerald-400 hover:text-emerald-300">privacy@mintloop.dev</a></p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

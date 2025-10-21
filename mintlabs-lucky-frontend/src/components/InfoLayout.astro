@@ -1,0 +1,74 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+export interface Props {
+  title: string;
+  subtitle?: string;
+}
+
+const { title, subtitle = "" } = Astro.props as Props;
+---
+
+<Layout>
+  <main class="mx-auto max-w-5xl p-6 space-y-12">
+    <header class="mb-12 text-center">
+      <h1 class="mb-6 text-5xl font-bold bg-gradient-to-r from-emerald-300 via-blue-300 to-purple-400 bg-clip-text text-transparent">
+        {title}
+      </h1>
+      {subtitle ? (
+        <p class="mx-auto mb-8 max-w-3xl text-xl leading-relaxed text-gray-300">{subtitle}</p>
+      ) : null}
+
+      <div class="mb-8 rounded-2xl border border-slate-700 bg-slate-800 p-6 backdrop-blur-sm">
+        <p class="text-sm leading-relaxed text-gray-300">
+          <slot name="teaser" />
+        </p>
+      </div>
+
+      <a
+        href="/"
+        class="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-emerald-500 to-blue-500 px-8 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-emerald-400 hover:to-blue-400 hover:shadow-xl"
+      >
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+        Generate Numbers
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+      </a>
+    </header>
+
+    <slot />
+
+    <div class="pt-12 text-center">
+      <slot name="back-cta">
+        <a
+          href="/"
+          class="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-emerald-500 to-blue-500 px-8 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-emerald-400 hover:to-blue-400 hover:shadow-xl"
+        >
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Generate Numbers
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+        </a>
+      </slot>
+    </div>
+
+    <footer class="mt-8 pb-8 text-center text-sm text-slate-400">
+      <p>
+        © 2025 MintLabs.
+        <a href="/terms" class="underline hover:text-slate-300">Terms &amp; Conditions</a>
+        |
+        <a href="/privacy" class="underline hover:text-slate-300">Privacy Policy</a>
+      </p>
+      <div class="mt-2 flex items-center justify-center gap-2 text-xs text-slate-500">
+        <img src="/mintlab.png" alt="MintLabs" class="h-4 w-4 opacity-70" />
+        <span>Powered by MintLabs</span>
+      </div>
+    </footer>
+  </main>
+</Layout>

@@ -1,0 +1,26 @@
+---
+import TrackLink from "./TrackLink.astro";
+
+const {
+  id,
+  title,
+  desc,
+  cta,
+  href,
+  disclaimer = "Affiliate link. We may earn a commission.",
+} = Astro.props;
+---
+<aside class="rounded-xl2 bg-ink-900/70 border border-mint-700 shadow-card p-5">
+  <h4 class="text-base font-semibold text-mint-300">{title}</h4>
+  <p class="mt-2 text-ink-100/90">{desc}</p>
+  <TrackLink
+    href={href}
+    rel="nofollow sponsored noopener"
+    event="affiliate_click"
+    props={{ id, title }}
+    class="inline-flex items-center gap-2 rounded-xl2 px-4 py-2 bg-mint-500 text-white hover:bg-mint-600 transition shadow-card mt-3"
+  >
+    {cta}
+  </TrackLink>
+  <p class="mt-2 text-xs text-ink-400">{disclaimer}</p>
+</aside>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Response</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
+        .result { background: rgba(30, 41, 59, 0.6); padding: 16px; border-radius: 16px; margin: 10px 0; }
+        .numbers { font-size: 20px; margin: 8px 0; }
+        .odds { color: #10b981; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Test API Response Display</h1>
+    
+    <div class="result">
+        <div class="text-sm">Set 1 • Uniform</div>
+        <div class="numbers">Numbers: <b>16, 17, 34, 45, 65</b> | Bonus: <b>24</b></div>
+        <div class="odds">Odds: <span>1 in 292,201,338</span> (0.000000% chance)</div>
+        <div>Bonus #24: 1 in 26 (3.8462%)</div>
+    </div>
+    
+    <script>
+        // Test the actual API response format
+        const mockResponse = {
+            "game": "powerball",
+            "mode": "uniform", 
+            "numbers": [16, 17, 34, 45, 65],
+            "bonus": 24,
+            "odds": "1 in 292,201,338",
+            "probability": 3.4222978130237033e-09,
+            "probability_percent": 3.4222978130237034e-07,
+            "last_number_info": "Bonus #24: 1 in 26 (3.8462%)"
+        };
+        
+        console.log('Mock API Response:', mockResponse);
+        console.log('Last number info present:', !!mockResponse.last_number_info);
+        console.log('Last number info length:', mockResponse.last_number_info.length);
+    </script>
+</body>
+</html>

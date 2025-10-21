@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/mintlab.png" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Lottery Math</title>
+		<link rel="stylesheet" href="/src/styles/global.css" />
+	</head>
+	<body class="min-h-screen theme-bg-primary theme-text-primary">
+		<slot />
+	</body>
+</html>
+
+<style>
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+<script>
+	// Apply saved theme on page load for all pages
+	function loadSavedTheme() {
+		const savedTheme = localStorage.getItem('selectedTheme') || 'green-dark';
+		document.documentElement.setAttribute('data-theme', savedTheme);
+	}
+	
+	// Load theme when DOM is ready
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', loadSavedTheme);
+	} else {
+		loadSavedTheme();
+	}
+</script>

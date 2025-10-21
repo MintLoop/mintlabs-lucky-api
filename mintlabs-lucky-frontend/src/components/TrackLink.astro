@@ -1,0 +1,51 @@
+---
+const {
+  href = "#",
+  class: klass = "",
+  rel = "nofollow sponsored noopener",
+  event = "link_click",
+  props = {},
+} = Astro.props as {
+  href?: string;
+  class?: string;
+  rel?: string;
+  event?: string;
+  props?: Record<string, unknown>;
+};
+
+const id = `tl-${Math.random().toString(36).slice(2, 9)}`;
+const payload = JSON.stringify(props ?? {});
+---
+<a
+  id={id}
+  href={href}
+  rel={rel}
+  class={klass}
+  data-track-event={event}
+  data-track-props={payload}
+>
+  <slot />
+</a>
+
+<script is:inline>
+  import { track } from "../scripts/tracking";
+  const el = document.getElementById("{id}");
+  if (el) {
+    const eventName = el.dataset.trackEvent || "link_click";
+    let propsData = {};
+    if (el.dataset.trackProps) {
+      try {
+        propsData = JSON.parse(el.dataset.trackProps);
+      } catch (err) {
+        console.warn('TrackLink payload parse failed', err);
+      }
+    }
+    el.addEventListener(
+      "click",
+      () => {
+        track(eventName, { href: el.getAttribute("href"), ...propsData });
+      },
+      { passive: true },
+    );
+  }
+</script>

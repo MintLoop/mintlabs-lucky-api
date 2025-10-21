@@ -1,0 +1,37 @@
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+exclude = """
+(
+  /migrations
+  |/venv
+  |/env
+  |/.venv
+)
+"""
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle (errors)
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "S",   # bandit security rules
+]
+ignore = [
+    "S101",  # allow assert in tests/scripts
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra --cov=app --cov-report=term-missing"
+testpaths = ["tests"]

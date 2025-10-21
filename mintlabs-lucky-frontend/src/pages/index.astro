@@ -1,0 +1,95 @@
+---
+import "../styles/global.css"; // bundle Tailwind + your theme tokens
+
+import SiteHeader from "../components/SiteHeader.astro";
+import ThemeToolbar from "../components/ThemeToolBar.astro";
+import GeneratorForm from "../components/GeneratorForm.astro";
+import EduGrid from "../components/EduGrid.astro";
+import GameFacts from "../components/GameFacts.astro";
+import TermsModal from "../components/TermsModal.astro";
+import PrivacyModal from "../components/PrivacyModal.astro";
+// env + API
+const API = import.meta.env.PUBLIC_API_BASE;
+const ADS = import.meta.env.PUBLIC_ADSENSE_CLIENT;
+const IS_PROD = import.meta.env.PROD;
+
+const gamesEndpoint = API ? `${String(API).replace(/\/$/, '')}/games` : '/games';
+const games = await fetch(gamesEndpoint).then(r => r.json()).catch(() => []);
+const jsonGames = Array.isArray(games) ? JSON.stringify(games).replaceAll('`', '\\`') : '[]';
+const current = Array.isArray(games) && games.length > 0 ? games[0] : null;
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/clover.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/clover.png" />
+    <meta name="theme-color" content="#0f766e" />
+    <title>MintLabs Lucky Numbers</title>
+
+    <!-- apply saved theme before paint -->
+    <script is:inline>
+      document.documentElement.setAttribute(
+        'data-theme',
+        localStorage.getItem('selectedTheme') || 'green-dark'
+      );
+    </script>
+  </head>
+
+  <body class="min-h-screen theme-bg-primary theme-text-primary">
+    {jsonGames && jsonGames !== '[]' && (
+      <script type="application/json" id="initial-games">{jsonGames}</script>
+    )}
+    <main class="mx-auto max-w-xl sm:max-w-2xl p-6 space-y-6">
+      <SiteHeader />
+
+      <!-- selector lives above the card; transparency preserved -->
+      <ThemeToolbar />
+
+      <!-- form component: markup unchanged; gets games from API -->
+      <GeneratorForm games={Array.isArray(games) ? games : []} />
+
+      {IS_PROD && ADS && (
+        <>
+          <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS}`} crossorigin="anonymous"></script>
+          <ins class="adsbygoogle block h-[90px]" data-ad-client={ADS} data-ad-slot="0000000001" data-full-width-responsive="true"></ins>
+          <script is:inline>try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){console.warn('AdSense failed:',e);}</script>
+        </>
+      )}
+
+      <section id="results" class="space-y-3"></section>
+
+      <div id="facts" class="mt-3">
+        {current && <GameFacts game={current} />}
+      </div>
+
+      <EduGrid />
+
+      <footer class="text-center text-sm theme-text-muted mt-8 pb-8">
+        <p>© 2025 MintLabs. <a href="/terms" id="termsLink" class="hover:text-slate-300 underline">Terms &amp; Conditions</a> | <a href="/privacy" id="privacyLink" class="hover:text-slate-300 underline">Privacy Policy</a></p>
+        <div class="mt-2 flex items-center justify-center gap-2 text-xs theme-text-muted">
+          <img src="/mintlab.png" alt="MintLabs" class="w-4 h-4 opacity-70" />
+          <span>Powered by MintLabs</span>
+        </div>
+      </footer>
+
+      {IS_PROD && ADS && (
+        <>
+          <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS}`} crossorigin="anonymous"></script>
+          <ins class="adsbygoogle block h-[90px]" data-ad-client={ADS} data-ad-slot="0000000002" data-full-width-responsive="true"></ins>
+          <script is:inline>try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){console.warn('AdSense failed:',e);}</script>
+        </>
+      )}
+    </main>
+
+    <TermsModal />
+    <PrivacyModal />
+
+    <!-- your generator logic -->
+    <script is:inline>
+      window.__LUCKY_API_BASE = {JSON.stringify(API ? String(API).replace(/\/$/, '') : '')};
+    </script>
+    <script type="module" src="/scripts/entry.js"></script>
+
+  </body>
+</html>

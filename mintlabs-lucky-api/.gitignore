@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+lucky/
+.env
+.env.*
+!.env.example
+
+# Node (for when you do frontend in same pattern)
+node_modules/
+
+# macOS
+.DS_Store

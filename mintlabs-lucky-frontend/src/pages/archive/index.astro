@@ -1,0 +1,221 @@
+---
+const API = import.meta.env.PUBLIC_API_BASE;
+const ADS = import.meta.env.PUBLIC_ADSENSE_CLIENT;
+const IS_PROD = import.meta.env.PROD;
+
+const gamesEndpoint = API ? `${String(API).replace(/\/$/, '')}/games` : '/games';
+const games = await fetch(gamesEndpoint).then((r) => r.json()).catch(() => []);
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/clover.png" />
+    <title>MintLabs Lucky Numbers</title>
+    <link rel="stylesheet" href="/src/styles/global.css" />
+  </head>
+  <body class="min-h-screen theme-bg-primary theme-text-primary">
+    <main class="mx-auto max-w-xl p-6 space-y-6">
+      <header class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <img src="/clover.png" alt="Lucky Clover" class="h-18 w-18" />
+          <div>
+            <h1 class="overflow-hidden text-ellipsis whitespace-nowrap text-2xl font-bold leading-tight md:text-3xl">
+              MintLabs Lucky Numbers
+            </h1>
+            <p class="mt-1 text-sm text-center theme-text-secondary md:text-center">
+              For education and entertainment only. Play responsibly.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-30 mb-1 flex flex-col gap-0 sm:flex-row sm:items-center sm:justify-end">
+          <label for="themeSelect" class="hidden text-sm theme-text-secondary sm:inline"></label>
+          <select
+            id="themeSelect"
+            class="h-10 w-full rounded-lg border theme-bg-card theme-border-primary theme-text-primary bg-clip-padding px-3 pr-8 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] text-sm sm:w-auto"
+          >
+            <option value="green-dark">Classic</option>
+            <option value="green-light">Classic Light</option>
+            <option value="blue-dark">Alpine</option>
+            <option value="purple-dark">Perilla</option>
+            <option value="amber-dark">Eau de Cologne</option>
+            <option value="red-dark">Red</option>
+            <option value="teal-dark">Teal</option>
+            <option value="bw-dark">Monochrome</option>
+            <option value="bw-light">Monochrome Light</option>
+          </select>
+        </div>
+      </header>
+
+      <form id="genForm" class="space-y-4 rounded-2xl p-4 theme-bg-card">
+        <label class="block">
+          <span class="text-sm theme-text-secondary">Game</span>
+          <select name="game" class="mt-1 w-full rounded-lg p-2 theme-input-bg theme-text-primary">
+            {Array.isArray(games) && games.length
+              ? games.map((g: any) => <option value={g.code}>{g.name}</option>)
+              : <option value="">No games available</option>}
+          </select>
+        </label>
+        <label class="block">
+          <span class="text-sm theme-text-secondary">Mode</span>
+          <select name="mode" id="modeSelect" class="mt-1 w-full rounded-lg p-2 theme-input-bg theme-text-primary">
+            <optgroup label="Basic">
+              <option value="uniform">Uniform Random</option>
+              <option value="spaced">Spaced Distribution</option>
+              <option value="balanced">Balanced</option>
+            </optgroup>
+            <optgroup label="Strategic">
+              <option value="odd_even_mix">Odd-Even Mix</option>
+              <option value="sum_target">Sum Target</option>
+              <option value="pattern_avoid">Pattern Avoid</option>
+            </optgroup>
+            <optgroup label="Statistical">
+              <option value="hot">Hot Numbers</option>
+              <option value="cold">Cold Numbers</option>
+            </optgroup>
+            <optgroup label="Personal">
+              <option value="birthday">Birthday</option>
+              <option value="lucky">Lucky Numbers</option>
+            </optgroup>
+            <optgroup label="Systematic">
+              <option value="wheel">Wheel System</option>
+            </optgroup>
+          </select>
+        </label>
+
+        <div id="sumTargetField" class="hidden">
+          <label class="block">
+            <span class="text-sm theme-text-secondary">Target Sum</span>
+            <input
+              type="number"
+              name="target_sum"
+              placeholder="e.g., 150"
+              class="mt-1 w-full rounded-lg p-2 theme-input-bg theme-text-primary"
+            />
+          </label>
+        </div>
+
+        <div id="birthdayField" class="hidden">
+          <label class="block">
+            <span class="text-sm theme-text-secondary">Birth Date</span>
+            <input
+              type="date"
+              name="birth_date"
+              class="mt-1 w-full rounded-lg p-2 theme-input-bg theme-text-primary"
+            />
+            <span class="text-xs theme-text-muted">Format: YYYY-MM-DD</span>
+          </label>
+        </div>
+
+        <div id="luckyField" class="hidden">
+          <label class="block">
+            <span class="text-sm theme-text-secondary">Lucky Numbers</span>
+            <input
+              type="text"
+              name="lucky_numbers"
+              placeholder="e.g., 7,13,21,42"
+              class="mt-1 w-full rounded-lg p-2 theme-input-bg theme-text-primary"
+            />
+            <span class="text-xs theme-text-muted">Comma-separated numbers</span>
+          </label>
+        </div>
+
+        <div id="wheelField" class="hidden">
+          <label class="block">
+            <span class="text-sm theme-text-secondary">Wheel Type</span>
+            <select name="wheel_type" class="mt-1 w-full rounded-lg p-2 theme-input-bg theme-text-primary">
+              <option value="key">Key Number</option>
+              <option value="abbreviated">Abbreviated</option>
+              <option value="full">Full Wheel</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="block">
+          <span class="text-sm theme-text-secondary">How many sets?</span>
+          <input
+            type="number"
+            name="sets"
+            min="1"
+            max="10"
+            value="5"
+            class="mt-1 w-full rounded-lg p-2 theme-input-bg theme-text-primary"
+          />
+        </label>
+
+        <div class="space-y-2 border-t pt-3 theme-border-primary">
+          <h3 class="text-xs font-semibold uppercase tracking-wide theme-text-muted">Additional Filters</h3>
+
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="allow_repeats"
+              value="true"
+              class="h-3 w-3 rounded theme-input-bg theme-border-primary focus:ring-emerald-500 focus:ring-1"
+            />
+            <div>
+              <span class="text-xs font-medium theme-text-primary">Allow Repeats</span>
+              <p class="text-xs theme-text-secondary">Include numbers from recent draws</p>
+            </div>
+          </label>
+
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="allow_consecutive"
+              value="true"
+              class="h-3 w-3 rounded theme-input-bg theme-border-primary focus:ring-emerald-500 focus:ring-1"
+            />
+            <div>
+              <span class="text-xs font-medium theme-text-primary">Allow Consecutive</span>
+              <p class="text-xs theme-text-secondary">Include sequences like 14-15-16</p>
+            </div>
+          </label>
+        </div>
+
+        <button
+          class="flex w-full items-center justify-center gap-2 rounded-xl py-2 font-semibold theme-accent-primary theme-text-primary hover:theme-accent-hover"
+        >
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Generate Numbers
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+        </button>
+      </form>
+
+      {IS_PROD && ADS && (
+        <>
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS}`}
+            crossorigin="anonymous"
+          ></script>
+          <ins
+            class="adsbygoogle"
+            style="display:block;height:90px"
+            data-ad-client={ADS}
+            data-ad-slot="0000000001"
+            data-full-width-responsive="true"
+          ></ins>
+          <script is:inline>
+            {`
+              try {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+              } catch (err) {
+                console.warn('AdSense failed to load:', err);
+              }
+            `}
+          </script>
+        </>
+      )}
+
+      <section id="results" class="space-y-3"></section>
+      <div id="facts" class="mt-3"></div>
+    </main>
+    <script type="module" src="/scripts/entry.js"></script>
+  </body>
+</html>

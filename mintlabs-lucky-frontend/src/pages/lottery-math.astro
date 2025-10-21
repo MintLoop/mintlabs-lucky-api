@@ -1,0 +1,148 @@
+---
+import InfoLayout from "../components/InfoLayout.astro";
+---
+
+<InfoLayout
+  title="Lottery Math Explained"
+  subtitle="Deep dive into the mathematics behind lottery probability and odds calculation."
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">🔢 Key Formula:</strong>
+    The probability of winning is calculated using combinations, not permutations. Order doesn't matter in lottery draws.
+  </div>
+
+  <!-- Quick Summary -->
+  <section class="rounded-2xl border border-slate-700 bg-gradient-to-r from-emerald-900/20 to-blue-900/20 p-8 shadow-xl backdrop-blur-sm">
+    <h2 class="mb-6 text-3xl font-semibold text-emerald-300">Mathematical Foundation</h2>
+    <div class="grid gap-4 md:grid-cols-1">
+      <div class="flex items-start gap-4 rounded-xl border border-slate-700 bg-slate-800 p-4">
+        <div class="mt-2 h-3 w-3 flex-shrink-0 rounded-full bg-emerald-400"></div>
+        <div>
+          <h3 class="mb-2 font-semibold text-emerald-300">Combinations</h3>
+          <p class="leading-relaxed text-gray-300">Lottery odds use combinations (order doesn't matter) rather than permutations (order matters).</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 rounded-xl border border-slate-700 bg-slate-800 p-4">
+        <div class="mt-2 h-3 w-3 flex-shrink-0 rounded-full bg-blue-400"></div>
+        <div>
+          <h3 class="mb-2 font-semibold text-blue-300">Probability</h3>
+          <p class="text-gray-300">Understanding probability is essential for interpreting lottery odds.</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 rounded-xl border border-slate-700 bg-slate-800 p-4">
+        <div class="mt-2 h-3 w-3 flex-shrink-0 rounded-full bg-purple-400"></div>
+        <div>
+          <h3 class="mb-2 font-semibold text-purple-300">Odds</h3>
+          <p class="leading-relaxed text-gray-300">Odds = Probability of losing / Probability of winning.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Combinations vs Permutations -->
+  <section id="combinations" class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl backdrop-blur-sm">
+    <h2 class="mb-6 text-3xl font-semibold text-emerald-300">Combinations vs Permutations</h2>
+    <p class="mb-8 text-lg leading-relaxed text-gray-300">
+      The difference between combinations and permutations is crucial for understanding lottery odds. Because order doesn't matter in lottery draws, combinations are used.
+    </p>
+
+    <div class="mb-6 rounded-xl border border-slate-700 bg-gradient-to-r from-emerald-900/30 to-blue-900/30 p-6">
+      <h3 class="mb-4 text-xl font-semibold text-emerald-300">Permutations (Order Matters)</h3>
+      <p class="mb-4 leading-relaxed text-gray-300">
+        If order mattered, selecting 3 numbers from 10 would give us:
+      </p>
+      <div class="rounded-lg border border-slate-700 bg-slate-800 p-4">
+        <p class="text-center font-mono text-lg text-emerald-300">P(10,3) = 10 × 9 × 8 = 720</p>
+        <p class="mt-2 text-center text-sm text-gray-400">Different arrangements count as different outcomes.</p>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-slate-700 bg-gradient-to-r from-blue-900/30 to-emerald-900/30 p-6">
+      <h3 class="mb-4 text-xl font-semibold text-blue-300">Combinations (Order Doesn't Matter)</h3>
+      <p class="mb-4 leading-relaxed text-gray-300">
+        Since order doesn't matter in lottery draws, combinations are used:
+      </p>
+      <div class="rounded-lg border border-slate-700 bg-slate-800 p-4 text-center">
+        <p class="mt-2 text-sm text-gray-400">Same numbers in any order count as a single combination.</p>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-slate-700 bg-slate-800 p-4 text-center">
+      <code class="font-mono text-blue-300">
+        C(10,3) = 10! / (3! × (10-3)!) = (10 × 9 × 8) / (3 × 2 × 1) = 120
+      </code>
+    </div>
+  </section>
+
+  <!-- Expected Value -->
+  <section id="expected-value" class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl backdrop-blur-sm">
+    <h2 class="mb-6 text-3xl font-semibold text-purple-300">Expected Value</h2>
+    <p class="mb-6 leading-relaxed text-gray-300">
+      Expected value (EV) helps quantify the average outcome if you played the lottery many times:
+    </p>
+    <div class="rounded-lg border border-slate-700 bg-slate-800 p-4 text-center">
+      <code class="font-mono text-emerald-300">EV = (P × J) - C</code>
+      <p class="mt-2 text-sm text-gray-400">P = probability, J = jackpot, C = cost per ticket.</p>
+    </div>
+  </section>
+
+  <!-- Powerball Example -->
+  <section id="powerball-math" class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl backdrop-blur-sm">
+    <h2 class="mb-6 text-3xl font-semibold text-blue-300">Powerball Example</h2>
+    <p class="mb-8 text-lg leading-relaxed text-gray-300">
+      Let's calculate the odds for Powerball (5/69 + 1/26):
+    </p>
+
+    <div class="grid gap-6 md:grid-cols-2">
+      <div class="rounded-xl border border-slate-700 bg-gradient-to-br from-blue-900/30 to-purple-900/30 p-6">
+        <h3 class="mb-4 text-xl font-semibold text-blue-300">Main Numbers (5/69)</h3>
+        <div class="rounded-lg border border-slate-700 bg-slate-800 p-3 text-center">
+          <p class="font-mono text-blue-300">C(69,5) = 11,238,513</p>
+          <p class="mt-1 text-sm text-gray-400">Possible combinations for main numbers.</p>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-700 bg-gradient-to-br from-purple-900/30 to-blue-900/30 p-6">
+        <h3 class="mb-4 text-xl font-semibold text-purple-300">Powerball (1/26)</h3>
+        <div class="rounded-lg border border-slate-700 bg-slate-800 p-3 text-center">
+          <p class="font-mono text-purple-300">C(26,1) = 26</p>
+          <p class="mt-1 text-sm text-gray-400">Possible Powerball numbers.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-slate-700 bg-gradient-to-r from-emerald-900/30 to-blue-900/30 p-6">
+      <h3 class="mb-4 text-xl font-semibold text-emerald-300">Total Odds</h3>
+      <div class="rounded-lg border border-slate-700 bg-slate-800 p-4 text-center">
+        <p class="mt-2 text-sm text-gray-400">1 in 292,201,338 chance of winning the Powerball jackpot.</p>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-slate-700 bg-slate-800 p-4 text-center">
+      <code class="font-mono text-emerald-300">Total Odds = 11,238,513 × 26 = 292,201,338</code>
+    </div>
+  </section>
+
+  <!-- Multiple Tickets -->
+  <section id="multiple-tickets" class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl backdrop-blur-sm">
+    <h2 class="mb-6 text-3xl font-semibold text-purple-300">Multiple Tickets</h2>
+    <p class="mb-8 text-lg leading-relaxed text-gray-300">
+      Buying multiple tickets improves your odds linearly, but the expected value remains negative.
+    </p>
+
+    <div class="rounded-xl border border-slate-700 bg-gradient-to-r from-purple-900/30 to-emerald-900/30 p-6">
+      <h3 class="mb-4 text-xl font-semibold text-purple-300">Improved Odds with Multiple Tickets</h3>
+      <p class="mb-4 leading-relaxed text-gray-300">
+        If you buy T tickets, your probability becomes:
+      </p>
+      <div class="rounded-lg border border-slate-700 bg-slate-800 p-4 text-center">
+        <p class="mt-2 text-sm text-gray-400">Odds improve linearly with the number of tickets purchased.</p>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-slate-700 bg-slate-800 p-4 text-center">
+      <code class="font-mono text-purple-300">P(win with T tickets) = T × P(single ticket)</code>
+      <p class="mt-2 text-sm text-gray-400">Probability with multiple tickets.</p>
+    </div>
+  </section>
+</InfoLayout>

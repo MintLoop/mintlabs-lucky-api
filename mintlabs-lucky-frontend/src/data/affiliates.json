@@ -1,0 +1,42 @@
+[
+  {
+    "id": "probability-course",
+    "title": "Learn Probability (Beginner → Intermediate)",
+    "desc": "Short, structured lessons to understand combinations, independence, and expectation.",
+    "cta": "View Course",
+    "href": "https://example.com/aff/probability",
+    "placement": ["lottery-math", "lottery-odds"],
+    "tags": ["education", "course"],
+    "commission": "10-20%"
+  },
+  {
+    "id": "stats-tutor",
+    "title": "1:1 Stats Tutor",
+    "desc": "Get help with combinatorics, probability, and problem sets. External tutoring marketplace.",
+    "cta": "Find a Tutor",
+    "href": "https://example.com/aff/tutors",
+    "placement": ["lottery-math"],
+    "tags": ["tutoring", "education"],
+    "commission": "variable, ~20%"
+  },
+  {
+    "id": "math-books",
+    "title": "Recommended Math Reads",
+    "desc": "Books that make probability and randomness easy to grasp. Affiliate links via Amazon.",
+    "cta": "Shop Books",
+    "href": "https://amzn.to/example",
+    "placement": ["lottery-odds", "lottery-math"],
+    "tags": ["books"],
+    "commission": "4-8%"
+  },
+  {
+    "id": "finance-app",
+    "title": "Smarter Budgeting",
+    "desc": "Enjoy numbers? Apply them to your money. Track spending and plan smarter with this app.",
+    "cta": "Start Free",
+    "href": "https://example.com/aff/finance-app",
+    "placement": ["lottery-odds"],
+    "tags": ["finance", "budgeting"],
+    "commission": "10-30%"
+  }
+]
