@@ -1,6 +1,8 @@
-// compiled lucky script
-var API_ENV = typeof window !== 'undefined' && window.__LUCKY_API_BASE !== void 0 ? window.__LUCKY_API_BASE : '';
-var API = API_ENV && String(API_ENV).trim() !== '' ? String(API_ENV).replace(/\/$/, '') : typeof location !== 'undefined' && location.hostname === 'localhost' ? `${location.protocol}//localhost:8000` : '';
+// src/scripts/lucky.ts
+var metaEnv = import.meta?.env ?? {};
+var globalApi = typeof window !== "undefined" ? window.__LUCKY_API_BASE : void 0;
+var API_ENV = metaEnv.PUBLIC_API_BASE ?? globalApi ?? "";
+var API = API_ENV && String(API_ENV).trim() !== "" ? String(API_ENV).replace(/\/$/, "") : typeof location !== "undefined" && location.hostname === "localhost" ? `${location.protocol}//localhost:8000` : "";
 var GAMES_ENDPOINT = API ? `${API}/games` : "/games";
 var GENERATE_ENDPOINT = API ? `${API}/generate` : "/generate";
 var mounted = false;

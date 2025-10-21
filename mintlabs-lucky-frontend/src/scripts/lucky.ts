@@ -1,4 +1,6 @@
-const API_ENV = import.meta.env.PUBLIC_API_BASE;
+const metaEnv = (import.meta as any)?.env ?? {};
+const globalApi = typeof window !== 'undefined' ? (window as any).__LUCKY_API_BASE : undefined;
+const API_ENV = metaEnv.PUBLIC_API_BASE ?? globalApi ?? '';
 const API = (API_ENV && String(API_ENV).trim() !== '')
   ? String(API_ENV).replace(/\/$/, '')
   : (typeof location !== 'undefined' && location.hostname === 'localhost')
@@ -288,4 +290,3 @@ fixMonochromeButton();
 
 const mo = new MutationObserver(fixMonochromeButton);
 mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-
