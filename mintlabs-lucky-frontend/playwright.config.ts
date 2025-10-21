@@ -1,5 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
+const HOST = process.env.CI ? '0.0.0.0' : '127.0.0.1';
+
 export default defineConfig({
   testDir: './tests',
   timeout: 30_000,
@@ -11,7 +13,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'npm run preview -- --host 0.0.0.0 --port 4173',
+    command: `npm run preview -- --host ${HOST} --port 4173`,
     port: 4173,
     reuseExistingServer: !process.env.CI,
     env: {
