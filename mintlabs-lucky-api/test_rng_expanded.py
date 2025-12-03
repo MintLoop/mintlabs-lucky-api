@@ -1,15 +1,24 @@
 #!/usr/bin/env python3
 """Test script for the expanded RNG modes"""
 
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from app.rng import (
-    SecureRng, spaced_draw, draw_balanced, draw_odd_even_mix,
-    draw_sum_target, draw_pattern_avoid, draw_hot_cold,
-    draw_birthday, draw_lucky, draw_wheel
+    SecureRng,
+    draw_balanced,
+    draw_birthday,
+    draw_hot_cold,
+    draw_lucky,
+    draw_odd_even_mix,
+    draw_pattern_avoid,
+    draw_sum_target,
+    draw_wheel,
+    spaced_draw,
 )
+
 
 def test_mode(name, func, *args):
     """Test a specific RNG mode"""
@@ -56,7 +65,7 @@ def main():
         if test_mode(name, test_func):
             passed += 1
 
-    print(f"\n=== Summary ===")
+    print("\n=== Summary ===")
     print(f"Passed: {passed}/{len(tests)} tests")
 
     if passed == len(tests):

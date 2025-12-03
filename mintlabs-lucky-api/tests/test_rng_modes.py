@@ -1,18 +1,18 @@
 import statistics
+
 import pytest
 
 from app.rng import (
     SecureRng,
-    spaced_draw,
-    draw_balanced,
-    draw_odd_even_mix,
-    draw_sum_target,
-    draw_pattern_avoid,
-    draw_hot_cold,
-    draw_birthday,
-    draw_lucky,
-    draw_wheel,
     apply_filters,
+    draw_balanced,
+    draw_birthday,
+    draw_hot_cold,
+    draw_lucky,
+    draw_odd_even_mix,
+    draw_pattern_avoid,
+    draw_sum_target,
+    draw_wheel,
 )
 
 
@@ -78,6 +78,14 @@ def test_wheel_modes(rng):
 
 def test_apply_filters_allows_repeat_flags(rng):
     numbers = [1, 5, 9, 13]
-    result = apply_filters(rng, 1, 20, len(numbers), allow_repeats=True, allow_consecutive=True, recent_numbers=numbers)
+    result = apply_filters(
+    rng,
+    1,
+    20,
+    len(numbers),
+    allow_repeats=True,
+    allow_consecutive=True,
+    recent_numbers=numbers,
+)
     assert len(result) == len(numbers)
     assert all(1 <= value <= 20 for value in result)

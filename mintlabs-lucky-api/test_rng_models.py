@@ -4,15 +4,25 @@ Test script for RNG models in rng.py
 Run with: python test_rng.py
 """
 
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(__file__))
 
 from app.rng import (
-    SecureRng, spaced_draw, draw_balanced, draw_odd_even_mix,
-    draw_sum_target, draw_pattern_avoid, draw_hot_cold,
-    draw_birthday, draw_lucky, draw_wheel, apply_filters
+    SecureRng,
+    apply_filters,
+    draw_balanced,
+    draw_birthday,
+    draw_hot_cold,
+    draw_lucky,
+    draw_odd_even_mix,
+    draw_pattern_avoid,
+    draw_sum_target,
+    draw_wheel,
+    spaced_draw,
 )
+
 
 def test_basic_rng():
     """Test basic SecureRng functionality"""
@@ -79,7 +89,7 @@ def test_odd_even_mix():
     nums = draw_odd_even_mix(1, 49, 6, rng)
     assert len(nums) == 6, f"Wrong length: {len(nums)}"
     odds = sum(1 for n in nums if n % 2 == 1)
-    evens = len(nums) - odds
+    
     # Should have roughly equal odds/evens (target_odds = count//2 = 3)
     assert 2 <= odds <= 4, f"Odd count out of balance: {odds}"
     print("✓ Odd-even mix test passed")

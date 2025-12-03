@@ -1,4 +1,5 @@
 import math
+
 import pytest
 
 from app.rng import SecureRng, spaced_draw

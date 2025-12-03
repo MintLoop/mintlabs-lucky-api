@@ -3,6 +3,7 @@
 
 from app.rng import SecureRng, spaced_draw
 
+
 def test_secure_rng():
     rng = SecureRng()
     

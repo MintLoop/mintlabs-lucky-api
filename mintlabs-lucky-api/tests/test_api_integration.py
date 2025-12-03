@@ -1,4 +1,4 @@
-from typing import Dict
+
 
 import pytest
 from fastapi.testclient import TestClient
@@ -37,7 +37,7 @@ def test_games_endpoint_uses_cache(client):
     ],
 )
 def test_generate_valid_modes(client, mode):
-    request: Dict[str, object] = {
+    request: dict[str, object] = {
         "game_code": "powerball",
         "mode": mode,
         "sets": 1,
