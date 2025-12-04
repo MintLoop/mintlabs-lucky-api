@@ -15,6 +15,46 @@ let out: HTMLElement | null = null;
 let gameSel: HTMLSelectElement | null = null;
 let factsEl: HTMLElement | null = null;
 let games: any[] = [];
+let submitBtn: HTMLButtonElement | null = null;
+let isRateLimited = false;
+
+// Toast notification helper
+function showToast(message: string, type: 'warning' | 'error' = 'warning', durationMs = 3000): void {
+  let toast = document.getElementById('lucky-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'lucky-toast';
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.className = `toast toast-${type} show`;
+  setTimeout(() => {
+    toast!.classList.remove('show');
+  }, durationMs);
+}
+
+// Disable button temporarily during rate limit cooldown
+function handleRateLimitCooldown(retryAfterSec: number): void {
+  if (isRateLimited || !submitBtn) return;
+  isRateLimited = true;
+  const originalText = submitBtn.textContent || 'Generate Numbers';
+  submitBtn.disabled = true;
+  submitBtn.textContent = `Wait ${retryAfterSec}s...`;
+  
+  let remaining = retryAfterSec;
+  const interval = setInterval(() => {
+    remaining--;
+    if (remaining > 0) {
+      submitBtn!.textContent = `Wait ${remaining}s...`;
+    } else {
+      clearInterval(interval);
+      submitBtn!.disabled = false;
+      submitBtn!.textContent = originalText;
+      isRateLimited = false;
+    }
+  }, 1000);
+}
 
 function readInitialGames(): any[] {
   const el = document.getElementById('initial-games');
@@ -52,6 +92,8 @@ export function initLucky() {
   out = document.getElementById('results') as HTMLElement | null;
   gameSel = document.querySelector('select[name="game"]') as HTMLSelectElement | null;
   factsEl = document.getElementById('facts') as HTMLElement | null;
+  submitBtn = document.getElementById('generateBtn') as HTMLButtonElement | null
+    || document.querySelector('button[type="submit"]') as HTMLButtonElement | null;
 
   if (!form || !out || !gameSel) return;
 
@@ -148,14 +190,19 @@ export function initLucky() {
             const text = await res.text();
             if (!res.ok) {
               let msg: string = text || res.statusText || 'Unknown error';
+              let retryAfter = 2; // default
               try {
                 const json = JSON.parse(text || '{}');
                 msg = json?.detail || json?.message || msg;
+                if (json?.retry_after) retryAfter = parseInt(json.retry_after, 10) || 2;
               } catch {
                 // ignore parse failures
               }
+              // Also check Retry-After header
+              const headerRetry = res.headers.get('Retry-After');
+              if (headerRetry) retryAfter = parseInt(headerRetry, 10) || retryAfter;
               if (typeof msg !== 'string') msg = JSON.stringify(msg);
-              return { ok: false, message: msg, status: res.status };
+              return { ok: false, message: msg, status: res.status, retryAfter };
             }
             try {
               return { ok: true, data: JSON.parse(text || '{}') };
@@ -170,6 +217,13 @@ export function initLucky() {
 
       results.forEach((result, idx) => {
         if (!result.ok) {
+          // Handle rate limiting with toast + cooldown
+          if (result.status === 429) {
+            const retryAfter = (result as any).retryAfter || 2;
+            showToast(`Slow down! Try again in ${retryAfter}s`, 'warning', 2500);
+            handleRateLimitCooldown(retryAfter);
+            return;
+          }
           _out.innerHTML += `<div class="text-red-400">Error ${result.status}: ${result.message}</div>`;
           return;
         }

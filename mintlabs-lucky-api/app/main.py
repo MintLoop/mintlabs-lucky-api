@@ -126,6 +126,36 @@ async def generic_exception_handler(request: Request, exc: Exception):
     )
 
 
+# ---------------------------------------------------------------------------
+# Simple analytics counters (in-memory, resets on restart)
+# For production, replace with proper metrics (Prometheus, StatsD, etc.)
+# ---------------------------------------------------------------------------
+_analytics_lock = Lock()
+_analytics: dict[str, dict[str, int]] = {
+    "by_game": {},   # game_code -> count
+    "by_mode": {},   # mode -> count
+    "total": 0,
+}
+
+
+def _record_generation(game_code: str, mode: str) -> None:
+    """Record a generation for analytics. Thread-safe."""
+    with _analytics_lock:
+        _analytics["by_game"][game_code] = _analytics["by_game"].get(game_code, 0) + 1
+        _analytics["by_mode"][mode] = _analytics["by_mode"].get(mode, 0) + 1
+        _analytics["total"] += 1
+
+
+def _get_analytics_summary() -> dict:
+    """Return current analytics snapshot."""
+    with _analytics_lock:
+        return {
+            "by_game": dict(_analytics["by_game"]),
+            "by_mode": dict(_analytics["by_mode"]),
+            "total": _analytics["total"],
+        }
+
+
 # Simple in-process cache for infrequently changing game metadata
 _games_cache_lock = Lock()
 _games_cache: dict[str, object] = {
@@ -216,6 +246,12 @@ def health():
     return {"ok": True}
 
 
+@app.get("/stats")
+def stats():
+    """Return generation analytics (in-memory, resets on restart)."""
+    return _get_analytics_summary()
+
+
 @app.get("/games")
 def games():
     return _get_games_cached()
@@ -298,7 +334,10 @@ def generate(req: GenerateReq, request: Request):
                 (session_id, req.game_code, req.mode, whites, bonus, nhash, commit, latency),
                 prepare=False,
             )
-            print(f"[GEN] {request_id} game={req.game_code} mode={req.mode}")
+
+        # Record analytics (in-memory counters)
+        _record_generation(req.game_code, req.mode)
+        print(f"[GEN] {request_id} game={req.game_code} mode={req.mode} latency={latency}ms")
 
         # Calculate probabilities for the generated set
         try:

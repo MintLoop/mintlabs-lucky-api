@@ -11,6 +11,41 @@ var out = null;
 var gameSel = null;
 var factsEl = null;
 var games = [];
+var submitBtn = null;
+var isRateLimited = false;
+function showToast(message, type = "warning", durationMs = 3e3) {
+  let toast = document.getElementById("lucky-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "lucky-toast";
+    toast.className = "toast";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.className = `toast toast-${type} show`;
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, durationMs);
+}
+function handleRateLimitCooldown(retryAfterSec) {
+  if (isRateLimited || !submitBtn) return;
+  isRateLimited = true;
+  const originalText = submitBtn.textContent || "Generate Numbers";
+  submitBtn.disabled = true;
+  submitBtn.textContent = `Wait ${retryAfterSec}s...`;
+  let remaining = retryAfterSec;
+  const interval = setInterval(() => {
+    remaining--;
+    if (remaining > 0) {
+      submitBtn.textContent = `Wait ${remaining}s...`;
+    } else {
+      clearInterval(interval);
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+      isRateLimited = false;
+    }
+  }, 1e3);
+}
 function readInitialGames() {
   const el = document.getElementById("initial-games");
   if (!el || !(el instanceof HTMLScriptElement)) return [];
@@ -41,6 +76,7 @@ function initLucky() {
   out = document.getElementById("results");
   gameSel = document.querySelector('select[name="game"]');
   factsEl = document.getElementById("facts");
+  submitBtn = document.getElementById("generateBtn") || document.querySelector('button[type="submit"]');
   if (!form || !out || !gameSel) return;
   const _form = form;
   const _out = out;
@@ -121,13 +157,17 @@ function initLucky() {
           const text = await res.text();
           if (!res.ok) {
             let msg = text || res.statusText || "Unknown error";
+            let retryAfter = 2;
             try {
               const json = JSON.parse(text || "{}");
               msg = json?.detail || json?.message || msg;
+              if (json?.retry_after) retryAfter = parseInt(json.retry_after, 10) || 2;
             } catch {
             }
+            const headerRetry = res.headers.get("Retry-After");
+            if (headerRetry) retryAfter = parseInt(headerRetry, 10) || retryAfter;
             if (typeof msg !== "string") msg = JSON.stringify(msg);
-            return { ok: false, message: msg, status: res.status };
+            return { ok: false, message: msg, status: res.status, retryAfter };
           }
           try {
             return { ok: true, data: JSON.parse(text || "{}") };
@@ -139,6 +179,12 @@ function initLucky() {
       const results = await Promise.all(requests);
       results.forEach((result, idx) => {
         if (!result.ok) {
+          if (result.status === 429) {
+            const retryAfter = result.retryAfter || 2;
+            showToast(`Slow down! Try again in ${retryAfter}s`, "warning", 2500);
+            handleRateLimitCooldown(retryAfter);
+            return;
+          }
           _out.innerHTML += `<div class="text-red-400">Error ${result.status}: ${result.message}</div>`;
           return;
         }
