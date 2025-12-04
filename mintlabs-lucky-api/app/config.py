@@ -12,12 +12,27 @@ class Settings(BaseSettings):
     HMAC_SECRET: str = "dev-secret"
 
     ALLOWED_ORIGINS: list[str] = Field(
-        default_factory=lambda: ["http://localhost:4321", "http://localhost:4322"],
+        default_factory=lambda: [
+            "http://localhost:4321",
+            "http://localhost:4322",
+            "https://lucky.mintloop.dev",
+            "https://www.lucky.mintloop.dev",
+        ],
     )
-    # ALLOWED_ORIGINS: List[str] = Field(default_factory=lambda: ["https://lucky.mintloop.dev"])
 
-    ALLOWED_HOSTS: list[str] = Field(default_factory=lambda: ["localhost", "127.0.0.1"])
-    RATE_LIMIT_PER_MINUTE: int = 60
+    ALLOWED_HOSTS: list[str] = Field(
+        default_factory=lambda: [
+            "localhost",
+            "127.0.0.1",
+            "lucky.mintloop.dev",
+            "www.lucky.mintloop.dev",
+        ]
+    )
+    RATE_LIMIT_PER_MINUTE: int = 120
+    RATE_LIMIT_BURST: int = 20
+    RATE_LIMIT_EXEMPT_PATHS: list[str] = Field(
+        default_factory=lambda: ["/", "/health", "/games"]
+    )
     ENFORCE_HTTPS: bool = False
     TRUST_PROXY: bool = False
 

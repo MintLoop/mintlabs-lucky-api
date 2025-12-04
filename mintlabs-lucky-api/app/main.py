@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
-from starlette.responses import Response
+from starlette.responses import JSONResponse, Response
 
 from .config import settings
 from .db import get_conn
@@ -55,11 +55,13 @@ if settings.ENFORCE_HTTPS:
 # Trusted hosts
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS)
 
-# Rate limit
+# Rate limit (token bucket with burst support)
 app.add_middleware(
     SimpleRateLimitMiddleware,
     max_per_minute=settings.RATE_LIMIT_PER_MINUTE,
+    burst=settings.RATE_LIMIT_BURST,
     trust_proxy=settings.TRUST_PROXY,
+    exempt_paths=settings.RATE_LIMIT_EXEMPT_PATHS,
 )
 
 # CORS (avoid "*" when credentials are allowed)
@@ -70,6 +72,59 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+
+# ---------------------------------------------------------------------------
+# Request tracing & logging middleware
+# ---------------------------------------------------------------------------
+@app.middleware("http")
+async def add_request_tracing(request: Request, call_next):
+    """Add request ID to all requests for tracing and log timing."""
+    request_id = request.headers.get("X-Request-ID") or new_request_id()
+    request.state.request_id = request_id
+    start = time.time()
+
+    response = await call_next(request)
+
+    duration_ms = int((time.time() - start) * 1000)
+    response.headers["X-Request-ID"] = request_id
+
+    # Structured log line for observability
+    print(f"[{request_id}] {request.method} {request.url.path} →"
+          f"{response.status_code} ({duration_ms}ms)")
+
+    return response
+
+
+# ---------------------------------------------------------------------------
+# Global exception handlers
+# ---------------------------------------------------------------------------
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Return consistent JSON for HTTP exceptions with request ID."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": exc.detail,
+            "request_id": getattr(request.state, "request_id", None),
+        },
+    )
+
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    """Catch-all handler: log full error, return safe message to client."""
+    import traceback
+
+    traceback.print_exc()
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "internal_error",
+            "request_id": getattr(request.state, "request_id", None),
+        },
+    )
+
 
 # Simple in-process cache for infrequently changing game metadata
 _games_cache_lock = Lock()
@@ -95,7 +150,8 @@ def _load_games_from_db() -> list[dict[str, object]]:
                 bonus_count
             from games
             order by name
-            """
+            """,
+            prepare=False,
         ).fetchall()
     return [
         {
@@ -240,8 +296,9 @@ def generate(req: GenerateReq, request: Request):
                 values (%s,%s,%s,%s,%s,%s,%s,%s)
                 """,
                 (session_id, req.game_code, req.mode, whites, bonus, nhash, commit, latency),
+                prepare=False,
             )
-            print(f"Inserted generation: {request_id} for game {req.game_code}")  # debug log
+            print(f"[GEN] {request_id} game={req.game_code} mode={req.mode}")
 
         # Calculate probabilities for the generated set
         try:

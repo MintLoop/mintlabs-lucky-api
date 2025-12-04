@@ -21,6 +21,7 @@ def list_draws(game_code: str, days: int = Query(30, ge=1, le=365)):
             limit 365
         """,
             (game_code, since),
+            prepare=False,
         ).fetchall()
     return [dict(r) for r in rows]
 
@@ -44,5 +45,6 @@ def draw_stats(game_code: str, days: int = Query(30, ge=1, le=365)):
             order by kind, c desc, n asc
         """,
             (game_code, since),
+            prepare=False,
         ).fetchall()
     return [dict(r) for r in freq]
