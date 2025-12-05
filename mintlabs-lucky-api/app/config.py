@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     RATE_LIMIT_EXEMPT_PATHS: list[str] = Field(
         default_factory=lambda: ["/", "/health", "/games"]
     )
+    # Admin paths get stricter rate limiting (10/min, burst 3)
+    RATE_LIMIT_ADMIN_PATHS: list[str] = Field(
+        default_factory=lambda: ["/stats"]
+    )
+    RATE_LIMIT_ADMIN_PER_MINUTE: int = 10
+    RATE_LIMIT_ADMIN_BURST: int = 3
     ENFORCE_HTTPS: bool = False
     TRUST_PROXY: bool = False
 
@@ -41,6 +47,9 @@ class Settings(BaseSettings):
     DB_MAX_CONNECTIONS: int = 5
     DB_POOL_TIMEOUT: float = 30.0
     GAMES_CACHE_SECONDS: int = 60
+
+    # Admin token for /stats endpoint (empty = open access in dev)
+    ADMIN_TOKEN: str = ""
 
 
 settings = Settings()

@@ -268,11 +268,198 @@ git push origin --delete feature/<short-name>  # optional
 
 ---
 
-## 6. Recovery / Reset
+## 6. Log Format (Frozen)
+
+The backend uses structured log lines with consistent prefixes for observability.
+
+### 6.1 Request logs
+
+All HTTP requests are logged:
+
+```
+[REQ] {request_id} {method} {path} {status} {latency}ms
+```
+
+Example:
+```
+[REQ] abc123 GET /games 200 12ms
+[REQ] def456 POST /generate 200 45ms
+```
+
+### 6.2 Generation logs
+
+Successful number generations include game/mode detail:
+
+```
+[GEN] {request_id} game={game_code} mode={mode} latency={latency}ms
+```
+
+Example:
+```
+[GEN] def456 game=powerball mode=random latency=42ms
+```
+
+### 6.3 Error logs
+
+Client errors (4xx) and server errors (5xx):
+
+```
+[ERR] {request_id} {status} {error_type}: {message}
+```
+
+Examples:
+```
+[ERR] ghi789 404 HTTPException: unknown game_code
+[ERR] jkl012 400 HTTPException: invalid_config: target_sum 10 not achievable
+[ERR] mno345 500 ValueError: unexpected error during generation
+```
+
+### 6.4 Searching logs
+
+On Vercel or local:
+```bash
+# Find all errors
+grep "\\[ERR\\]" logs.txt
+
+# Find slow requests (>100ms)
+grep -E "\\[REQ\\].*[0-9]{3,}ms" logs.txt
+
+# Trace a specific request
+grep "abc123" logs.txt
+```
+
+---
+
+## 6.5 Error Response Shape (Frozen)
+
+All API error responses use a consistent JSON shape:
+
+```json
+{
+  "error": "<type>:<code>",
+  "request_id": "<trace_id>",
+  "status": <http_status>
+}
+```
+
+### Error types and codes
+
+| Type | Example Code | Meaning |
+|------|-------------|---------|
+| `client_error` | `rate_limited` | Rate limit exceeded (429) |
+| `client_error` | `invalid_config` | Bad request params (400) |
+| `client_error` | `not_found` | Resource not found (404) |
+| `server_error` | `internal` | Unhandled exception (500) |
+
+### Examples
+
+```json
+// 429 Rate limit
+{"error": "client_error:rate_limited", "status": 429, "retry_after": 5}
+
+// 400 Bad request
+{"error": "client_error:400", "request_id": "abc123", "status": 400}
+
+// 404 Not found
+{"error": "client_error:404", "request_id": "def456", "status": 404}
+
+// 500 Internal error
+{"error": "server_error:internal", "request_id": "ghi789", "status": 500}
+```
+
+### Frontend handling
+
+The frontend should:
+1. Check `error` field for the type prefix (`client_error:` vs `server_error:`)
+2. Use `retry_after` on 429s to implement backoff
+3. Display user-friendly messages, never raw error text
+
+---
+
+## 6.6 Security Headers
+
+The API adds security headers to all responses:
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `X-Content-Type-Options` | `nosniff` | Prevent MIME sniffing |
+| `X-Frame-Options` | `DENY` | Prevent clickjacking |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Limit referrer info |
+| `Permissions-Policy` | `camera=(), microphone=()...` | Disable unused browser features |
+| `Content-Security-Policy` | `default-src 'none'...` | Defense in depth |
+| `Strict-Transport-Security` | `max-age=31536000...` | HTTPS only (production) |
+
+These are automatically applied via middleware; no configuration needed.
+
+---
+
+## 6.7 Rate Limiting
+
+Token bucket rate limiting protects the API:
+
+| Path Type | Requests/min | Burst |
+|-----------|-------------|-------|
+| Normal endpoints | 120 | 20 |
+| Admin endpoints (`/stats`) | 10 | 3 |
+| Exempt (`/health`, `/readyz`, `/`) | Unlimited | - |
+
+Rate limit responses include `Retry-After` header.
+
+---
+
+## 6.8 Admin Endpoint Security
+
+Admin endpoints (like `/stats`) follow these rules:
+
+1. **Return 404, not 401** - Prevents endpoint discovery
+2. **Stricter rate limits** - 10 req/min vs 120 for normal endpoints
+3. **Token authentication** - Requires `ADMIN_TOKEN` env var
+
+To use admin endpoints locally:
+```bash
+export ADMIN_TOKEN=your-secret-token
+curl -H "Authorization: Bearer $ADMIN_TOKEN" http://localhost:8000/stats
+```
+
+---
+
+## 6.9 Database Usage Guardrails
+
+When modifying `app/db.py` or database queries:
+
+1. **Always use `prepare=False`** - psycopg3 prepared statements conflict across pooled connections
+2. **Use context managers** - Always `with get_conn() as conn:` to ensure cleanup
+3. **Keep queries simple** - This is a read-mostly API; avoid complex transactions
+4. **Test with mocked DB** - `tests/conftest.py` provides `_DummyConn` fixture
+
+Example safe query pattern:
+```python
+with get_conn() as conn:
+    result = conn.execute(
+        "SELECT * FROM games WHERE code = %s",
+        (game_code,),
+        prepare=False,  # Critical!
+    ).fetchone()
+```
+
+---
+
+## 6.10 Supabase Key Safety
+
+| Key Type | Safe for Browser? | Use Case |
+|----------|-------------------|----------|
+| `anon` key | ✅ Yes | Public API calls with RLS |
+| `service_role` key | ❌ Never | Server-side only, bypasses RLS |
+
+**Never expose `service_role` key in frontend code or environment variables prefixed with `PUBLIC_`.**
+
+---
+
+## 7. Recovery / Reset
 
 If your environment gets weird.
 
-### 6.1 Reset local Git state
+### 7.1 Reset local Git state
 
 Return to a clean `main`:
 
@@ -286,7 +473,7 @@ git clean -fd
 
 This discards uncommitted changes in your working tree.
 
-### 6.2 Rebuild backend environment
+### 7.2 Rebuild backend environment
 
 ```bash
 cd mintlabs-lucky-api
@@ -297,7 +484,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 6.3 Rebuild frontend environment
+### 7.3 Rebuild frontend environment
 
 ```bash
 cd mintlabs-lucky-frontend
@@ -322,11 +509,11 @@ npm run test:e2e
 
 ---
 
-## 7. Deployment (Overview)
+## 8. Deployment (Overview)
 
 Deployment is handled via GitHub Actions and Vercel (plus Supabase/Postgres for data).
 
-### 7.1 CI Workflow (high-level)
+### 8.1 CI Workflow (high-level)
 
 When pushing to GitHub:
 
@@ -340,7 +527,7 @@ When pushing to GitHub:
   - Deploy frontend to Vercel (staging or production)
   - Optionally trigger backend deploy (if configured)
 
-### 7.2 Required GitHub secrets (typical)
+### 8.2 Required GitHub secrets (typical)
 
 In the repo’s GitHub settings → Secrets & variables → Actions, expect values like:
 
@@ -351,7 +538,7 @@ In the repo’s GitHub settings → Secrets & variables → Actions, expect valu
 
 Do not commit any of these to the repo.
 
-### 7.3 Deployment flow
+### 8.3 Deployment flow
 
 1. Ensure `main` is green locally (`ruff`, `pytest`, `npm run test:e2e`).
 2. Merge PR into `main`.
