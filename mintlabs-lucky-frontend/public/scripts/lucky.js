@@ -210,6 +210,8 @@ function initLucky() {
         }
         const singleOddsDisplay = d.odds || (d.combined_odds ? `1 in ${Number(d.combined_odds).toLocaleString()}` : d.main_odds ? `1 in ${Number(d.main_odds).toLocaleString()}` : "\u2014");
         const singlePct = Number(d.probability_percent || 0).toFixed(6);
+        const gameCode = game || d.game || "";
+        const oddsLinkHref = `/lottery-odds${gameCode ? `?game=${encodeURIComponent(gameCode)}` : ""}`;
         let combinedSetsHtml = "";
         if (d.combined_sets_odds) {
           const combinedOddsNum = Number(d.combined_sets_odds);
@@ -221,7 +223,10 @@ function initLucky() {
             <div class="result-card">
               <div class="text-sm" style="color: var(--text-secondary)">Set ${idx + 1} \u2022 ${modeDisplay}</div>
               <div class="text-xl mt-1" style="color: var(--text-primary)">Numbers: <b>${numbersHtml}</b>${d.bonus ? ` | Bonus: <b>${bonusHtml}</b>` : ""}</div>
-              <div class="text-xs mt-2" style="color: var(--text-muted)">Single draw: <span class="font-semibold odds-number">${singleOddsDisplay}</span> (${singlePct}% chance)</div>
+              <div class="text-xs mt-2" style="color: var(--text-muted)">
+                Odds: <span class="font-semibold odds-number">${singleOddsDisplay}</span> (${singlePct}% chance)
+              </div>
+              <a href="${oddsLinkHref}" class="odds-link">View full odds &amp; math \u2192</a>
               ${combinedSetsHtml}
               ${lastInfoHtml}
             </div>`;

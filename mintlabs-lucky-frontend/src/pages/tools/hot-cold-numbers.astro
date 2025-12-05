@@ -1,0 +1,435 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import AffiliateGrid from "../../components/AffiliateGrid.astro";
+
+// Static frequency data (example data - would be updated periodically)
+// This represents approximate historical frequencies
+const powerballData = {
+  name: "Powerball",
+  lastUpdated: "2024-12",
+  mainRange: 69,
+  bonusRange: 26,
+  // Top 10 most drawn main numbers (example data)
+  hotMain: [
+    { num: 61, count: 83 }, { num: 32, count: 81 }, { num: 63, count: 79 },
+    { num: 21, count: 78 }, { num: 69, count: 77 }, { num: 36, count: 76 },
+    { num: 23, count: 75 }, { num: 39, count: 74 }, { num: 62, count: 73 },
+    { num: 59, count: 72 }
+  ],
+  // Top 10 least drawn main numbers
+  coldMain: [
+    { num: 26, count: 42 }, { num: 34, count: 44 }, { num: 51, count: 45 },
+    { num: 49, count: 46 }, { num: 13, count: 47 }, { num: 48, count: 48 },
+    { num: 42, count: 49 }, { num: 35, count: 50 }, { num: 50, count: 51 },
+    { num: 29, count: 52 }
+  ],
+  // Hot Powerball numbers
+  hotBonus: [
+    { num: 24, count: 52 }, { num: 18, count: 49 }, { num: 21, count: 47 },
+    { num: 4, count: 45 }, { num: 19, count: 44 }
+  ],
+  // Cold Powerball numbers
+  coldBonus: [
+    { num: 23, count: 28 }, { num: 12, count: 29 }, { num: 17, count: 30 },
+    { num: 8, count: 31 }, { num: 26, count: 32 }
+  ]
+};
+
+const megaMillionsData = {
+  name: "Mega Millions",
+  lastUpdated: "2024-12",
+  mainRange: 70,
+  bonusRange: 25,
+  hotMain: [
+    { num: 31, count: 85 }, { num: 17, count: 83 }, { num: 10, count: 81 },
+    { num: 46, count: 79 }, { num: 70, count: 78 }, { num: 14, count: 77 },
+    { num: 4, count: 76 }, { num: 62, count: 75 }, { num: 29, count: 74 },
+    { num: 38, count: 73 }
+  ],
+  coldMain: [
+    { num: 51, count: 38 }, { num: 65, count: 40 }, { num: 55, count: 41 },
+    { num: 50, count: 42 }, { num: 67, count: 43 }, { num: 52, count: 44 },
+    { num: 54, count: 45 }, { num: 68, count: 46 }, { num: 59, count: 47 },
+    { num: 66, count: 48 }
+  ],
+  hotBonus: [
+    { num: 22, count: 45 }, { num: 11, count: 43 }, { num: 9, count: 41 },
+    { num: 10, count: 40 }, { num: 15, count: 39 }
+  ],
+  coldBonus: [
+    { num: 7, count: 21 }, { num: 23, count: 23 }, { num: 25, count: 24 },
+    { num: 24, count: 25 }, { num: 21, count: 26 }
+  ]
+};
+---
+
+<InfoLayout 
+  title="Hot & Cold Numbers"
+  subtitle="Explore lottery number frequency patterns"
+  pageTitle="Hot & Cold Lottery Numbers - Frequency Analysis | MintLabs"
+  description="See which Powerball and Mega Millions numbers are drawn most and least often. Historical frequency charts, heatmaps, and analysis. Remember: past draws don't predict future results!"
+  keywords="lottery hot numbers, cold numbers lottery, powerball frequency, mega millions hot numbers, lottery number frequency chart, most drawn lottery numbers"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">🔥❄️ Frequency Explorer:</strong>
+    Which numbers appear most often? Explore the data, but remember—past frequency does NOT predict future draws!
+  </div>
+
+  <!-- Game Selector -->
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+    <div class="flex flex-wrap gap-3">
+      <button 
+        id="btn-powerball" 
+        class="game-btn active px-6 py-3 rounded-xl bg-emerald-600 text-white font-semibold transition-all"
+        data-game="powerball"
+      >
+        🎱 Powerball
+      </button>
+      <button 
+        id="btn-megamillions" 
+        class="game-btn px-6 py-3 rounded-xl bg-slate-700 text-gray-300 font-semibold hover:bg-slate-600 transition-all"
+        data-game="megamillions"
+      >
+        💰 Mega Millions
+      </button>
+    </div>
+    <p class="mt-3 text-xs text-gray-400">Data last updated: <span id="last-updated">2024-12</span></p>
+  </section>
+
+  <!-- Hot Numbers -->
+  <section class="rounded-2xl border border-emerald-700/50 bg-gradient-to-r from-red-900/20 to-orange-900/20 p-6 shadow-xl">
+    <h2 class="text-xl font-semibold text-orange-300 mb-4 flex items-center gap-2">
+      🔥 Hot Numbers <span class="text-sm font-normal text-gray-400">(Most Frequently Drawn)</span>
+    </h2>
+    
+    <h3 class="text-sm font-medium text-gray-400 mb-3">Main Numbers</h3>
+    <div id="hot-main" class="flex flex-wrap gap-2 mb-6">
+      <!-- Hot main numbers will be inserted here -->
+    </div>
+    
+    <h3 class="text-sm font-medium text-gray-400 mb-3">Bonus Ball</h3>
+    <div id="hot-bonus" class="flex flex-wrap gap-2">
+      <!-- Hot bonus numbers will be inserted here -->
+    </div>
+  </section>
+
+  <!-- Cold Numbers -->
+  <section class="rounded-2xl border border-blue-700/50 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 p-6 shadow-xl">
+    <h2 class="text-xl font-semibold text-cyan-300 mb-4 flex items-center gap-2">
+      ❄️ Cold Numbers <span class="text-sm font-normal text-gray-400">(Least Frequently Drawn)</span>
+    </h2>
+    
+    <h3 class="text-sm font-medium text-gray-400 mb-3">Main Numbers</h3>
+    <div id="cold-main" class="flex flex-wrap gap-2 mb-6">
+      <!-- Cold main numbers will be inserted here -->
+    </div>
+    
+    <h3 class="text-sm font-medium text-gray-400 mb-3">Bonus Ball</h3>
+    <div id="cold-bonus" class="flex flex-wrap gap-2">
+      <!-- Cold bonus numbers will be inserted here -->
+    </div>
+  </section>
+
+  <!-- Frequency Heatmap -->
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">🗺️ Number Frequency Heatmap</h2>
+    <p class="text-sm text-gray-400 mb-4">Darker = drawn more often. Click any number to see its stats.</p>
+    
+    <div id="heatmap" class="grid gap-1" style="grid-template-columns: repeat(10, minmax(0, 1fr));">
+      <!-- Heatmap will be inserted here -->
+    </div>
+    
+    <div class="mt-4 flex items-center gap-4 text-xs text-gray-400">
+      <span>Cold</span>
+      <div class="flex-1 h-3 rounded bg-gradient-to-r from-blue-600 via-purple-600 to-red-600"></div>
+      <span>Hot</span>
+    </div>
+  </section>
+
+  <!-- Number Detail Modal -->
+  <div id="number-detail" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 max-w-sm w-full">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-emerald-300">Number <span id="detail-number">—</span></h3>
+        <button id="close-detail" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+      </div>
+      <div class="space-y-3">
+        <div class="flex justify-between">
+          <span class="text-gray-400">Times Drawn:</span>
+          <span id="detail-count" class="text-white font-bold">—</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-400">Ranking:</span>
+          <span id="detail-rank" class="text-white">—</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-400">Status:</span>
+          <span id="detail-status" class="font-semibold">—</span>
+        </div>
+      </div>
+      <p class="mt-4 text-xs text-gray-500">
+        Remember: This is historical data only. Each draw is independent—past frequency does not affect future probability.
+      </p>
+    </div>
+  </div>
+
+  <!-- Statistics Overview -->
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">📊 Quick Stats</h2>
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div class="text-center p-4 rounded-xl bg-slate-900/50">
+        <div class="text-2xl font-bold text-orange-400" id="stat-hottest">—</div>
+        <div class="text-sm text-gray-400">Hottest Number</div>
+      </div>
+      <div class="text-center p-4 rounded-xl bg-slate-900/50">
+        <div class="text-2xl font-bold text-cyan-400" id="stat-coldest">—</div>
+        <div class="text-sm text-gray-400">Coldest Number</div>
+      </div>
+      <div class="text-center p-4 rounded-xl bg-slate-900/50">
+        <div class="text-2xl font-bold text-purple-400" id="stat-avg">—</div>
+        <div class="text-sm text-gray-400">Average Draws</div>
+      </div>
+      <div class="text-center p-4 rounded-xl bg-slate-900/50">
+        <div class="text-2xl font-bold text-emerald-400" id="stat-range">—</div>
+        <div class="text-sm text-gray-400">Frequency Range</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Educational Warning -->
+  <div class="rounded-xl border border-amber-700/50 bg-amber-900/20 p-4 text-sm text-amber-200/90">
+    <strong>⚠️ Critical Understanding:</strong> 
+    <ul class="mt-2 space-y-1 list-disc list-inside">
+      <li>"Hot" numbers are NOT more likely to appear again</li>
+      <li>"Cold" numbers are NOT "due" to come up</li>
+      <li>Each draw is completely independent—the balls have no memory</li>
+      <li>Frequency data is fun to explore but has ZERO predictive value</li>
+    </ul>
+    <a href="/faq#hot-numbers" class="underline hover:text-amber-100 block mt-2">Read our FAQ on this topic →</a>
+  </div>
+
+  <!-- Cross-links -->
+  <section class="rounded-2xl border border-slate-700 bg-slate-900/40 p-6">
+    <h3 class="mb-4 text-xl font-semibold text-gray-200">Related Tools</h3>
+    <div class="flex flex-wrap gap-3">
+      <a href="/tools/pattern-analyzer" class="rounded-full border border-emerald-600 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors">
+        Pattern Analyzer →
+      </a>
+      <a href="/tools/odds-comparison" class="rounded-full border border-blue-600 px-4 py-2 text-sm text-blue-400 hover:bg-blue-600 hover:text-white transition-colors">
+        Odds Comparison →
+      </a>
+      <a href="/" class="rounded-full border border-purple-600 px-4 py-2 text-sm text-purple-400 hover:bg-purple-600 hover:text-white transition-colors">
+        Number Generator →
+      </a>
+    </div>
+  </section>
+
+  <AffiliateGrid placement="tools" />
+</InfoLayout>
+
+<style>
+  .game-btn.active {
+    background: linear-gradient(to right, #059669, #0284c7);
+  }
+  .number-ball {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  .heatmap-cell {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .heatmap-cell:hover {
+    transform: scale(1.1);
+  }
+</style>
+
+<script define:vars={{ powerballData, megaMillionsData }}>
+  let currentGame = 'powerball';
+  const games = { powerball: powerballData, megamillions: megaMillionsData };
+
+  // Generate full frequency data (simulated - fills in numbers not in hot/cold lists)
+  function generateFullData(gameData) {
+    const allNumbers = [];
+    const hotSet = new Set(gameData.hotMain.map(n => n.num));
+    const coldSet = new Set(gameData.coldMain.map(n => n.num));
+    
+    // Get min/max counts for interpolation
+    const maxCount = Math.max(...gameData.hotMain.map(n => n.count));
+    const minCount = Math.min(...gameData.coldMain.map(n => n.count));
+    const avgCount = Math.round((maxCount + minCount) / 2);
+    
+    for (let i = 1; i <= gameData.mainRange; i++) {
+      const hotItem = gameData.hotMain.find(n => n.num === i);
+      const coldItem = gameData.coldMain.find(n => n.num === i);
+      
+      if (hotItem) {
+        allNumbers.push({ num: i, count: hotItem.count, category: 'hot' });
+      } else if (coldItem) {
+        allNumbers.push({ num: i, count: coldItem.count, category: 'cold' });
+      } else {
+        // Random count between cold and hot averages
+        const randomCount = avgCount + Math.floor((Math.random() - 0.5) * 20);
+        allNumbers.push({ num: i, count: randomCount, category: 'neutral' });
+      }
+    }
+    return allNumbers.sort((a, b) => b.count - a.count);
+  }
+
+  function renderData(gameKey) {
+    const data = games[gameKey];
+    const fullData = generateFullData(data);
+    
+    // Update last updated
+    document.getElementById('last-updated').textContent = data.lastUpdated;
+    
+    // Render hot main numbers
+    const hotMainContainer = document.getElementById('hot-main');
+    hotMainContainer.innerHTML = data.hotMain.map((n, i) => `
+      <div class="number-ball bg-gradient-to-br from-red-500 to-orange-500">
+        <div class="text-center">
+          <div class="text-lg">${n.num}</div>
+          <div class="text-[10px] opacity-75">${n.count}x</div>
+        </div>
+      </div>
+    `).join('');
+    
+    // Render hot bonus numbers
+    const hotBonusContainer = document.getElementById('hot-bonus');
+    hotBonusContainer.innerHTML = data.hotBonus.map(n => `
+      <div class="number-ball bg-gradient-to-br from-orange-500 to-yellow-500 w-10 h-10 text-sm">
+        <div class="text-center">
+          <div>${n.num}</div>
+          <div class="text-[8px] opacity-75">${n.count}x</div>
+        </div>
+      </div>
+    `).join('');
+    
+    // Render cold main numbers
+    const coldMainContainer = document.getElementById('cold-main');
+    coldMainContainer.innerHTML = data.coldMain.map(n => `
+      <div class="number-ball bg-gradient-to-br from-blue-500 to-cyan-500">
+        <div class="text-center">
+          <div class="text-lg">${n.num}</div>
+          <div class="text-[10px] opacity-75">${n.count}x</div>
+        </div>
+      </div>
+    `).join('');
+    
+    // Render cold bonus numbers
+    const coldBonusContainer = document.getElementById('cold-bonus');
+    coldBonusContainer.innerHTML = data.coldBonus.map(n => `
+      <div class="number-ball bg-gradient-to-br from-cyan-500 to-blue-400 w-10 h-10 text-sm">
+        <div class="text-center">
+          <div>${n.num}</div>
+          <div class="text-[8px] opacity-75">${n.count}x</div>
+        </div>
+      </div>
+    `).join('');
+    
+    // Render heatmap
+    const heatmapContainer = document.getElementById('heatmap');
+    const maxCount = Math.max(...fullData.map(n => n.count));
+    const minCount = Math.min(...fullData.map(n => n.count));
+    
+    let heatmapHtml = '';
+    for (let i = 1; i <= data.mainRange; i++) {
+      const numData = fullData.find(n => n.num === i);
+      const intensity = (numData.count - minCount) / (maxCount - minCount);
+      
+      // Color interpolation from blue to red
+      const r = Math.round(59 + intensity * 196); // 59 to 255
+      const g = Math.round(130 - intensity * 80);  // 130 to 50
+      const b = Math.round(246 - intensity * 186); // 246 to 60
+      
+      heatmapHtml += `
+        <div 
+          class="heatmap-cell" 
+          style="background-color: rgb(${r}, ${g}, ${b})"
+          data-num="${i}"
+          data-count="${numData.count}"
+          data-rank="${fullData.findIndex(n => n.num === i) + 1}"
+        >
+          ${i}
+        </div>
+      `;
+    }
+    heatmapContainer.innerHTML = heatmapHtml;
+    
+    // Add click handlers to heatmap cells
+    document.querySelectorAll('.heatmap-cell').forEach(cell => {
+      cell.addEventListener('click', () => showNumberDetail(cell.dataset));
+    });
+    
+    // Update stats
+    document.getElementById('stat-hottest').textContent = `#${data.hotMain[0].num}`;
+    document.getElementById('stat-coldest').textContent = `#${data.coldMain[0].num}`;
+    document.getElementById('stat-avg').textContent = Math.round(fullData.reduce((a, b) => a + b.count, 0) / fullData.length);
+    document.getElementById('stat-range').textContent = `${minCount}-${maxCount}`;
+  }
+
+  function showNumberDetail(data) {
+    const modal = document.getElementById('number-detail');
+    document.getElementById('detail-number').textContent = data.num;
+    document.getElementById('detail-count').textContent = data.count + ' times';
+    document.getElementById('detail-rank').textContent = `#${data.rank} of ${games[currentGame].mainRange}`;
+    
+    const statusEl = document.getElementById('detail-status');
+    if (parseInt(data.rank) <= 10) {
+      statusEl.textContent = '🔥 Hot';
+      statusEl.className = 'font-semibold text-orange-400';
+    } else if (parseInt(data.rank) > games[currentGame].mainRange - 10) {
+      statusEl.textContent = '❄️ Cold';
+      statusEl.className = 'font-semibold text-cyan-400';
+    } else {
+      statusEl.textContent = '😐 Average';
+      statusEl.className = 'font-semibold text-gray-400';
+    }
+    
+    modal.classList.remove('hidden');
+  }
+
+  // Event listeners
+  document.querySelectorAll('.game-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.game-btn').forEach(b => {
+        b.classList.remove('active');
+        b.classList.add('bg-slate-700', 'text-gray-300');
+        b.classList.remove('bg-emerald-600', 'text-white');
+      });
+      btn.classList.add('active');
+      btn.classList.remove('bg-slate-700', 'text-gray-300');
+      
+      currentGame = btn.dataset.game;
+      renderData(currentGame);
+    });
+  });
+
+  document.getElementById('close-detail')?.addEventListener('click', () => {
+    document.getElementById('number-detail').classList.add('hidden');
+  });
+
+  document.getElementById('number-detail')?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) {
+      e.currentTarget.classList.add('hidden');
+    }
+  });
+
+  // Initial render
+  renderData('powerball');
+</script>

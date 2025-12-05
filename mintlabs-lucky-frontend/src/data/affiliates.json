@@ -35,8 +35,28 @@
     "desc": "Enjoy numbers? Apply them to your money. Track spending and plan smarter with this app.",
     "cta": "Start Free",
     "href": "https://example.com/aff/finance-app",
-    "placement": ["lottery-odds"],
+    "placement": ["lottery-odds", "tools"],
     "tags": ["finance", "budgeting"],
     "commission": "10-30%"
+  },
+  {
+    "id": "tax-software",
+    "title": "Tax Prep for Winnings",
+    "desc": "If you do win, you'll need good tax software. Simplified filing for any windfall.",
+    "cta": "Check It Out",
+    "href": "https://example.com/aff/tax",
+    "placement": ["tools"],
+    "tags": ["finance", "taxes"],
+    "commission": "15-25%"
+  },
+  {
+    "id": "financial-advisor",
+    "title": "Find a Financial Advisor",
+    "desc": "Major winnings need major planning. Connect with vetted advisors.",
+    "cta": "Get Matched",
+    "href": "https://example.com/aff/advisor",
+    "placement": ["tools"],
+    "tags": ["finance", "planning"],
+    "commission": "variable"
   }
 ]

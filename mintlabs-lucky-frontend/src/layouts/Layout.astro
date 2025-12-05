@@ -1,12 +1,93 @@
+---
+interface Props {
+	title?: string;
+	description?: string;
+	keywords?: string;
+	ogImage?: string;
+	ogType?: string;
+	canonicalUrl?: string;
+	noIndex?: boolean;
+	jsonLd?: object;
+}
+
+const { 
+	title = "MintLabs Lucky Numbers - Free Lottery Number Generator",
+	description = "Generate random lottery numbers for Powerball, Mega Millions, and more. Free, transparent, and educational lottery tools.",
+	keywords = "lottery number generator, powerball numbers, mega millions, random numbers, lottery odds, lottery calculator",
+	ogImage = "/og/default.png",
+	ogType = "website",
+	canonicalUrl,
+	noIndex = false,
+	jsonLd
+} = Astro.props;
+
+const siteUrl = "https://lucky.mintlabs.dev";
+const fullCanonical = canonicalUrl || Astro.url.href;
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/mintlab.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/clover.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/clover.png" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Lottery Math</title>
+		
+		<!-- Primary Meta Tags -->
+		<title>{title}</title>
+		<meta name="title" content={title} />
+		<meta name="description" content={description} />
+		<meta name="keywords" content={keywords} />
+		{noIndex && <meta name="robots" content="noindex, nofollow" />}
+		
+		<!-- Canonical URL -->
+		<link rel="canonical" href={fullCanonical} />
+		
+		<!-- Theme Color -->
+		<meta name="theme-color" content="#0f766e" />
+		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content={ogType} />
+		<meta property="og:url" content={fullCanonical} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={`${siteUrl}${ogImage}`} />
+		<meta property="og:site_name" content="MintLabs Lucky Numbers" />
+		
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={fullCanonical} />
+		<meta property="twitter:title" content={title} />
+		<meta property="twitter:description" content={description} />
+		<meta property="twitter:image" content={`${siteUrl}${ogImage}`} />
+		
+		<!-- JSON-LD Structured Data -->
+		{jsonLd && (
+			<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+		)}
+		
+		<!-- Default Organization Schema -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "Organization",
+				"name": "MintLabs",
+				"url": "https://lucky.mintlabs.dev",
+				"logo": "https://lucky.mintlabs.dev/mintlab.png",
+				"sameAs": []
+			}
+		</script>
+		
 		<link rel="stylesheet" href="/src/styles/global.css" />
+		
+		<!-- Apply saved theme before paint -->
+		<script is:inline>
+			document.documentElement.setAttribute(
+				'data-theme',
+				localStorage.getItem('selectedTheme') || 'green-dark'
+			);
+		</script>
 	</head>
 	<body class="min-h-screen theme-bg-primary theme-text-primary">
 		<slot />
@@ -21,18 +102,3 @@
 		height: 100%;
 	}
 </style>
-
-<script>
-	// Apply saved theme on page load for all pages
-	function loadSavedTheme() {
-		const savedTheme = localStorage.getItem('selectedTheme') || 'green-dark';
-		document.documentElement.setAttribute('data-theme', savedTheme);
-	}
-	
-	// Load theme when DOM is ready
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', loadSavedTheme);
-	} else {
-		loadSavedTheme();
-	}
-</script>

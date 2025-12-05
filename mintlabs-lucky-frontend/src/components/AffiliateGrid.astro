@@ -1,0 +1,38 @@
+---
+import AffiliateCard from "./AffiliateCard.astro";
+import affiliatesData from "../data/affiliates.json";
+
+interface Props {
+  placement: string;
+  maxItems?: number;
+}
+
+const { placement, maxItems = 3 } = Astro.props;
+
+// Filter affiliates by placement
+const affiliates = affiliatesData
+  .filter(a => a.placement.includes(placement))
+  .slice(0, maxItems);
+---
+
+{affiliates.length > 0 && (
+  <aside class="mt-8 rounded-2xl border border-slate-700 bg-gradient-to-r from-slate-900/80 to-slate-800/80 p-6">
+    <h3 class="mb-4 text-lg font-semibold text-gray-300 flex items-center gap-2">
+      <span class="text-emerald-400">📚</span> Related Resources
+    </h3>
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {affiliates.map(affiliate => (
+        <AffiliateCard
+          id={affiliate.id}
+          title={affiliate.title}
+          desc={affiliate.desc}
+          cta={affiliate.cta}
+          href={affiliate.href}
+        />
+      ))}
+    </div>
+    <p class="mt-4 text-xs text-gray-500">
+      Some links may be affiliate links. We may earn a commission at no extra cost to you.
+    </p>
+  </aside>
+)}

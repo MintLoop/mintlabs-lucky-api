@@ -262,6 +262,10 @@ export function initLucky() {
             : '—');
         const singlePct = Number(d.probability_percent || 0).toFixed(6);
 
+        // Build odds link to education page
+        const gameCode = game || d.game || '';
+        const oddsLinkHref = `/lottery-odds${gameCode ? `?game=${encodeURIComponent(gameCode)}` : ''}`;
+
         let combinedSetsHtml = '';
         if (d.combined_sets_odds) {
           const combinedOddsNum = Number(d.combined_sets_odds);
@@ -276,7 +280,10 @@ export function initLucky() {
             <div class="result-card">
               <div class="text-sm" style="color: var(--text-secondary)">Set ${idx + 1} • ${modeDisplay}</div>
               <div class="text-xl mt-1" style="color: var(--text-primary)">Numbers: <b>${numbersHtml}</b>${d.bonus ? ` | Bonus: <b>${bonusHtml}</b>` : ''}</div>
-              <div class="text-xs mt-2" style="color: var(--text-muted)">Single draw: <span class="font-semibold odds-number">${singleOddsDisplay}</span> (${singlePct}% chance)</div>
+              <div class="text-xs mt-2" style="color: var(--text-muted)">
+                Odds: <span class="font-semibold odds-number">${singleOddsDisplay}</span> (${singlePct}% chance)
+              </div>
+              <a href="${oddsLinkHref}" class="odds-link">View full odds &amp; math →</a>
               ${combinedSetsHtml}
               ${lastInfoHtml}
             </div>`;

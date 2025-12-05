@@ -1,0 +1,119 @@
+---
+import InfoLayout from "../components/InfoLayout.astro";
+
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
+const faqs: FAQ[] = [
+  {
+    question: "Why can't you predict winning lottery numbers?",
+    answer: "Lottery drawings use physical ball machines or certified random number generators that produce truly unpredictable results. Each draw is an independent event—previous numbers have zero influence on future outcomes. No pattern, system, or algorithm can predict what random chance will produce. Anyone claiming otherwise is either mistaken or trying to sell you something."
+  },
+  {
+    question: "What do the different generator modes mean?",
+    answer: "Our modes change how numbers are selected, not your odds of winning. 'Random' uses pure randomness. 'Balanced' spreads numbers across the range. 'Hot/Cold' favors frequently or rarely drawn numbers (for fun, not prediction). 'Birthday' uses date-based numbers. 'Sum Target' hits a specific total. All modes produce equally valid tickets—they just organize your picks differently."
+  },
+  {
+    question: "Is a 'balanced' ticket better than random?",
+    answer: "No. Every combination has exactly the same probability of winning. 1-2-3-4-5 is just as likely as 7-19-33-45-62. 'Balanced' tickets may feel more satisfying or help you remember your numbers, but they don't improve your odds. The lottery doesn't care if your numbers are spread out or clustered."
+  },
+  {
+    question: "Why do odds differ between games?",
+    answer: "Odds depend on how many numbers you pick and from what range. Powerball (5 from 69, plus 1 from 26) has odds of 1 in 292 million. Mega Millions (5 from 70, plus 1 from 25) is 1 in 302 million. State games with smaller pools have better odds—CA SuperLotto is 'only' 1 in 41 million. Smaller games usually mean smaller jackpots too."
+  },
+  {
+    question: "Is playing the lottery a good financial decision?",
+    answer: "Mathematically, no. Lotteries return about 50 cents for every dollar played—worse than almost any other form of entertainment or investment. If you play, treat it as entertainment with a strict budget, not as a financial strategy. The expected value of a lottery ticket is always negative. We believe in being honest about this."
+  },
+  {
+    question: "Do 'hot' numbers have a better chance of being drawn?",
+    answer: "No. Past frequency doesn't predict future results. If a ball has come up more often recently, that's just normal statistical variance—it doesn't mean it's 'due' to cool off, or that it's on a streak that will continue. Each draw resets completely. Hot/cold analysis is fun for exploration but has no predictive value."
+  },
+  {
+    question: "Should I use Quick Pick or choose my own numbers?",
+    answer: "It makes no mathematical difference. Quick Picks win more jackpots because more people use them (about 70-80% of tickets). Your personally chosen numbers have identical odds to any Quick Pick. Choose whichever feels more fun to you."
+  },
+  {
+    question: "How does this generator actually work?",
+    answer: "We use cryptographically secure random number generation (the same type used for security applications). Numbers are selected uniformly from the valid range for each game, with no repetition. When you choose a mode like 'balanced' or 'sum target,' we apply filters after generation—but the underlying randomness is always the same quality."
+  },
+  {
+    question: "Is my data private?",
+    answer: "Yes. We don't store your generated numbers or any personal information. Everything runs in your browser or on our servers without logging your picks. We don't sell data, and we don't track what numbers you generate. See our Privacy Policy for full details."
+  },
+  {
+    question: "Why do you show the actual odds? Isn't that discouraging?",
+    answer: "We believe in honesty. Understanding the real odds helps you make informed decisions about how much to spend and what to expect. Many lottery sites hide or minimize this information. We think you deserve the truth—and you can still have fun playing while knowing the math."
+  }
+];
+
+// FAQ Page JSON-LD for rich search results
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer
+    }
+  }))
+};
+---
+
+<InfoLayout 
+  title="Frequently Asked Questions" 
+  subtitle="Honest answers about lottery numbers, odds, and how our generator works."
+  pageTitle="Lottery FAQ - Common Questions About Lottery Numbers & Odds"
+  description="Get honest answers about lottery number generators, odds, hot/cold numbers, Quick Pick vs manual selection, and responsible play. No hype, just facts."
+  keywords="lottery FAQ, lottery questions, how lottery works, lottery odds explained, quick pick vs manual, lottery prediction myths"
+  jsonLd={faqJsonLd}
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">Our promise:</strong>
+    Clear, honest information. No hype, no false claims, no predictions.
+  </div>
+
+  <section class="space-y-4">
+    {faqs.map((faq, index) => (
+      <details class="group rounded-2xl border border-slate-700 bg-slate-800 shadow-xl">
+        <summary class="flex cursor-pointer items-center justify-between p-6 text-lg font-semibold text-gray-200 hover:text-emerald-300 transition-colors">
+          <span>{faq.question}</span>
+          <span class="ml-4 flex-shrink-0 text-emerald-400 group-open:rotate-180 transition-transform">
+            ▼
+          </span>
+        </summary>
+        <div class="px-6 pb-6 text-gray-300 leading-relaxed">
+          {faq.answer}
+        </div>
+      </details>
+    ))}
+  </section>
+
+  {/* Cross-links */}
+  <section class="rounded-2xl border border-slate-700 bg-slate-900/40 p-6 mt-8">
+    <h3 class="mb-4 text-xl font-semibold text-gray-200">Explore more</h3>
+    <div class="flex flex-wrap gap-3">
+      <a href="/lottery-odds" class="rounded-full border border-emerald-600 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors">
+        Lottery Odds →
+      </a>
+      <a href="/lottery-math" class="rounded-full border border-blue-600 px-4 py-2 text-sm text-blue-400 hover:bg-blue-600 hover:text-white transition-colors">
+        The Math →
+      </a>
+      <a href="/" class="rounded-full border border-purple-600 px-4 py-2 text-sm text-purple-400 hover:bg-purple-600 hover:text-white transition-colors">
+        Generate Numbers →
+      </a>
+    </div>
+  </section>
+
+  {/* Responsible gambling note */}
+  <aside class="mt-8 rounded-xl border border-amber-700/50 bg-amber-900/20 p-4 text-sm text-amber-200/90">
+    <strong>Play responsibly:</strong> Lottery should be entertainment, not investment. 
+    If you or someone you know has a gambling problem, contact the 
+    <a href="https://www.ncpgambling.org/" target="_blank" rel="noopener" class="underline hover:text-amber-100">National Council on Problem Gambling</a> 
+    at 1-800-522-4700.
+  </aside>
+</InfoLayout>

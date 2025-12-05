@@ -1,0 +1,257 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import AffiliateGrid from "../../components/AffiliateGrid.astro";
+
+// State tax rates (simplified - actual rates vary)
+const stateTaxRates: Record<string, { name: string; rate: number }> = {
+  none: { name: "No State Tax (FL, TX, etc.)", rate: 0 },
+  ca: { name: "California", rate: 13.3 },
+  ny: { name: "New York", rate: 10.9 },
+  nj: { name: "New Jersey", rate: 10.75 },
+  mn: { name: "Minnesota", rate: 9.85 },
+  or: { name: "Oregon", rate: 9.9 },
+  dc: { name: "Washington D.C.", rate: 10.75 },
+  other_low: { name: "Low Tax State (~5%)", rate: 5 },
+  other_med: { name: "Medium Tax State (~7%)", rate: 7 },
+};
+
+const federalRate = 37; // Top federal bracket
+const lumpSumRate = 0.60; // Typical lump sum is ~60% of advertised jackpot
+
+// JSON-LD for the calculator tool
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Lottery Payout Calculator",
+  "description": "Calculate your take-home lottery winnings after federal and state taxes. Compare lump sum vs annuity options.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "provider": {
+    "@type": "Organization",
+    "name": "MintLabs"
+  }
+};
+---
+
+<InfoLayout 
+  title="Lottery Payout Calculator" 
+  subtitle="Estimate your take-home winnings after federal and state taxes."
+  pageTitle="Lottery Payout Calculator - Tax Calculator for Jackpot Winnings"
+  description="Free lottery payout calculator. See how much you'd actually take home after federal and state taxes. Compare lump sum vs annuity options for Powerball, Mega Millions."
+  keywords="lottery payout calculator, lottery tax calculator, jackpot after taxes, lump sum vs annuity, lottery winnings calculator, powerball payout"
+  jsonLd={jsonLd}
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">Reality check:</strong>
+    Jackpots are always less than advertised. Here's what you'd actually keep.
+  </div>
+
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl">
+    <h2 class="mb-6 text-2xl font-semibold text-emerald-300">Calculate Your Payout</h2>
+    
+    <form id="payoutForm" class="space-y-6">
+      <div>
+        <label for="jackpot" class="block text-sm font-medium text-gray-300 mb-2">
+          Advertised Jackpot ($)
+        </label>
+        <input 
+          type="number" 
+          id="jackpot" 
+          name="jackpot" 
+          min="1000000" 
+          step="1000000" 
+          value="100000000"
+          class="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-gray-100 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+          placeholder="100000000"
+        />
+        <p class="mt-1 text-xs text-gray-400">Enter the advertised jackpot amount (e.g., 100000000 for $100 million)</p>
+      </div>
+
+      <div>
+        <label for="state" class="block text-sm font-medium text-gray-300 mb-2">
+          Your State
+        </label>
+        <select 
+          id="state" 
+          name="state"
+          class="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-gray-100 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+        >
+          {Object.entries(stateTaxRates).map(([key, { name }]) => (
+            <option value={key}>{name}</option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">
+          Payment Option
+        </label>
+        <div class="flex gap-4">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="payment" value="lump" checked class="text-emerald-500 focus:ring-emerald-500" />
+            <span class="text-gray-300">Lump Sum</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="payment" value="annuity" class="text-emerald-500 focus:ring-emerald-500" />
+            <span class="text-gray-300">Annuity (30 years)</span>
+          </label>
+        </div>
+      </div>
+
+      <button 
+        type="submit"
+        class="w-full rounded-lg bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-500 transition-colors"
+      >
+        Calculate Payout
+      </button>
+    </form>
+  </section>
+
+  <section id="results" class="hidden rounded-2xl border border-emerald-600 bg-gradient-to-r from-emerald-900/30 to-blue-900/30 p-8 shadow-xl">
+    <h2 class="mb-6 text-2xl font-semibold text-emerald-300">Your Estimated Payout</h2>
+    
+    <div class="grid gap-4 md:grid-cols-2">
+      <div class="rounded-xl border border-slate-700 bg-slate-800 p-4">
+        <p class="text-sm text-gray-400">Advertised Jackpot</p>
+        <p id="resultJackpot" class="text-2xl font-bold text-gray-100">$0</p>
+      </div>
+      <div class="rounded-xl border border-slate-700 bg-slate-800 p-4">
+        <p class="text-sm text-gray-400">Cash Value (if lump sum)</p>
+        <p id="resultCashValue" class="text-2xl font-bold text-blue-300">$0</p>
+      </div>
+      <div class="rounded-xl border border-slate-700 bg-slate-800 p-4">
+        <p class="text-sm text-gray-400">Federal Tax (37%)</p>
+        <p id="resultFederal" class="text-2xl font-bold text-red-400">-$0</p>
+      </div>
+      <div class="rounded-xl border border-slate-700 bg-slate-800 p-4">
+        <p class="text-sm text-gray-400">State Tax</p>
+        <p id="resultState" class="text-2xl font-bold text-red-400">-$0</p>
+      </div>
+    </div>
+
+    <div class="mt-6 rounded-xl border-2 border-emerald-500 bg-emerald-900/30 p-6 text-center">
+      <p class="text-sm text-gray-400 mb-1">Estimated Take-Home</p>
+      <p id="resultTakeHome" class="text-4xl font-bold text-emerald-400">$0</p>
+      <p id="resultPercent" class="text-sm text-gray-400 mt-2">0% of advertised jackpot</p>
+    </div>
+
+    <div id="annuityNote" class="hidden mt-4 rounded-lg border border-blue-600/50 bg-blue-900/20 p-4">
+      <p class="text-sm text-blue-300">
+        <strong>Annuity option:</strong> You'd receive approximately 
+        <span id="annuityYearly" class="font-bold">$0</span>/year for 30 years 
+        (before taxes on each payment).
+      </p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+    <h3 class="mb-4 text-xl font-semibold text-gray-200">How This Works</h3>
+    <ul class="space-y-2 text-sm text-gray-300 list-inside list-disc">
+      <li><strong>Lump sum</strong> is typically ~60% of the advertised jackpot</li>
+      <li><strong>Federal tax</strong> on large winnings is 37% (top bracket)</li>
+      <li><strong>State taxes</strong> vary from 0% to 13.3%</li>
+      <li>Some states (FL, TX, WA, etc.) have no state income tax</li>
+      <li>Actual amounts may vary based on current rates and your situation</li>
+    </ul>
+  </section>
+
+  {/* Cross-links */}
+  <section class="rounded-2xl border border-slate-700 bg-slate-900/40 p-6">
+    <h3 class="mb-4 text-xl font-semibold text-gray-200">More tools</h3>
+    <div class="flex flex-wrap gap-3">
+      <a href="/tools/lottery-budget" class="rounded-full border border-emerald-600 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors">
+        Budget Calculator →
+      </a>
+      <a href="/lottery-odds" class="rounded-full border border-blue-600 px-4 py-2 text-sm text-blue-400 hover:bg-blue-600 hover:text-white transition-colors">
+        Lottery Odds →
+      </a>
+      <a href="/" class="rounded-full border border-purple-600 px-4 py-2 text-sm text-purple-400 hover:bg-purple-600 hover:text-white transition-colors">
+        Generate Numbers →
+      </a>
+    </div>
+  </section>
+
+  {/* Affiliate resources */}
+  <AffiliateGrid placement="tools" />
+</InfoLayout>
+
+<script>
+  const stateTaxRates: Record<string, number> = {
+    none: 0,
+    ca: 13.3,
+    ny: 10.9,
+    nj: 10.75,
+    mn: 9.85,
+    or: 9.9,
+    dc: 10.75,
+    other_low: 5,
+    other_med: 7,
+  };
+  
+  const federalRate = 37;
+  const lumpSumRate = 0.60;
+
+  function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  }
+
+  function calculate() {
+    const form = document.getElementById('payoutForm') as HTMLFormElement;
+    const resultsSection = document.getElementById('results');
+    
+    const jackpot = parseFloat((form.querySelector('#jackpot') as HTMLInputElement).value) || 0;
+    const state = (form.querySelector('#state') as HTMLSelectElement).value;
+    const payment = (form.querySelector('input[name="payment"]:checked') as HTMLInputElement).value;
+    
+    const stateRate = stateTaxRates[state] || 0;
+    const isLumpSum = payment === 'lump';
+    
+    // Calculate cash value (for lump sum)
+    const cashValue = isLumpSum ? jackpot * lumpSumRate : jackpot;
+    
+    // Calculate taxes
+    const federalTax = cashValue * (federalRate / 100);
+    const stateTax = cashValue * (stateRate / 100);
+    const totalTax = federalTax + stateTax;
+    const takeHome = cashValue - totalTax;
+    const percentOfAdvertised = (takeHome / jackpot) * 100;
+    
+    // Update UI
+    document.getElementById('resultJackpot')!.textContent = formatCurrency(jackpot);
+    document.getElementById('resultCashValue')!.textContent = formatCurrency(cashValue);
+    document.getElementById('resultFederal')!.textContent = `-${formatCurrency(federalTax)}`;
+    document.getElementById('resultState')!.textContent = `-${formatCurrency(stateTax)}`;
+    document.getElementById('resultTakeHome')!.textContent = formatCurrency(takeHome);
+    document.getElementById('resultPercent')!.textContent = `${percentOfAdvertised.toFixed(1)}% of advertised jackpot`;
+    
+    // Annuity note
+    const annuityNote = document.getElementById('annuityNote');
+    const annuityYearly = document.getElementById('annuityYearly');
+    if (!isLumpSum) {
+      annuityNote?.classList.remove('hidden');
+      annuityYearly!.textContent = formatCurrency(jackpot / 30);
+    } else {
+      annuityNote?.classList.add('hidden');
+    }
+    
+    // Show results
+    resultsSection?.classList.remove('hidden');
+  }
+
+  document.getElementById('payoutForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    calculate();
+  });
+  
+  // Also calculate on input changes
+  document.getElementById('payoutForm')?.addEventListener('change', calculate);
+</script>

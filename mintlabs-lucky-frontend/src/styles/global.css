@@ -380,3 +380,31 @@ html[data-theme="bw-light"] #generateBtn {
   background-color: #ef4444;
   color: #fff;
 }
+
+/* Odds link on result cards */
+.odds-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent-primary);
+  background: transparent;
+  border: 1px solid var(--accent-primary);
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.odds-link:hover,
+.odds-link:focus {
+  background-color: var(--accent-primary);
+  color: var(--bg-primary);
+  outline: none;
+}
+/* Ensure link is tappable on mobile (min 44px touch target) */
+@media (max-width: 640px) {
+  .odds-link {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+}

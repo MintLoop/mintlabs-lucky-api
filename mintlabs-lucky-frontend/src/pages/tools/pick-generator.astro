@@ -1,0 +1,620 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Pick-3 & Pick-4 Number Generator | Quick Random Picks";
+const description = "Generate random Pick-3 and Pick-4 lottery numbers instantly. Supports straight, box, and combo plays with multiple sets generation.";
+const keywords = "pick 3 generator, pick 4 generator, pick 3 numbers, pick 4 numbers, daily numbers generator, cash 3, cash 4, play 3, play 4";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Pick-3 & Pick-4 Number Generator",
+  "description": description,
+  "applicationCategory": "Lottery Tool",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<InfoLayout
+  title="Pick-3 & Pick-4 Generator"
+  subtitle="Quick random numbers for daily lottery games"
+  pageTitle={pageTitle}
+  description={description}
+  keywords={keywords}
+  jsonLd={jsonLd}
+>
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Generate random numbers for Pick-3 and Pick-4 games instantly. 
+      These daily lottery games offer better odds than big jackpot games—
+      <strong>1 in 1,000 for Pick-3 straight</strong> vs 1 in 300 million for Powerball.
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="game-selector">
+      <button class="game-btn active" data-game="pick3">Pick-3</button>
+      <button class="game-btn" data-game="pick4">Pick-4</button>
+    </div>
+
+    <div class="generator-options">
+      <div class="option-group">
+        <label for="playType">Play Type:</label>
+        <select id="playType">
+          <option value="straight">Straight (exact order)</option>
+          <option value="box">Box (any order)</option>
+          <option value="combo">Combo (all straights)</option>
+          <option value="pairs">Front/Back Pair</option>
+        </select>
+      </div>
+
+      <div class="option-group">
+        <label for="setCount">Number of Sets:</label>
+        <select id="setCount">
+          <option value="1">1 Set</option>
+          <option value="3">3 Sets</option>
+          <option value="5">5 Sets</option>
+          <option value="10">10 Sets</option>
+        </select>
+      </div>
+
+      <div class="option-group">
+        <label>
+          <input type="checkbox" id="allowDoubles" checked>
+          Allow Doubles (e.g., 1-1-3)
+        </label>
+      </div>
+
+      <div class="option-group">
+        <label>
+          <input type="checkbox" id="allowTriples" checked>
+          <span class="triples-label">Allow Triples (e.g., 7-7-7)</span>
+        </label>
+      </div>
+    </div>
+
+    <button id="generateBtn" class="generate-btn">
+      🎲 Generate Numbers
+    </button>
+
+    <div id="results" class="results-container"></div>
+
+    <div class="play-info">
+      <h3>Understanding Your Play Type</h3>
+      <div id="playTypeInfo" class="info-box">
+        <p><strong>Straight:</strong> Match numbers in exact order. Best payout, hardest to win.</p>
+        <p class="odds-note">Pick-3 odds: 1 in 1,000 | Pick-4 odds: 1 in 10,000</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="edu-section">
+    <h2>Pick Games: Better Odds, Daily Action</h2>
+    
+    <div class="comparison-grid">
+      <div class="comparison-card">
+        <h4>Pick-3 Straight</h4>
+        <p class="odds-display">1 in 1,000</p>
+        <p class="payout-note">~$500 payout on $1 bet</p>
+      </div>
+      <div class="comparison-card">
+        <h4>Pick-4 Straight</h4>
+        <p class="odds-display">1 in 10,000</p>
+        <p class="payout-note">~$5,000 payout on $1 bet</p>
+      </div>
+      <div class="comparison-card">
+        <h4>Pick-3 Box (3-way)</h4>
+        <p class="odds-display">1 in 333</p>
+        <p class="payout-note">~$160 payout on $1 bet</p>
+      </div>
+      <div class="comparison-card">
+        <h4>Pick-4 Box (4-way)</h4>
+        <p class="odds-display">1 in 2,500</p>
+        <p class="payout-note">~$1,200 payout on $1 bet</p>
+      </div>
+    </div>
+
+    <div class="strategy-notes">
+      <h3>💡 Pick Game Facts</h3>
+      <ul>
+        <li><strong>Daily draws</strong> mean more chances to play (and lose)—budget accordingly</li>
+        <li><strong>Box plays</strong> have better odds but lower payouts—same expected value</li>
+        <li><strong>Doubles appear</strong> in ~28% of Pick-3 drawings—don't avoid them</li>
+        <li><strong>Every combination</strong> has equal probability—"hot" or "cold" numbers are myths</li>
+        <li><strong>Expected return</strong> is typically 50 cents per dollar—worse than slot machines</li>
+      </ul>
+    </div>
+  </section>
+</InfoLayout>
+
+<style>
+  .tool-section {
+    padding: 2rem;
+    background: var(--surface);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+  }
+
+  .game-selector {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .game-btn {
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .game-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .game-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .generator-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--bg);
+    border-radius: 8px;
+  }
+
+  .option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .option-group label {
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .option-group select {
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1rem;
+  }
+
+  .option-group input[type="checkbox"] {
+    margin-right: 0.5rem;
+  }
+
+  .generate-btn {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 2rem;
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+  }
+
+  .generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+  }
+
+  .generate-btn:active {
+    transform: translateY(0);
+  }
+
+  .results-container {
+    min-height: 100px;
+  }
+
+  .results-container:empty::before {
+    content: "Click 'Generate Numbers' to get your picks";
+    display: block;
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem;
+    font-style: italic;
+  }
+
+  .result-set {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .set-number {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-right: 1rem;
+    min-width: 30px;
+  }
+
+  .digit-ball {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 50%;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  }
+
+  .pair-set .digit-ball.faded {
+    opacity: 0.3;
+  }
+
+  .combo-display {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--surface);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .play-info {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .play-info h3 {
+    margin-bottom: 1rem;
+  }
+
+  .info-box {
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+  }
+
+  .info-box p {
+    margin-bottom: 0.5rem;
+  }
+
+  .info-box p:last-child {
+    margin-bottom: 0;
+  }
+
+  .odds-note {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .edu-section {
+    padding: 2rem;
+  }
+
+  .edu-section h2 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .comparison-card {
+    padding: 1.5rem;
+    background: var(--surface);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .comparison-card h4 {
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+  }
+
+  .odds-display {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .payout-note {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .strategy-notes {
+    padding: 1.5rem;
+    background: var(--surface);
+    border-radius: 12px;
+  }
+
+  .strategy-notes h3 {
+    margin-bottom: 1rem;
+  }
+
+  .strategy-notes ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .strategy-notes li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .strategy-notes li:last-child {
+    border-bottom: none;
+  }
+
+  @media (max-width: 600px) {
+    .game-btn {
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+    }
+
+    .digit-ball {
+      width: 40px;
+      height: 40px;
+      font-size: 1.25rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const pick3Btn = document.querySelector('[data-game="pick3"]') as HTMLButtonElement;
+    const pick4Btn = document.querySelector('[data-game="pick4"]') as HTMLButtonElement;
+    const playTypeSelect = document.getElementById('playType') as HTMLSelectElement;
+    const setCountSelect = document.getElementById('setCount') as HTMLSelectElement;
+    const allowDoublesCheck = document.getElementById('allowDoubles') as HTMLInputElement;
+    const allowTriplesCheck = document.getElementById('allowTriples') as HTMLInputElement;
+    const triplesLabel = document.querySelector('.triples-label') as HTMLSpanElement;
+    const generateBtn = document.getElementById('generateBtn') as HTMLButtonElement;
+    const resultsContainer = document.getElementById('results') as HTMLDivElement;
+    const playTypeInfo = document.getElementById('playTypeInfo') as HTMLDivElement;
+
+    let currentGame: 'pick3' | 'pick4' = 'pick3';
+
+    const playTypeDescriptions = {
+      pick3: {
+        straight: {
+          desc: '<strong>Straight:</strong> Match all 3 digits in exact order.',
+          odds: 'Odds: 1 in 1,000 | Typical payout: $500 on $1'
+        },
+        box: {
+          desc: '<strong>Box:</strong> Match all 3 digits in any order.',
+          odds: '6-way odds: 1 in 167 | 3-way odds: 1 in 333'
+        },
+        combo: {
+          desc: '<strong>Combo:</strong> Covers all straight combinations. Costs more, wins as straight.',
+          odds: '6 unique digits = 6 plays ($6) | 1 double = 3 plays ($3)'
+        },
+        pairs: {
+          desc: '<strong>Front/Back Pair:</strong> Match first 2 or last 2 digits in order.',
+          odds: 'Odds: 1 in 100 | Typical payout: $50 on $1'
+        }
+      },
+      pick4: {
+        straight: {
+          desc: '<strong>Straight:</strong> Match all 4 digits in exact order.',
+          odds: 'Odds: 1 in 10,000 | Typical payout: $5,000 on $1'
+        },
+        box: {
+          desc: '<strong>Box:</strong> Match all 4 digits in any order.',
+          odds: '24-way odds: 1 in 417 | 4-way odds: 1 in 2,500'
+        },
+        combo: {
+          desc: '<strong>Combo:</strong> Covers all straight combinations.',
+          odds: '4 unique = 24 plays ($24) | 1 double = 12 plays ($12)'
+        },
+        pairs: {
+          desc: '<strong>Front/Back Pair:</strong> Match first 2 or last 2 digits in order.',
+          odds: 'Odds: 1 in 100 | Typical payout: $50 on $1'
+        }
+      }
+    };
+
+    function updatePlayTypeInfo() {
+      const playType = playTypeSelect.value as keyof typeof playTypeDescriptions.pick3;
+      const info = playTypeDescriptions[currentGame][playType];
+      playTypeInfo.innerHTML = `
+        <p>${info.desc}</p>
+        <p class="odds-note">${info.odds}</p>
+      `;
+    }
+
+    function switchGame(game: 'pick3' | 'pick4') {
+      currentGame = game;
+      pick3Btn.classList.toggle('active', game === 'pick3');
+      pick4Btn.classList.toggle('active', game === 'pick4');
+      
+      // Update triples label
+      if (game === 'pick4') {
+        triplesLabel.textContent = 'Allow Triples/Quads (e.g., 7-7-7-7)';
+      } else {
+        triplesLabel.textContent = 'Allow Triples (e.g., 7-7-7)';
+      }
+      
+      resultsContainer.innerHTML = '';
+      updatePlayTypeInfo();
+    }
+
+    function generateDigit(): number {
+      return Math.floor(Math.random() * 10);
+    }
+
+    function generateNumber(length: number, allowDoubles: boolean, allowTriples: boolean): number[] {
+      const maxAttempts = 1000;
+      let attempts = 0;
+      
+      while (attempts < maxAttempts) {
+        const digits: number[] = [];
+        for (let i = 0; i < length; i++) {
+          digits.push(generateDigit());
+        }
+        
+        // Check constraints
+        const digitCounts: Record<number, number> = {};
+        digits.forEach(d => {
+          digitCounts[d] = (digitCounts[d] || 0) + 1;
+        });
+        
+        const maxCount = Math.max(...Object.values(digitCounts));
+        
+        if (!allowDoubles && maxCount >= 2) {
+          attempts++;
+          continue;
+        }
+        
+        if (!allowTriples && maxCount >= 3) {
+          attempts++;
+          continue;
+        }
+        
+        return digits;
+      }
+      
+      // Fallback: return a valid number anyway
+      const digits: number[] = [];
+      for (let i = 0; i < length; i++) {
+        digits.push(i % 10);
+      }
+      return digits;
+    }
+
+    function getComboPermutations(digits: number[]): string[] {
+      const permutations = new Set<string>();
+      
+      function permute(arr: number[], start: number) {
+        if (start === arr.length) {
+          permutations.add(arr.join('-'));
+          return;
+        }
+        for (let i = start; i < arr.length; i++) {
+          [arr[start], arr[i]] = [arr[i], arr[start]];
+          permute([...arr], start + 1);
+          [arr[start], arr[i]] = [arr[i], arr[start]];
+        }
+      }
+      
+      permute([...digits], 0);
+      return Array.from(permutations);
+    }
+
+    function displayResults(sets: number[][], playType: string) {
+      resultsContainer.innerHTML = '';
+      
+      sets.forEach((digits, index) => {
+        const setDiv = document.createElement('div');
+        setDiv.className = 'result-set';
+        if (playType === 'pairs') setDiv.classList.add('pair-set');
+        setDiv.style.animationDelay = `${index * 0.1}s`;
+        
+        const setNum = document.createElement('span');
+        setNum.className = 'set-number';
+        setNum.textContent = `#${index + 1}`;
+        setDiv.appendChild(setNum);
+        
+        digits.forEach((digit, digitIndex) => {
+          const ball = document.createElement('div');
+          ball.className = 'digit-ball';
+          ball.textContent = digit.toString();
+          
+          // For pairs, fade the irrelevant digit
+          if (playType === 'pairs') {
+            const isPick3 = digits.length === 3;
+            if (isPick3 && digitIndex === 2) {
+              ball.classList.add('faded');
+              ball.textContent = 'X';
+            }
+            if (!isPick3 && (digitIndex === 2 || digitIndex === 3)) {
+              ball.classList.add('faded');
+              ball.textContent = 'X';
+            }
+          }
+          
+          setDiv.appendChild(ball);
+        });
+        
+        // Show combo permutations if combo play type
+        if (playType === 'combo') {
+          const perms = getComboPermutations(digits);
+          const comboDiv = document.createElement('div');
+          comboDiv.className = 'combo-display';
+          comboDiv.innerHTML = `<strong>${perms.length} ways:</strong> ${perms.slice(0, 6).join(', ')}${perms.length > 6 ? '...' : ''}`;
+          setDiv.appendChild(comboDiv);
+        }
+        
+        resultsContainer.appendChild(setDiv);
+      });
+    }
+
+    pick3Btn.addEventListener('click', () => switchGame('pick3'));
+    pick4Btn.addEventListener('click', () => switchGame('pick4'));
+    playTypeSelect.addEventListener('change', updatePlayTypeInfo);
+
+    generateBtn.addEventListener('click', () => {
+      const length = currentGame === 'pick3' ? 3 : 4;
+      const count = parseInt(setCountSelect.value);
+      const allowDoubles = allowDoublesCheck.checked;
+      const allowTriples = allowTriplesCheck.checked;
+      const playType = playTypeSelect.value;
+      
+      const sets: number[][] = [];
+      for (let i = 0; i < count; i++) {
+        sets.push(generateNumber(length, allowDoubles, allowTriples));
+      }
+      
+      displayResults(sets, playType);
+    });
+
+    // Initial setup
+    updatePlayTypeInfo();
+  });
+</script>

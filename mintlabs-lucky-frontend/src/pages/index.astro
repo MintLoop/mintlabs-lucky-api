@@ -65,11 +65,44 @@ const current = Array.isArray(games) && games.length > 0 ? games[0] : null;
 
       <EduGrid />
 
-      <footer class="text-center text-sm theme-text-muted mt-8 pb-8">
-        <p>© 2025 MintLabs. <a href="/terms" id="termsLink" class="hover:text-slate-300 underline">Terms &amp; Conditions</a> | <a href="/privacy" id="privacyLink" class="hover:text-slate-300 underline">Privacy Policy</a></p>
-        <div class="mt-2 flex items-center justify-center gap-2 text-xs theme-text-muted">
-          <img src="/mintlab.png" alt="MintLabs" class="w-4 h-4 opacity-70" />
-          <span>Powered by MintLabs</span>
+      <footer class="mt-12 pb-8 border-t border-slate-700/50 pt-8">
+        {/* Footer Navigation */}
+        <div class="grid gap-6 grid-cols-2 md:grid-cols-3 mb-6 text-sm">
+          <div>
+            <h4 class="font-semibold theme-text-secondary mb-2">Education</h4>
+            <ul class="space-y-1.5 theme-text-muted">
+              <li><a href="/lottery-odds" class="hover:text-emerald-400 transition-colors">Lottery Odds</a></li>
+              <li><a href="/lottery-math" class="hover:text-emerald-400 transition-colors">The Math</a></li>
+              <li><a href="/faq" class="hover:text-emerald-400 transition-colors">FAQ</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold theme-text-secondary mb-2">Tools</h4>
+            <ul class="space-y-1.5 theme-text-muted">
+              <li><a href="/tools/payout-calculator" class="hover:text-emerald-400 transition-colors">Payout Calculator</a></li>
+              <li><a href="/tools/lottery-budget" class="hover:text-emerald-400 transition-colors">Budget Planner</a></li>
+              <li><a href="/archive" class="hover:text-emerald-400 transition-colors">Past Results</a></li>
+            </ul>
+          </div>
+          <div class="col-span-2 md:col-span-1">
+            <h4 class="font-semibold theme-text-secondary mb-2">Legal</h4>
+            <ul class="space-y-1.5 theme-text-muted">
+              <li><a href="/terms" class="hover:text-emerald-400 transition-colors">Terms & Conditions</a></li>
+              <li><a href="/privacy" class="hover:text-emerald-400 transition-colors">Privacy Policy</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        {/* Copyright */}
+        <div class="text-center text-sm theme-text-muted border-t border-slate-700/50 pt-4">
+          <p>© 2025 MintLabs. All rights reserved.</p>
+          <div class="mt-2 flex items-center justify-center gap-2 text-xs theme-text-muted">
+            <img src="/mintlab.png" alt="MintLabs" class="w-4 h-4 opacity-70" />
+            <span>Powered by MintLabs</span>
+          </div>
+          <p class="mt-2 text-xs theme-text-muted max-w-sm mx-auto">
+            For entertainment and education only. We do not predict lottery numbers. Play responsibly.
+          </p>
         </div>
       </footer>
 

@@ -1,0 +1,641 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import AffiliateGrid from "../../components/AffiliateGrid.astro";
+
+// Lottery odds data
+const lotteries = [
+  { 
+    name: "Powerball Jackpot", 
+    odds: 292201338,
+    color: "#E53935"
+  },
+  { 
+    name: "Mega Millions Jackpot", 
+    odds: 302575350,
+    color: "#FFC107"
+  },
+  { 
+    name: "CA SuperLotto Plus Jackpot", 
+    odds: 41416353,
+    color: "#2196F3"
+  },
+  { 
+    name: "Powerball (Match 5, no PB)", 
+    odds: 11688054,
+    color: "#FF7043"
+  },
+  { 
+    name: "Mega Millions (Match 5, no MB)", 
+    odds: 12607306,
+    color: "#FFCA28"
+  },
+  { 
+    name: "Powerball ($50K - Match 4 + PB)", 
+    odds: 913129,
+    color: "#EF5350"
+  },
+  { 
+    name: "Any Lottery Scratch-off ($1M+)", 
+    odds: 2000000,
+    color: "#9C27B0"
+  }
+];
+
+// Real-life comparisons
+const comparisons = [
+  {
+    event: "Grains of sand on a beach",
+    count: 7500000000000000000, // 7.5 quintillion on Earth's beaches
+    beachGrains: 100000000000, // ~100 billion on one beach
+    icon: "🏖️",
+    description: "Finding one specific grain of sand on a large beach"
+  },
+  {
+    event: "Stars in the Milky Way",
+    count: 200000000000,
+    icon: "⭐",
+    description: "Picking one specific star in our galaxy"
+  },
+  {
+    event: "Seconds in a human lifetime",
+    count: 2500000000, // ~80 years
+    icon: "⏱️",
+    description: "One specific second in an 80-year life"
+  },
+  {
+    event: "People on Earth",
+    count: 8000000000,
+    icon: "🌍",
+    description: "Randomly selecting one specific person on Earth"
+  },
+  {
+    event: "Heartbeats in a lifetime",
+    count: 3000000000,
+    icon: "❤️",
+    description: "One specific heartbeat in your entire life"
+  },
+  {
+    event: "Drops of water in an Olympic pool",
+    count: 660000000,
+    icon: "🏊",
+    description: "Finding one specific drop in an Olympic swimming pool"
+  },
+  {
+    event: "Blades of grass on a football field",
+    count: 3000000,
+    icon: "🌱",
+    description: "Picking one specific blade of grass on a football field"
+  },
+  {
+    event: "Words in all books ever written",
+    count: 130000000000000,
+    icon: "📚",
+    description: "Finding one specific word among all books"
+  },
+  {
+    event: "Lightning strike (annual odds)",
+    count: 500000,
+    icon: "⚡",
+    description: "Chance of being struck by lightning this year"
+  },
+  {
+    event: "Plane crash fatality (per flight)",
+    count: 11000000,
+    icon: "✈️",
+    description: "Odds of dying in a plane crash per flight"
+  }
+];
+---
+
+<InfoLayout 
+  title="Probability Visualizer"
+  subtitle="See lottery odds compared to real-life events"
+  pageTitle="Lottery Odds Visualizer – See Your Real Chances | MintLabs"
+  description="Visualize lottery odds compared to real-life events. See why winning Powerball is like finding a specific grain of sand on a beach. Educational and shareable!"
+  keywords="lottery odds visualizer, probability comparison, powerball odds, mega millions odds, lottery chances explained"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">🧠 Mind-bending:</strong>
+    Lottery odds are hard to comprehend. Let's make them <em>real</em> by comparing to things you can actually imagine.
+  </div>
+
+  <section class="lottery-selector rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+    <label for="lottery-select">Choose a lottery to visualize:</label>
+    <select id="lottery-select">
+      {lotteries.map((lottery, index) => (
+        <option value={index} data-odds={lottery.odds} data-color={lottery.color}>
+          {lottery.name} (1 in {lottery.odds.toLocaleString()})
+        </option>
+      ))}
+    </select>
+  </div>
+
+  <div class="visualization-container">
+    <div class="main-stat" id="main-stat">
+      <div class="stat-lottery">Powerball Jackpot</div>
+      <div class="stat-odds">1 in <span id="odds-number">292,201,338</span></div>
+      <div class="stat-percent" id="stat-percent">0.00000034% chance</div>
+    </div>
+
+    <div class="comparison-grid" id="comparison-grid">
+      <!-- Filled by JavaScript -->
+    </div>
+  </div>
+
+  <div class="visual-demo" id="visual-demo">
+    <h2>🎯 Visual Scale: Find the Winner</h2>
+    <p class="demo-intro">
+      Below are <span id="dot-count">10,000</span> dots. <strong>ONE</strong> of them is the "winner" (highlighted).
+      This represents <span id="scale-ratio">1 in 10,000</span> odds.
+      <br><em>The actual lottery odds are <span id="times-harder">29,220×</span> harder than this!</em>
+    </p>
+    <div class="dot-container" id="dot-container">
+      <!-- Dots rendered by JS -->
+    </div>
+    <button id="reveal-btn" class="reveal-button">🔍 Reveal the Winner</button>
+  </div>
+
+  <div class="perspective-section">
+    <h2>📊 Putting It In Perspective</h2>
+    
+    <div class="perspective-cards">
+      <div class="perspective-card">
+        <div class="p-icon">🎰</div>
+        <div class="p-title">Play Every Day for 800,000 Years</div>
+        <div class="p-desc">
+          If you bought one Powerball ticket every day, you'd need to play for about 
+          <strong>800,000 years</strong> to have a 50/50 shot at winning once.
+        </div>
+      </div>
+
+      <div class="perspective-card">
+        <div class="p-icon">💰</div>
+        <div class="p-title">$584 Million in Tickets</div>
+        <div class="p-desc">
+          To buy enough tickets to cover every Powerball combination (guaranteeing a win), 
+          you'd spend <strong>$584,402,676</strong>. The jackpot is often less than that.
+        </div>
+      </div>
+
+      <div class="perspective-card">
+        <div class="p-icon">🌍</div>
+        <div class="p-title">36× Rarer Than Finding One Person</div>
+        <div class="p-desc">
+          Winning Powerball is <strong>36 times less likely</strong> than randomly 
+          picking one specific person out of everyone on Earth.
+        </div>
+      </div>
+
+      <div class="perspective-card">
+        <div class="p-icon">⚡</div>
+        <div class="p-title">584× Rarer Than Lightning</div>
+        <div class="p-desc">
+          You're <strong>584 times more likely</strong> to be struck by lightning 
+          this year than to win the Powerball jackpot.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="share-section">
+    <h3>📱 Share This Visualization</h3>
+    <p>Help others understand lottery odds!</p>
+    <div class="share-buttons">
+      <button id="share-twitter" class="share-btn twitter">Share on X</button>
+      <button id="share-copy" class="share-btn copy">Copy Link</button>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Remember:</strong> Every lottery drawing is independent. Past results don't affect future odds. 
+    The lottery is entertainment, not investment. If you play, set a strict budget and stick to it.
+    <br><br>
+    <a href="/lottery-math">Learn more about lottery mathematics →</a>
+  </div>
+
+  <AffiliateGrid placement="tools" />
+
+  <style>
+    .page-intro {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .lottery-selector {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .lottery-selector label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+    }
+
+    .lottery-selector select {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.1rem;
+      background: var(--surface-2);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+      min-width: 300px;
+    }
+
+    .visualization-container {
+      margin: 2rem 0;
+    }
+
+    .main-stat {
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(135deg, var(--surface-1), var(--surface-2));
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      margin-bottom: 2rem;
+    }
+
+    .stat-lottery {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-odds {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    #odds-number {
+      color: var(--accent);
+    }
+
+    .stat-percent {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .comparison-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .comparison-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .comparison-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .comparison-icon {
+      font-size: 2rem;
+    }
+
+    .comparison-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .comparison-analogy {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .comparison-analogy strong {
+      color: var(--accent);
+    }
+
+    .visual-demo {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 3rem 0;
+      text-align: center;
+    }
+
+    .visual-demo h2 {
+      margin-top: 0;
+    }
+
+    .demo-intro {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .dot-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2px;
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+      padding: 1rem;
+      background: var(--surface-2);
+      border-radius: 8px;
+      max-height: 300px;
+      overflow: hidden;
+    }
+
+    .dot {
+      width: 4px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .dot.winner {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      transform: scale(2);
+    }
+
+    .dot.revealed {
+      background: rgba(var(--accent-rgb), 0.3);
+    }
+
+    .reveal-button {
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .reveal-button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .perspective-section {
+      margin: 3rem 0;
+    }
+
+    .perspective-section h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .perspective-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .perspective-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .p-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .p-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .p-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .share-section {
+      text-align: center;
+      padding: 2rem;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin: 2rem 0;
+    }
+
+    .share-section h3 {
+      margin-top: 0;
+    }
+
+    .share-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .share-btn {
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .share-btn.twitter {
+      background: #1DA1F2;
+      color: white;
+    }
+
+    .share-btn.copy {
+      background: var(--surface-2);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .share-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.9;
+    }
+
+    .disclaimer {
+      background: rgba(var(--accent-rgb), 0.1);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .disclaimer a {
+      color: var(--accent);
+    }
+
+    @media (max-width: 600px) {
+      .stat-odds {
+        font-size: 1.75rem;
+      }
+
+      .lottery-selector select {
+        min-width: auto;
+        width: 100%;
+      }
+
+      .dot {
+        width: 3px;
+        height: 3px;
+      }
+    }
+  </style>
+
+  <script define:vars={{ lotteries, comparisons }}>
+    document.addEventListener('DOMContentLoaded', () => {
+      const select = document.getElementById('lottery-select');
+      const statLottery = document.querySelector('.stat-lottery');
+      const oddsNumber = document.getElementById('odds-number');
+      const statPercent = document.getElementById('stat-percent');
+      const comparisonGrid = document.getElementById('comparison-grid');
+      const dotContainer = document.getElementById('dot-container');
+      const dotCount = document.getElementById('dot-count');
+      const scaleRatio = document.getElementById('scale-ratio');
+      const timesHarder = document.getElementById('times-harder');
+      const revealBtn = document.getElementById('reveal-btn');
+
+      const DOT_COUNT = 10000;
+      let winnerIndex = Math.floor(Math.random() * DOT_COUNT);
+      let revealed = false;
+
+      function updateVisualization(lotteryIndex) {
+        const lottery = lotteries[lotteryIndex];
+        const odds = lottery.odds;
+        const percent = (100 / odds).toFixed(8);
+
+        // Update main stat
+        statLottery.textContent = lottery.name;
+        oddsNumber.textContent = odds.toLocaleString();
+        statPercent.textContent = `${percent}% chance`;
+
+        // Generate comparisons
+        comparisonGrid.innerHTML = '';
+        
+        comparisons.forEach(comp => {
+          const ratio = odds / comp.count;
+          let analogy = '';
+          
+          if (ratio >= 1) {
+            analogy = `Winning is <strong>${Math.round(ratio).toLocaleString()}× harder</strong> than ${comp.description.toLowerCase()}.`;
+          } else if (ratio >= 0.01) {
+            analogy = `Winning is about as hard as ${comp.description.toLowerCase()} — if there were <strong>${Math.round(comp.count / odds).toLocaleString()}</strong> people doing it.`;
+          } else {
+            const equivalent = Math.round(comp.count / odds);
+            analogy = `It's like ${comp.description.toLowerCase()}, but <strong>${equivalent.toLocaleString()}× easier</strong>.`;
+          }
+
+          const card = document.createElement('div');
+          card.className = 'comparison-card';
+          card.innerHTML = `
+            <div class="comparison-header">
+              <span class="comparison-icon">${comp.icon}</span>
+              <span class="comparison-title">${comp.event}</span>
+            </div>
+            <div class="comparison-analogy">${analogy}</div>
+          `;
+          comparisonGrid.appendChild(card);
+        });
+
+        // Update dot visualization scale info
+        const hardness = Math.round(odds / DOT_COUNT);
+        timesHarder.textContent = `${hardness.toLocaleString()}×`;
+
+        // Reset dots
+        renderDots();
+        revealed = false;
+        revealBtn.textContent = '🔍 Reveal the Winner';
+      }
+
+      function renderDots() {
+        dotContainer.innerHTML = '';
+        winnerIndex = Math.floor(Math.random() * DOT_COUNT);
+        
+        for (let i = 0; i < DOT_COUNT; i++) {
+          const dot = document.createElement('div');
+          dot.className = 'dot';
+          if (i === winnerIndex && revealed) {
+            dot.classList.add('winner');
+          }
+          dotContainer.appendChild(dot);
+        }
+      }
+
+      function revealWinner() {
+        if (revealed) {
+          // Reset
+          revealed = false;
+          renderDots();
+          revealBtn.textContent = '🔍 Reveal the Winner';
+        } else {
+          // Reveal
+          revealed = true;
+          const dots = dotContainer.querySelectorAll('.dot');
+          dots[winnerIndex].classList.add('winner');
+          
+          // Scroll to winner
+          dots[winnerIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+          revealBtn.textContent = '🔄 Reset & Try Again';
+        }
+      }
+
+      // Event listeners
+      select.addEventListener('change', (e) => {
+        updateVisualization(parseInt(e.target.value));
+      });
+
+      revealBtn.addEventListener('click', revealWinner);
+
+      // Share buttons
+      document.getElementById('share-twitter').addEventListener('click', () => {
+        const lottery = lotteries[parseInt(select.value)];
+        const text = `Did you know? Winning ${lottery.name} is a 1 in ${lottery.odds.toLocaleString()} chance. That's ${Math.round(lottery.odds / 500000)}× less likely than being struck by lightning! ⚡🎰`;
+        const url = window.location.href;
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+      });
+
+      document.getElementById('share-copy').addEventListener('click', () => {
+        navigator.clipboard.writeText(window.location.href);
+        const btn = document.getElementById('share-copy');
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => btn.textContent = 'Copy Link', 2000);
+      });
+
+      // Initialize
+      renderDots();
+      dotCount.textContent = DOT_COUNT.toLocaleString();
+      scaleRatio.textContent = `1 in ${DOT_COUNT.toLocaleString()}`;
+      updateVisualization(0);
+    });
+  </script>
+</InfoLayout>

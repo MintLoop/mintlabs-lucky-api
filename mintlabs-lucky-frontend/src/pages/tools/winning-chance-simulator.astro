@@ -1,0 +1,355 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import AffiliateGrid from "../../components/AffiliateGrid.astro";
+
+const lotteries = [
+  { id: 'powerball', name: 'Powerball', odds: 292201338, drawsPerWeek: 3 },
+  { id: 'megamillions', name: 'Mega Millions', odds: 302575350, drawsPerWeek: 2 },
+  { id: 'superlotto', name: 'CA SuperLotto Plus', odds: 41416353, drawsPerWeek: 2 },
+  { id: 'lotto', name: 'Generic 6/49 Lotto', odds: 13983816, drawsPerWeek: 2 },
+];
+---
+
+<InfoLayout 
+  title="Winning Chance Simulator"
+  subtitle="Calculate your probability of winning over time"
+  pageTitle="Lottery Winning Chance Simulator - Yearly Probability Calculator | MintLabs"
+  description="Calculate your realistic chances of winning the lottery over 1, 5, 10, or 50 years. See how many tickets you'd need to buy. Eye-opening probability calculator."
+  keywords="lottery probability calculator, chance of winning lottery, lottery odds over time, powerball probability, lottery winning chance simulator"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">📊 Reality Check:</strong>
+    See your actual probability of winning if you play every draw for years. Spoiler: the numbers are sobering.
+  </div>
+
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Configure Your Simulation</h2>
+    
+    <div class="grid gap-6 md:grid-cols-2">
+      <div>
+        <label for="lottery-select" class="block text-sm font-medium text-gray-300 mb-2">Select Lottery:</label>
+        <select id="lottery-select" class="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-gray-100 focus:border-emerald-500">
+          {lotteries.map(lottery => (
+            <option value={lottery.id} data-odds={lottery.odds} data-draws={lottery.drawsPerWeek}>
+              {lottery.name} (1 in {lottery.odds.toLocaleString()})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label for="tickets-per-draw" class="block text-sm font-medium text-gray-300 mb-2">Tickets Per Draw:</label>
+        <input 
+          type="number" 
+          id="tickets-per-draw" 
+          value="1" 
+          min="1" 
+          max="1000"
+          class="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-gray-100 focus:border-emerald-500"
+        />
+      </div>
+
+      <div>
+        <label for="years" class="block text-sm font-medium text-gray-300 mb-2">Years of Play:</label>
+        <input 
+          type="range" 
+          id="years" 
+          value="10" 
+          min="1" 
+          max="100"
+          class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+        />
+        <div class="flex justify-between text-xs text-gray-400 mt-1">
+          <span>1 year</span>
+          <span id="years-display" class="text-emerald-400 font-bold">10 years</span>
+          <span>100 years</span>
+        </div>
+      </div>
+
+      <div>
+        <label for="ticket-cost" class="block text-sm font-medium text-gray-300 mb-2">Ticket Cost ($):</label>
+        <input 
+          type="number" 
+          id="ticket-cost" 
+          value="2" 
+          min="1" 
+          max="50"
+          step="0.5"
+          class="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-gray-100 focus:border-emerald-500"
+        />
+      </div>
+    </div>
+
+    <button 
+      id="simulate-btn"
+      class="mt-6 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg hover:from-emerald-400 hover:to-blue-400 transition-all"
+    >
+      🎲 Calculate My Chances
+    </button>
+  </section>
+
+  <section id="results" class="hidden space-y-6">
+    <!-- Main Result -->
+    <div class="rounded-2xl border border-emerald-600/50 bg-gradient-to-r from-emerald-900/40 to-blue-900/40 p-8 shadow-xl text-center">
+      <h2 class="text-xl text-gray-300 mb-2">Your Probability of Winning the Jackpot</h2>
+      <div class="text-5xl md:text-6xl font-bold text-emerald-400 mb-4" id="main-probability">—</div>
+      <p class="text-gray-400" id="probability-context">—</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center">
+        <div class="text-2xl font-bold text-emerald-400" id="total-draws">—</div>
+        <div class="text-sm text-gray-400">Total Draws</div>
+      </div>
+      <div class="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center">
+        <div class="text-2xl font-bold text-blue-400" id="total-tickets">—</div>
+        <div class="text-sm text-gray-400">Total Tickets</div>
+      </div>
+      <div class="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center">
+        <div class="text-2xl font-bold text-purple-400" id="total-cost">—</div>
+        <div class="text-sm text-gray-400">Total Spent</div>
+      </div>
+      <div class="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center">
+        <div class="text-2xl font-bold text-amber-400" id="prob-not-win">—</div>
+        <div class="text-sm text-gray-400">Prob. of NOT Winning</div>
+      </div>
+    </div>
+
+    <!-- Perspective Section -->
+    <div class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+      <h3 class="text-xl font-semibold text-emerald-300 mb-4">🎯 Putting It In Perspective</h3>
+      <div id="perspectives" class="space-y-3">
+        <!-- Perspectives will be inserted here -->
+      </div>
+    </div>
+
+    <!-- Time-based Milestones -->
+    <div class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+      <h3 class="text-xl font-semibold text-emerald-300 mb-4">📅 Probability Milestones</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left border-b border-slate-700">
+              <th class="pb-2 text-gray-400">Time Period</th>
+              <th class="pb-2 text-gray-400">Tickets</th>
+              <th class="pb-2 text-gray-400">Probability</th>
+              <th class="pb-2 text-gray-400">Cost</th>
+            </tr>
+          </thead>
+          <tbody id="milestones-table" class="text-gray-300">
+            <!-- Milestones will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Break-even Analysis -->
+    <div class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+      <h3 class="text-xl font-semibold text-emerald-300 mb-4">💰 What Would It Take?</h3>
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="p-4 rounded-xl bg-slate-900/50">
+          <div class="text-lg font-bold text-emerald-400" id="tickets-for-50pct">—</div>
+          <div class="text-sm text-gray-400">Tickets needed for 50% chance</div>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-900/50">
+          <div class="text-lg font-bold text-blue-400" id="cost-for-50pct">—</div>
+          <div class="text-sm text-gray-400">Cost for 50% chance</div>
+        </div>
+      </div>
+      <p class="mt-4 text-sm text-gray-400" id="break-even-note">—</p>
+    </div>
+
+    <!-- Educational Note -->
+    <div class="rounded-xl border border-amber-700/50 bg-amber-900/20 p-4 text-sm text-amber-200/90">
+      <strong>⚠️ Remember:</strong> These calculations assume independent draws. Your probability never "builds up" 
+      between draws - each ticket is a fresh chance. The lottery is entertainment, not investment.
+      <a href="/lottery-math" class="underline hover:text-amber-100">Learn the math →</a>
+    </div>
+  </section>
+
+  <!-- Cross-links -->
+  <section class="rounded-2xl border border-slate-700 bg-slate-900/40 p-6">
+    <h3 class="mb-4 text-xl font-semibold text-gray-200">Related Tools</h3>
+    <div class="flex flex-wrap gap-3">
+      <a href="/tools/pattern-analyzer" class="rounded-full border border-emerald-600 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors">
+        Pattern Analyzer →
+      </a>
+      <a href="/tools/lottery-budget" class="rounded-full border border-blue-600 px-4 py-2 text-sm text-blue-400 hover:bg-blue-600 hover:text-white transition-colors">
+        Budget Planner →
+      </a>
+      <a href="/tools/odds-comparison" class="rounded-full border border-purple-600 px-4 py-2 text-sm text-purple-400 hover:bg-purple-600 hover:text-white transition-colors">
+        Odds Comparison →
+      </a>
+    </div>
+  </section>
+
+  <AffiliateGrid placement="tools" />
+</InfoLayout>
+
+<script>
+  const lotteryData: Record<string, { odds: number; drawsPerWeek: number }> = {
+    powerball: { odds: 292201338, drawsPerWeek: 3 },
+    megamillions: { odds: 302575350, drawsPerWeek: 2 },
+    superlotto: { odds: 41416353, drawsPerWeek: 2 },
+    lotto: { odds: 13983816, drawsPerWeek: 2 }
+  };
+
+  function formatNumber(n: number): string {
+    if (n >= 1e12) return (n / 1e12).toFixed(1) + ' trillion';
+    if (n >= 1e9) return (n / 1e9).toFixed(1) + ' billion';
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + ' million';
+    if (n >= 1e3) return n.toLocaleString();
+    return n.toString();
+  }
+
+  function formatCurrency(n: number): string {
+    if (n >= 1e9) return '$' + (n / 1e9).toFixed(1) + 'B';
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return '$' + (n / 1e3).toFixed(0) + 'K';
+    return '$' + n.toLocaleString();
+  }
+
+  function formatProbability(p: number): string {
+    if (p >= 0.01) return (p * 100).toFixed(2) + '%';
+    if (p >= 0.0001) return (p * 100).toFixed(4) + '%';
+    if (p >= 0.000001) return (p * 100).toFixed(6) + '%';
+    return (p * 100).toExponential(2) + '%';
+  }
+
+  function calculate() {
+    const lotterySelect = document.getElementById('lottery-select') as HTMLSelectElement;
+    const ticketsInput = document.getElementById('tickets-per-draw') as HTMLInputElement;
+    const yearsInput = document.getElementById('years') as HTMLInputElement;
+    const costInput = document.getElementById('ticket-cost') as HTMLInputElement;
+    const resultsSection = document.getElementById('results')!;
+
+    const lotteryId = lotterySelect.value;
+    const lottery = lotteryData[lotteryId];
+    const ticketsPerDraw = parseInt(ticketsInput.value) || 1;
+    const years = parseInt(yearsInput.value) || 10;
+    const ticketCost = parseFloat(costInput.value) || 2;
+
+    const drawsPerYear = lottery.drawsPerWeek * 52;
+    const totalDraws = drawsPerYear * years;
+    const totalTickets = totalDraws * ticketsPerDraw;
+    const totalCost = totalTickets * ticketCost;
+
+    // P(win at least once) = 1 - P(lose all)
+    // P(lose all) = (1 - 1/odds)^totalTickets
+    const pLose = Math.pow(1 - 1/lottery.odds, totalTickets);
+    const pWin = 1 - pLose;
+
+    // Update main probability
+    document.getElementById('main-probability')!.textContent = formatProbability(pWin);
+
+    // Context message
+    let context = '';
+    if (pWin < 0.000001) {
+      context = "That's essentially zero. You're more likely to be struck by lightning multiple times.";
+    } else if (pWin < 0.0001) {
+      context = "Still astronomically small. Don't count on it.";
+    } else if (pWin < 0.01) {
+      context = "Better than a single ticket, but still extremely unlikely.";
+    } else if (pWin < 0.5) {
+      context = "Getting into visible territory, but still unlikely.";
+    } else {
+      context = "You've crossed the 50% threshold! (Assuming you can afford it...)";
+    }
+    document.getElementById('probability-context')!.textContent = context;
+
+    // Stats
+    document.getElementById('total-draws')!.textContent = totalDraws.toLocaleString();
+    document.getElementById('total-tickets')!.textContent = totalTickets.toLocaleString();
+    document.getElementById('total-cost')!.textContent = formatCurrency(totalCost);
+    document.getElementById('prob-not-win')!.textContent = (pLose * 100).toFixed(6) + '%';
+
+    // Perspectives
+    const perspectives = [];
+    
+    // Compare to other unlikely events
+    if (pWin < 1/1000000) {
+      perspectives.push({
+        icon: '⚡',
+        text: `You're about ${Math.round((1/15300) / pWin)}x more likely to be struck by lightning this year`
+      });
+    }
+    if (pWin < 1/10000) {
+      perspectives.push({
+        icon: '🎰',
+        text: `At these odds, you'd need to play for ${Math.round(Math.log(0.5) / Math.log(1 - 1/lottery.odds) / (drawsPerYear * ticketsPerDraw))} years for a 50% chance`
+      });
+    }
+    perspectives.push({
+      icon: '💸',
+      text: `You'll spend ${formatCurrency(totalCost)}, and statistically win back about ${formatCurrency(totalCost * 0.5)} in small prizes`
+    });
+    perspectives.push({
+      icon: '📈',
+      text: `If invested at 7% annual return, ${formatCurrency(totalCost)} would grow to ${formatCurrency(totalCost * Math.pow(1.07, years))}`
+    });
+
+    const perspectivesContainer = document.getElementById('perspectives')!;
+    perspectivesContainer.innerHTML = perspectives.map(p => `
+      <div class="flex items-start gap-3 p-3 rounded-lg bg-slate-900/50">
+        <span class="text-2xl">${p.icon}</span>
+        <span class="text-gray-300">${p.text}</span>
+      </div>
+    `).join('');
+
+    // Milestones table
+    const milestones = [
+      { label: '1 month', years: 1/12 },
+      { label: '1 year', years: 1 },
+      { label: '5 years', years: 5 },
+      { label: '10 years', years: 10 },
+      { label: '25 years', years: 25 },
+      { label: '50 years', years: 50 },
+      { label: 'Lifetime (78 years)', years: 78 }
+    ];
+
+    const milestonesTable = document.getElementById('milestones-table')!;
+    milestonesTable.innerHTML = milestones.map(m => {
+      const draws = Math.round(drawsPerYear * m.years);
+      const tickets = draws * ticketsPerDraw;
+      const cost = tickets * ticketCost;
+      const prob = 1 - Math.pow(1 - 1/lottery.odds, tickets);
+      return `
+        <tr class="border-b border-slate-700/50">
+          <td class="py-2">${m.label}</td>
+          <td class="py-2">${tickets.toLocaleString()}</td>
+          <td class="py-2 ${prob > 0.01 ? 'text-emerald-400' : ''}">${formatProbability(prob)}</td>
+          <td class="py-2">${formatCurrency(cost)}</td>
+        </tr>
+      `;
+    }).join('');
+
+    // Break-even analysis
+    // For 50% chance: n = ln(0.5) / ln(1 - 1/odds)
+    const ticketsFor50 = Math.ceil(Math.log(0.5) / Math.log(1 - 1/lottery.odds));
+    const costFor50 = ticketsFor50 * ticketCost;
+
+    document.getElementById('tickets-for-50pct')!.textContent = formatNumber(ticketsFor50) + ' tickets';
+    document.getElementById('cost-for-50pct')!.textContent = formatCurrency(costFor50);
+    document.getElementById('break-even-note')!.textContent = 
+      `To have a 50% chance of winning the jackpot, you'd need to spend ${formatCurrency(costFor50)}. ` +
+      `Most jackpots are worth less than this, making it a losing proposition even at 50% odds.`;
+
+    // Show results
+    resultsSection.classList.remove('hidden');
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Update years display
+  document.getElementById('years')?.addEventListener('input', (e) => {
+    const value = (e.target as HTMLInputElement).value;
+    document.getElementById('years-display')!.textContent = value + ' years';
+  });
+
+  document.getElementById('simulate-btn')?.addEventListener('click', calculate);
+
+  // Auto-calculate on changes
+  ['lottery-select', 'tickets-per-draw', 'years', 'ticket-cost'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', calculate);
+  });
+</script>

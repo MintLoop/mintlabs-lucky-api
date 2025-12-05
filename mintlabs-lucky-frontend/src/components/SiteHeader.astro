@@ -1,11 +1,35 @@
+---
+// Navigation items for the header
+const navItems = [
+  { href: "/lottery-odds", label: "Odds" },
+  { href: "/lottery-math", label: "Math" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/tools/payout-calculator", label: "Tools" },
+];
+---
+
 <header class="pt-3">
   <div class="flex items-center justify-center gap-3 md:gap-4">
-    <img src="/clover.png" alt="Lucky Clover" class="w-12 h-12 md:w-14 md:h-14 shrink-0" />
-    <h1 class="text-3xl md:text-4xl font-bold leading-tight whitespace-nowrap">
-      MintLabs Lucky Numbers
-    </h1>
+    <a href="/" class="flex items-center gap-3 md:gap-4 hover:opacity-90 transition-opacity">
+      <img src="/clover.png" alt="Lucky Clover" class="w-12 h-12 md:w-14 md:h-14 shrink-0" />
+      <h1 class="text-3xl md:text-4xl font-bold leading-tight whitespace-nowrap">
+        MintLabs Lucky Numbers
+      </h1>
+    </a>
   </div>
   <p class="mt-1 text-center theme-text-secondary text-sm">
     For education and entertainment only. Play responsibly.
   </p>
+  
+  {/* Navigation bar */}
+  <nav class="mt-4 flex flex-wrap justify-center gap-2 md:gap-4">
+    {navItems.map(item => (
+      <a 
+        href={item.href} 
+        class="px-3 py-1.5 text-sm rounded-full border border-slate-700 bg-slate-800/50 text-gray-300 hover:border-emerald-500 hover:text-emerald-400 transition-colors"
+      >
+        {item.label}
+      </a>
+    ))}
+  </nav>
 </header>

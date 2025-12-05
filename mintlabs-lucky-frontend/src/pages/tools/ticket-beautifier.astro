@@ -1,0 +1,666 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Lottery Ticket Beautifier | Create Shareable Lottery Graphics";
+const description = "Transform your lottery numbers into beautiful, shareable graphics. Create stylish lottery ticket images for social media, office pools, or just for fun.";
+const keywords = "lottery ticket generator, lottery ticket image, shareable lottery numbers, lottery graphics, lottery ticket maker, lottery pool ticket";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Lottery Ticket Beautifier",
+  "description": description,
+  "applicationCategory": "Lottery Tool",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<InfoLayout
+  title="Ticket Beautifier"
+  subtitle="Make your numbers look amazing"
+  pageTitle={pageTitle}
+  description={description}
+  keywords={keywords}
+  jsonLd={jsonLd}
+>
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Create stunning lottery ticket graphics perfect for sharing with friends, 
+      organizing office pools, or keeping a visual record of your picks.
+      <strong>Screenshot or download</strong> your creation!
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="input-panel">
+      <div class="input-row">
+        <div class="game-select-group">
+          <label for="gameSelect">Game:</label>
+          <select id="gameSelect">
+            <option value="powerball">Powerball</option>
+            <option value="megamillions">Mega Millions</option>
+            <option value="pick3">Pick-3</option>
+            <option value="pick4">Pick-4</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        
+        <div class="theme-select-group">
+          <label for="themeSelect">Style:</label>
+          <select id="themeSelect">
+            <option value="classic">Classic</option>
+            <option value="neon">Neon Glow</option>
+            <option value="gold">Golden Luxury</option>
+            <option value="minimal">Minimalist</option>
+            <option value="retro">Retro Vegas</option>
+            <option value="lucky">Lucky Charm</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="numbers-input">
+        <label>Your Numbers:</label>
+        <div id="numberFields" class="number-fields">
+          <input type="number" class="num-input main" min="1" max="69" placeholder="1">
+          <input type="number" class="num-input main" min="1" max="69" placeholder="2">
+          <input type="number" class="num-input main" min="1" max="69" placeholder="3">
+          <input type="number" class="num-input main" min="1" max="69" placeholder="4">
+          <input type="number" class="num-input main" min="1" max="69" placeholder="5">
+          <input type="number" class="num-input bonus" min="1" max="26" placeholder="PB">
+        </div>
+      </div>
+
+      <div class="options-row">
+        <div class="option-group">
+          <label for="playerName">Player Name (optional):</label>
+          <input type="text" id="playerName" placeholder="Lucky Winner" maxlength="30">
+        </div>
+        
+        <div class="option-group">
+          <label for="drawDate">Draw Date (optional):</label>
+          <input type="date" id="drawDate">
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button id="randomBtn" class="action-btn secondary">🎲 Random Numbers</button>
+        <button id="generateBtn" class="action-btn primary">✨ Create Ticket</button>
+      </div>
+    </div>
+
+    <div class="preview-panel">
+      <h3>Your Ticket</h3>
+      <div id="ticketPreview" class="ticket-preview">
+        <div class="ticket-placeholder">
+          <p>Enter numbers and click "Create Ticket"</p>
+        </div>
+      </div>
+      
+      <div class="download-hint">
+        <p>📸 Right-click → Save Image, or take a screenshot to share</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="edu-section">
+    <h2>Ideas for Using Your Ticket</h2>
+    
+    <div class="ideas-grid">
+      <div class="idea-card">
+        <span class="idea-icon">🏢</span>
+        <h4>Office Pool</h4>
+        <p>Share with coworkers to track everyone's picks. Makes the pool more exciting!</p>
+      </div>
+      
+      <div class="idea-card">
+        <span class="idea-icon">🎁</span>
+        <h4>Gift Inside Card</h4>
+        <p>Tuck a beautiful ticket image in a birthday or holiday card.</p>
+      </div>
+      
+      <div class="idea-card">
+        <span class="idea-icon">📱</span>
+        <h4>Social Sharing</h4>
+        <p>Post your "lucky numbers" with style (just don't blame us when they don't win!).</p>
+      </div>
+      
+      <div class="idea-card">
+        <span class="idea-icon">📋</span>
+        <h4>Record Keeping</h4>
+        <p>Keep a visual history of all your number picks over time.</p>
+      </div>
+    </div>
+
+    <div class="disclaimer-box">
+      <h3>⚠️ Entertainment Only</h3>
+      <p>
+        This is <strong>not an official lottery ticket</strong>. To actually play the lottery, 
+        you must purchase tickets from authorized retailers. These graphics are for fun, 
+        record-keeping, and sharing purposes only.
+      </p>
+    </div>
+  </section>
+</InfoLayout>
+
+<style>
+  .tool-section {
+    padding: 2rem;
+    background: var(--surface);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+  }
+
+  .input-panel {
+    margin-bottom: 2rem;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .game-select-group,
+  .theme-select-group {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .game-select-group label,
+  .theme-select-group label,
+  .numbers-input label,
+  .option-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .game-select-group select,
+  .theme-select-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+  }
+
+  .numbers-input {
+    margin-bottom: 1.5rem;
+  }
+
+  .number-fields {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .num-input {
+    width: 55px;
+    height: 55px;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .num-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .num-input.bonus {
+    border-color: #f59e0b;
+  }
+
+  .num-input.bonus:focus {
+    border-color: #ef4444;
+  }
+
+  .options-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .option-group {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .option-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+  }
+
+  .action-btn.primary {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .action-btn.secondary {
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  .preview-panel h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+  }
+
+  .ticket-preview {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ticket-placeholder {
+    padding: 3rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    background: var(--bg);
+    border-radius: 12px;
+    width: 100%;
+  }
+
+  /* Ticket Canvas Styles - Generated dynamically */
+  .ticket-canvas {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+
+  /* Theme: Classic */
+  .ticket-canvas.theme-classic {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: white;
+    border: 3px solid #e94560;
+  }
+
+  /* Theme: Neon */
+  .ticket-canvas.theme-neon {
+    background: #0a0a0a;
+    color: #0ff;
+    border: 3px solid #0ff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.1);
+  }
+
+  /* Theme: Gold */
+  .ticket-canvas.theme-gold {
+    background: linear-gradient(135deg, #2d1810 0%, #4a2c1c 100%);
+    color: #ffd700;
+    border: 3px solid #ffd700;
+  }
+
+  /* Theme: Minimal */
+  .ticket-canvas.theme-minimal {
+    background: white;
+    color: #333;
+    border: 2px solid #333;
+  }
+
+  /* Theme: Retro */
+  .ticket-canvas.theme-retro {
+    background: linear-gradient(135deg, #7b2d8e 0%, #d4145a 100%);
+    color: #ffd700;
+    border: 4px double #ffd700;
+  }
+
+  /* Theme: Lucky */
+  .ticket-canvas.theme-lucky {
+    background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+    color: white;
+    border: 3px solid #ffd700;
+  }
+
+  .ticket-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .ticket-game-name {
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.25rem;
+  }
+
+  .ticket-subtext {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  .ticket-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .ticket-ball {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-radius: 50%;
+    background: white;
+    color: #333;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+  }
+
+  .theme-neon .ticket-ball {
+    background: transparent;
+    border: 2px solid #0ff;
+    color: #0ff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  }
+
+  .theme-gold .ticket-ball {
+    background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+    color: #2d1810;
+  }
+
+  .theme-minimal .ticket-ball {
+    background: #333;
+    color: white;
+  }
+
+  .theme-retro .ticket-ball {
+    background: #ffd700;
+    color: #7b2d8e;
+  }
+
+  .theme-lucky .ticket-ball {
+    background: white;
+    color: #134e5e;
+  }
+
+  .ticket-ball.bonus {
+    background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+    color: white;
+  }
+
+  .theme-neon .ticket-ball.bonus {
+    background: transparent;
+    border-color: #f0f;
+    color: #f0f;
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+  }
+
+  .ticket-footer {
+    font-size: 0.85rem;
+    opacity: 0.9;
+  }
+
+  .ticket-player {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .ticket-date {
+    opacity: 0.7;
+  }
+
+  .download-hint {
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  .download-hint p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .edu-section {
+    padding: 2rem;
+  }
+
+  .edu-section h2 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .ideas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .idea-card {
+    padding: 1.5rem;
+    background: var(--surface);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .idea-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .idea-card h4 {
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+  }
+
+  .idea-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .disclaimer-box {
+    padding: 1.5rem;
+    background: var(--surface);
+    border-radius: 12px;
+    border-left: 4px solid #f59e0b;
+  }
+
+  .disclaimer-box h3 {
+    margin-bottom: 0.75rem;
+    color: #f59e0b;
+  }
+
+  .disclaimer-box p {
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 600px) {
+    .num-input {
+      width: 45px;
+      height: 45px;
+      font-size: 1rem;
+    }
+
+    .ticket-ball {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const gameSelect = document.getElementById('gameSelect') as HTMLSelectElement;
+    const themeSelect = document.getElementById('themeSelect') as HTMLSelectElement;
+    const numberFields = document.getElementById('numberFields') as HTMLDivElement;
+    const playerName = document.getElementById('playerName') as HTMLInputElement;
+    const drawDate = document.getElementById('drawDate') as HTMLInputElement;
+    const randomBtn = document.getElementById('randomBtn') as HTMLButtonElement;
+    const generateBtn = document.getElementById('generateBtn') as HTMLButtonElement;
+    const ticketPreview = document.getElementById('ticketPreview') as HTMLDivElement;
+
+    const gameConfig: Record<string, { main: number, mainMax: number, bonus?: number, bonusMax?: number, name: string }> = {
+      powerball: { main: 5, mainMax: 69, bonus: 1, bonusMax: 26, name: 'Powerball' },
+      megamillions: { main: 5, mainMax: 70, bonus: 1, bonusMax: 25, name: 'Mega Millions' },
+      pick3: { main: 3, mainMax: 9, name: 'Pick-3' },
+      pick4: { main: 4, mainMax: 9, name: 'Pick-4' },
+      custom: { main: 6, mainMax: 99, name: 'Lucky Numbers' }
+    };
+
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    drawDate.value = today;
+
+    function updateNumberFields() {
+      const config = gameConfig[gameSelect.value];
+      numberFields.innerHTML = '';
+      
+      for (let i = 0; i < config.main; i++) {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.className = 'num-input main';
+        input.min = config.mainMax <= 9 ? '0' : '1';
+        input.max = config.mainMax.toString();
+        input.placeholder = (i + 1).toString();
+        numberFields.appendChild(input);
+      }
+      
+      if (config.bonus && config.bonusMax) {
+        const bonusInput = document.createElement('input');
+        bonusInput.type = 'number';
+        bonusInput.className = 'num-input bonus';
+        bonusInput.min = '1';
+        bonusInput.max = config.bonusMax.toString();
+        bonusInput.placeholder = gameSelect.value === 'powerball' ? 'PB' : 'MB';
+        numberFields.appendChild(bonusInput);
+      }
+    }
+
+    function generateRandomNumbers() {
+      const config = gameConfig[gameSelect.value];
+      const mainInputs = numberFields.querySelectorAll('.main') as NodeListOf<HTMLInputElement>;
+      const bonusInput = numberFields.querySelector('.bonus') as HTMLInputElement;
+      
+      const usedNumbers = new Set<number>();
+      
+      mainInputs.forEach(input => {
+        let num: number;
+        if (config.mainMax <= 9) {
+          // Pick games allow repeats
+          num = Math.floor(Math.random() * 10);
+        } else {
+          // Draw without replacement
+          do {
+            num = Math.floor(Math.random() * config.mainMax) + 1;
+          } while (usedNumbers.has(num));
+          usedNumbers.add(num);
+        }
+        input.value = num.toString();
+      });
+      
+      if (bonusInput && config.bonusMax) {
+        bonusInput.value = (Math.floor(Math.random() * config.bonusMax) + 1).toString();
+      }
+    }
+
+    function createTicket() {
+      const config = gameConfig[gameSelect.value];
+      const theme = themeSelect.value;
+      const mainInputs = numberFields.querySelectorAll('.main') as NodeListOf<HTMLInputElement>;
+      const bonusInput = numberFields.querySelector('.bonus') as HTMLInputElement;
+      
+      const mainNumbers: string[] = [];
+      mainInputs.forEach(input => {
+        mainNumbers.push(input.value || '?');
+      });
+      
+      const bonusNumber = bonusInput ? bonusInput.value : null;
+      const player = playerName.value || 'Lucky Player';
+      const date = drawDate.value ? new Date(drawDate.value).toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      }) : '';
+      
+      let numbersHTML = mainNumbers.map(n => 
+        `<div class="ticket-ball">${n}</div>`
+      ).join('');
+      
+      if (bonusNumber) {
+        numbersHTML += `<div class="ticket-ball bonus">${bonusNumber}</div>`;
+      }
+      
+      ticketPreview.innerHTML = `
+        <div class="ticket-canvas theme-${theme}">
+          <div class="ticket-header">
+            <div class="ticket-game-name">${config.name}</div>
+            <div class="ticket-subtext">Official Looking (But Not Official) Ticket</div>
+          </div>
+          <div class="ticket-numbers">
+            ${numbersHTML}
+          </div>
+          <div class="ticket-footer">
+            <div class="ticket-player">🎫 ${player}</div>
+            ${date ? `<div class="ticket-date">Draw: ${date}</div>` : ''}
+            <div class="ticket-luck">Good Luck! 🍀</div>
+          </div>
+        </div>
+      `;
+    }
+
+    gameSelect.addEventListener('change', updateNumberFields);
+    randomBtn.addEventListener('click', generateRandomNumbers);
+    generateBtn.addEventListener('click', createTicket);
+
+    // Initialize
+    updateNumberFields();
+  });
+</script>
