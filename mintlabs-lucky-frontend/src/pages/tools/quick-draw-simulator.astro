@@ -1,0 +1,341 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const games = [
+  { name: 'Powerball', mainNumbers: 5, mainRange: 69, bonusNumbers: 1, bonusRange: 26, jackpot: '$1.25B' },
+  { name: 'Mega Millions', mainNumbers: 5, mainRange: 70, bonusNumbers: 1, bonusRange: 25, jackpot: '$1.45B' },
+  { name: 'Lotto America', mainNumbers: 5, mainRange: 52, bonusNumbers: 1, bonusRange: 10, jackpot: '$2.35M' },
+  { name: 'Cash4Life', mainNumbers: 5, mainRange: 60, bonusNumbers: 1, bonusRange: 4, jackpot: '$1,000/day' },
+  { name: 'Lucky for Life', mainNumbers: 5, mainRange: 48, bonusNumbers: 1, bonusRange: 18, jackpot: '$1,000/day' },
+  { name: 'Pick 6/49', mainNumbers: 6, mainRange: 49, bonusNumbers: 0, bonusRange: 0, jackpot: '$5M' },
+  { name: 'Pick 5/35', mainNumbers: 5, mainRange: 35, bonusNumbers: 0, bonusRange: 0, jackpot: '$100K' },
+  { name: 'Pick 4/24', mainNumbers: 4, mainRange: 24, bonusNumbers: 0, bonusRange: 0, jackpot: '$2K' },
+  { name: 'Pick 3/10', mainNumbers: 3, mainRange: 10, bonusNumbers: 0, bonusRange: 0, jackpot: '$500' },
+];
+
+const pageTitle = "Quick Draw Simulator | Lottery Draw Simulator for Powerball, Mega Millions";
+const description = "Simulate random lottery draws for Powerball, Mega Millions, and other games. See what winning numbers look like before you play.";
+const keywords = "lottery simulator, powerball simulator, mega millions simulator, lottery draw simulator, random lottery numbers, lottery number generator";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Quick Draw Simulator",
+  "description": description,
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<InfoLayout
+  title="Quick Draw Simulator"
+  subtitle="Experience the thrill of lottery draws without spending a dime"
+  pageTitle={pageTitle}
+  description={description}
+  keywords={keywords}
+  jsonLd={jsonLd}
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">For entertainment only:</strong>
+    Simulate random lottery draws for popular games like Powerball and Mega Millions.
+    See what winning number combinations look like before you decide to play.
+  </div>
+
+<script>
+  interface GameConfig {
+    name: string;
+    mainNumbers: number;
+    mainRange: number;
+    bonusNumbers: number;
+    bonusRange: number;
+    jackpot: string;
+  }
+
+  const gamesData: GameConfig[] = [
+    { name: 'Powerball', mainNumbers: 5, mainRange: 69, bonusNumbers: 1, bonusRange: 26, jackpot: '$1.25B' },
+    { name: 'Mega Millions', mainNumbers: 5, mainRange: 70, bonusNumbers: 1, bonusRange: 25, jackpot: '$1.45B' },
+    { name: 'Lotto America', mainNumbers: 5, mainRange: 52, bonusNumbers: 1, bonusRange: 10, jackpot: '$2.35M' },
+    { name: 'Cash4Life', mainNumbers: 5, mainRange: 60, bonusNumbers: 1, bonusRange: 4, jackpot: '$1,000/day' },
+    { name: 'Lucky for Life', mainNumbers: 5, mainRange: 48, bonusNumbers: 1, bonusRange: 18, jackpot: '$1,000/day' },
+    { name: 'Pick 6/49', mainNumbers: 6, mainRange: 49, bonusNumbers: 0, bonusRange: 0, jackpot: '$5M' },
+    { name: 'Pick 5/35', mainNumbers: 5, mainRange: 35, bonusNumbers: 0, bonusRange: 0, jackpot: '$100K' },
+    { name: 'Pick 4/24', mainNumbers: 4, mainRange: 24, bonusNumbers: 0, bonusRange: 0, jackpot: '$2K' },
+    { name: 'Pick 3/10', mainNumbers: 3, mainRange: 10, bonusNumbers: 0, bonusRange: 0, jackpot: '$500' },
+  ];
+
+  let selectedGame: GameConfig = gamesData[0];
+  let drawResults: { main: number[], bonus: number[] } | null = null;
+
+  function selectGame(gameName: string) {
+    selectedGame = gamesData.find(g => g.name === gameName) || gamesData[0];
+    updateGameDisplay();
+    updateGameCardSelection();
+  }
+
+  function updateGameCardSelection() {
+    // Remove selected class from all game cards
+    const gameCards = document.querySelectorAll('.game-card');
+    gameCards.forEach(card => card.classList.remove('selected'));
+
+    // Add selected class to the current game card
+    const selectedCard = document.querySelector(`.game-card[onclick*="${selectedGame.name}"]`);
+    if (selectedCard) {
+      selectedCard.classList.add('selected');
+    }
+  }
+
+  function updateGameDisplay() {
+    const gameSelect = document.getElementById('game-select') as HTMLSelectElement;
+    const jackpotDisplay = document.getElementById('jackpot-display') as HTMLElement;
+    const drawButton = document.getElementById('draw-button') as HTMLButtonElement;
+
+    if (gameSelect && jackpotDisplay && drawButton) {
+      gameSelect.value = selectedGame.name;
+      jackpotDisplay.textContent = selectedGame.jackpot;
+      drawButton.textContent = `Draw ${selectedGame.name} Numbers`;
+    }
+  }
+
+  function generateRandomNumbers(count: number, max: number): number[] {
+    const numbers: number[] = [];
+    while (numbers.length < count) {
+      const num = Math.floor(Math.random() * max) + 1;
+      if (!numbers.includes(num)) {
+        numbers.push(num);
+      }
+    }
+    return numbers.sort((a, b) => a - b);
+  }
+
+  function simulateDraw() {
+    const mainNumbers = generateRandomNumbers(selectedGame.mainNumbers, selectedGame.mainRange);
+    const bonusNumbers = selectedGame.bonusNumbers > 0
+      ? generateRandomNumbers(selectedGame.bonusNumbers, selectedGame.bonusRange)
+      : [];
+
+    drawResults = { main: mainNumbers, bonus: bonusNumbers };
+    displayResults();
+  }
+
+  function displayResults() {
+    if (!drawResults) return;
+
+    const resultsDiv = document.getElementById('draw-results') as HTMLElement;
+    if (!resultsDiv) {
+      console.error('draw-results element not found');
+      return;
+    }
+
+    const mainBalls = drawResults.main.map(num =>
+      `<span class="inline-block w-12 h-12 bg-white border-2 border-slate-400 rounded-full text-center leading-12 font-bold text-lg mx-1 shadow-md text-slate-900">${num}</span>`
+    ).join('');
+
+    const bonusBalls = drawResults.bonus.map(num =>
+      `<span class="inline-block w-12 h-12 bg-red-500 text-white rounded-full text-center leading-12 font-bold text-lg mx-1 shadow-md border-2 border-red-600">${num}</span>`
+    ).join('');
+
+    resultsDiv.innerHTML = `
+      <div class="bg-white border-2 border-slate-300 rounded-lg p-6 shadow-lg">
+        <h3 class="text-xl font-bold text-center mb-4 text-slate-900">Your Simulated ${selectedGame.name} Draw</h3>
+        <div class="flex flex-wrap justify-center items-center gap-2 mb-4">
+          ${mainBalls}
+          ${bonusBalls ? `<span class="text-2xl font-bold text-slate-900 mx-2">+</span>${bonusBalls}` : ''}
+        </div>
+        <p class="text-center text-sm text-slate-700">
+          These are randomly generated numbers for entertainment purposes only.<br>
+          <strong class="text-slate-900">Remember:</strong> All lottery games are games of chance. Play responsibly.
+        </p>
+      </div>
+    `;
+
+    // Add animation effect
+    resultsDiv.style.animation = 'none';
+    setTimeout(() => {
+      resultsDiv.style.animation = 'fadeIn 0.5s ease-in-out';
+    }, 10);
+  }
+
+  function resetDraw() {
+    drawResults = null;
+    const resultsDiv = document.getElementById('draw-results') as HTMLElement;
+    if (resultsDiv) {
+      resultsDiv.innerHTML = '<p class="text-center text-gray-500 italic">Click "Draw Numbers" to simulate a lottery draw</p>';
+    }
+  }
+
+  // Make functions globally available for onclick handlers
+  (window as any).selectGame = selectGame;
+  (window as any).simulateDraw = simulateDraw;
+  (window as any).resetDraw = resetDraw;
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    updateGameDisplay();
+    updateGameCardSelection();
+    resetDraw();
+  });
+</script>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .game-card {
+    transition: all 0.3s ease;
+  }
+
+  .game-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .game-card.selected {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+  }
+
+  .game-card.selected h3 {
+    color: #1f2937; /* text-slate-800 */
+  }
+
+  .game-card.selected p {
+    color: #374151; /* text-slate-700 */
+  }
+
+  .game-card.selected p:last-child {
+    color: #065f46; /* text-green-800 - darker green for jackpot */
+  }
+</style>
+
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="text-center mb-8">
+    <h1 class="text-4xl font-bold theme-text-primary mb-4">Quick Draw Simulator</h1>
+    <p class="text-xl theme-text-secondary max-w-2xl mx-auto">
+      Experience the thrill of lottery draws without spending a dime. Simulate random draws for popular games and see what winning numbers look like.
+    </p>
+  </div>
+
+  <!-- Game Selection -->
+  <div class="theme-bg-card rounded-lg shadow-lg p-6 mb-8">
+    <h2 class="text-2xl font-bold theme-text-primary mb-4">Choose Your Game</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      {games.map(game => (
+        <div
+          class="game-card cursor-pointer p-4 rounded-lg border-2 theme-border-primary theme-bg-secondary hover:bg-blue-50 transition-all"
+          onclick={`selectGame('${game.name}')`}
+        >
+          <h3 class="font-bold text-lg theme-text-primary">{game.name}</h3>
+          <p class="text-sm theme-text-secondary">
+            {game.mainNumbers}/{game.mainRange}
+            {game.bonusNumbers > 0 ? ` + ${game.bonusNumbers}/${game.bonusRange}` : ''}
+          </p>
+          <p class="text-sm font-semibold text-green-600 mt-1">Jackpot: {game.jackpot}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <select
+        id="game-select"
+        class="px-4 py-2 border theme-border-primary rounded-lg focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent theme-bg-input theme-text-primary"
+        onchange="selectGame(this.value)"
+      >
+        {games.map(game => (
+          <option value={game.name}>{game.name}</option>
+        ))}
+      </select>
+
+      <div class="text-center">
+        <p class="text-sm theme-text-secondary">Current Jackpot</p>
+        <p id="jackpot-display" class="text-2xl font-bold text-green-600"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Draw Controls -->
+  <div class="theme-bg-card rounded-lg shadow-lg p-6 mb-8">
+    <div class="text-center">
+      <button
+        id="draw-button"
+        onclick="simulateDraw()"
+        class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-lg text-xl shadow-lg transform hover:scale-105 transition-all duration-200"
+      >
+        Draw Numbers
+      </button>
+
+      <button
+        onclick="resetDraw()"
+        class="ml-4 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200"
+      >
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Display -->
+  <div id="draw-results" class="min-h-[200px]">
+    <!-- Results will be inserted here -->
+  </div>
+
+  <!-- Educational Content -->
+  <div class="theme-bg-card rounded-lg shadow-lg p-6 mt-8">
+    <h2 class="text-2xl font-bold theme-text-primary mb-4">Understanding Lottery Odds</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="text-lg font-semibold theme-text-primary mb-2">How Lotteries Work</h3>
+        <ul class="theme-text-secondary space-y-2">
+          <li>• Numbers are drawn randomly from a pool</li>
+          <li>• Each combination has an equal chance</li>
+          <li>• Past draws don't affect future results</li>
+          <li>• The more tickets you buy, the better your odds</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold theme-text-primary mb-2">Responsible Play Tips</h3>
+        <ul class="theme-text-secondary space-y-2">
+          <li>• Set a budget and stick to it</li>
+          <li>• Treat lottery as entertainment, not investment</li>
+          <li>• Consider joining a lottery pool</li>
+          <li>• Check odds before playing</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400">
+      <p class="text-sm text-yellow-800">
+        <strong>Important:</strong> This simulator generates random numbers for educational purposes only.
+        It does not guarantee future lottery results. Always play responsibly and within your means.
+      </p>
+    </div>
+  </div>
+
+  <!-- Related Tools -->
+  <div class="theme-bg-card rounded-lg shadow-lg p-6 mt-8">
+    <h2 class="text-2xl font-bold theme-text-primary mb-4">Explore More Tools</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <a href="/tools/odds-comparison" class="block p-4 border theme-border-primary rounded-lg hover:bg-slate-800/80 transition-colors">
+        <h3 class="font-semibold text-blue-600">Odds Comparison</h3>
+        <p class="text-sm theme-text-secondary">Compare odds across different lottery games</p>
+      </a>
+      <a href="/tools/expected-value-calculator" class="block p-4 border theme-border-primary rounded-lg hover:bg-slate-800/80 transition-colors">
+        <h3 class="font-semibold text-blue-600">Expected Value Calculator</h3>
+        <p class="text-sm theme-text-secondary">Calculate the mathematical value of lottery tickets</p>
+      </a>
+      <a href="/tools/winning-chance-simulator" class="block p-4 border theme-border-primary rounded-lg hover:bg-slate-800/80 transition-colors">
+        <h3 class="font-semibold text-blue-600">Winning Chance Simulator</h3>
+        <p class="text-sm theme-text-secondary">Simulate multiple draws to understand probability</p>
+      </a>
+    </div>
+  </div>
+</div>

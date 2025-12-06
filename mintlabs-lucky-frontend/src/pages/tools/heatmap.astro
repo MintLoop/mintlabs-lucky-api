@@ -147,16 +147,23 @@ const jsonLd = {
 <style>
   .tool-section {
     padding: 2rem;
-    background: var(--surface);
-    border-radius: 12px;
+    background: var(--bg-card);
+    border-radius: 14px;
     margin-bottom: 2rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
   }
 
   .controls {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
   }
 
   .game-selector,
@@ -169,13 +176,13 @@ const jsonLd = {
 
   .game-btn,
   .time-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    border: 2px solid var(--border);
-    border-radius: 6px;
-    background: transparent;
-    color: var(--text);
+    padding: 0.55rem 1.1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text-primary);
     cursor: pointer;
     transition: all 0.2s ease;
   }
@@ -183,6 +190,8 @@ const jsonLd = {
   .game-btn:hover,
   .time-btn:hover {
     border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
   }
 
   .game-btn.active,
@@ -190,67 +199,105 @@ const jsonLd = {
     background: var(--accent);
     border-color: var(--accent);
     color: var(--bg);
+    box-shadow: 0 8px 18px rgba(var(--accent-rgb), 0.25);
   }
 
   .heatmap-container {
     margin-bottom: 2rem;
+    background: var(--surface);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
   }
 
   .heatmap-container h3 {
     margin-bottom: 1rem;
     text-align: center;
-    color: var(--text-secondary);
+    color: var(--text-primary);
   }
 
-  .heatmap-grid {
+  :global(.heatmap-grid) {
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 4px;
-    max-width: 500px;
-    margin: 0 auto 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(68px, 1fr));
+    gap: 10px;
+    max-width: 760px;
+    margin: 0 auto 1rem auto;
+    justify-items: center;
   }
 
-  .bonus-grid {
-    grid-template-columns: repeat(9, 1fr);
-    max-width: 360px;
+  :global(.bonus-grid) {
+    grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+    max-width: 440px;
   }
 
-  .heat-cell {
+  :global(.heat-cell) {
+    width: 100%;
     aspect-ratio: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    font-size: 0.9rem;
-    border-radius: 4px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    border-radius: 16px;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease;
     position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    overflow: visible;
   }
 
-  .heat-cell:hover {
-    transform: scale(1.15);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  :global(.heat-cell:hover),
+  :global(.heat-cell.show) {
+    transform: translateY(-2px) scale(1.06);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.22);
     z-index: 10;
+    border-color: rgba(255, 255, 255, 0.24);
   }
 
-  .heat-cell .tooltip {
+  :global(.heat-cell .heat-label) {
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  :global(.heat-cell .tooltip) {
     display: none;
     position: absolute;
-    bottom: 100%;
+    bottom: 110%;
     left: 50%;
     transform: translateX(-50%);
-    padding: 0.5rem 0.75rem;
-    background: var(--bg);
+    padding: 0.65rem 0.85rem;
+    background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 4px;
-    font-size: 0.75rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
     white-space: nowrap;
     z-index: 100;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+    color: var(--text-primary);
+    min-width: 180px;
   }
 
-  .heat-cell:hover .tooltip {
+  :global(.tooltip-title) {
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+  }
+
+  :global(.tooltip-row) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    padding: 0.15rem 0;
+  }
+
+  :global(.heat-cell:hover .tooltip),
+  :global(.heat-cell.show .tooltip) {
     display: block;
   }
 
@@ -263,21 +310,26 @@ const jsonLd = {
   }
 
   .legend-label {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
+    font-weight: 600;
   }
 
   .legend-gradient {
-    width: 200px;
-    height: 20px;
-    border-radius: 4px;
-    background: linear-gradient(90deg, #3b82f6 0%, #fbbf24 50%, #ef4444 100%);
+    width: 220px;
+    height: 16px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #0ea5e9 0%, #fbbf24 50%, #ef4444 100%);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
   }
 
   .stats-panel {
     padding: 1.5rem;
-    background: var(--bg);
-    border-radius: 8px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
   }
 
   .stats-panel h3 {
@@ -287,28 +339,32 @@ const jsonLd = {
 
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 1rem;
   }
 
   .stat-box {
     text-align: center;
     padding: 1rem;
-    background: var(--surface);
-    border-radius: 8px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
   }
 
   .stat-label {
     display: block;
     font-size: 0.8rem;
     color: var(--text-secondary);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
   }
 
   .stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.35rem;
+    font-weight: 800;
     color: var(--accent);
+    letter-spacing: 0.01em;
   }
 
   .edu-section {
@@ -333,14 +389,17 @@ const jsonLd = {
     gap: 1rem;
     padding: 1rem;
     background: var(--surface);
-    border-radius: 8px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
   }
 
   .sample-cell {
     width: 50px;
     height: 50px;
-    border-radius: 8px;
+    border-radius: 10px;
     flex-shrink: 0;
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .sample-cell.hot {
@@ -352,7 +411,7 @@ const jsonLd = {
   }
 
   .sample-cell.cold {
-    background: #3b82f6;
+    background: #0ea5e9;
   }
 
   .guide-text h4 {
@@ -370,7 +429,8 @@ const jsonLd = {
     background: var(--surface);
     border-radius: 12px;
     margin-bottom: 2rem;
-    border-left: 4px solid #ef4444;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
   }
 
   .truth-bomb h3 {
@@ -390,6 +450,7 @@ const jsonLd = {
     padding: 1.5rem;
     background: var(--surface);
     border-radius: 12px;
+    border: 1px solid var(--border);
   }
 
   .use-cases h3 {
@@ -422,7 +483,8 @@ const jsonLd = {
     }
 
     .heat-cell {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
+      border-radius: 10px;
     }
   }
 </style>
@@ -448,29 +510,45 @@ const jsonLd = {
       megamillions: { mainMax: 70, bonusMax: 25, bonusName: 'Mega Ball' }
     };
 
-    // Generate simulated frequency data with variance based on time period
-    function generateFrequencyData(max: number, timePeriod: string): Map<number, number> {
-      const data = new Map<number, number>();
-      
-      // Different base draws for different time periods
+    function expectedPerNumber(max: number, timePeriod: string, isBonus: boolean): number {
       const baseDraws: Record<string, number> = {
         'all': 520,
         'year': 104,
         '6month': 52,
         '3month': 26
       };
-      
       const draws = baseDraws[timePeriod] || 520;
-      
+      return draws * (isBonus ? 1 / max : 5 / max);
+    }
+
+    // Generate simulated frequency data with variance, normalized so totals match expected.
+    function generateFrequencyData(max: number, timePeriod: string, isBonus = false): Map<number, number> {
+      const data = new Map<number, number>();
+      const baseDraws: Record<string, number> = {
+        'all': 520,
+        'year': 104,
+        '6month': 52,
+        '3month': 26
+      };
+      const draws = baseDraws[timePeriod] || 520;
+      const expected = expectedPerNumber(max, timePeriod, isBonus);
+      const expectedTotal = expected * max;
+      const varianceFactor = timePeriod === 'all' ? 0.12 : timePeriod === 'year' ? 0.2 : 0.32;
+
+      let rawTotal = 0;
       for (let i = 1; i <= max; i++) {
-        // Add realistic variance - more variance with fewer draws
-        const expectedRate = 5 / max; // Approximate for main numbers
-        const expected = draws * expectedRate;
-        const varianceFactor = timePeriod === 'all' ? 0.15 : timePeriod === 'year' ? 0.25 : 0.4;
         const variance = (Math.random() - 0.5) * 2 * expected * varianceFactor;
-        data.set(i, Math.max(1, Math.round(expected + variance)));
+        const raw = Math.max(0, expected + variance);
+        data.set(i, raw);
+        rawTotal += raw;
       }
-      
+
+      const scale = rawTotal > 0 ? expectedTotal / rawTotal : 1;
+      for (let i = 1; i <= max; i++) {
+        const scaled = Math.max(1, Math.round((data.get(i) || 0) * scale));
+        data.set(i, scaled);
+      }
+
       return data;
     }
 
@@ -506,18 +584,41 @@ const jsonLd = {
       const values = Array.from(data.values());
       const min = Math.min(...values);
       const max = Math.max(...values);
+      const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
+      let openCell: HTMLDivElement | null = null;
       
       data.forEach((count, num) => {
         const cell = document.createElement('div');
         cell.className = 'heat-cell';
         cell.style.backgroundColor = getHeatColor(count, min, max);
         cell.style.color = getTextColor(count, min, max);
-        cell.textContent = num.toString();
-        
+
+        const label = document.createElement('span');
+        label.className = 'heat-label';
+        label.textContent = num.toString();
+        cell.appendChild(label);
+
         const tooltip = document.createElement('div');
         tooltip.className = 'tooltip';
-        tooltip.innerHTML = `<strong>#${num}</strong><br>Appearances: ${count}`;
+        const expectedCount = expectedPerNumber(container === bonusHeatmap ? (currentGame === 'powerball' ? 26 : 25) : (currentGame === 'powerball' ? 69 : 70), currentTime, container === bonusHeatmap);
+        const deltaPct = Math.round((count / expectedCount) * 100);
+        const status = deltaPct > 110 ? 'Hot' : deltaPct < 90 ? 'Cold' : 'Neutral';
+        const statusEmoji = deltaPct > 110 ? '🔥' : deltaPct < 90 ? '❄️' : '⚪';
+        tooltip.innerHTML = `
+          <div class="tooltip-title">${statusEmoji} #${num} — ${status}</div>
+          <div class="tooltip-row"><span>Hits</span><strong>${count}</strong></div>
+          <div class="tooltip-row"><span>vs expected</span><strong>${deltaPct}%</strong></div>
+        `;
         cell.appendChild(tooltip);
+
+        cell.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (openCell && openCell !== cell) {
+            openCell.classList.remove('show');
+          }
+          cell.classList.toggle('show');
+          openCell = cell.classList.contains('show') ? cell : null;
+        });
         
         container.appendChild(cell);
       });
@@ -565,8 +666,8 @@ const jsonLd = {
     function render() {
       const config = gameConfig[currentGame];
       
-      const mainData = generateFrequencyData(config.mainMax, currentTime);
-      const bonusData = generateFrequencyData(config.bonusMax, currentTime);
+      const mainData = generateFrequencyData(config.mainMax, currentTime, false);
+      const bonusData = generateFrequencyData(config.bonusMax, currentTime, true);
       
       bonusTitle.textContent = `${config.bonusName} Numbers`;
       
@@ -594,6 +695,10 @@ const jsonLd = {
     megamillionsBtn.addEventListener('click', () => switchGame('megamillions'));
     timeButtons.forEach(btn => {
       btn.addEventListener('click', () => switchTime(btn.dataset.time || 'all'));
+    });
+
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.heat-cell.show').forEach(el => el.classList.remove('show'));
     });
 
     // Initial render

@@ -9,7 +9,7 @@ import GameFacts from "../components/GameFacts.astro";
 import TermsModal from "../components/TermsModal.astro";
 import PrivacyModal from "../components/PrivacyModal.astro";
 // env + API
-const API = import.meta.env.PUBLIC_API_BASE;
+const API = import.meta.env.PUBLIC_API_BASE || 'http://localhost:8000';
 const ADS = import.meta.env.PUBLIC_ADSENSE_CLIENT;
 const IS_PROD = import.meta.env.PROD;
 
@@ -17,6 +17,7 @@ const gamesEndpoint = API ? `${String(API).replace(/\/$/, '')}/games` : '/games'
 const games = await fetch(gamesEndpoint).then(r => r.json()).catch(() => []);
 const jsonGames = Array.isArray(games) ? JSON.stringify(games).replaceAll('`', '\\`') : '[]';
 const current = Array.isArray(games) && games.length > 0 ? games[0] : null;
+const apiBase = API ? String(API).replace(/\/$/, '') : '';
 ---
 <html lang="en">
   <head>
@@ -120,7 +121,7 @@ const current = Array.isArray(games) && games.length > 0 ? games[0] : null;
 
     <!-- your generator logic -->
     <script is:inline>
-      window.__LUCKY_API_BASE = {JSON.stringify(API ? String(API).replace(/\/$/, '') : '')};
+      window.__LUCKY_API_BASE = "http://localhost:8000";
     </script>
     <script type="module" src="/scripts/entry.js"></script>
 

@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import ThemeToolbar from "../components/ThemeToolBar.astro";
 
 export interface Props {
   title: string;
@@ -41,6 +42,11 @@ const seoTitle = pageTitle || `${title} - MintLabs Lucky Numbers`;
         <p class="text-sm leading-relaxed text-gray-300">
           <slot name="teaser" />
         </p>
+      </div>
+
+      <!-- Theme Selector -->
+      <div class="flex justify-center mb-6">
+        <ThemeToolbar />
       </div>
 
       <a

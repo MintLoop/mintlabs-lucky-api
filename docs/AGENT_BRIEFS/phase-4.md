@@ -93,6 +93,24 @@ Phase 4 is split into **4 micro-phases** for stability and maintainability:
 
 ---
 
+## Recent UX / QA updates (ticket-beautifier)
+
+Small but important improvements landed in the Ticket Beautifier during the Phase 4.2 UX sweep. These are delivery-focused items that improve export parity, usability for raffles, and testability for QA:
+
+- Exports now rasterize the actual preview DOM using html2canvas so downloaded PNGs match the on-screen preview exactly (backgrounds, borders, shadows, fonts and embedded QR images).
+- Switched QR generation to in-browser (no remote dependence) and inject QR image elements into the preview so rasterization includes them.
+- Copies behavior: when generating multiple copies the tool now produces randomized tickets but guarantees exactly one duplicated pair (useful for raffle/winner workflows). A future toggle can allow identical copies on demand.
+- Filenames and QA: human-readable theme names are not included in the filename. Instead we use deterministic short theme codes (3-digit) plus a tiny color marker drawn in the exported image for automated QA verification.
+
+Recommended follow-ups / tests:
+
+- Add Playwright tests to assert downloaded file names use the internal numeric theme id and do not contain the human theme name.
+- Add an e2e test for the Download All flow verifying the number of downloaded assets matches requested copies (or add a zip option for batch downloads to avoid multiple browser prompts).
+- Optional pixel-check test: check that exported PNG contains the tiny theme color marker or rendered QR when enabled.
+
+
+---
+
 ## TIER S — TOP SEO VALUE (Build First) 🔥
 
 These tools target extremely high-volume keyword clusters (Powerball, Mega Millions, odds, combinations, patterns, EV).

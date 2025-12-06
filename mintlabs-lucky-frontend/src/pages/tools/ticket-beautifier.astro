@@ -52,7 +52,7 @@ const jsonLd = {
         
         <div class="theme-select-group">
           <label for="themeSelect">Style:</label>
-          <select id="themeSelect">
+          <select id="ticketThemeSelect">
             <option value="classic">Classic</option>
             <option value="neon">Neon Glow</option>
             <option value="gold">Golden Luxury</option>
@@ -80,10 +80,33 @@ const jsonLd = {
           <label for="playerName">Player Name (optional):</label>
           <input type="text" id="playerName" placeholder="Lucky Winner" maxlength="30">
         </div>
+
+        <div class="option-group">
+          <label for="pinCode">Passcode / PIN (optional)</label>
+          <input type="text" id="pinCode" placeholder="1234 (optional)" maxlength="12" />
+          <div style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.25rem">
+            <label><input type="checkbox" id="showPin" /> Show PIN on ticket</label>
+          </div>
+        </div>
+
+        <div class="option-group">
+          <label for="notes">Notes (optional)</label>
+          <input type="text" id="notes" placeholder="Birthday, raffle, reminder..." maxlength="80" />
+        </div>
+
+        <div class="option-group">
+          <label for="includeQr">Include QR code</label>
+          <div style="display:flex;align-items:center;gap:0.5rem"><input type="checkbox" id="includeQr" /> <small style="color:var(--text-secondary)">(link back to this site or personal URL)</small></div>
+        </div>
         
         <div class="option-group">
           <label for="drawDate">Draw Date (optional):</label>
           <input type="date" id="drawDate">
+        </div>
+
+        <div class="option-group">
+          <label for="copies">Copies</label>
+          <input type="number" id="copies" min="1" max="20" value="1" title="How many identical tickets to create (for raffles)" />
         </div>
       </div>
 
@@ -100,9 +123,18 @@ const jsonLd = {
           <p>Enter numbers and click "Create Ticket"</p>
         </div>
       </div>
-      
+
+      <canvas id="ticketCanvas" style="display: none;"></canvas>
+      <div id="canvasHolder" style="display: none;"></div>
+
+      <div class="action-buttons">
+        <!-- Keep the button visible but disabled until a ticket is created so users don't "lose" the control -->
+        <button id="downloadBtn" class="action-btn primary" disabled aria-disabled="true">📥 Download Image</button>
+        <button id="downloadAllBtn" class="action-btn secondary" style="display:none;">📦 Download All</button>
+      </div>
+
       <div class="download-hint">
-        <p>📸 Right-click → Save Image, or take a screenshot to share</p>
+        <p>✨ Your ticket(s) will appear above. Click "Download Image" to save the last ticket, or "Download All" to save every generated ticket.</p>
       </div>
     </div>
   </section>
@@ -143,6 +175,15 @@ const jsonLd = {
         you must purchase tickets from authorized retailers. These graphics are for fun, 
         record-keeping, and sharing purposes only.
       </p>
+    </div>
+
+    <div class="ai-notes">
+      <h3>Should We Use AI-Generated Images?</h3>
+      <ul>
+        <li><strong>Pros:</strong> Fast variety, thematic artwork, and unique visuals per ticket.</li>
+        <li><strong>Cons:</strong> Potential IP/licensing concerns, inconsistent branding, longer render time, and larger file sizes.</li>
+        <li><strong>Current approach:</strong> On-page themed vector/canvas ensures consistent branding, small assets, and instant generation with no external calls.</li>
+      </ul>
     </div>
   </section>
 </InfoLayout>
@@ -307,78 +348,156 @@ const jsonLd = {
     width: 100%;
   }
 
-  /* Ticket Canvas Styles - Generated dynamically */
-  .ticket-canvas {
+  /* Ticket Canvas Styles - Enhanced for realism */
+  :global(.ticket-canvas) {
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
     padding: 2rem;
-    border-radius: 12px;
+    border-radius: 16px;
     text-align: center;
     box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
   }
 
-  /* Theme: Classic */
-  .ticket-canvas.theme-classic {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    color: white;
-    border: 3px solid #e94560;
+  :global(.ticket-canvas)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.02)"/><circle cx="10" cy="50" r="0.5" fill="rgba(255,255,255,0.02)"/><circle cx="90" cy="30" r="0.5" fill="rgba(255,255,255,0.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    pointer-events: none;
   }
 
-  /* Theme: Neon */
-  .ticket-canvas.theme-neon {
-    background: #0a0a0a;
-    color: #0ff;
-    border: 3px solid #0ff;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.1);
+  /* Theme: Classic - Powerball Style */
+  :global(.ticket-canvas.theme-classic) {
+    /* warm beige with ornate orange borders */
+    background: linear-gradient(180deg, #f7efe6 0%, #efe4d1 100%);
+    color: #3b2f2f;
+    border: 6px solid #d97706;
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+    background-image: linear-gradient(180deg, #f7efe6 0%, #efe4d1 50%), repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 2px, transparent 2px 6px);
+    position: relative;
   }
 
-  /* Theme: Gold */
-  .ticket-canvas.theme-gold {
-    background: linear-gradient(135deg, #2d1810 0%, #4a2c1c 100%);
+  :global(.ticket-canvas.theme-classic)::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, #ffd700 0%, #ffed4e 50%, #f39c12 100%);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.6);
+  }
+
+  /* Theme: Neon - Cyberpunk Style */
+  :global(.ticket-canvas.theme-neon) {
+    background: radial-gradient(circle at 30% 30%, rgba(255,0,255,0.06), transparent 40%), radial-gradient(circle at 70% 70%, rgba(0,255,255,0.06), transparent 40%), linear-gradient(135deg, #09010f 0%, #1a0528 40%, #09010f 100%);
+    color: #fff;
+    border: 6px solid; border-image: linear-gradient(90deg,#ff00ff,#00eaff) 1;
+    box-shadow: 0 8px 30px rgba(255,0,255,0.08), 0 0 40px rgba(0,255,255,0.06);
+    border-radius: 12px;
+  }
+
+  .ticket-canvas.theme-neon::before {
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="circuit" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M0,10 L10,10 L10,0 M10,20 L20,20 L20,10" stroke="rgba(0,255,255,0.1)" stroke-width="0.5" fill="none"/></pattern></defs><rect width="100" height="100" fill="url(%23circuit)"/></svg>');
+  }
+
+  /* Theme: Gold - Luxury Style */
+  :global(.ticket-canvas.theme-gold) {
+    background: linear-gradient(135deg, #2b1a12 0%, #7a4a18 40%, #d4a73a 75%);
+    color: #2b1a12;
+    border: 6px solid #d6a83b; /* gold */
+    border-radius: 14px;
+    box-shadow: 0 14px 36px rgba(0,0,0,0.32), inset 0 2px 6px rgba(255,255,255,0.08);
+    /* add an ornate silver trim using pseudo element if supported */
+  }
+
+  .ticket-canvas.theme-gold::after {
+    content: '★';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
     color: #ffd700;
-    border: 3px solid #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
   }
 
-  /* Theme: Minimal */
-  .ticket-canvas.theme-minimal {
-    background: white;
-    color: #333;
-    border: 2px solid #333;
+  /* Theme: Minimal - Clean Style */
+  :global(.ticket-canvas.theme-minimal) {
+    background: linear-gradient(180deg,#ffffff 0%, #f3f4f6 100%);
+    color: #0f172a;
+    border: 2px solid rgba(15,23,42,0.08);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
   }
 
-  /* Theme: Retro */
-  .ticket-canvas.theme-retro {
-    background: linear-gradient(135deg, #7b2d8e 0%, #d4145a 100%);
+  /* Theme: Retro - 80s Style */
+  :global(.ticket-canvas.theme-retro) {
+    background: linear-gradient(135deg,#0f1122 0%, #5b21b6 30%, #fb7185 70%);
     color: #ffd700;
-    border: 4px double #ffd700;
+    border: 4px solid rgba(255,255,255,0.06);
+    position: relative;
+    box-shadow: 0 12px 36px rgba(112,33,180,0.25), inset 0 0 18px rgba(255,255,255,0.02);
   }
 
-  /* Theme: Lucky */
-  .ticket-canvas.theme-lucky {
-    background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
-    color: white;
-    border: 3px solid #ffd700;
+  :global(.ticket-canvas.theme-retro)::before {
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stars" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1" fill="rgba(255,215,0,0.35)"/><circle cx="25" cy="15" r="0.9" fill="rgba(255,215,0,0.25)"/><circle cx="15" cy="25" r="0.7" fill="rgba(255,215,0,0.4)"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23stars)\"/></svg>');
   }
 
-  .ticket-header {
+  /* Theme: Lucky - Irish Style */
+  :global(.ticket-canvas.theme-lucky) {
+    background: linear-gradient(135deg, #0e3b40 0%, #1b6f47 45%, #18a55c 80%);
+    color: #ffffff;
+    border: 6px solid transparent; border-image: linear-gradient(45deg,#ffd700,#f97316,#a78bfa) 1;
+    border-radius: 16px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.2), inset 0 2px 8px rgba(255,215,0,0.06);
+  }
+
+  :global(.ticket-canvas.theme-lucky)::after {
+    content: '🍀';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 28px;
+    opacity: 0.9;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+
+  :global(.ticket-header) {
     margin-bottom: 1.5rem;
+    text-align: center;
+    padding: 1rem 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
-  .ticket-game-name {
+  :global(.ticket-game-name) {
     font-size: 1.75rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 2px;
     margin-bottom: 0.25rem;
+    color: var(--accent-primary);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
 
-  .ticket-subtext {
+  :global(.ticket-subtext) {
     font-size: 0.9rem;
     opacity: 0.8;
+    font-style: italic;
+    color: var(--text-secondary);
   }
 
-  .ticket-numbers {
+  :global(.ticket-numbers) {
     display: flex;
     justify-content: center;
     gap: 0.75rem;
@@ -386,71 +505,162 @@ const jsonLd = {
     margin-bottom: 1.5rem;
   }
 
-  .ticket-ball {
-    width: 50px;
-    height: 50px;
+  :global(.ticket-ball) {
+    width: 55px;
+    height: 55px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-size: 1.4rem;
+    font-weight: 800;
     border-radius: 50%;
-    background: white;
-    color: #333;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #e9ecef 100%);
+    color: #1a202c;
+    box-shadow:
+      0 4px 8px rgba(0,0,0,0.3),
+      inset 0 1px 0 rgba(255,255,255,0.8),
+      inset 0 -1px 0 rgba(0,0,0,0.1);
+    border: 2px solid #cbd5e0;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .theme-neon .ticket-ball {
-    background: transparent;
+  :global(.ticket-ball:hover) {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow:
+      0 6px 12px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.9),
+      inset 0 -1px 0 rgba(0,0,0,0.1);
+  }
+
+  :global(.ticket-ball::before) {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  :global(.theme-neon .ticket-ball) {
+    background: radial-gradient(circle at 30% 30%, rgba(0,255,255,0.35), transparent 60%);
     border: 2px solid #0ff;
     color: #0ff;
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
   }
 
-  .theme-gold .ticket-ball {
+  :global(.theme-gold .ticket-ball) {
     background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
     color: #2d1810;
   }
 
-  .theme-minimal .ticket-ball {
-    background: #333;
+  :global(.theme-minimal .ticket-ball) {
+    background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+    color: #f8fafc;
+    border-color: #1f2937;
+  }
+
+  :global(.theme-retro .ticket-ball) {
+    background: linear-gradient(135deg, #ffd700 0%, #ffb347 80%);
+    color: #6b21a8;
+    border-color: #ffd700;
+  }
+
+  :global(.theme-lucky .ticket-ball) {
+    background: linear-gradient(135deg, #fefefe 0%, #e2f1e8 100%);
+    color: #0f3a4a;
+    border-color: #86efac;
+  }
+
+  :global(.ticket-ball.bonus) {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #f59e0b 0%, #ef4444 50%, #dc2626 100%);
     color: white;
+    border: 3px solid #fbbf24;
+    box-shadow:
+      0 6px 12px rgba(239, 68, 68, 0.4),
+      inset 0 2px 0 rgba(255,255,255,0.3),
+      inset 0 -2px 0 rgba(0,0,0,0.2),
+      0 0 20px rgba(239, 68, 68, 0.2);
+    animation: pulse 2s infinite;
   }
 
-  .theme-retro .ticket-ball {
-    background: #ffd700;
-    color: #7b2d8e;
+  :global(.ticket-ball.bonus::after) {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+    animation: rotate 3s linear infinite;
   }
 
-  .theme-lucky .ticket-ball {
-    background: white;
-    color: #134e5e;
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
   }
 
-  .ticket-ball.bonus {
-    background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-    color: white;
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 
-  .theme-neon .ticket-ball.bonus {
+  :global(.theme-neon .ticket-ball.bonus) {
     background: transparent;
     border-color: #f0f;
     color: #f0f;
-    box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+    box-shadow:
+      0 0 15px rgba(255, 0, 255, 0.6),
+      inset 0 0 15px rgba(255, 0, 255, 0.2);
+    animation: neonPulse 1.5s infinite;
   }
 
-  .ticket-footer {
+  :global(.theme-neon .ticket-ball.bonus::after) {
+    background: linear-gradient(45deg, transparent 30%, rgba(255,0,255,0.3) 50%, transparent 70%);
+  }
+
+  @keyframes neonPulse {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(255, 0, 255, 0.6), inset 0 0 15px rgba(255, 0, 255, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 25px rgba(255, 0, 255, 0.8), inset 0 0 25px rgba(255, 0, 255, 0.3);
+    }
+  }
+
+  :global(.ticket-footer) {
     font-size: 0.85rem;
     opacity: 0.9;
+    text-align: center;
+    padding: 1rem 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-top: 1rem;
   }
 
-  .ticket-player {
+  :global(.ticket-player) {
     font-weight: 600;
     margin-bottom: 0.25rem;
+    color: var(--text-primary);
   }
 
-  .ticket-date {
+  :global(.ticket-date) {
     opacity: 0.7;
+    margin-bottom: 0.25rem;
+    color: var(--text-secondary);
+  }
+
+  :global(.ticket-luck) {
+    font-weight: 500;
+    color: var(--accent-primary);
+    font-style: italic;
   }
 
   .download-hint {
@@ -520,6 +730,28 @@ const jsonLd = {
     line-height: 1.6;
   }
 
+  .ai-notes {
+    padding: 1.5rem;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-top: 1.5rem;
+  }
+
+  .ai-notes h3 {
+    margin-bottom: 0.75rem;
+  }
+
+  .ai-notes ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--text-secondary);
+  }
+
+  .ai-notes li {
+    margin: 0.4rem 0;
+  }
+
   @media (max-width: 600px) {
     .num-input {
       width: 45px;
@@ -538,13 +770,18 @@ const jsonLd = {
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const gameSelect = document.getElementById('gameSelect') as HTMLSelectElement;
-    const themeSelect = document.getElementById('themeSelect') as HTMLSelectElement;
+    // ticketThemeSelect is the ticket-specific style selector (avoid colliding with global/theme toolbar)
+    const themeSelect = document.getElementById('ticketThemeSelect') as HTMLSelectElement;
     const numberFields = document.getElementById('numberFields') as HTMLDivElement;
     const playerName = document.getElementById('playerName') as HTMLInputElement;
     const drawDate = document.getElementById('drawDate') as HTMLInputElement;
     const randomBtn = document.getElementById('randomBtn') as HTMLButtonElement;
     const generateBtn = document.getElementById('generateBtn') as HTMLButtonElement;
+    const downloadBtn = document.getElementById('downloadBtn') as HTMLButtonElement;
+    const downloadAllBtn = document.getElementById('downloadAllBtn') as HTMLButtonElement;
     const ticketPreview = document.getElementById('ticketPreview') as HTMLDivElement;
+    const ticketCanvas = document.getElementById('ticketCanvas') as HTMLCanvasElement;
+    let hasRenderedOnce = false;
 
     const gameConfig: Record<string, { main: number, mainMax: number, bonus?: number, bonusMax?: number, name: string }> = {
       powerball: { main: 5, mainMax: 69, bonus: 1, bonusMax: 26, name: 'Powerball' },
@@ -554,9 +791,382 @@ const jsonLd = {
       custom: { main: 6, mainMax: 99, name: 'Lucky Numbers' }
     };
 
-    // Set default date to today
-    const today = new Date().toISOString().split('T')[0];
-    drawDate.value = today;
+    const themeStyles: Record<string, {
+      bg: string;
+      border: string;
+      shadow: string;
+      headerColor: string;
+      subtextColor: string;
+      footerAccent: string;
+      ballFill: string;
+      ballStroke: string;
+      ballText: string;
+      bonusFill: string;
+      bonusStroke: string;
+      bonusText: string;
+    }> = {
+      classic: {
+        bg: 'linear-gradient(180deg, #f7efe6 0%, #efe4d1 100%)',
+        border: '6px solid #d97706',
+        shadow: '0 12px 28px rgba(0,0,0,0.18)',
+        headerColor: '#b45309',
+        subtextColor: '#6b4f3e',
+        footerAccent: '#b45309',
+        ballFill: 'linear-gradient(180deg,#fffaf0 0%, #f3e5d0 100%)',
+        ballStroke: '#d6a05c',
+        ballText: '#3b2f2f',
+        bonusFill: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 50%, #dc2626 100%)',
+        bonusStroke: '#fbbf24',
+        bonusText: '#ffffff'
+      },
+      neon: {
+        bg: 'linear-gradient(135deg,#0f0210 0%, #1b0036 40%, #080013 100%)',
+        border: '6px solid transparent; border-image: linear-gradient(90deg,#ff00ff,#00eaff) 1',
+        shadow: '0 8px 30px rgba(255,0,255,0.06), 0 0 40px rgba(0,255,255,0.04)',
+        headerColor: '#ff00ff',
+        subtextColor: '#9bf6ff',
+        footerAccent: '#00eaff',
+        ballFill: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.02), rgba(10,10,30,1))',
+        ballStroke: '#00eaff',
+        ballText: '#ff66ff',
+        bonusFill: 'linear-gradient(135deg, #ffb347 0%, #ff4d6d 100%)',
+        bonusStroke: '#ff66ff',
+        bonusText: '#0b1020'
+      },
+      gold: {
+        bg: 'linear-gradient(135deg, #2b1a12 0%, #7a4a18 40%, #d4a73a 75%)',
+        border: '6px solid #d6a83b',
+        shadow: '0 14px 36px rgba(0,0,0,0.32)',
+        headerColor: '#f5d042',
+        subtextColor: '#efe6d0',
+        footerAccent: '#c48a1f',
+        ballFill: 'linear-gradient(135deg,#fff7d6 0%, #ffd700 100%)',
+        ballStroke: '#b16800',
+        ballText: '#2d1810',
+        bonusFill: 'linear-gradient(135deg, #ffb347 0%, #ff4d6d 100%)',
+        bonusStroke: '#b45309',
+        bonusText: '#ffffff'
+      },
+      minimal: {
+        bg: 'linear-gradient(180deg,#ffffff 0%, #f3f4f6 100%)',
+        border: '2px solid rgba(15,23,42,0.08)',
+        shadow: '0 6px 18px rgba(0,0,0,0.06)',
+        headerColor: '#0f172a',
+        subtextColor: '#6b7280',
+        footerAccent: '#0f172a',
+        ballFill: 'linear-gradient(180deg,#111827 0%, #1f2937 100%)',
+        ballStroke: '#1f2937',
+        ballText: '#f8fafc',
+        bonusFill: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+        bonusStroke: '#b91c1c',
+        bonusText: '#fff'
+      },
+      retro: {
+        bg: 'linear-gradient(135deg,#0f1122 0%, #5b21b6 30%, #fb7185 70%)',
+        border: '4px solid rgba(255,255,255,0.06)',
+        shadow: '0 12px 36px rgba(112,33,180,0.25)',
+        headerColor: '#ffd700',
+        subtextColor: '#ffdf8a',
+        footerAccent: '#ffdf8a',
+        ballFill: 'linear-gradient(135deg,#ffd700 0%, #ffb347 80%)',
+        ballStroke: '#6b21a8',
+        ballText: '#1f1024',
+        bonusFill: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',
+        bonusStroke: '#ff6b6b',
+        bonusText: '#1f1024'
+      },
+      lucky: {
+        bg: 'linear-gradient(135deg, #0e3b40 0%, #1b6f47 45%, #18a55c 80%)',
+        border: '6px solid transparent; border-image: linear-gradient(45deg,#ffd700,#f97316,#a78bfa) 1',
+        shadow: '0 12px 36px rgba(0,0,0,0.2)',
+        headerColor: '#fff1c7',
+        subtextColor: 'rgba(255,255,255,0.9)',
+        footerAccent: '#f6c94b',
+        ballFill: 'linear-gradient(135deg,#ffffff 0%, #e2f1e8 100%)',
+        ballStroke: '#86efac',
+        ballText: '#0f3a4a',
+        bonusFill: 'linear-gradient(135deg, #ffd700 0%, #f97316 60%)',
+        bonusStroke: '#fbbf24',
+        bonusText: '#0f2430'
+      }
+    };
+
+    const canvasThemeCodes: Record<string, string> = {
+      classic: '#c1001f',
+      neon: '#00eaff',
+      gold: '#d9a441',
+      minimal: '#1f2937',
+      retro: '#c026d3',
+      lucky: '#16a34a'
+    };
+
+    // Short, subtle internal numeric codes for filenames (user-facing names are excluded).
+    // These are deterministic and minimal so filenames don't leak the page theme.
+    // Use a 3-digit numeric code where possible and a stable fallback hash.
+    const themeCodeMap: Record<string, string> = {
+      classic: '001',
+      neon: '002',
+      gold: '003',
+      minimal: '004',
+      retro: '005',
+      lucky: '006'
+    };
+
+    function stableThemeId(theme: string) {
+      if (themeCodeMap[theme]) return themeCodeMap[theme];
+      // Fallback: simple deterministic numeric hash (sum of char codes mod 900 + 100)
+      let sum = 0;
+      for (let i = 0; i < theme.length; i++) sum += theme.charCodeAt(i);
+      const v = (sum % 900) + 100;
+      return String(v).padStart(3, '0');
+    }
+
+    // Canvas-friendly theme definitions (used when drawing to the <canvas>)
+    const canvasThemes: Record<string, { stops: string[]; text: string; subtext: string; footer: string; border: string } > = {
+      classic: { stops: ['#0f172a', '#111827', '#0b1220'], text: '#ffffff', subtext: 'rgba(255,255,255,0.8)', footer: '#22c55e', border: '#e94560' },
+      neon: { stops: ['#050510', '#0f172a', '#050510'], text: '#00eaff', subtext: 'rgba(255,255,255,0.8)', footer: '#00eaff', border: '#00eaff' },
+      gold: { stops: ['#1f130c', '#3b2417', '#7a3b16'], text: '#ffd700', subtext: 'rgba(255,255,255,0.85)', footer: '#ffd700', border: '#ffd700' },
+      minimal: { stops: ['#f8fafc', '#e2e8f0', '#cbd5e1'], text: '#1f2937', subtext: '#475569', footer: '#0f172a', border: '#1f2937' },
+      retro: { stops: ['#5b21b6', '#c026d3', '#fb7185'], text: '#ffd700', subtext: 'rgba(255,255,255,0.85)', footer: '#ffd700', border: '#ffd700' },
+      lucky: { stops: ['#0f3a4a', '#1b6f47', '#1d8c3f'], text: '#ffffff', subtext: 'rgba(255,255,255,0.85)', footer: '#22c55e', border: '#ffd700' }
+    };
+
+    // Per-theme solid colors for canvas balls (canvas cannot consume CSS gradients string values).
+    const canvasBallColors: Record<string, { fill: string; bonusFill: string; stroke: string; text: string }> = {
+      classic: { fill: '#fffaf0', bonusFill: '#ffb347', stroke: '#d6a05c', text: '#3b2f2f' },
+      neon: { fill: '#0c1029', bonusFill: '#ff4d6d', stroke: '#00eaff', text: '#ff66ff' },
+      gold: { fill: '#fff7d6', bonusFill: '#ffb347', stroke: '#b16800', text: '#2d1810' },
+      minimal: { fill: '#111827', bonusFill: '#ef4444', stroke: '#1f2937', text: '#f8fafc' },
+      retro: { fill: '#ffd700', bonusFill: '#ff9a9e', stroke: '#6b21a8', text: '#1f1024' },
+      lucky: { fill: '#ffffff', bonusFill: '#ffd700', stroke: '#86efac', text: '#0f3a4a' }
+    };
+
+    function drawTicketOnCanvas(canvas: HTMLCanvasElement, config: any, theme: string, mainNumbers: string[], bonusNumber: string | null, player: string, date: string, notes?: string, pin?: string, showPin?: boolean, includeQr?: boolean, qrUrl?: string) {
+      const ctx = canvas.getContext('2d')!;
+      const width = 480;
+      const height = 300;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+
+      // Prefer the more detailed ticket style map so canvas output matches preview
+      const themeStyle = (themeStyles[theme] || themeStyles.classic) as any;
+      const themeCfg = canvasThemes[theme] || canvasThemes.classic;
+
+      // Draw background based on style (use headerColor/footerAccent or fallback to canvasThemes)
+      drawThemeBackground(ctx, theme, width, height, themeStyle);
+
+      // Draw header
+      ctx.fillStyle = themeStyle.headerColor || themeCfg.text;
+      ctx.font = 'bold 24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(config.name, width / 2, 40);
+
+      ctx.font = 'italic 14px Arial';
+      ctx.fillStyle = themeStyle.subtextColor || themeCfg.subtext;
+      ctx.fillText('Official Looking (But Not Official) Ticket', width / 2, 60);
+      // Intentionally not drawing the theme label on the ticket canvas.
+      // Theme will be encoded into the filename and a tiny color marker is left on the canvas for tests.
+
+      // Draw numbers
+      const ballRadius = 25;
+      const ballY = 120;
+      let ballX = width / 2 - ((mainNumbers.length * (ballRadius * 2 + 10) - 10) / 2) + ballRadius;
+
+      mainNumbers.forEach(num => {
+        drawBall(ctx, ballX, ballY, ballRadius, num, false, theme);
+        ballX += ballRadius * 2 + 10;
+      });
+
+      if (bonusNumber) {
+        drawBall(ctx, ballX, ballY, ballRadius + 5, bonusNumber, true, theme);
+      }
+
+      // Draw footer (stack lines vertically to avoid overlaps)
+      const footerBase = height - 72; // starting Y for footer block
+      let y = footerBase;
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = themeStyle.text || themeCfg.text;
+      ctx.font = 'bold 16px Arial';
+      ctx.fillText(`🎫 ${player}`, width / 2, y); // player
+
+      // date
+      if (date) {
+        y += 20;
+        ctx.fillStyle = themeStyle.subtextColor || themeCfg.subtext;
+        ctx.font = '12px Arial';
+        ctx.fillText(`Draw: ${date}`, width / 2, y);
+      }
+
+      // notes
+      if (notes) {
+        y += 18;
+        ctx.fillStyle = themeStyle.subtextColor || themeCfg.subtext;
+        ctx.font = 'italic 12px Arial';
+        ctx.fillText(notes, width / 2, y);
+      }
+
+      // PIN
+      if (showPin && pin) {
+        y += 18;
+        ctx.fillStyle = themeCfg.footer;
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText(`PIN: ${pin}`, width / 2, y);
+      }
+
+      // Good luck (always last)
+      y += 18;
+      ctx.fillStyle = themeStyle.footerAccent || themeCfg.footer;
+      ctx.font = '12px Arial';
+      ctx.fillText('Good Luck! 🍀', width / 2, y);
+
+      // Hidden theme marker for testing (tiny square in corner)
+      const marker = canvasThemeCodes[theme] || '#444';
+      ctx.fillStyle = marker;
+      ctx.fillRect(width - 12, height - 12, 8, 8);
+
+      // Optional QR code - use in-browser generator to produce an image PNG and draw it.
+      // Return a promise that resolves when the QR image is loaded (or immediately if no QR).
+      return new Promise<void>(resolve => {
+        if (includeQr && qrUrl) {
+          // Use in-browser QR generator (qrcode package) -> generate data URL and draw it
+          import('qrcode')
+            .then((QRModule) => QRModule.toDataURL(qrUrl, { width: 150, margin: 1 }))
+            .then((dataUrl) => {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => {
+                const size = 72;
+                ctx.drawImage(img, 12, height - size - 12, size, size);
+                resolve();
+              };
+              img.onerror = () => resolve();
+              img.src = dataUrl as string;
+            })
+            .catch(() => resolve());
+        } else {
+          resolve();
+        }
+      });
+    }
+
+    function drawThemeBackground(ctx: CanvasRenderingContext2D, theme: string, width: number, height: number, style?: any) {
+      // Prefer themeStyles passed in (style) so preview colors and canvases match.
+      const themeCfg = style ? style : canvasThemes[theme] || canvasThemes.classic;
+
+      // Create a simple two-stop gradient using headerColor/footerAccent when available
+      try {
+        const gradient = ctx.createLinearGradient(0, 0, width, height);
+        if (style && style.headerColor && style.footerAccent) {
+          gradient.addColorStop(0, style.headerColor);
+          gradient.addColorStop(1, style.footerAccent);
+        } else if (themeCfg.stops) {
+          gradient.addColorStop(0, themeCfg.stops[0]);
+          gradient.addColorStop(0.5, themeCfg.stops[1]);
+          gradient.addColorStop(1, themeCfg.stops[2]);
+        } else {
+          gradient.addColorStop(0, '#ffffff');
+          gradient.addColorStop(1, '#f0f0f0');
+        }
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+      } catch (e) {
+        ctx.fillStyle = style?.bg || '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      // Add border color (try to extract a color from style.border if supplied)
+      let borderColor = themeCfg.border || '#000';
+      if (style && style.border) {
+        // try to extract hex color
+        const m = String(style.border).match(/(#[0-9a-fA-F]{3,6})/);
+        if (m) borderColor = m[1];
+        else borderColor = String(style.border);
+      }
+
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 4;
+      ctx.strokeRect(2, 2, width - 4, height - 4);
+    }
+
+    function getThemeTextColor(theme: string): string {
+      switch (theme) {
+        case 'minimal': return '#2d3748';
+        default: return 'white';
+      }
+    }
+
+    function getThemeBorderColor(theme: string): string {
+      switch (theme) {
+        case 'classic': return '#e94560';
+        case 'neon': return '#0ff';
+        case 'gold': return '#ffd700';
+        case 'minimal': return '#4a5568';
+        case 'retro': return '#ffd700';
+        case 'lucky': return '#ffd700';
+        default: return '#e94560';
+      }
+    }
+
+    function getBallStyle(theme: string, isBonus: boolean) {
+      if (isBonus) {
+        return {
+          fill: '#f59e0b',
+          stroke: '#ef4444',
+          text: '#ffffff'
+        };
+      }
+      // prefer solid canvas ball colors where available (themeStyles often contains gradients)
+      const canvasColors = canvasBallColors[theme];
+      if (canvasColors) {
+        return {
+          fill: canvasColors.fill,
+          stroke: canvasColors.stroke,
+          text: canvasColors.text
+        };
+      }
+
+      // fallback defaults
+      return { fill: '#ffffff', stroke: '#cbd5e0', text: '#0f172a' };
+    }
+
+    function drawBall(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, number: string, isBonus: boolean, theme: string) {
+      // Ball shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.beginPath();
+      ctx.arc(x + 2, y + 2, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      const style = getBallStyle(theme, isBonus);
+
+      ctx.fillStyle = style.fill;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ball border
+      ctx.strokeStyle = style.stroke;
+      ctx.lineWidth = isBonus ? 3 : 2;
+      ctx.stroke();
+
+      // Ball highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.beginPath();
+      ctx.arc(x - radius/3, y - radius/3, radius/3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Number
+      ctx.fillStyle = style.text;
+
+      ctx.font = `bold ${radius * 0.8}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(number, x, y);
+    }
 
     function updateNumberFields() {
       const config = gameConfig[gameSelect.value];
@@ -610,55 +1220,260 @@ const jsonLd = {
       }
     }
 
-    function createTicket() {
+    async function createTicket() {
       const config = gameConfig[gameSelect.value];
       const theme = themeSelect.value;
+      const copiesEl = document.getElementById('copies') as HTMLInputElement;
+      const copies = Math.max(1, Math.min(20, parseInt(copiesEl.value || '1')));
+      const pinValue = (document.getElementById('pinCode') as HTMLInputElement).value || '';
+      const showPin = (document.getElementById('showPin') as HTMLInputElement).checked;
+      const notesValue = (document.getElementById('notes') as HTMLInputElement).value || '';
+      const includeQr = (document.getElementById('includeQr') as HTMLInputElement).checked;
+      // Default QR targets back to the site landing page(s). prefer lucky first, fall back to mintloop.dev
+      const defaultQr = 'https://lucky.mintloop.dev';
+      const fallbackQr = 'https://mintloop.dev';
+      const qrUrl = includeQr ? (defaultQr || fallbackQr) : undefined;
       const mainInputs = numberFields.querySelectorAll('.main') as NodeListOf<HTMLInputElement>;
       const bonusInput = numberFields.querySelector('.bonus') as HTMLInputElement;
-      
+
       const mainNumbers: string[] = [];
       mainInputs.forEach(input => {
         mainNumbers.push(input.value || '?');
       });
-      
+
       const bonusNumber = bonusInput ? bonusInput.value : null;
       const player = playerName.value || 'Lucky Player';
-      const date = drawDate.value ? new Date(drawDate.value).toLocaleDateString('en-US', { 
-        weekday: 'short', 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
+      const date = drawDate.value ? new Date(drawDate.value).toLocaleDateString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
       }) : '';
-      
-      let numbersHTML = mainNumbers.map(n => 
-        `<div class="ticket-ball">${n}</div>`
+
+      const style = themeStyles[theme] || themeStyles.classic;
+
+      let numbersHTML = mainNumbers.map(n =>
+        `<div class="ticket-ball" style="background:${style.ballFill};border-color:${style.ballStroke};color:${style.ballText}">${n}</div>`
       ).join('');
-      
+
       if (bonusNumber) {
-        numbersHTML += `<div class="ticket-ball bonus">${bonusNumber}</div>`;
+        numbersHTML += `<div class="ticket-ball bonus" style="background:${style.bonusFill};border-color:${style.bonusStroke};color:${style.bonusText}">${bonusNumber}</div>`;
       }
-      
-      ticketPreview.innerHTML = `
-        <div class="ticket-canvas theme-${theme}">
-          <div class="ticket-header">
-            <div class="ticket-game-name">${config.name}</div>
-            <div class="ticket-subtext">Official Looking (But Not Official) Ticket</div>
+
+      // clear previous previews and canvases
+      ticketPreview.innerHTML = '';
+      const holder = document.getElementById('canvasHolder') as HTMLDivElement;
+      holder.innerHTML = '';
+
+      // Helper to create randomized ticket numbers for a copy
+      function generateRandomTicket(config: { main: number; mainMax: number; bonus?: number; bonusMax?: number }): { main: string[]; bonus: string | null } {
+        const main: string[] = [];
+        const used = new Set<number>();
+        for (let k = 0; k < config.main; k++) {
+          let num: number;
+          if (config.mainMax <= 9) {
+            num = Math.floor(Math.random() * 10);
+          } else {
+            do {
+              num = Math.floor(Math.random() * config.mainMax) + 1;
+            } while (used.has(num));
+            used.add(num);
+          }
+          main.push(String(num));
+        }
+        const bonus = (config.bonusMax) ? String(Math.floor(Math.random() * config.bonusMax) + 1) : null;
+        return { main, bonus };
+      }
+
+      // Build the set of tickets we will render and export. We want randomized copies with exactly one duplicate pair
+      const ticketPayloads: Array<{ main: string[]; bonus: string | null; player: string }> = [];
+
+      // If user provided fully-specified numbers (no '?'), treat them as one seed ticket
+      const baseProvided = mainNumbers.length && mainNumbers.every(n => n && n !== '?');
+
+      if (baseProvided) {
+        ticketPayloads.push({ main: mainNumbers, bonus: bonusNumber, player });
+      }
+
+      // Fill remaining unique tickets
+      while (ticketPayloads.length < copies) {
+        const t = generateRandomTicket(config);
+        // ensure no exact duplicate exists yet
+        const repr = `${t.main.join(',')}|${t.bonus || ''}`;
+        const exists = ticketPayloads.some(x => `${x.main.join(',')}|${x.bonus || ''}` === repr);
+        if (!exists) ticketPayloads.push({ main: t.main, bonus: t.bonus, player });
+        // If we've tried too many times and still short, just force it (avoid infinite loops)
+        if (ticketPayloads.length < copies && ticketPayloads.length > 500) break;
+      }
+
+      // Ensure exactly one duplicate (if copies >= 2)
+      if (copies >= 2) {
+        // pick two different indices to make a single duplicate pair
+        const idxA = Math.floor(Math.random() * ticketPayloads.length);
+        let idxB = Math.floor(Math.random() * ticketPayloads.length);
+        if (ticketPayloads.length === 2) idxB = 1 - idxA;
+        while (idxB === idxA) idxB = Math.floor(Math.random() * ticketPayloads.length);
+        ticketPayloads[idxB] = { ...ticketPayloads[idxA] };
+      }
+
+      // We will render previews for each payload and then rasterize each preview using html2canvas
+      // Note: html2canvas will capture CSS styles + any embedded images (QR) to produce accurate export PNGs.
+      // dynamic import - prefer to ignore TS checks for the runtime-only bundling
+      // @ts-ignore
+      const html2canvas: any = (await import('html2canvas')).default;
+
+      for (let i = 0; i < ticketPayloads.length; i++) {
+        const p = ticketPayloads[i];
+        const copyPlayer = copies > 1 ? `${p.player} (${i + 1}/${copies})` : p.player;
+
+        // build numbers markup for this payload
+        let payloadNumbersHTML = p.main.map(n => `<div class="ticket-ball" style="background:${style.ballFill};border-color:${style.ballStroke};color:${style.ballText}">${n}</div>`).join('');
+        if (p.bonus) payloadNumbersHTML += `<div class="ticket-ball bonus" style="background:${style.bonusFill};border-color:${style.bonusStroke};color:${style.bonusText}">${p.bonus}</div>`;
+
+        const previewHTML = `
+          <div class="ticket-instance">
+            <div class="ticket-canvas theme-${theme}" style="background:${style.bg};border:${style.border};box-shadow:${style.shadow}">
+              <div class="ticket-header">
+                <div class="ticket-game-name" style="color:${style.headerColor}">${config.name}</div>
+                <div class="ticket-subtext" style="color:${style.subtextColor}">Official Looking (But Not Official) Ticket</div>
+              </div>
+              <div class="ticket-numbers">
+                ${payloadNumbersHTML}
+              </div>
+              <div class="ticket-footer">
+                <div class="ticket-player">🎫 ${copyPlayer}</div>
+                ${date ? `<div class="ticket-date" style="color:${style.subtextColor}">Draw: ${date}</div>` : ''}
+                ${notesValue ? `<div class="ticket-note" style="color:${style.subtextColor}">${notesValue}</div>` : ''}
+                ${showPin && pinValue ? `<div class="ticket-pin" style="color:${style.footerAccent}">PIN: ${pinValue}</div>` : ''}
+                <div class="ticket-luck" style="color:${style.footerAccent}">Good Luck! 🍀</div>
+              </div>
+            </div>
           </div>
-          <div class="ticket-numbers">
-            ${numbersHTML}
-          </div>
-          <div class="ticket-footer">
-            <div class="ticket-player">🎫 ${player}</div>
-            ${date ? `<div class="ticket-date">Draw: ${date}</div>` : ''}
-            <div class="ticket-luck">Good Luck! 🍀</div>
-          </div>
-        </div>
-      `;
+        `;
+
+        ticketPreview.insertAdjacentHTML('beforeend', previewHTML);
+        // make sure theme-specific classes and ball styles are applied cleanly
+        applyThemeToPreview(theme);
+
+        // create a canvas for this copy and draw
+        // Wait for DOM to be updated and then rasterize the preview with html2canvas
+        // optionally generate a QR data url and inject image into the preview before rasterizing
+        if (includeQr && qrUrl) {
+          try {
+            const QR = await import('qrcode');
+            const dataUrl = await QR.toDataURL(qrUrl, { width: 150, margin: 1 });
+            // inject QR image into latest preview instance
+            const lastInserted = ticketPreview.querySelectorAll('.ticket-instance');
+            const lastNode = lastInserted[lastInserted.length - 1] as HTMLElement;
+            const qrEl = document.createElement('img');
+            qrEl.src = dataUrl as string;
+            qrEl.alt = 'QR';
+            qrEl.style.width = '72px';
+            qrEl.style.height = '72px';
+            qrEl.style.position = 'absolute';
+            qrEl.style.left = '12px';
+            qrEl.style.bottom = '12px';
+            lastNode.querySelector('.ticket-canvas')?.appendChild(qrEl);
+          } catch (e) {
+            // ignore QR failures and continue
+          }
+        }
+
+        // Wait a tick for DOM painting
+        await new Promise(r => setTimeout(r, 40));
+
+        const lastInserted = ticketPreview.querySelectorAll('.ticket-instance');
+        const lastNode = lastInserted[lastInserted.length - 1] as HTMLElement;
+        const canvasNode = await html2canvas(lastNode.querySelector('.ticket-canvas') as HTMLElement, { backgroundColor: null, scale: 1 });
+        canvasNode.id = `ticketCanvas-${i}`;
+        canvasNode.style.display = 'none';
+        holder.appendChild(canvasNode);
+      }
+
+      // Enable download controls - the last canvas will be the most recent
+      downloadBtn.disabled = false;
+      downloadBtn.setAttribute('aria-disabled', 'false');
+      if (copies > 1) {
+        downloadAllBtn.style.display = 'inline-block';
+        downloadAllBtn.disabled = false;
+      } else {
+        downloadAllBtn.style.display = 'none';
+      }
+
+      hasRenderedOnce = true;
+    }
+
+    function downloadTicket() {
+      const theme = themeSelect.value;
+      const holder = document.getElementById('canvasHolder') as HTMLDivElement;
+      // If multiple canvases exist, download the last one (most recent)
+      const canvases = holder.querySelectorAll('canvas');
+      const lastCanvas = canvases.length ? canvases[canvases.length - 1] as HTMLCanvasElement : ticketCanvas;
+
+      const link = document.createElement('a');
+      const themeCode = stableThemeId(theme);
+      const themeHex = (canvasThemeCodes[theme] || '#444').replace('#', '');
+      link.download = `lottery-ticket-${themeCode}-${themeHex}-${Date.now()}.png`;
+      link.href = lastCanvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function downloadAllTickets() {
+      const holder = document.getElementById('canvasHolder') as HTMLDivElement;
+      const canvases = Array.from(holder.querySelectorAll('canvas')) as HTMLCanvasElement[];
+      if (!canvases.length) return;
+
+      const theme = themeSelect.value;
+      const themeCode = stableThemeId(theme);
+      const themeHex = (canvasThemeCodes[theme] || '#444').replace('#', '');
+
+      // Download each canvas sequentially (triggered by a user interaction should allow multiple downloads)
+      canvases.forEach((c, i) => {
+        const link = document.createElement('a');
+        link.download = `lottery-ticket-${themeCode}-${themeHex}-${Date.now()}-${i + 1}.png`;
+        link.href = c.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      });
     }
 
     gameSelect.addEventListener('change', updateNumberFields);
     randomBtn.addEventListener('click', generateRandomNumbers);
     generateBtn.addEventListener('click', createTicket);
+    downloadBtn.addEventListener('click', downloadTicket);
+    function applyThemeToPreview(theme: string) {
+      const style = themeStyles[theme] || themeStyles.classic;
+      const instances = ticketPreview.querySelectorAll('.ticket-canvas');
+      instances.forEach((el: Element) => {
+        const div = el as HTMLDivElement;
+        div.className = `ticket-canvas theme-${theme}`;
+        div.setAttribute('style', `background:${style.bg};border:${style.border};box-shadow:${style.shadow}`);
+        // update balls in preview
+        const balls = div.querySelectorAll('.ticket-ball');
+        balls.forEach((b: Element) => {
+          const be = b as HTMLElement;
+          if (be.classList.contains('bonus')) {
+            be.style.background = style.bonusFill as string;
+            be.style.borderColor = style.bonusStroke as string;
+            be.style.color = style.bonusText as string;
+          } else {
+            be.style.background = style.ballFill as string;
+            be.style.borderColor = style.ballStroke as string;
+            be.style.color = style.ballText as string;
+          }
+        });
+      });
+    }
+
+    themeSelect.addEventListener('change', () => {
+      // update preview immediately if there is one
+      applyThemeToPreview(themeSelect.value);
+      // if we've previously rendered a canvas, re-generate to update canvases too
+      if (hasRenderedOnce) createTicket();
+    });
+
+    downloadAllBtn.addEventListener('click', downloadAllTickets);
 
     // Initialize
     updateNumberFields();

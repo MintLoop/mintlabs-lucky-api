@@ -56,6 +56,10 @@ const jsonLd = {
       <button id="checkBtn" class="check-btn">
         🔍 Check Numbers
       </button>
+      
+      <button id="randomBtn" class="random-btn">
+        🎲 Generate Random Numbers
+      </button>
     </div>
 
     <div id="results" class="results-container"></div>
@@ -224,6 +228,26 @@ const jsonLd = {
   .check-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+  }
+
+  .random-btn {
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: var(--secondary);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 1rem;
+  }
+
+  .random-btn:hover {
+    background: var(--surface);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   .results-container {
@@ -398,20 +422,369 @@ const jsonLd = {
     margin-bottom: 1rem;
   }
 
-  .fun-facts ul {
+  /* Report & results layout (global so JS-injected markup is styled) */
+  :global(.results-container) {
+    min-height: 120px;
+  }
+
+  :global(.report-card) {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    animation: fadeInUp 0.4s ease-out;
+  }
+
+  :global(.report-header) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    padding: 1.5rem 1.75rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  :global(.report-title-block h3) {
+    margin: 0.15rem 0 0.35rem 0;
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  :global(.report-kicker) {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 700;
+  }
+
+  :global(.report-subtitle) {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  :global(.report-combination) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  :global(.result-ball) {
+    width: 3.1rem;
+    height: 3.1rem;
+    border-radius: 14px;
+    border: 2px solid var(--border);
+    background: #fff;
+    color: #0f172a;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+    transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  :global(.result-ball.hot) {
+    border-color: var(--hot-color);
+    color: #b91c1c;
+    box-shadow: 0 10px 24px rgba(239, 68, 68, 0.2);
+  }
+
+  :global(.result-ball.cold) {
+    border-color: var(--cold-color);
+    color: #1e3a8a;
+    box-shadow: 0 10px 24px rgba(59, 130, 246, 0.2);
+  }
+
+  :global(.result-ball.normal) {
+    border-color: var(--border);
+  }
+
+  :global(.result-ball.bonus) {
+    border-color: #b91c1c;
+    background: linear-gradient(135deg, #f43f5e, #b91c1c);
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(244, 63, 94, 0.28);
+  }
+
+  :global(.result-ball:hover) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+  }
+
+  :global(.report-content) {
+    padding: 1.5rem 1.75rem 1.75rem;
+    background: var(--bg);
+  }
+
+  :global(.mini-report) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  :global(.mini-row) {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.85rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  :global(.mini-row:hover) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  }
+
+  :global(.mini-label) {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    min-width: 120px;
+  }
+
+  :global(.mini-value) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    padding: 0.3rem 0.7rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  :global(.mini-value.success) {
+    color: var(--success);
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.25);
+  }
+
+  :global(.mini-value.muted) {
+    color: var(--text-secondary);
+  }
+
+  :global(.mini-value.hot) {
+    color: var(--hot-color);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.08));
+    border-color: rgba(239, 68, 68, 0.35);
+  }
+
+  :global(.mini-value.cold) {
+    color: var(--cold-color);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(59, 130, 246, 0.08));
+    border-color: rgba(59, 130, 246, 0.35);
+  }
+
+  :global(.mini-value.normal) {
+    color: var(--text-secondary);
+  }
+
+  :global(.numbers-report-grid) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  :global(.number-card) {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.9rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    animation: fadeInUp 0.5s ease both;
+  }
+
+  :global(.number-card:hover) {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  :global(.number-card.hot) {
+    border-color: var(--hot-color);
+    box-shadow: 0 8px 22px rgba(239, 68, 68, 0.12);
+  }
+
+  :global(.number-card.cold) {
+    border-color: var(--cold-color);
+    box-shadow: 0 8px 22px rgba(59, 130, 246, 0.12);
+  }
+
+  :global(.number-card.bonus) {
+    border-style: dashed;
+  }
+
+  :global(.number-card-header) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  :global(.number-chip) {
+    width: 2.9rem;
+    height: 2.9rem;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #0f172a;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  :global(.number-chip.hot) {
+    border-color: var(--hot-color);
+  }
+
+  :global(.number-chip.cold) {
+    border-color: var(--cold-color);
+  }
+
+  :global(.number-chip.normal) {
+    border-color: var(--border);
+  }
+
+  :global(.number-chip.bonus) {
+    border-color: #b91c1c;
+    color: #fff;
+    background: linear-gradient(135deg, #f43f5e, #b91c1c);
+  }
+
+  :global(.status-chip) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 700;
+    padding: 0.35rem 0.65rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  :global(.status-chip.hot) {
+    color: var(--hot-color);
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.08);
+  }
+
+  :global(.status-chip.cold) {
+    color: var(--cold-color);
+    border-color: rgba(59, 130, 246, 0.35);
+    background: rgba(59, 130, 246, 0.08);
+  }
+
+  :global(.status-chip.normal) {
+    color: var(--text-secondary);
+  }
+
+  :global(.status-chip.bonus) {
+    color: #b91c1c;
+    border-color: rgba(185, 28, 28, 0.35);
+    background: rgba(185, 28, 28, 0.1);
+  }
+
+  :global(.number-metrics) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  :global(.metric) {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+  }
+
+  :global(.metric-label) {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+  }
+
+  :global(.metric-value) {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+
+  :global(.report-footer) {
+    padding: 1rem 1.5rem;
+    background: var(--warning-bg);
+    border-top: 1px solid var(--warning-border);
+  }
+
+  :global(.disclaimer-text) {
+    margin: 0;
+    color: var(--warning-text);
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  :global(.disclaimer-text strong) {
+    color: var(--text-primary);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  :global(.fun-facts ul) {
     list-style: none;
     padding: 0;
     margin: 0;
   }
 
-  .fun-facts li {
+  :global(.fun-facts li) {
     padding: 0.75rem 0;
     border-bottom: 1px solid var(--border);
     line-height: 1.5;
   }
 
-  .fun-facts li:last-child {
+  :global(.fun-facts li:last-child) {
     border-bottom: none;
+  }
+
+  @media (max-width: 900px) {
+    :global(.report-header) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    :global(.report-combination) {
+      justify-content: flex-start;
+    }
   }
 
   @media (max-width: 600px) {
@@ -426,10 +799,16 @@ const jsonLd = {
       font-size: 1rem;
     }
 
-    .result-ball {
-      width: 40px;
-      height: 40px;
-      font-size: 1rem;
+    :global(.result-ball),
+    :global(.number-chip) {
+      width: 2.6rem;
+      height: 2.6rem;
+      font-size: 0.95rem;
+      border-radius: 10px;
+    }
+
+    :global(.mini-report) {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
   }
 </style>
@@ -440,6 +819,7 @@ const jsonLd = {
     const megamillionsBtn = document.querySelector('[data-game="megamillions"]') as HTMLButtonElement;
     const numberInputs = document.getElementById('numberInputs') as HTMLDivElement;
     const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
+    const randomBtn = document.getElementById('randomBtn') as HTMLButtonElement;
     const resultsContainer = document.getElementById('results') as HTMLDivElement;
 
     let currentGame: 'powerball' | 'megamillions' = 'powerball';
@@ -523,6 +903,18 @@ const jsonLd = {
       resultsContainer.innerHTML = '';
     }
 
+    function formatLastSeenDraws(lastSeen: number): string {
+      if (!lastSeen || lastSeen === 0) return 'Never';
+      if (lastSeen === 1) return '1 draw ago';
+      return `${lastSeen} draws ago`;
+    }
+
+    function getStatusFromDeviation(deviation: number) {
+      if (deviation > 5) return { statusClass: 'hot', statusEmoji: '🔥', statusLabel: 'Hot' };
+      if (deviation < -5) return { statusClass: 'cold', statusEmoji: '❄️', statusLabel: 'Cold' };
+      return { statusClass: 'normal', statusEmoji: '⚪', statusLabel: 'Normal' };
+    }
+
     function checkNumbers() {
       const mainInputs = numberInputs.querySelectorAll('.main') as NodeListOf<HTMLInputElement>;
       const bonusInput = numberInputs.querySelector('.bonus') as HTMLInputElement;
@@ -541,105 +933,195 @@ const jsonLd = {
       }
       
       const data = historicalData[currentGame];
-      
-      let html = '';
-      
-      // Results for each main number
-      mainNumbers.forEach((num, index) => {
+      const validBonus = !isNaN(bonusNumber) && bonusNumber > 0;
+      const expectedMain = Math.round(data.totalDraws * (5 / (currentGame === 'powerball' ? 69 : 70)));
+      const expectedBonus = Math.round(data.totalDraws * (1 / (currentGame === 'powerball' ? 26 : 25)));
+      let bonusStats: { count: number; lastSeen: number; streak: number } | null = null;
+      let bonusStatus: { statusClass: string; statusEmoji: string; statusLabel: string } | null = null;
+
+      const mainDetails = mainNumbers.map((num, index) => {
         const stats = data.frequency[num] || { count: 0, lastSeen: 0, streak: 0 };
-        const expected = Math.round(data.totalDraws * (5 / (currentGame === 'powerball' ? 69 : 70)));
-        const deviation = stats.count - expected;
-        const deviationClass = deviation > 5 ? 'hot' : deviation < -5 ? 'cold' : '';
-        
-        html += `
-          <div class="number-result" style="animation-delay: ${index * 0.1}s">
-            <div class="result-ball">${num}</div>
-            <div class="result-stats">
-              <div class="stat-item">
-                <span class="stat-label">Appearances</span>
-                <span class="stat-value ${deviationClass}">${stats.count}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Expected</span>
-                <span class="stat-value">${expected}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Last Seen</span>
-                <span class="stat-value">${stats.lastSeen} draws ago</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Consecutive</span>
-                <span class="stat-value">${stats.streak > 0 ? stats.streak + 'x' : 'None'}</span>
-              </div>
-            </div>
-          </div>
-        `;
+        const deviation = stats.count - expectedMain;
+        const status = getStatusFromDeviation(deviation);
+        return {
+          num,
+          stats,
+          expected: expectedMain,
+          statusClass: status.statusClass,
+          statusEmoji: status.statusEmoji,
+          statusLabel: status.statusLabel,
+          delay: index * 80
+        };
       });
-      
-      // Bonus number result
-      if (!isNaN(bonusNumber) && bonusNumber > 0) {
-        const bonusStats = data.bonusFrequency[bonusNumber] || { count: 0, lastSeen: 0, streak: 0 };
-        const bonusExpected = Math.round(data.totalDraws / (currentGame === 'powerball' ? 26 : 25));
-        const bonusDeviation = bonusStats.count - bonusExpected;
-        const bonusClass = bonusDeviation > 3 ? 'hot' : bonusDeviation < -3 ? 'cold' : '';
-        
-        html += `
-          <div class="number-result" style="animation-delay: ${mainNumbers.length * 0.1}s">
-            <div class="result-ball bonus">${bonusNumber}</div>
-            <div class="result-stats">
-              <div class="stat-item">
-                <span class="stat-label">Appearances</span>
-                <span class="stat-value ${bonusClass}">${bonusStats.count}</span>
+
+      const exactMatch = data.recentDraws.find(d => 
+        mainNumbers.every(n => d.main.includes(n)) && d.bonus === bonusNumber
+      );
+
+      const hotCount = mainDetails.filter(detail => detail.statusClass === 'hot').length;
+      const coldCount = mainDetails.filter(detail => detail.statusClass === 'cold').length;
+      const recentHits = mainDetails.filter(detail => detail.stats.lastSeen <= 5 && detail.stats.lastSeen !== 0).length;
+      const streaking = mainDetails.filter(detail => detail.stats.streak > 0).length;
+
+      let bonusMarkup = '';
+      let bonusCard = '';
+      if (validBonus) {
+        bonusStats = (data as any).bonusFrequency?.[bonusNumber] || data.frequency[bonusNumber] || { count: 0, lastSeen: 0, streak: 0 };
+        const bonusDeviation = bonusStats.count - expectedBonus;
+        bonusStatus = getStatusFromDeviation(bonusDeviation);
+
+        bonusMarkup = `<span class="result-ball bonus ${bonusStatus.statusClass}">${bonusNumber}</span>`;
+
+        bonusCard = `
+          <div class="number-card bonus ${bonusStatus.statusClass}" style="animation-delay: ${mainDetails.length * 80}ms">
+            <div class="number-card-header">
+              <span class="number-chip bonus ${bonusStatus.statusClass}">${bonusNumber}</span>
+              <span class="status-chip ${bonusStatus.statusClass}">${bonusStatus.statusEmoji} ${bonusStatus.statusLabel}</span>
+            </div>
+            <div class="number-metrics">
+              <div class="metric">
+                <span class="metric-label">Hits</span>
+                <span class="metric-value">${bonusStats.count.toLocaleString()}</span>
               </div>
-              <div class="stat-item">
-                <span class="stat-label">Expected</span>
-                <span class="stat-value">${bonusExpected}</span>
+              <div class="metric">
+                <span class="metric-label">Expected</span>
+                <span class="metric-value">${expectedBonus.toLocaleString()}</span>
               </div>
-              <div class="stat-item">
-                <span class="stat-label">Last Seen</span>
-                <span class="stat-value">${bonusStats.lastSeen} draws ago</span>
+              <div class="metric">
+                <span class="metric-label">Last seen</span>
+                <span class="metric-value">${formatLastSeenDraws(bonusStats.lastSeen)}</span>
               </div>
-              <div class="stat-item">
-                <span class="stat-label">Consecutive</span>
-                <span class="stat-value">${bonusStats.streak > 0 ? bonusStats.streak + 'x' : 'None'}</span>
+              <div class="metric">
+                <span class="metric-label">Streak</span>
+                <span class="metric-value">${bonusStats.streak > 0 ? `${bonusStats.streak}x` : 'None'}</span>
               </div>
             </div>
           </div>
         `;
       }
-      
-      // Check if this exact combination ever appeared
-      const exactMatch = data.recentDraws.find(d => 
-        mainNumbers.every(n => d.main.includes(n)) && d.bonus === bonusNumber
-      );
-      
-      // Summary
-      const hotCount = mainNumbers.filter(n => {
-        const stats = data.frequency[n];
-        const expected = Math.round(data.totalDraws * (5 / (currentGame === 'powerball' ? 69 : 70)));
-        return stats && stats.count > expected + 5;
-      }).length;
-      
-      const coldCount = mainNumbers.filter(n => {
-        const stats = data.frequency[n];
-        const expected = Math.round(data.totalDraws * (5 / (currentGame === 'powerball' ? 69 : 70)));
-        return stats && stats.count < expected - 5;
-      }).length;
-      
-      html += `
-        <div class="summary-box">
-          <h4>📊 Analysis Summary</h4>
-          <p><strong>Exact combination match in recent history:</strong> ${exactMatch ? 'Yes! (' + exactMatch.date + ')' : 'No (not surprising—there are millions of combinations)'}</p>
-          <p><strong>Your set contains:</strong> ${hotCount} numbers appearing above average, ${coldCount} below average</p>
-          <p><strong>Remember:</strong> This historical data has <em>zero</em> predictive value. Each future draw is completely independent!</p>
+
+      const numberCards = mainDetails.map(detail => `
+        <div class="number-card ${detail.statusClass}" style="animation-delay: ${detail.delay}ms">
+          <div class="number-card-header">
+            <span class="number-chip ${detail.statusClass}">${detail.num}</span>
+            <span class="status-chip ${detail.statusClass}">${detail.statusEmoji} ${detail.statusLabel}</span>
+          </div>
+          <div class="number-metrics">
+            <div class="metric">
+              <span class="metric-label">Hits</span>
+              <span class="metric-value">${detail.stats.count.toLocaleString()}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Expected</span>
+              <span class="metric-value">${detail.expected.toLocaleString()}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Last seen</span>
+              <span class="metric-value">${formatLastSeenDraws(detail.stats.lastSeen)}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Streak</span>
+              <span class="metric-value">${detail.stats.streak > 0 ? `${detail.stats.streak}x` : 'None'}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      resultsContainer.innerHTML = `
+        <div class="report-card">
+          <div class="report-header">
+            <div class="report-title-block">
+              <p class="report-kicker">Unified report card</p>
+              <h3>Repeat Check Report</h3>
+              <p class="report-subtitle">${data.totalDraws.toLocaleString()} draws checked • ${currentGame === 'powerball' ? 'Powerball' : 'Mega Millions'}</p>
+            </div>
+            <div class="report-combination">
+              ${mainDetails.map(detail => `<span class="result-ball ${detail.statusClass}">${detail.num}</span>`).join('')}
+              ${bonusMarkup}
+            </div>
+          </div>
+          
+          <div class="report-content">
+            <div class="mini-report">
+              <div class="mini-row">
+                <span class="mini-label">🎯 Exact match</span>
+                <span class="mini-value ${exactMatch ? 'success' : 'muted'}">
+                  ${exactMatch ? `✅ Found on ${exactMatch.date}` : `No match in last ${data.recentDraws.length} draws`}
+                </span>
+              </div>
+              <div class="mini-row">
+                <span class="mini-label">🔥 Hot numbers</span>
+                <span class="mini-value hot">🔥 ${hotCount}/${mainDetails.length} above trend</span>
+              </div>
+              <div class="mini-row">
+                <span class="mini-label">❄️ Cold numbers</span>
+                <span class="mini-value cold">❄️ ${coldCount}/${mainDetails.length} below trend</span>
+              </div>
+              <div class="mini-row">
+                <span class="mini-label">🕒 Recent hits</span>
+                <span class="mini-value normal">${recentHits}/${mainDetails.length} seen within last 5 draws • ${streaking}/${mainDetails.length} on a streak</span>
+              </div>
+              ${validBonus ? `
+                <div class="mini-row">
+                  <span class="mini-label">⭐ Bonus ball</span>
+                  <span class="mini-value ${bonusStatus?.statusClass || 'normal'}">
+                    ${bonusStatus ? `${bonusStatus.statusEmoji} ${bonusStatus.statusLabel}` : '⚪ Normal'}
+                  </span>
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="numbers-report-grid">
+              ${numberCards}
+              ${bonusCard}
+            </div>
+          </div>
+          
+          <div class="report-footer">
+            <p class="disclaimer-text">
+              <strong>⚠️ Important:</strong> This historical data has <em>zero</em> predictive value. 
+              Each future draw is completely independent and random.
+            </p>
+          </div>
         </div>
       `;
+    }
+
+    function generateRandomNumbers() {
+      const mainInputs = numberInputs.querySelectorAll('.main') as NodeListOf<HTMLInputElement>;
+      const bonusInput = numberInputs.querySelector('.bonus') as HTMLInputElement;
       
-      resultsContainer.innerHTML = html;
+      const maxMain = currentGame === 'powerball' ? 69 : 70;
+      const maxBonus = currentGame === 'powerball' ? 26 : 25;
+      
+      // Generate unique main numbers
+      const mainNumbers: number[] = [];
+      while (mainNumbers.length < 5) {
+        const num = Math.floor(Math.random() * maxMain) + 1;
+        if (!mainNumbers.includes(num)) {
+          mainNumbers.push(num);
+        }
+      }
+      
+      // Sort the numbers
+      mainNumbers.sort((a, b) => a - b);
+      
+      // Generate bonus number
+      const bonusNumber = Math.floor(Math.random() * maxBonus) + 1;
+      
+      // Fill the inputs
+      mainInputs.forEach((input, index) => {
+        input.value = mainNumbers[index]?.toString() || '';
+      });
+      bonusInput.value = bonusNumber.toString();
+      
+      // Auto-check the numbers
+      setTimeout(() => checkNumbers(), 100);
     }
 
     powerballBtn.addEventListener('click', () => switchGame('powerball'));
     megamillionsBtn.addEventListener('click', () => switchGame('megamillions'));
     checkBtn.addEventListener('click', checkNumbers);
+    randomBtn.addEventListener('click', generateRandomNumbers);
   });
 </script>

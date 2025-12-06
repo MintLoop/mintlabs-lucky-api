@@ -1,0 +1,472 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Lottery Combination Calculator | C(n,k) Calculator for Any Lottery Game";
+const description = "Calculate lottery combinations using C(n,k) formula. Find out how many possible combinations exist for Powerball, Mega Millions, EuroMillions, and any lottery game.";
+const keywords = "lottery combinations calculator, C(n,k), combination calculator, lottery odds calculator, powerball combinations, mega millions combinations, how many lottery combinations";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Lottery Combination Calculator",
+  "description": description,
+  "applicationCategory": "CalculatorApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<InfoLayout
+  title="Lottery Combination Calculator"
+  subtitle="Calculate C(n,k) combinations for any lottery game"
+  pageTitle={pageTitle}
+  description={description}
+  keywords={keywords}
+  jsonLd={jsonLd}
+>
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Calculate the number of possible combinations for any lottery game using the mathematical formula C(n,k).
+      This tells you exactly how many different ways you can pick k numbers from a pool of n total numbers.
+      <strong>Understanding combinations is key to grasping lottery odds.</strong>
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="calculator-container">
+      <div class="input-section">
+        <h3>Enter Your Lottery Parameters</h3>
+
+        <div class="input-group">
+          <label for="totalNumbers">Total Numbers in Game (n):</label>
+          <input type="number" id="totalNumbers" min="1" max="100" value="69" placeholder="e.g., 69 for Powerball">
+          <span class="help-text">How many total numbers are in the game?</span>
+        </div>
+
+        <div class="input-group">
+          <label for="numbersToPick">Numbers You Pick (k):</label>
+          <input type="number" id="numbersToPick" min="1" max="100" value="5" placeholder="e.g., 5 for Powerball">
+          <span class="help-text">How many numbers do you need to pick?</span>
+        </div>
+
+        <button id="calculateBtn" class="calculate-btn">Calculate Combinations</button>
+      </div>
+
+      <div class="results-section">
+        <h3>Results</h3>
+
+        <div id="result" class="result-display">
+          <div class="result-item">
+            <span class="label">Total Combinations:</span>
+            <span id="combinations" class="value">--</span>
+          </div>
+
+          <div class="result-item">
+            <span class="label">Your Odds:</span>
+            <span id="odds" class="value">--</span>
+          </div>
+
+          <div class="result-item">
+            <span class="label">Formula:</span>
+            <span id="formula" class="value">C(n,k) = n! / (k! × (n-k)!)</span>
+          </div>
+        </div>
+
+        <div id="explanation" class="explanation" style="display: none;">
+          <h4>What This Means</h4>
+          <p id="explanationText"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="popular-games">
+      <h3>Popular Lottery Games</h3>
+      <div class="game-buttons">
+        <button class="game-preset" data-n="69" data-k="5">Powerball (5/69)</button>
+        <button class="game-preset" data-n="70" data-k="5">Mega Millions (5/70)</button>
+        <button class="game-preset" data-n="50" data-k="5">EuroMillions (5/50)</button>
+        <button class="game-preset" data-n="49" data-k="6">UK Lotto (6/49)</button>
+        <button class="game-preset" data-n="59" data-k="6">Lotto 6/59</button>
+        <button class="game-preset" data-n="35" data-k="5">Pick 5 (5/35)</button>
+      </div>
+    </div>
+
+    <div class="educational-content">
+      <h3>How Lottery Combinations Work</h3>
+
+      <div class="math-explanation">
+        <p>
+          Lottery combinations are calculated using the mathematical formula C(n,k), which represents
+          the number of ways to choose k items from n total items without regard to order.
+        </p>
+
+        <div class="formula-box">
+          <strong>C(n,k) = n! / (k! × (n-k)!)</strong>
+        </div>
+
+        <p>
+          Where:
+        </p>
+        <ul>
+          <li><strong>n</strong> = total numbers available (the pool)</li>
+          <li><strong>k</strong> = numbers you need to pick</li>
+          <li><strong>!</strong> = factorial (n! = n × (n-1) × (n-2) × ... × 1)</li>
+        </ul>
+      </div>
+
+      <div class="examples">
+        <h4>Examples:</h4>
+        <ul>
+          <li><strong>Powerball:</strong> C(69,5) = 11,238,513 combinations</li>
+          <li><strong>Mega Millions:</strong> C(70,5) = 12,103,014 combinations</li>
+          <li><strong>Pick 3:</strong> C(10,3) = 120 combinations</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</InfoLayout>
+
+<style>
+  .calculator-container {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .input-section, .results-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .input-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border-primary);
+    border-radius: 8px;
+    font-size: 1.1rem;
+    transition: border-color 0.2s;
+    background: var(--input-bg);
+    color: var(--text-primary);
+  }
+
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+  }
+
+  .help-text {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  .calculate-btn {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+    color: var(--bg-primary);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .calculate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .result-display {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-primary);
+  }
+
+  .result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-primary);
+  }
+
+  .result-item:last-child {
+    border-bottom: none;
+  }
+
+  .label {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .value {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .explanation {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-success);
+  }
+
+  .popular-games {
+    margin-bottom: 3rem;
+  }
+
+  .game-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .game-preset {
+    background: var(--bg-card);
+    border: 2px solid var(--border-primary);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    color: var(--text-primary);
+  }
+
+  .game-preset:hover {
+    background: var(--bg-secondary);
+    border-color: var(--accent-primary);
+  }
+
+  .educational-content {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-primary);
+  }
+
+  .formula-box {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.2rem;
+    margin: 1rem 0;
+    border: 1px solid var(--border-primary);
+  }
+
+  .examples {
+    margin-top: 1.5rem;
+  }
+
+  .examples ul {
+    background: var(--bg-card);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+  }
+
+  .examples li {
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 768px) {
+    .calculator-container {
+      grid-template-columns: 1fr;
+    }
+
+    .game-buttons {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  // Big integer factorial calculation for large combinations
+  function factorial(n: number): bigint {
+    if (n < 0) return 0n;
+    if (n === 0 || n === 1) return 1n;
+
+    let result = 1n;
+    for (let i = 2n; i <= BigInt(n); i++) {
+      result *= i;
+    }
+    return result;
+  }
+
+  // Calculate combinations C(n,k) = n! / (k! * (n-k)!)
+  function combinations(n: number, k: number): bigint {
+    if (k > n || k < 0 || n < 0) return 0n;
+    if (k === 0 || k === n) return 1n;
+
+    // Use BigInt to handle large numbers
+    const nFact = factorial(n);
+    const kFact = factorial(k);
+    const nkFact = factorial(n - k);
+
+    return nFact / (kFact * nkFact);
+  }
+
+  // Format large numbers with commas
+  function formatNumber(num: bigint): string {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  // Format odds as "1 in X"
+  function formatOdds(comboCount: bigint): string {
+    return `1 in ${formatNumber(comboCount)}`;
+  }
+
+  // Generate explanation text
+  function generateExplanation(n: number, k: number, combos: bigint): string {
+    const game = getGameName(n, k);
+    let explanation = `For a lottery game with ${n} total numbers where you pick ${k}, there are ${formatNumber(combos)} possible combinations. `;
+
+    if (game) {
+      explanation += `This matches games like ${game}. `;
+    }
+
+    explanation += `Your odds of winning are ${formatOdds(combos)}. `;
+
+    if (combos > 1000000n) {
+      explanation += `That's over ${Math.floor(Number(combos) / 1000000)} million possible combinations!`;
+    } else if (combos > 1000n) {
+      explanation += `That's over ${Math.floor(Number(combos) / 1000)} thousand possible combinations!`;
+    }
+
+    return explanation;
+  }
+
+  // Try to identify the game based on n,k values
+  function getGameName(n: number, k: number): string | null {
+    const games: { [key: string]: string } = {
+      "69,5": "Powerball",
+      "70,5": "Mega Millions",
+      "50,5": "EuroMillions",
+      "49,6": "UK Lotto",
+      "59,6": "Lotto 6/59",
+      "35,5": "Pick 5",
+      "10,3": "Pick 3",
+      "10,4": "Pick 4"
+    };
+
+    return games[`${n},${k}`] || null;
+  }
+
+  // Main calculation function
+  function calculate(): void {
+    const nInput = document.getElementById('totalNumbers') as HTMLInputElement;
+    const kInput = document.getElementById('numbersToPick') as HTMLInputElement;
+
+    if (!nInput || !kInput) return;
+
+    const n = parseInt(nInput.value);
+    const k = parseInt(kInput.value);
+
+    if (isNaN(n) || isNaN(k) || n < 1 || k < 1 || k > n) {
+      alert('Please enter valid numbers (k must be ≤ n)');
+      return;
+    }
+
+    const combos = combinations(n, k);
+
+    // Update results
+    const combinationsEl = document.getElementById('combinations');
+    const oddsEl = document.getElementById('odds');
+    const formulaEl = document.getElementById('formula');
+    const explanationEl = document.getElementById('explanation');
+    const explanationTextEl = document.getElementById('explanationText');
+
+    if (combinationsEl) combinationsEl.textContent = formatNumber(combos);
+    if (oddsEl) oddsEl.textContent = formatOdds(combos);
+    if (formulaEl) formulaEl.textContent = `C(${n},${k}) = ${n}! / (${k}! × ${n-k}!)`;
+
+    // Show explanation
+    const explanation = generateExplanation(n, k, combos);
+    if (explanationTextEl) explanationTextEl.textContent = explanation;
+    if (explanationEl) explanationEl.style.display = 'block';
+  }
+
+  // Set up event listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    // Calculate button
+    const calculateBtn = document.getElementById('calculateBtn');
+    if (calculateBtn) {
+      calculateBtn.addEventListener('click', calculate);
+    }
+
+    // Enter key support
+    const totalNumbersInput = document.getElementById('totalNumbers') as HTMLInputElement;
+    const numbersToPickInput = document.getElementById('numbersToPick') as HTMLInputElement;
+
+    if (totalNumbersInput) {
+      totalNumbersInput.addEventListener('keypress', function(e: KeyboardEvent) {
+        if (e.key === 'Enter') calculate();
+      });
+    }
+
+    if (numbersToPickInput) {
+      numbersToPickInput.addEventListener('keypress', function(e: KeyboardEvent) {
+        if (e.key === 'Enter') calculate();
+      });
+    }
+
+    // Game presets
+    document.querySelectorAll('.game-preset').forEach((btn) => {
+      btn.addEventListener('click', function(this: HTMLElement) {
+        const n = parseInt(this.dataset.n || '0');
+        const k = parseInt(this.dataset.k || '0');
+
+        if (totalNumbersInput) totalNumbersInput.value = n.toString();
+        if (numbersToPickInput) numbersToPickInput.value = k.toString();
+
+        calculate();
+      });
+    });
+
+    // Auto-calculate on input change
+    let timeout: number | undefined;
+
+    if (totalNumbersInput) {
+      totalNumbersInput.addEventListener('input', function() {
+        clearTimeout(timeout);
+        timeout = window.setTimeout(calculate, 500);
+      });
+    }
+
+    if (numbersToPickInput) {
+      numbersToPickInput.addEventListener('input', function() {
+        clearTimeout(timeout);
+        timeout = window.setTimeout(calculate, 500);
+      });
+    }
+  });
+</script>

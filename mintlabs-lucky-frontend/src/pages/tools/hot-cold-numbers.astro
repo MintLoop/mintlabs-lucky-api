@@ -351,6 +351,7 @@ const megaMillionsData = {
     for (let i = 1; i <= data.mainRange; i++) {
       const numData = fullData.find(n => n.num === i);
       const intensity = (numData.count - minCount) / (maxCount - minCount);
+      const percentage = ((numData.count / maxCount) * 100).toFixed(1);
       
       // Color interpolation from blue to red
       const r = Math.round(59 + intensity * 196); // 59 to 255
@@ -364,6 +365,7 @@ const megaMillionsData = {
           data-num="${i}"
           data-count="${numData.count}"
           data-rank="${fullData.findIndex(n => n.num === i) + 1}"
+          title="${i}: ${percentage}% frequency (${numData.count} draws)"
         >
           ${i}
         </div>

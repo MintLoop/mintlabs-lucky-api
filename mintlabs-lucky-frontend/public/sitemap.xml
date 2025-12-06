@@ -88,11 +88,35 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- Tools: Expected Value Calculator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/expected-value-calculator</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Jackpot Split Calculator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/jackpot-split-calculator</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Tools: Hot & Cold Numbers -->
   <url>
     <loc>https://lucky.mintlabs.dev/tools/hot-cold-numbers</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Common Combo Checker -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/common-combo-checker</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
@@ -143,7 +167,23 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
+
+  <!-- Tools: Combination Calculator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/combination-calculator</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Quick Draw Simulator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/quick-draw-simulator</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Archive: Past Draws -->
   <url>
     <loc>https://lucky.mintlabs.dev/archive</loc>
