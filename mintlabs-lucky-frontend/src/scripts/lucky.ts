@@ -351,3 +351,45 @@ fixMonochromeButton();
 
 const mo = new MutationObserver(fixMonochromeButton);
 mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+// --- test & instrumentation bootstrapping ---
+// Ensure a single global tracking delegation exists so elements with
+// data-track-event / data-track-props will be recorded consistently.
+try {
+  // lazy-import tracking so tests don't break if module isn't present during SSR
+  // (esbuild bundles this file into public/scripts/lucky.js during build).
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  import('./tracking').then(({ track }) => {
+    if (typeof window !== 'undefined') {
+      try {
+        (window as any).__LUCKY_EVENTS = (window as any).__LUCKY_EVENTS || [];
+        // expose a safe window.track for inline scripts/tests
+        (window as any).track = (window as any).track || track;
+
+        document.addEventListener('click', (ev) => {
+          try {
+            let tgt: any = ev.target;
+            if (!(tgt instanceof Element)) tgt = (tgt && tgt.parentElement) || null;
+            if (!tgt) return;
+            const el = tgt.closest && tgt.closest('[data-track-event]');
+            if (!el) return;
+            const eventName = el.dataset.trackEvent || 'link_click';
+            let props: Record<string, any> = {};
+            if (el.dataset.trackProps) {
+              try { props = JSON.parse(el.dataset.trackProps); } catch (e) { props = {}; }
+            }
+            if (typeof (window as any).track === 'function') {
+              try { (window as any).track(eventName, { href: el.getAttribute && el.getAttribute('href'), ...props }); } catch (e) { /* swallow */ }
+            }
+          } catch (err) {
+            // swallow
+          }
+        }, false);
+      } catch (err) {
+        // ignore
+      }
+    }
+  }).catch(() => {});
+} catch (err) {
+  // ignore import failures during SSR
+}

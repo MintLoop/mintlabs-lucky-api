@@ -117,16 +117,16 @@ These tools target extremely high-volume keyword clusters (Powerball, Mega Milli
 
 | # | Tool | Target Keywords | Description | Status |
 |---|------|-----------------|-------------|--------|
-| 1 | **Lottery Combination Calculator** | "lottery combinations calculator", "C(n,k)" | Compute combinations for any lottery game | ⬜ |
-| 2 | **"How Many Combinations?" Calculator** | "how many lottery combinations", "powerball combinations" | Universal n/k calculator for any game | ⬜ |
-| 3 | **Prize Tier Odds Lookup** | "powerball prize tiers", "mega millions prizes" | Full prize tier odds for PB/MM | ⬜ |
-| 4 | **Expected Value (EV) Calculator** | "lottery expected value", "lottery EV calculator" | Mathematical expected loss for any lottery | ⬜ |
-| 5 | **Multi-Winner Jackpot Splitter** | "split jackpot calculator", "lottery jackpot split" | "What if 2, 3, 4 people win?" calculator | ⬜ |
-| 6 | **Quick Draw Simulator** | "lottery simulator", "powerball simulator" | Simulate a single random PB/MM draw | ⬜ |
-| 7 | **Common Combo Checker** | "overplayed lottery numbers", "common lottery combinations" | Detects overplayed combinations | ⬜ |
-| 8 | **Hot–Cold–Overdue Analyzer** | "hot cold overdue numbers", "lottery number trends" | Combine three metrics users search constantly | ⬜ |
-| 9 | **PB vs MM vs EuroMillions Odds** | "powerball vs mega millions odds", "euromillions odds" | International lottery comparison | ⬜ |
-| 10 | **Powerball Payout Breakdown** | "powerball payout table", "powerball prizes" | Quick payout table based on common jackpots | ⬜ |
+| 1 | **Lottery Combination Calculator** | "lottery combinations calculator", "C(n,k)" | Compute combinations for any lottery game | ✅ Complete |
+| 2 | **"How Many Combinations?" Calculator** | "how many lottery combinations", "powerball combinations" | Universal n/k calculator for any game | ✅ Complete |
+| 3 | **Prize Tier Odds Lookup** | "powerball prize tiers", "mega millions prizes" | Full prize tier odds for PB/MM | ✅ Complete |
+| 4 | **Expected Value (EV) Calculator** | "lottery expected value", "lottery EV calculator" | Mathematical expected loss for any lottery | ✅ Complete |
+| 5 | **Multi-Winner Jackpot Splitter** | "split jackpot calculator", "lottery jackpot split" | "What if 2, 3, 4 people win?" calculator | ✅ Complete |
+| 6 | **Quick Draw Simulator** | "lottery simulator", "powerball simulator" | Simulate a single random PB/MM draw | ✅ Complete |
+| 7 | **Common Combo Checker** | "overplayed lottery numbers", "common lottery combinations" | Detects overplayed combinations | ✅ Complete |
+| 8 | **Hot–Cold–Overdue Analyzer** | "hot cold overdue numbers", "lottery number trends" | Combine three metrics users search constantly | ✅ Complete |
+| 9 | **PB vs MM vs EuroMillions Odds** | "powerball vs mega millions odds", "euromillions odds" | International lottery comparison | ✅ Complete |
+| 10 | **Powerball Payout Breakdown** | "powerball payout table", "powerball prizes" | Quick payout table based on common jackpots | ✅ Complete |
 
 **Tier S Priority:** Build these 10 tools first for maximum SEO impact.
 
@@ -136,10 +136,10 @@ These tools target extremely high-volume keyword clusters (Powerball, Mega Milli
 
 | # | Tool | Target Keywords | Description | Status |
 |---|------|-----------------|-------------|--------|
-| 11 | **"How Rare Is This?" Converter** | "probability converter", "odds calculator" | Convert odds to analogies (shark attack, lightning) | ⬜ |
-| 12 | **Expected Loss Over X Years** | "lottery long term cost", "lifetime lottery spending" | Compounds probability for 5–30 year timelines | ⬜ |
-| 13 | **Annuity Breakdown Visualizer** | "powerball annuity schedule", "lottery annuity payments" | Shows year-by-year annuity payment schedule | ⬜ |
-| 14 | **Probability Playground** | "probability simulator", "interactive odds" | Adjust odds and ticket count → see results | ⬜ |
+| 11 | **"How Rare Is This?" Converter** | "probability converter", "odds calculator" | Convert odds to analogies (shark attack, lightning) | ✅ Complete |
+| 12 | **Expected Loss Over X Years** | "lottery long term cost", "lifetime lottery spending" | Compounds probability for 5–30 year timelines | ✅ Complete |
+| 13 | **Annuity Breakdown Visualizer** | "powerball annuity schedule", "lottery annuity payments" | Shows year-by-year annuity payment schedule | ✅ Complete |
+| 14 | **Probability Playground** | "probability simulator", "interactive odds" | Adjust odds and ticket count → see results | ✅ Complete |
 | 15 | **Ticket Variance Calculator** | "lottery variance", "lottery outcome range" | Measures range of outcomes across draws | ⬜ |
 | 16 | **Beginner's Math Flash Cards** | "lottery math quiz", "probability basics" | Interactive learning for misconceptions | ⬜ |
 | 17 | **"Why Odds Don't Change" Demo** | "gambler's fallacy explained", "lottery independence" | Shows identical probability regardless of past | ⬜ |
@@ -237,7 +237,7 @@ For maximum SEO + session length, build in this sequence:
 
 ## Acceptance Criteria
 
-- [ ] Each tool < 500 lines of code
+- [ ] Each tool ~ 500 lines of code
 - [ ] All tools use InfoLayout for consistent SEO structure
 - [ ] JSON-LD schema (`WebApplication`) for each tool
 - [ ] Mobile responsive (320px minimum)
@@ -368,6 +368,7 @@ Logic:
 |---------|---------|
 | "Start Here" page | Onboarding for new visitors |
 | Tool popularity badges | "Popular", "New", "Staff Pick" |
+| Client telemetry & analytics (privacy-first) | Lightweight, opt-in events to measure tool card and carousel engagement |
 | Session journey tracking | Client-side only, privacy-safe |
 | "Last Used" quick links | Show user's recent tools |
 | Favorites system | LocalStorage-based bookmarks |
@@ -398,6 +399,41 @@ Logic:
 
 - **Session duration:** 30 seconds → 5+ minutes
 - **Pages per session:** 1.2 → 4+
+
+---
+
+## Measurement & Growth — Analytics + Newsletter (Phase 4 scope)
+
+To measure performance fast and safely while Phase 4 expands the site, we propose a two-part, privacy-first plan that can be implemented now (Phase 4) and extended later (Phase 5 / Monetization).
+
+1) Client-side, privacy-safe analytics (Phase 4, light):
+  - Add a small instrumentation wrapper (analytics.ts) that exposes a single method trackEvent(eventName, props).
+  - Instrument high-value UI interactions initially: home carousel clicks, tool-card clicks (EduGrid), tool-presets, and major CTA clicks (Generate, Calculate, Download).
+  - Default behaviour: no external vendor. The wrapper is feature-flagged / gated by a build-time or runtime config toggle so it is a no-op unless enabled.
+  - Events are coarse and non-identifying: event name, tool slug, timestamp, theme, and an anonymized session id (no PII). Do NOT store emails or raw user-entered numbers in events.
+  - Respect Do Not Track / user opt-out: if the user opts out (cookie or localStorage flag), the wrapper is disabled.
+
+2) Opt-in newsletter capture (Phase 4, front-end only):
+  - Add an unobtrusive, opt-in newsletter modal and inline signup form on high-traffic pages (home + select tool pages).
+  - UI-only flow: collect email on the client and POST to a protected backend endpoint only when available. If backend subscription API is not ready, store submissions locally (encrypted) and show an admin export path for manual action, or queue for Phase 5 processing.
+  - Include a short privacy notice explaining what email is used for (updates, promotions) and an unsubscribe link in future messages.
+
+3) Phase 5 / Monetization (server-side & dashboards):
+  - Implement a telemetry ingestion pipeline (server or third-party) with storage, sampling, and dashboards.
+  - Implement backend newsletter subscription handling (double opt-in, email provider integration, unsubscribe, privacy docs).
+  - Add aggregated dashboards and KPI tracking (tool CTR, conversion to signup, weekly active tools) and retention cohorts.
+
+Why this split?
+  - Quick wins: lightweight client instrumentation helps prioritize tools and A/B ordering decisions during Phase 4 without large infra work.
+  - Privacy-first: Phase 4 keeps everything opt-in, low-sensitivity, and reversible.
+  - Future-proof: Phase 5/Monetization will handle storage, dashboards, and compliance (double opt-in, unsubscribe, GDPR/CCPA docs).
+
+Acceptance notes for Phase 4 light analytics/newsletter:
+  - [x] Instrumentation wrapper created and documented (`src/scripts/tracking.ts`)
+  - [x] Carousel and EduGrid tool-card CTR events instrumented (TrackLink → data-track-event + global delegation)
+  - [x] Simple opt-in newsletter modal & UI created (front-end only) (`src/components/NewsletterModal.astro`) — queues to `localStorage` (`newsletter_queue_v1`) until backend exists
+  - [x] Playwright tests verifying events fire and the modal queues emails (`tests/analytics-and-newsletter.spec.ts`) — local e2e suite passes (30/30)
+  - [x] Privacy text added to subscription UI and a short note in the footer; events are non-identifying and explicitly avoid sending emails/PII to analytics
 - **Google ranking factors:**
   - ✅ Content clusters (5 distinct topic areas)
   - ✅ Internal link density (exceeds competitors)

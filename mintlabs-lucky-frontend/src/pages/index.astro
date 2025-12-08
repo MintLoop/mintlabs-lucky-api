@@ -2,9 +2,11 @@
 import "../styles/global.css"; // bundle Tailwind + your theme tokens
 
 import SiteHeader from "../components/SiteHeader.astro";
+import TrackLink from "../components/TrackLink.astro";
 import ThemeToolbar from "../components/ThemeToolBar.astro";
 import GeneratorForm from "../components/GeneratorForm.astro";
 import EduGrid from "../components/EduGrid.astro";
+import NewsletterModal from "../components/NewsletterModal.astro";
 import GameFacts from "../components/GameFacts.astro";
 import TermsModal from "../components/TermsModal.astro";
 import PrivacyModal from "../components/PrivacyModal.astro";
@@ -50,6 +52,34 @@ const apiBase = API ? String(API).replace(/\/$/, '') : '';
       <!-- form component: markup unchanged; gets games from API -->
       <GeneratorForm games={Array.isArray(games) ? games : []} />
 
+      <!-- quick tools carousel to give visitors one-click access to high-value tools -->
+      <section id="tools-quick" class="mt-6">
+        <h3 class="text-lg font-semibold mb-2">Explore our tools</h3>
+        <div class="tools-carousel" aria-label="Featured tools carousel">
+          <div class="carousel-track" role="list">
+            <TrackLink class="tool-card" href="/tools/combination-calculator" event="carousel_click" props={{ tool: 'combination-calculator' }}>Combination Calculator</TrackLink>
+            <TrackLink class="tool-card" href="/tools/expected-value-calculator" event="carousel_click" props={{ tool: 'expected-value-calculator' }}>Expected Value Calculator</TrackLink>
+            <TrackLink class="tool-card" href="/tools/odds-comparison" event="carousel_click" props={{ tool: 'odds-comparison' }}>Odds Comparison</TrackLink>
+            <TrackLink class="tool-card" href="/tools/quick-draw-simulator" event="carousel_click" props={{ tool: 'quick-draw-simulator' }}>Quick Draw Simulator</TrackLink>
+            <TrackLink class="tool-card" href="/tools/common-combo-checker" event="carousel_click" props={{ tool: 'common-combo-checker' }}>Common Combo Checker</TrackLink>
+            <TrackLink class="tool-card" href="/tools/jackpot-split-calculator" event="carousel_click" props={{ tool: 'jackpot-split-calculator' }}>Jackpot Splitter</TrackLink>
+            <TrackLink class="tool-card" href="/tools/expected-loss-over-years" event="carousel_click" props={{ tool: 'expected-loss-over-years' }}>Expected Loss (Years)</TrackLink>
+            <TrackLink class="tool-card" href="/tools/ticket-beautifier" event="carousel_click" props={{ tool: 'ticket-beautifier' }}>Ticket Beautifier</TrackLink>
+            <TrackLink class="tool-card" href="/tools/annuity-breakdown" event="carousel_click" props={{ tool: 'annuity-breakdown' }}>Annuity Visualizer</TrackLink>
+            <!-- duplicate set for smooth looping -->
+            <TrackLink class="tool-card" href="/tools/combination-calculator" event="carousel_click" props={{ tool: 'combination-calculator' }}>Combination Calculator</TrackLink>
+            <TrackLink class="tool-card" href="/tools/expected-value-calculator" event="carousel_click" props={{ tool: 'expected-value-calculator' }}>Expected Value Calculator</TrackLink>
+            <TrackLink class="tool-card" href="/tools/odds-comparison" event="carousel_click" props={{ tool: 'odds-comparison' }}>Odds Comparison</TrackLink>
+            <TrackLink class="tool-card" href="/tools/quick-draw-simulator" event="carousel_click" props={{ tool: 'quick-draw-simulator' }}>Quick Draw Simulator</TrackLink>
+            <TrackLink class="tool-card" href="/tools/common-combo-checker" event="carousel_click" props={{ tool: 'common-combo-checker' }}>Common Combo Checker</TrackLink>
+            <TrackLink class="tool-card" href="/tools/jackpot-split-calculator" event="carousel_click" props={{ tool: 'jackpot-split-calculator' }}>Jackpot Splitter</TrackLink>
+            <TrackLink class="tool-card" href="/tools/expected-loss-over-years" event="carousel_click" props={{ tool: 'expected-loss-over-years' }}>Expected Loss (Years)</TrackLink>
+            <TrackLink class="tool-card" href="/tools/ticket-beautifier" event="carousel_click" props={{ tool: 'ticket-beautifier' }}>Ticket Beautifier</TrackLink>
+            <TrackLink class="tool-card" href="/tools/annuity-breakdown" event="carousel_click" props={{ tool: 'annuity-breakdown' }}>Annuity Visualizer</TrackLink>
+          </div>
+        </div>
+      </section>
+
       {IS_PROD && ADS && (
         <>
           <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS}`} crossorigin="anonymous"></script>
@@ -65,6 +95,14 @@ const apiBase = API ? String(API).replace(/\/$/, '') : '';
       </div>
 
       <EduGrid />
+
+      <style is:inline>
+        .tools-carousel { overflow: hidden; border-radius: 12px; border:1px solid rgba(255,255,255,0.04); background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005)); }
+        .carousel-track { display:flex; gap:1rem; padding:0.75rem; align-items:center; animation: scroll-left 20s linear infinite; }
+        .tool-card { display:inline-block; padding:0.6rem 1rem; border-radius:8px; background:var(--bg-card); color:var(--text); text-decoration:none; font-weight:600; border:1px solid var(--border); white-space:nowrap; }
+        .tools-carousel:hover .carousel-track { animation-play-state: paused; }
+        @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+      </style>
 
       <footer class="mt-12 pb-8 border-t border-slate-700/50 pt-8">
         {/* Footer Navigation */}
@@ -118,6 +156,8 @@ const apiBase = API ? String(API).replace(/\/$/, '') : '';
 
     <TermsModal />
     <PrivacyModal />
+    <NewsletterModal />
+    
 
     <!-- your generator logic -->
     <script is:inline>

@@ -1,3 +1,46 @@
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+
+// src/scripts/tracking.ts
+var tracking_exports = {};
+__export(tracking_exports, {
+  track: () => track
+});
+function track(event, props = {}) {
+  try {
+    try {
+      window.__LUCKY_EVENTS = window.__LUCKY_EVENTS || [];
+      window.__LUCKY_EVENTS.push({ event, props, ts: Date.now() });
+    } catch (err) {
+    }
+    if (typeof window.plausible === "function") {
+      window.plausible(event, { props });
+    }
+    const umami = window.umami;
+    if (umami) {
+      if (typeof umami.track === "function") umami.track(event, props);
+      else if (typeof umami === "function") umami(event, props);
+    }
+    if (!window.plausible && !window.umami) {
+      console.debug("[track]", event, props);
+    }
+  } catch (e) {
+    console.warn("[track:error]", e);
+  }
+}
+var init_tracking = __esm({
+  "src/scripts/tracking.ts"() {
+    "use strict";
+  }
+});
+
 // src/scripts/lucky.ts
 var metaEnv = import.meta?.env ?? {};
 var globalApi = typeof window !== "undefined" ? window.__LUCKY_API_BASE : void 0;
@@ -283,6 +326,44 @@ var fixMonochromeButton = () => {
 fixMonochromeButton();
 var mo = new MutationObserver(fixMonochromeButton);
 mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+try {
+  Promise.resolve().then(() => (init_tracking(), tracking_exports)).then(({ track: track2 }) => {
+    if (typeof window !== "undefined") {
+      try {
+        window.__LUCKY_EVENTS = window.__LUCKY_EVENTS || [];
+        window.track = window.track || track2;
+        document.addEventListener("click", (ev) => {
+          try {
+            let tgt = ev.target;
+            if (!(tgt instanceof Element)) tgt = tgt && tgt.parentElement || null;
+            if (!tgt) return;
+            const el = tgt.closest && tgt.closest("[data-track-event]");
+            if (!el) return;
+            const eventName = el.dataset.trackEvent || "link_click";
+            let props = {};
+            if (el.dataset.trackProps) {
+              try {
+                props = JSON.parse(el.dataset.trackProps);
+              } catch (e) {
+                props = {};
+              }
+            }
+            if (typeof window.track === "function") {
+              try {
+                window.track(eventName, { href: el.getAttribute && el.getAttribute("href"), ...props });
+              } catch (e) {
+              }
+            }
+          } catch (err) {
+          }
+        }, false);
+      } catch (err) {
+      }
+    }
+  }).catch(() => {
+  });
+} catch (err) {
+}
 export {
   initLucky
 };

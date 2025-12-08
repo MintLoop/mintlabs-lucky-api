@@ -1,4 +1,5 @@
 ---
+import NewsletterModal from '../components/NewsletterModal.astro';
 interface Props {
 	title?: string;
 	description?: string;
@@ -8,18 +9,18 @@ interface Props {
 	canonicalUrl?: string;
 	noIndex?: boolean;
 	jsonLd?: object;
-}
+	}
 
-const { 
-	title = "MintLabs Lucky Numbers - Free Lottery Number Generator",
-	description = "Generate random lottery numbers for Powerball, Mega Millions, and more. Free, transparent, and educational lottery tools.",
-	keywords = "lottery number generator, powerball numbers, mega millions, random numbers, lottery odds, lottery calculator",
-	ogImage = "/og/default.png",
-	ogType = "website",
-	canonicalUrl,
-	noIndex = false,
-	jsonLd
-} = Astro.props;
+	const { 
+		title = "MintLabs Lucky Numbers - Free Lottery Number Generator",
+		description = "Generate random lottery numbers for Powerball, Mega Millions, and more. Free, transparent, and educational lottery tools.",
+		keywords = "lottery number generator, powerball numbers, mega millions, random numbers, lottery odds, lottery calculator",
+		ogImage = "/og/default.png",
+		ogType = "website",
+		canonicalUrl,
+		noIndex = false,
+		jsonLd
+	} = Astro.props;
 
 const siteUrl = "https://lucky.mintlabs.dev";
 const fullCanonical = canonicalUrl || Astro.url.href;
@@ -91,6 +92,7 @@ const fullCanonical = canonicalUrl || Astro.url.href;
 	</head>
 	<body class="min-h-screen theme-bg-primary theme-text-primary">
 		<slot />
+		<NewsletterModal />
 	</body>
 </html>
 

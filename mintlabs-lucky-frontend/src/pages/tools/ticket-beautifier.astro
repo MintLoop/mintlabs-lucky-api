@@ -990,9 +990,11 @@ const jsonLd = {
       let y = footerBase;
 
       ctx.textAlign = 'center';
-      ctx.fillStyle = themeStyle.text || themeCfg.text;
+      // Use footer accent (or canvas footer) color for the player label so it
+      // remains legible on light backgrounds like the minimal theme.
+      ctx.fillStyle = themeStyle.footerAccent || themeCfg.footer;
       ctx.font = 'bold 16px Arial';
-      ctx.fillText(`🎫 ${player}`, width / 2, y); // player
+      ctx.fillText(player, width / 2, y); // player (no emoji)
 
       // date
       if (date) {
@@ -1341,7 +1343,7 @@ const jsonLd = {
                 ${payloadNumbersHTML}
               </div>
               <div class="ticket-footer">
-                <div class="ticket-player">🎫 ${copyPlayer}</div>
+                <div class="ticket-player" style="color:${style.footerAccent}">${copyPlayer}</div>
                 ${date ? `<div class="ticket-date" style="color:${style.subtextColor}">Draw: ${date}</div>` : ''}
                 ${notesValue ? `<div class="ticket-note" style="color:${style.subtextColor}">${notesValue}</div>` : ''}
                 ${showPin && pinValue ? `<div class="ticket-pin" style="color:${style.footerAccent}">PIN: ${pinValue}</div>` : ''}
@@ -1384,7 +1386,38 @@ const jsonLd = {
 
         const lastInserted = ticketPreview.querySelectorAll('.ticket-instance');
         const lastNode = lastInserted[lastInserted.length - 1] as HTMLElement;
-        const canvasNode = await html2canvas(lastNode.querySelector('.ticket-canvas') as HTMLElement, { backgroundColor: null, scale: 1 });
+        // Render at the device pixel ratio so the generated canvas more closely
+        // matches what a browser screenshot (Playwright) will capture. html2canvas
+        // will use this scale when painting onto the created canvas.
+        const renderScale = (window && (window.devicePixelRatio || 1)) || 1;
+        const el = lastNode.querySelector('.ticket-canvas') as HTMLElement;
+        // compute client rect and target pixel dimensions
+        const rect = el.getBoundingClientRect();
+        const targetW = Math.round(rect.width * renderScale);
+        const targetH = Math.round(rect.height * renderScale);
+
+        // Prefer dom-to-image-more (often more faithful) but fall back to html2canvas
+        // if dom-to-image is unavailable or fails for some themes.
+        let canvasNode: HTMLCanvasElement | null = null;
+        try {
+          const domtoimage: any = (await import('dom-to-image-more')).default;
+          // Request output in CSS pixels — we'll scale to device pixels when drawing
+          const dataUrl: string = await domtoimage.toPng(el, { bgcolor: null, width: Math.round(rect.width), height: Math.round(rect.height) });
+          const img = document.createElement('img');
+          img.src = dataUrl;
+          await new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+
+          canvasNode = document.createElement('canvas');
+          // Use the natural pixel dimensions of the generated image
+          canvasNode.width = img.naturalWidth || Math.round(rect.width * renderScale);
+          canvasNode.height = img.naturalHeight || Math.round(rect.height * renderScale);
+          const ctx = canvasNode.getContext('2d')!;
+          ctx.drawImage(img, 0, 0, canvasNode.width, canvasNode.height);
+        } catch (e) {
+          // fallback: dynamic import html2canvas at runtime
+          const html2canvas: any = (await import('html2canvas')).default;
+          canvasNode = await html2canvas(el, { backgroundColor: null, scale: renderScale, width: targetW, height: targetH });
+        }
         canvasNode.id = `ticketCanvas-${i}`;
         canvasNode.style.display = 'none';
         holder.appendChild(canvasNode);

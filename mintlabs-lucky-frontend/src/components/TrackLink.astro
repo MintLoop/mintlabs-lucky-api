@@ -27,25 +27,7 @@ const payload = JSON.stringify(props ?? {});
   <slot />
 </a>
 
-<script is:inline>
-  import { track } from "../scripts/tracking";
-  const el = document.getElementById("{id}");
-  if (el) {
-    const eventName = el.dataset.trackEvent || "link_click";
-    let propsData = {};
-    if (el.dataset.trackProps) {
-      try {
-        propsData = JSON.parse(el.dataset.trackProps);
-      } catch (err) {
-        console.warn('TrackLink payload parse failed', err);
-      }
-    }
-    el.addEventListener(
-      "click",
-      () => {
-        track(eventName, { href: el.getAttribute("href"), ...propsData });
-      },
-      { passive: true },
-    );
-  }
-</script>
+<!-- TrackLink intentionally has no per-link inline import handlers.
+     We use a single global delegation hook for data-track-event attributes
+     (registered at app boot) so instrumentation is resilient and bundled
+     correctly for all pages. -->

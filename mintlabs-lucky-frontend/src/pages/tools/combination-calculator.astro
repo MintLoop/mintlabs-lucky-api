@@ -53,6 +53,12 @@ const jsonLd = {
           <span class="help-text">How many numbers do you need to pick?</span>
         </div>
 
+        <div class="input-group">
+          <label for="specialBallCount">Optional: Separate "Powerball" / special ball pool (m):</label>
+          <input type="number" id="specialBallCount" min="0" max="1000" placeholder="e.g., 26 for Powerball — leave blank or 0 to skip">
+          <span class="help-text">If the game also requires choosing a separate special ball (like Powerball, Mega Ball), include the number of choices here. The final combinations will be C(n,k) × m.</span>
+        </div>
+
         <button id="calculateBtn" class="calculate-btn">Calculate Combinations</button>
       </div>
 
@@ -86,8 +92,8 @@ const jsonLd = {
     <div class="popular-games">
       <h3>Popular Lottery Games</h3>
       <div class="game-buttons">
-        <button class="game-preset" data-n="69" data-k="5">Powerball (5/69)</button>
-        <button class="game-preset" data-n="70" data-k="5">Mega Millions (5/70)</button>
+      <button class="game-preset" data-n="69" data-k="5" data-m="26">Powerball (5/69 + PB 26)</button>
+      <button class="game-preset" data-n="70" data-k="5" data-m="25">Mega Millions (5/70 + Mega 25)</button>
         <button class="game-preset" data-n="50" data-k="5">EuroMillions (5/50)</button>
         <button class="game-preset" data-n="49" data-k="6">UK Lotto (6/49)</button>
         <button class="game-preset" data-n="59" data-k="6">Lotto 6/59</button>
@@ -121,7 +127,7 @@ const jsonLd = {
       <div class="examples">
         <h4>Examples:</h4>
         <ul>
-          <li><strong>Powerball:</strong> C(69,5) = 11,238,513 combinations</li>
+          <li><strong>Powerball:</strong> C(69,5) = 11,238,513 combinations (× 26 for the Powerball gives 292,201,338 unique tickets)</li>
           <li><strong>Mega Millions:</strong> C(70,5) = 12,103,014 combinations</li>
           <li><strong>Pick 3:</strong> C(10,3) = 120 combinations</li>
         </ul>
@@ -346,9 +352,11 @@ const jsonLd = {
   }
 
   // Generate explanation text
-  function generateExplanation(n: number, k: number, combos: bigint): string {
-    const game = getGameName(n, k);
-    let explanation = `For a lottery game with ${n} total numbers where you pick ${k}, there are ${formatNumber(combos)} possible combinations. `;
+  function generateExplanation(n: number, k: number, combos: bigint, special?: number): string {
+    const game = getGameName(n, k, special);
+    let explanation = `For a lottery game with ${n} total numbers where you pick ${k}, there are ${formatNumber(combos)} possible combinations`;
+    if (special && special > 0) explanation += ` (including ${special} special-ball choices)`;
+    explanation += `. `;
 
     if (game) {
       explanation += `This matches games like ${game}. `;
@@ -366,7 +374,7 @@ const jsonLd = {
   }
 
   // Try to identify the game based on n,k values
-  function getGameName(n: number, k: number): string | null {
+  function getGameName(n: number, k: number, m?: number): string | null {
     const games: { [key: string]: string } = {
       "69,5": "Powerball",
       "70,5": "Mega Millions",
@@ -377,6 +385,17 @@ const jsonLd = {
       "10,3": "Pick 3",
       "10,4": "Pick 4"
     };
+
+    // prefer exact match including special ball if provided
+    if (typeof m === 'number' && m > 0) {
+      const keyWithM = `${n},${k},${m}`;
+      const specialGames: { [key: string]: string } = {
+        "69,5,26": "Powerball",
+        "70,5,25": "Mega Millions"
+      };
+
+      if (specialGames[keyWithM]) return specialGames[keyWithM];
+    }
 
     return games[`${n},${k}`] || null;
   }
@@ -390,13 +409,20 @@ const jsonLd = {
 
     const n = parseInt(nInput.value);
     const k = parseInt(kInput.value);
+    const specialInput = document.getElementById('specialBallCount') as HTMLInputElement;
+    const m = specialInput ? parseInt(specialInput.value || '0') : 0;
 
     if (isNaN(n) || isNaN(k) || n < 1 || k < 1 || k > n) {
       alert('Please enter valid numbers (k must be ≤ n)');
       return;
     }
 
-    const combos = combinations(n, k);
+    let baseCombos = combinations(n, k);
+    let combos = baseCombos;
+
+    if (!isNaN(m) && m > 0) {
+      combos = combos * BigInt(m);
+    }
 
     // Update results
     const combinationsEl = document.getElementById('combinations');
@@ -407,10 +433,16 @@ const jsonLd = {
 
     if (combinationsEl) combinationsEl.textContent = formatNumber(combos);
     if (oddsEl) oddsEl.textContent = formatOdds(combos);
-    if (formulaEl) formulaEl.textContent = `C(${n},${k}) = ${n}! / (${k}! × ${n-k}!)`;
+    if (formulaEl) {
+      if (m && m > 0) {
+        formulaEl.textContent = `C(${n},${k}) × ${m} = (${n}! / (${k}! × ${n-k}!)) × ${m}`;
+      } else {
+        formulaEl.textContent = `C(${n},${k}) = ${n}! / (${k}! × ${n-k}!)`;
+      }
+    }
 
     // Show explanation
-    const explanation = generateExplanation(n, k, combos);
+    const explanation = generateExplanation(n, k, combos, m);
     if (explanationTextEl) explanationTextEl.textContent = explanation;
     if (explanationEl) explanationEl.style.display = 'block';
   }
@@ -444,9 +476,12 @@ const jsonLd = {
       btn.addEventListener('click', function(this: HTMLElement) {
         const n = parseInt(this.dataset.n || '0');
         const k = parseInt(this.dataset.k || '0');
+        const m = parseInt(this.dataset.m || '0');
 
         if (totalNumbersInput) totalNumbersInput.value = n.toString();
         if (numbersToPickInput) numbersToPickInput.value = k.toString();
+        const specialEl = document.getElementById('specialBallCount') as HTMLInputElement;
+        if (specialEl) specialEl.value = (!isNaN(m) && m > 0) ? m.toString() : '';
 
         calculate();
       });

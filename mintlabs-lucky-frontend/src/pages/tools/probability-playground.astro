@@ -1,0 +1,91 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Probability Playground — Interactive Odds Simulator";
+const description = "Interactive simulator to explore how odds change with ticket count, draws, and time. Visualize 'probability of at least one win' and expected wins.";
+const keywords = "probability playground, odds simulator, lottery probability, interactive odds";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Probability Playground",
+  "description": description,
+};
+---
+
+<InfoLayout title="Probability Playground" subtitle="Play with odds, tickets and draws" pageTitle={pageTitle} description={description} keywords={keywords} jsonLd={jsonLd}>
+
+  <div slot="teaser" class="teaser-content">
+    <p>Try different tickets-per-draw and draws-per-week with adjustable odds to see how your chance of a win grows over time.</p>
+  </div>
+
+  <section class="tool-section">
+    <div class="grid">
+      <div class="controls">
+        <label>Odds (1 in X)</label>
+        <input id="odds" type="number" value="292201338" min="1" />
+
+        <label>Tickets per draw</label>
+        <input id="tickets" type="number" value="1" min="1" />
+
+        <label>Draws per week</label>
+        <input id="draws" type="number" value="2" min="0" />
+
+        <label>Years to simulate</label>
+        <input id="years" type="number" value="1" min="0" />
+
+        <button id="run" class="action-btn primary">Compute Probability</button>
+      </div>
+
+      <div class="results">
+        <h3>Result</h3>
+        <div class="result-row"><strong>Trials:</strong> <span id="trials">—</span></div>
+        <div class="result-row"><strong>Probability of at least one win:</strong> <span id="prob">—</span></div>
+        <div class="result-row"><strong>Expected wins:</strong> <span id="exp">—</span></div>
+        <div class="explain">Use the sliders to understand how many plays you need to raise low odds — the math is simple and reveals how rare jackpots remain even after many plays.</div>
+      </div>
+    </div>
+  </section>
+
+</InfoLayout>
+
+<style>
+  .grid { display:grid; grid-template-columns: 320px 1fr; gap:1rem }
+  input { width:100%; padding:0.6rem; margin-bottom:0.75rem; border-radius:8px; border:1px solid var(--border-primary) }
+  .controls, .results { background:var(--bg-card); padding:1rem; border-radius:8px; border:1px solid var(--border-primary) }
+  .result-row { margin-bottom:0.5rem }
+  .explain { color:var(--text-muted); margin-top:0.5rem }
+</style>
+
+<script>
+  function formatPct(v) { return (v * 100).toFixed(6) + '%'; }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const odds = document.getElementById('odds');
+    const tickets = document.getElementById('tickets');
+    const draws = document.getElementById('draws');
+    const years = document.getElementById('years');
+    const run = document.getElementById('run');
+
+    function compute() {
+      const oddsVal = Number(odds.value || 1);
+      const t = Number(tickets.value || 1);
+      const d = Number(draws.value || 0);
+      const y = Number(years.value || 0);
+
+      const weeks = y * 52;
+      const trials = t * d * weeks;
+
+      const p_single = 1 / oddsVal;
+      // probability of at least one win over trials
+      const prob = 1 - Math.pow(1 - p_single, trials || 0);
+      const expectedWins = trials * p_single;
+
+      document.getElementById('trials').textContent = String(trials);
+      document.getElementById('prob').textContent = formatPct(prob);
+      document.getElementById('exp').textContent = expectedWins.toFixed(6);
+    }
+
+    run.addEventListener('click', compute);
+  });
+</script>

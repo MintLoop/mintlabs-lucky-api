@@ -1,0 +1,125 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Annuity Breakdown Visualizer — Lottery Payouts & Taxed Schedules";
+const description = "Visualize an annuity-style jackpot payout across N years, with optional tax withholding and present-value summary.";
+const keywords = "annuity calculator, lottery annuity, jackpot payout schedule, annuity visualizer";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Annuity Breakdown Visualizer",
+  "description": description,
+  "applicationCategory": "CalculatorApplication"
+};
+---
+
+<InfoLayout title="Annuity Breakdown Visualizer" subtitle="Year-by-year payout preview + tax" pageTitle={pageTitle} description={description} keywords={keywords} jsonLd={jsonLd}>
+
+  <div slot="teaser" class="teaser-content">
+    <p>Enter a jackpot and see the standard annuity schedule (e.g., 30-year annual payments), after-tax results, and simple present value calculation assuming a discount rate.</p>
+  </div>
+
+  <section class="tool-section">
+    <div class="grid">
+      <div class="controls">
+        <label for="jackpot">Jackpot amount</label>
+        <input id="jackpot" type="number" value="1000000000" />
+
+        <label for="years">Years (annuity length)</label>
+        <input id="years" type="number" value="30" min="1" />
+
+        <label for="upfrontPct">Upfront cash option (pct)</label>
+        <input id="upfrontPct" type="number" value="60" min="0" max="100" />
+
+        <label for="taxRate">Total tax rate (pct)</label>
+        <input id="taxRate" type="number" value="37" min="0" max="100" />
+
+        <label for="discountRate">Discount rate (annual % for PV)</label>
+        <input id="discountRate" type="number" value="3" min="0" step="0.1" />
+
+        <button id="compute" class="action-btn primary">Compute Schedule</button>
+      </div>
+
+      <div class="output">
+        <div id="summary"></div>
+        <table id="schedule" class="schedule"></table>
+      </div>
+    </div>
+  </section>
+
+</InfoLayout>
+
+<style>
+  .grid { display:grid; grid-template-columns: 320px 1fr; gap:1rem }
+  .controls { background:var(--bg-card); padding:1rem; border-radius:10px; border:1px solid var(--border-primary) }
+  .output { background:var(--bg-card); padding:1rem; border-radius:10px; border:1px solid var(--border-primary) }
+  input { width:100%; padding:0.5rem; margin-bottom:0.6rem; border-radius:6px; border:1px solid var(--border-primary) }
+  table.schedule { width:100%; border-collapse:collapse; margin-top:0.75rem }
+  table.schedule th, table.schedule td { padding:0.5rem; border-bottom:1px solid var(--border); text-align:right }
+  table.schedule th { text-align:left }
+</style>
+
+<script>
+  function currency(n) { return `$${Number(n).toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 })}`; }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const jackpotEl = document.getElementById('jackpot') as HTMLInputElement;
+    const yearsEl = document.getElementById('years') as HTMLInputElement;
+    const upfrontEl = document.getElementById('upfrontPct') as HTMLInputElement;
+    const taxEl = document.getElementById('taxRate') as HTMLInputElement;
+    const discountEl = document.getElementById('discountRate') as HTMLInputElement;
+    const computeBtn = document.getElementById('compute') as HTMLButtonElement;
+
+    function compute() {
+      const jackpot = Number(jackpotEl.value || 0);
+      const years = Number(yearsEl.value || 30);
+      const upfrontPct = Number(upfrontEl.value || 0) / 100;
+      const taxRate = Number(taxEl.value || 0) / 100;
+      const discount = Number(discountEl.value || 0) / 100;
+
+      const upfrontCash = jackpot * upfrontPct;
+      const remainder = jackpot - upfrontCash;
+
+      // equal annual payments of remainder / years
+      const annPayment = remainder / years;
+
+      const scheduleEl = document.getElementById('schedule') as HTMLTableElement;
+      scheduleEl.innerHTML = '';
+
+      // header
+      const header = document.createElement('thead');
+      header.innerHTML = '<tr><th>Year</th><th>Payment (pre-tax)</th><th>Payment (post-tax)</th><th>Present Value (post-tax)</th></tr>';
+      scheduleEl.appendChild(header);
+
+      const body = document.createElement('tbody');
+
+      let pvSum = 0;
+      for (let i = 1; i <= years; i++) {
+        const preTax = annPayment;
+        const postTax = preTax * (1 - taxRate);
+        const pv = postTax / Math.pow(1 + discount, i);
+        pvSum += pv;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `<td style="text-align:left">${i}</td><td>${currency(preTax)}</td><td>${currency(postTax)}</td><td>${currency(pv)}</td>`;
+        body.appendChild(row);
+      }
+
+      scheduleEl.appendChild(body);
+
+      const summary = document.getElementById('summary') as HTMLElement;
+      const totalPaid = upfrontCash + annPayment * years;
+      const totalAfterTax = upfrontCash * (1 - taxRate) + annPayment * years * (1 - taxRate);
+
+      summary.innerHTML = `
+        <div><strong>Upfront cash:</strong> ${currency(upfrontCash)}</div>
+        <div><strong>Total paid (annuity):</strong> ${currency(totalPaid)}</div>
+        <div><strong>Total after-tax:</strong> ${currency(totalAfterTax)}</div>
+        <div><strong>Present value (post-tax, discounted):</strong> ${currency(pvSum)}</div>
+      `;
+    }
+
+    computeBtn.addEventListener('click', compute);
+  });
+</script>
