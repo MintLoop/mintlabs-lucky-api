@@ -75,6 +75,18 @@ Phase 4 is split into **4 micro-phases** for stability and maintainability:
 ## Outcome
 **14 tools** now live. Site expanded from 11 pages to **21 pages**. Foundation for topical authority established.
 
+### Probability Visualizer — recent polish ✅
+
+Small UX and accessibility polish completed for `/tools/probability-visualizer` under `feature/phase-4-visualizer-fixes`:
+
+- Added additional density presets (20 and 100) so users can quickly tune visual clarity.
+- Increased icon/dot sizes and bolder SVG strokes for consistent visibility across themes and headless environments.
+- Implemented a conservative proximity (fuzzy) hit radius so clicks near a dot register without making the center gap clickable.
+- Winner spotlight modal is persistent until user dismissal and now contains richer details: visualization chance, actual lottery odds for the selected game, and amount spent on guesses.
+- Fixed attempt counting so the winning click is counted as a purchase/attempt and spent totals are accurate.
+- Playwright tests updated to assert density options, modal content, and attempt counting.
+
+
 ---
 
 # Phase 4.2 — Microtools Expansion (50+ Tools) 🔄
