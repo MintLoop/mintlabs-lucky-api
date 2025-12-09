@@ -25,14 +25,33 @@ Current Tasks In Progress (Phase 4 — Microtool Expansion)
 
 **Sprint 2 In Progress (Color & Personalization):**
 - [x] Lucky Colors by Birth Month (birthstone meanings + traits)
-- [ ] Lucky Colors by Zodiac (rashi data integration)
-- [ ] Personality Trait Mapper (numerology calculations)
+- [x] Random Color Generator (HEX/RGB/HSL with psychology)
+- [ ] Lucky Colors by Zodiac (DEFERRED — overlaps with Lucky Profile in Phase 4.3)
 
-**Claude Sonnet 4.5 continuation tasks:**
+**Sprint 3 Planned (Number Metrics & Visualizers - Tier A #21-25):**
+- [ ] Number Popularity Scorecard (hot/cold weighted index)
+- [ ] Consecutive Number Checker (sequence detection)
+- [ ] Even/Odd Ratio Visualizer (balance visualization)
+- [ ] High/Low Ratio Analyzer (distribution analysis)
+- [ ] Number Spread Visualizer (dispersion chart)
+
+**Sprint 4 Planned (Educational & Analysis - Tier A #26-28):**
+- [ ] Beginner's Lottery Guide (myths vs facts slideshow)
+- [ ] "Is My Ticket Balanced?" Analyzer (heuristic checker)
+- [ ] Birthday Risk Checker (split probability calculator)
+
+**Phase 4.2 Revised Scope (Option 1 - Consolidation):**
+- [x] Audit phase-4.md tools vs built tools (35 tools currently live)
+- [x] Consolidate duplicate tools (removed winning-chance.astro wrapper)
+- [x] Mark Tier B/C (25 tools) as Phase 5 backlog
+- [x] Update phase-4.md with accurate completion status (Tier S: 10/10, Tier A: 14/18)
+- [ ] Complete Sprint 3: Build remaining 5 Tier A tools (#21-25)
+- [ ] Complete Sprint 4: Build final 3 Tier A tools (#26-28)
+- [ ] After Tier A: Transition to Phase 4.3 (Lucky Profile + Themed RNG)
+
+**Token Compliance:**
 - [x] Ensure ALL new tools use global tokens (no hardcoded colors) — verified all tools
 - [x] Register new microtools in EduGrid (not homepage carousel per user preference)
-- [ ] Integrate casino-lite experimental tools under `/casino-lite` route
-- [ ] Build visualization microtools (odds charts, distribution graphs)
 
 **Previous Phase 4 UX tasks (baseline):**
 - [x] Contrast token refinement: --surface-elevated / --border-primary-darker / --card-shadow (contrast-agent)
@@ -82,12 +101,15 @@ Backfill Needed (due to Claude Sonnet 4.5 workflow)
 
 Future Tasks Backlog (Phase 4 only)
 -----------------------------------
-**Microtool categories for Sonnet expansion:**
-- [ ] Lightweight RNG tools (dice roller, coin flip, card picker)
-- [ ] Color/trait generators (lucky colors, personality traits)
-- [ ] Casino-lite experimental widgets (slot simulation, probability demos)
-- [ ] Visualization microtools (odds charts, distribution graphs)
-- [ ] Automatic Lucky Profile "mini analyzer" (trait summary widget)
+**Phase 4 Completion Roadmap (Updated Dec 2025):**
+- [x] Phase 4.1: Core Tools & UX Foundation (14 primary tools) ✅
+- [x] Phase 4.2 Wave 1-2: Tier S Complete (10/10) + Tier A Foundation (14/18) ✅
+- [ ] Phase 4.2 Sprint 3-4: Complete Tier A (4 tools remaining) 🎯
+- [ ] Phase 4.3: Lucky Profile Generator + Themed RNG Modes
+- [ ] Phase 4.4: Casino-Lite Suite + MintyCatnipCoin
+- [ ] Phase 4.5: Discoverability + Navigation System
+
+**Tier B/C Tools (25 tools) → Deferred to Phase 5**
 
 **Phase 4 UX-safe infrastructure tasks:**
 - [ ] Finish pixel-level regression scaffolding for core pages (ticket-beautifier, index, lucky-profile)

@@ -161,24 +161,28 @@ These tools target extremely high-volume keyword clusters (Powerball, Mega Milli
 | 12 | **Expected Loss Over X Years** | "lottery long term cost", "lifetime lottery spending" | Compounds probability for 5–30 year timelines | ✅ Complete |
 | 13 | **Annuity Breakdown Visualizer** | "powerball annuity schedule", "lottery annuity payments" | Shows year-by-year annuity payment schedule | ✅ Complete |
 | 14 | **Probability Playground** | "probability simulator", "interactive odds" | Adjust odds and ticket count → see results | ✅ Complete |
-| 15 | **Ticket Variance Calculator** | "lottery variance", "lottery outcome range" | Measures range of outcomes across draws | ⬜ |
-| 16 | **Beginner's Math Flash Cards** | "lottery math quiz", "probability basics" | Interactive learning for misconceptions | ⬜ |
-| 17 | **"Why Odds Don't Change" Demo** | "gambler's fallacy explained", "lottery independence" | Shows identical probability regardless of past | ⬜ |
-| 18 | **Number Trend Graph** | "lottery number trends", "number frequency chart" | Static trend lines for select lottery numbers | ⬜ |
-| 19 | **Top 10 Most Drawn Numbers** | "most common powerball numbers", "most drawn lottery numbers" | Massively searched every year | ⬜ |
-| 20 | **Top 10 Least Drawn Numbers** | "least drawn powerball numbers", "cold lottery numbers" | Pairs well with #19 for internal linking | ⬜ |
-| 21 | **Number Popularity Scorecard** | "lottery number popularity", "number frequency score" | Weighted index combining hot/cold metrics | ⬜ |
-| 22 | **Consecutive Number Checker** | "consecutive lottery numbers", "sequential numbers" | Detects 2, 3, 4-number sequences | ⬜ |
-| 23 | **Even/Odd Ratio Visualizer** | "even odd lottery numbers", "lottery number balance" | Simple but valuable visualization | ⬜ |
-| 24 | **High/Low Ratio Analyzer** | "high low lottery numbers", "number distribution" | Pairs with #23 | ⬜ |
-| 25 | **Number Spread Visualizer** | "lottery number spread", "number distribution chart" | Displays dispersion on a number line | ⬜ |
-| 26 | **Beginner's Lottery Guide** | "lottery for beginners", "how lottery works" | Interactive slideshow of myths vs facts | ⬜ |
-| 27 | **"Is My Ticket Balanced?" Analyzer** | "balanced lottery numbers", "lottery strategy checker" | Measures balance vs randomness heuristics | ⬜ |
-| 28 | **Birthday Risk Checker** | "birthday lottery numbers risk", "common birthday picks" | Checks how birthday picks affect expected splits | ⬜ |
+| 15 | **Ticket Variance Calculator** | "lottery variance", "lottery outcome range" | Measures range of outcomes across draws | ✅ Complete |
+| 16 | **Beginner's Math Flash Cards** | "lottery math quiz", "probability basics" | Interactive learning for misconceptions | ✅ Complete |
+| 17 | **"Why Odds Don't Change" Demo** | "gambler's fallacy explained", "lottery independence" | Shows identical probability regardless of past | ✅ Complete |
+| 18 | **Number Trend Graph** | "lottery number trends", "number frequency chart" | Static trend lines for select lottery numbers | ✅ Complete |
+| 19 | **Top 10 Most Drawn Numbers** | "most common powerball numbers", "most drawn lottery numbers" | Massively searched every year | ✅ Complete |
+| 20 | **Top 10 Least Drawn Numbers** | "least drawn powerball numbers", "cold lottery numbers" | Pairs well with #19 for internal linking | ✅ Complete |
+| 21 | **Number Popularity Scorecard** | "lottery number popularity", "number frequency score" | Weighted index combining hot/cold metrics | 🎯 Sprint 3 |
+| 22 | **Consecutive Number Checker** | "consecutive lottery numbers", "sequential numbers" | Detects 2, 3, 4-number sequences | 🎯 Sprint 3 |
+| 23 | **Even/Odd Ratio Visualizer** | "even odd lottery numbers", "lottery number balance" | Simple but valuable visualization | 🎯 Sprint 3 |
+| 24 | **High/Low Ratio Analyzer** | "high low lottery numbers", "number distribution" | Pairs with #23 | 🎯 Sprint 3 |
+| 25 | **Number Spread Visualizer** | "lottery number spread", "number distribution chart" | Displays dispersion on a number line | 🎯 Sprint 3 |
+| 26 | **Beginner's Lottery Guide** | "lottery for beginners", "how lottery works" | Interactive slideshow of myths vs facts | 🎯 Sprint 4 |
+| 27 | **"Is My Ticket Balanced?" Analyzer** | "balanced lottery numbers", "lottery strategy checker" | Measures balance vs randomness heuristics | 🎯 Sprint 4 |
+| 28 | **Birthday Risk Checker** | "birthday lottery numbers risk", "common birthday picks" | Checks how birthday picks affect expected splits | 🎯 Sprint 4 |
+
+**Tier A Status: 14/18 Complete (78%)** — Sprint 3 & 4 to complete remaining 4 tools.
 
 ---
 
-## TIER B — MEDIUM SEO VALUE (Engagement & Linking) 🔗
+## TIER B — MEDIUM SEO VALUE → MOVED TO PHASE 5 🔗
+
+**Note:** Tier B (13 tools) and Tier C (12 tools) have been moved to Phase 5 scope to focus on completing Tier A and transitioning to Lucky Profile (Phase 4.3) and Casino-Lite (Phase 4.4).
 
 | # | Tool | Target Keywords | Description | Status |
 |---|------|-----------------|-------------|--------|
@@ -198,7 +202,9 @@ These tools target extremely high-volume keyword clusters (Powerball, Mega Milli
 
 ---
 
-## TIER C — LONG-TAIL SEO + FUN (Low Effort, Long-Term) 🎮
+## TIER C — LONG-TAIL SEO + FUN → MOVED TO PHASE 5 🎮
+
+**Note:** Tier C tools (12 tools) deferred to Phase 5 for focused completion of Phase 4 core objectives.
 
 | # | Tool | Target Keywords | Description | Status |
 |---|------|-----------------|-------------|--------|
@@ -217,42 +223,37 @@ These tools target extremely high-volume keyword clusters (Powerball, Mega Milli
 
 ---
 
-## Recommended Build Order
+## Phase 4.2 Completion Roadmap (UPDATED)
 
-For maximum SEO + session length, build in this sequence:
+**Current Status:** 34 tools built (24 lottery analysis + 5 microtools + 5 pre-existing core)
 
-### Wave 1 (Tier S Core)
-1. Combination Calculator (C(n,k))
-2. Common Combo Checker
-3. Expected Value Calculator
-4. Multi-Winner Jackpot Splitter
-5. Quick Draw Simulator
+### ✅ Completed Waves
+- **Wave 1:** Tier S Core (10/10 tools) ✅
+- **Wave 2:** Tier A Foundation (14/18 tools) ✅
+- **Sprint 1:** Lightweight RNG Microtools (3/3) ✅
+- **Sprint 2:** Color/Personalization (2/3 in progress) 🔄
 
-### Wave 2 (Tier S Complete + Tier A Start)
-6. Hot–Cold–Overdue Hybrid
-7. Prize Tier Odds Lookup
-8. Top 10 Most/Least Drawn Numbers (#19, #20)
-9. PB vs MM vs EuroMillions
-10. Annuity Breakdown Visualizer
+### 🎯 Remaining Work
 
-### Wave 3 (Tier A Engagement)
-11. Number Trend Graph
-12. Spread Visualizers
-13. Beginner Flash Cards
-14. "Why Odds Don't Change" Demo
-15. Expected Loss Over X Years
+**Sprint 3: Number Metrics & Visualizers (Tools #21-25)**
+1. Number Popularity Scorecard (#21) — Hot/cold weighted index
+2. Consecutive Number Checker (#22) — Sequence detection
+3. Even/Odd Ratio Visualizer (#23) — Balance visualization
+4. High/Low Ratio Analyzer (#24) — Distribution analysis
+5. Number Spread Visualizer (#25) — Dispersion chart
 
-### Wave 4 (Tier B Fun Tools)
-16. Word/Color/Zodiac Mappers
-17. Daily Lucky Number
-18. Element Generator
-19. Themed Randomizer
-20. Multi-Ticket Generator
+**Sprint 4: Educational & Analysis Tools (Tools #26-28)**
+6. Beginner's Lottery Guide (#26) — Myths vs facts slideshow
+7. "Is My Ticket Balanced?" Analyzer (#27) — Heuristic checker
+8. Birthday Risk Checker (#28) — Split probability calculator
 
-### Wave 5 (Tier C Long-Tail)
-21–53. Remaining tools as time permits
+**Velocity Target:** 2-3 tools per session, ~3 sessions to complete Tier A
 
-**Velocity Target:** 2–4 tools per session
+**After Tier A Complete:**
+- Move to Phase 4.3 (Lucky Profile + Themed RNG)
+- Then Phase 4.4 (Casino-Lite Suite)
+- Then Phase 4.5 (Discoverability System)
+- Tier B/C deferred to Phase 5
 
 ---
 
@@ -268,13 +269,19 @@ For maximum SEO + session length, build in this sequence:
 - [ ] Lighthouse SEO > 90
 - [ ] Sitemap updated after each wave
 
-## Expected Outcome
+## Expected Outcome (REVISED)
 
-- **+50 new pages** (total ~70 pages)
-- **200+ internal links** between tools
-- **Long-tail keyword capture** for hundreds of lottery searches
-- **Session time:** Users hop tool → tool → tool
-- **Authority signals:** Comprehensive coverage of lottery math topics
+**Phase 4.2 Final Target:**
+- **~42 pages** (28 lottery tools + 8 microtools + 6 core pages)
+- **150+ internal links** between tools (focused quality over quantity)
+- **Tier S + Tier A coverage** = comprehensive lottery math foundation
+- **Session time:** High-value tool chains (combinations → odds → EV → loss)
+- **Authority signals:** Deep coverage of core lottery topics
+
+**Deferred to Phase 5:**
+- Additional 25 Tier B/C tools
+- Extended long-tail keyword expansion
+- Novelty/viral tools (emoji renderer, oddity meter, etc.)
 
 ---
 
