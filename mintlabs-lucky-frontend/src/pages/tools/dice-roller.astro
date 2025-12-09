@@ -1,0 +1,529 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Dice Roller | Roll Multiple Dice Online";
+const description = "Roll multiple dice of any size online. Supports d4, d6, d8, d10, d12, and d20 with instant results and roll history.";
+const keywords = "dice roller, online dice, d20 roller, d6 dice, tabletop dice simulator";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Dice Roller",
+  "description": description,
+  "applicationCategory": "Game Tool",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<InfoLayout
+  title="🎲 Dice Roller"
+  subtitle="Roll multiple dice of any size"
+  pageTitle={pageTitle}
+  description={description}
+  keywords={keywords}
+  jsonLd={jsonLd}
+>
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Roll standard polyhedral dice used in tabletop games, probability exercises, and random number generation.
+      <strong>Fun fact:</strong> The probability of rolling any specific number on a fair die is always 1/sides,
+      no matter how many times you've rolled before!
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="dice-config">
+      <h3>Configure Your Dice</h3>
+      
+      <div class="dice-selector-grid">
+        <button class="dice-btn" data-sides="4" aria-label="Add d4 die">
+          <span class="dice-icon">▲</span>
+          <span class="dice-label">d4</span>
+        </button>
+        
+        <button class="dice-btn" data-sides="6" aria-label="Add d6 die">
+          <span class="dice-icon">⬛</span>
+          <span class="dice-label">d6</span>
+        </button>
+        
+        <button class="dice-btn" data-sides="8" aria-label="Add d8 die">
+          <span class="dice-icon">◆</span>
+          <span class="dice-label">d8</span>
+        </button>
+        
+        <button class="dice-btn" data-sides="10" aria-label="Add d10 die">
+          <span class="dice-icon">🔟</span>
+          <span class="dice-label">d10</span>
+        </button>
+        
+        <button class="dice-btn" data-sides="12" aria-label="Add d12 die">
+          <span class="dice-icon">⬟</span>
+          <span class="dice-label">d12</span>
+        </button>
+        
+        <button class="dice-btn" data-sides="20" aria-label="Add d20 die">
+          <span class="dice-icon">⬢</span>
+          <span class="dice-label">d20</span>
+        </button>
+      </div>
+
+      <div id="dice-pool" class="dice-pool" role="list" aria-label="Selected dice">
+        <p class="empty-state">Click a die type above to add it to your pool</p>
+      </div>
+
+      <div class="action-buttons">
+        <button id="rollBtn" class="primary-btn" disabled>
+          🎲 Roll Dice
+        </button>
+        <button id="clearBtn" class="secondary-btn">
+          Clear Pool
+        </button>
+      </div>
+    </div>
+
+    <div id="results" class="results-container" hidden>
+      <h3>Results</h3>
+      <div id="roll-results" class="roll-results" role="region" aria-live="polite"></div>
+      <div class="total-display">
+        <span class="total-label">Total:</span>
+        <span id="total-value" class="total-value">0</span>
+      </div>
+    </div>
+
+    <div id="history" class="history-container" hidden>
+      <h3>Roll History</h3>
+      <button id="clearHistoryBtn" class="text-btn">Clear History</button>
+      <div id="history-list" class="history-list" role="list"></div>
+    </div>
+  </section>
+
+  <section class="info-section">
+    <h3>About Dice Roller</h3>
+    <p>
+      This tool simulates rolling polyhedral dice commonly used in tabletop role-playing games
+      like Dungeons & Dragons, Pathfinder, and other systems. Each die type has equal probability
+      for each face when rolled.
+    </p>
+
+    <h4>Dice Types</h4>
+    <ul>
+      <li><strong>d4</strong> — 4-sided die (tetrahedron): 1-4</li>
+      <li><strong>d6</strong> — 6-sided die (cube): 1-6</li>
+      <li><strong>d8</strong> — 8-sided die (octahedron): 1-8</li>
+      <li><strong>d10</strong> — 10-sided die (pentagonal trapezohedron): 0-9 or 1-10</li>
+      <li><strong>d12</strong> — 12-sided die (dodecahedron): 1-12</li>
+      <li><strong>d20</strong> — 20-sided die (icosahedron): 1-20</li>
+    </ul>
+
+    <h4>Probability Notes</h4>
+    <p>
+      Each roll is independent—previous results don't affect future rolls. The probability
+      of rolling any specific number is 1/sides (e.g., 1/20 for a d20). When rolling multiple
+      dice, the sum follows a bell curve distribution with outcomes near the average being most likely.
+    </p>
+  </section>
+</InfoLayout>
+
+<style>
+  .dice-config {
+    padding: 1.5rem;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-primary);
+    border-radius: 0.5rem;
+    box-shadow: var(--card-shadow);
+  }
+
+  .dice-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .dice-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1rem 0.5rem;
+    background: var(--surface);
+    border: 2px solid var(--border-primary);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .dice-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-primary-darker);
+    transform: translateY(-2px);
+  }
+
+  .dice-btn:active {
+    transform: translateY(0);
+  }
+
+  .dice-icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .dice-label {
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .dice-pool {
+    min-height: 80px;
+    padding: 1rem;
+    margin: 1rem 0;
+    background: var(--surface);
+    border: 2px dashed var(--border-primary);
+    border-radius: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .empty-state {
+    color: var(--text-secondary);
+    font-style: italic;
+    width: 100%;
+    text-align: center;
+  }
+
+  .die-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-primary-darker);
+    border-radius: 9999px;
+    font-weight: 600;
+  }
+
+  .die-chip button {
+    background: none;
+    border: none;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .die-chip button:hover {
+    opacity: 1;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .primary-btn {
+    flex: 1;
+    min-width: 150px;
+    padding: 0.75rem 1.5rem;
+    background: var(--accent);
+    color: var(--accent-foreground);
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .primary-btn:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .primary-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .secondary-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--surface);
+    border: 2px solid var(--border-primary);
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .secondary-btn:hover {
+    background: var(--surface-hover);
+  }
+
+  .results-container,
+  .history-container {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-primary);
+    border-radius: 0.5rem;
+    box-shadow: var(--card-shadow);
+  }
+
+  .roll-results {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .die-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    min-width: 60px;
+    background: var(--surface);
+    border: 2px solid var(--border-primary-darker);
+    border-radius: 0.5rem;
+    animation: dieRoll 0.3s ease;
+  }
+
+  @keyframes dieRoll {
+    0% { transform: rotate(0deg) scale(0.8); opacity: 0; }
+    50% { transform: rotate(180deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(1); opacity: 1; }
+  }
+
+  .die-result-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .die-result-label {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+
+  .total-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    margin-top: 1rem;
+    background: var(--surface);
+    border: 2px solid var(--border-primary-darker);
+    border-radius: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .text-btn {
+    background: none;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    color: var(--accent);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+
+  .info-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    border-radius: 0.5rem;
+  }
+
+  .info-section h3 {
+    margin-top: 0;
+  }
+
+  .info-section h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-section ul {
+    margin-left: 1.5rem;
+  }
+
+  .info-section li {
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .dice-selector-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+    
+    .primary-btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  // Dice pool state
+  let dicePool: Array<{ id: string; sides: number }> = [];
+  let rollHistory: Array<{ dice: string; results: number[]; total: number; timestamp: number }> = [];
+  let nextId = 1;
+
+  // DOM elements
+  const diceButtons = document.querySelectorAll<HTMLButtonElement>('.dice-btn[data-sides]');
+  const dicePoolEl = document.getElementById('dice-pool')!;
+  const rollBtn = document.getElementById('rollBtn') as HTMLButtonElement;
+  const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
+  const resultsContainer = document.getElementById('results')!;
+  const rollResultsEl = document.getElementById('roll-results')!;
+  const totalValueEl = document.getElementById('total-value')!;
+  const historyContainer = document.getElementById('history')!;
+  const historyListEl = document.getElementById('history-list')!;
+  const clearHistoryBtn = document.getElementById('clearHistoryBtn')!;
+
+  // Add die to pool
+  diceButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sides = parseInt(btn.dataset.sides || '6');
+      addDie(sides);
+    });
+  });
+
+  function addDie(sides: number) {
+    const id = `die-${nextId++}`;
+    dicePool.push({ id, sides });
+    renderDicePool();
+    rollBtn.disabled = false;
+  }
+
+  function removeDie(id: string) {
+    dicePool = dicePool.filter(die => die.id !== id);
+    renderDicePool();
+    if (dicePool.length === 0) {
+      rollBtn.disabled = true;
+    }
+  }
+
+  function renderDicePool() {
+    if (dicePool.length === 0) {
+      dicePoolEl.innerHTML = '<p class="empty-state">Click a die type above to add it to your pool</p>';
+      return;
+    }
+
+    dicePoolEl.innerHTML = dicePool.map(die => `
+      <span class="die-chip" role="listitem">
+        d${die.sides}
+        <button onclick="window.removeDie('${die.id}')" aria-label="Remove d${die.sides}" title="Remove">✕</button>
+      </span>
+    `).join('');
+  }
+
+  // Roll dice
+  rollBtn.addEventListener('click', rollDice);
+
+  function rollDice() {
+    const results = dicePool.map(die => {
+      const roll = Math.floor(Math.random() * die.sides) + 1;
+      return { sides: die.sides, roll };
+    });
+
+    const total = results.reduce((sum, r) => sum + r.roll, 0);
+
+    // Display results
+    rollResultsEl.innerHTML = results.map(r => `
+      <div class="die-result">
+        <span class="die-result-value">${r.roll}</span>
+        <span class="die-result-label">d${r.sides}</span>
+      </div>
+    `).join('');
+
+    totalValueEl.textContent = total.toString();
+    resultsContainer.hidden = false;
+
+    // Add to history
+    const diceDesc = dicePool.map(d => `d${d.sides}`).join(' + ');
+    rollHistory.unshift({
+      dice: diceDesc,
+      results: results.map(r => r.roll),
+      total,
+      timestamp: Date.now()
+    });
+
+    // Limit history to 10 items
+    if (rollHistory.length > 10) {
+      rollHistory = rollHistory.slice(0, 10);
+    }
+
+    renderHistory();
+  }
+
+  function renderHistory() {
+    if (rollHistory.length === 0) {
+      historyContainer.hidden = true;
+      return;
+    }
+
+    historyContainer.hidden = false;
+    historyListEl.innerHTML = rollHistory.map(item => {
+      const resultsStr = item.results.join(', ');
+      return `
+        <div class="history-item">
+          <span>${item.dice}: [${resultsStr}]</span>
+          <strong>Total: ${item.total}</strong>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Clear pool
+  clearBtn.addEventListener('click', () => {
+    dicePool = [];
+    renderDicePool();
+    rollBtn.disabled = true;
+    resultsContainer.hidden = true;
+  });
+
+  // Clear history
+  clearHistoryBtn.addEventListener('click', () => {
+    rollHistory = [];
+    renderHistory();
+  });
+
+  // Make removeDie available globally for onclick handler
+  (window as any).removeDie = removeDie;
+</script>
