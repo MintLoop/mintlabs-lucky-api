@@ -248,7 +248,71 @@ npm run test:e2e
 
 ---
 
-### 3.4 Infra / CI Agent
+### 3.4 Casino-Lite Visual Agent (Card System)
+
+**Scope**
+
+- `mintlabs-lucky-frontend/src/types/cards.ts`
+- `mintlabs-lucky-frontend/src/config/decks.ts`
+- `mintlabs-lucky-frontend/src/utils/cardDeck.ts`
+- `mintlabs-lucky-frontend/src/components/casino/*`
+- `mintlabs-lucky-frontend/src/pages/casino-lite/*`
+- `docs/CARD_SYSTEM_IMPLEMENTATION.md`
+
+**Responsibilities**
+
+- Maintain the **Card Template System** used across casino-lite card games:
+  - Card = (rank, suit) + DeckTheme + SuitSet.
+  - Centralize all config in `src/types/cards.ts`, `src/config/decks.ts`, and `src/utils/cardDeck.ts`.
+- Ensure all card-based tools (blackjack, high-card, draw simulators, etc.) use the shared `CardView` component and `DeckSelector`.
+- When new deck styles are added:
+  - Only require: 4 suit icons + 1 background + theme configuration.
+  - Do NOT introduce per-card one-off art in core systems.
+- Enforce the default **Emoji Deck** as a universal fallback:
+  - If a theme is missing assets or misconfigured, fall back to emoji suits and a simple card frame.
+- Avoid overengineering:
+  - No complex 3D or physics systems.
+  - Basic CSS animations only (e.g., flip, fade, slide).
+
+**Legal / Compliance**
+
+- Ensure all visual decks respect the Casino-Lite disclaimers:
+  - No real-money wagering.
+  - No promise or implication of actual casino or lottery prediction.
+  - All cards and decks are fictional or decorative.
+  - Include responsible gaming resources (NCPG link + hotline).
+- Avoid using trademarked real-world casino card designs or branded decks.
+- All card games must include:
+  - ⚠️ Fictional Simulation disclaimer box
+  - Educational content explaining game rules and probabilities
+  - No skill/strategy claims that imply real-world advantages
+
+**Adding a New Theme**
+
+1. Add `SuitSet` to `src/config/decks.ts` with 4 suit icons (emoji or URLs).
+2. Add `DeckTheme` to same file with background, CSS classes, and back pattern.
+3. Test with existing games (should work immediately without code changes).
+
+**Adding a New Game**
+
+1. Use `generateStandardDeck()` + `shuffleDeck()` from `src/utils/cardDeck.ts`.
+2. Import `CardView` and `DeckSelector` components.
+3. Render cards with current theme from `localStorage`.
+4. Listen for `deckThemeChange` events to update display.
+5. Include all casino-lite disclaimers (copy from `blackjack.astro` template).
+6. Add educational content explaining rules, probabilities, and strategy limitations.
+
+**Required commands before push**
+
+```bash
+cd mintlabs-lucky-frontend
+npm run build
+# Should see "53 page(s) built" (or more with additional games)
+```
+
+---
+
+### 3.5 Infra / CI Agent
 
 **Scope**
 
@@ -278,7 +342,7 @@ npm run test:e2e
 
 ---
 
-### 3.5 Docs Agent
+### 3.6 Docs Agent
 
 **Scope**
 
@@ -303,7 +367,7 @@ npm run test:e2e
 
 ---
 
-### 3.6 Research / Experiment Agent (Sandbox)
+### 3.7 Research / Experiment Agent (Sandbox)
 
 **Scope**
 

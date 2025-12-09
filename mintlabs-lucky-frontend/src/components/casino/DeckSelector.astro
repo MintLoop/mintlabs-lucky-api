@@ -1,0 +1,78 @@
+---
+// DeckSelector Component - Theme Switcher
+// Phase 4 - Casino-Lite Visual System
+
+import type { DeckTheme } from '../../types/cards';
+
+interface Props {
+  themes: DeckTheme[];
+  selectedId: string;
+  class?: string;
+}
+
+const { themes, selectedId, class: className = '' } = Astro.props;
+---
+
+<div class={`deck-selector ${className}`}>
+  <label for="deck-theme-select" class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">
+    Card Deck Style
+  </label>
+  <select
+    id="deck-theme-select"
+    class="w-full px-4 py-2 rounded-lg font-medium transition-all"
+    style="background: var(--surface-elevated); color: var(--text-primary); border: 1px solid var(--border-primary);"
+    data-deck-selector
+  >
+    {themes.map((theme) => (
+      <option value={theme.id} selected={theme.id === selectedId}>
+        {theme.label}
+      </option>
+    ))}
+  </select>
+  <p class="text-xs mt-1 opacity-70" style="color: var(--text-secondary);">
+    Choose your preferred card deck appearance
+  </p>
+</div>
+
+<script>
+  // Handle deck theme changes
+  function initDeckSelector() {
+    const selector = document.querySelector('[data-deck-selector]') as HTMLSelectElement;
+    if (!selector) return;
+
+    // Load saved preference
+    const saved = localStorage.getItem('casino-deck-theme');
+    if (saved) {
+      selector.value = saved;
+      // Dispatch event for other components to react
+      window.dispatchEvent(new CustomEvent('deckThemeChange', { detail: saved }));
+    }
+
+    // Save on change
+    selector.addEventListener('change', (e) => {
+      const target = e.target as HTMLSelectElement;
+      const themeId = target.value;
+      localStorage.setItem('casino-deck-theme', themeId);
+      window.dispatchEvent(new CustomEvent('deckThemeChange', { detail: themeId }));
+    });
+  }
+
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDeckSelector);
+  } else {
+    initDeckSelector();
+  }
+</script>
+
+<style>
+  select:focus {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  select option {
+    background: var(--surface-elevated);
+    color: var(--text-primary);
+  }
+</style>

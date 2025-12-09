@@ -1,0 +1,122 @@
+---
+// CardView Component - Reusable Card Renderer
+// Phase 4 - Casino-Lite Visual System
+
+import type { Card, DeckTheme, SuitSet } from '../../types/cards';
+import { getCardColor, formatCard } from '../../utils/cardDeck';
+
+interface Props {
+  card: Card;
+  theme: DeckTheme;
+  suitSet: SuitSet;
+  faceDown?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+
+const { card, theme, suitSet, faceDown = false, size = 'md', class: className = '' } = Astro.props;
+
+// Size mappings
+const sizeClasses = {
+  sm: 'w-16 text-xs',
+  md: 'w-24 text-sm',
+  lg: 'w-32 text-base',
+};
+
+// Get suit icon
+const suitIcon = suitSet.icons[card.suit];
+const isEmoji = !suitIcon.startsWith('/');
+
+// Determine suit color
+const cardColor = getCardColor(card.suit);
+const colorClass = cardColor === 'red' ? 'text-red-600' : 'text-slate-900';
+
+// Aria label for accessibility
+const ariaLabel = formatCard(card);
+---
+
+<div
+  class={`relative aspect-[3/4] overflow-hidden ${sizeClasses[size]} ${theme.cardFrameClass} ${className}`}
+  role="img"
+  aria-label={ariaLabel}
+>
+  {faceDown ? (
+    <!-- Card Back -->
+    <div class={`absolute inset-0 ${theme.backPattern || 'bg-emerald-700'} flex items-center justify-center overflow-hidden`}>
+      <div class="text-white text-2xl opacity-20">🎴</div>
+    </div>
+  ) : (
+    <!-- Card Front -->
+    <div class={`absolute inset-0 ${theme.background || 'bg-white'} overflow-hidden`}>
+      <!-- Top-left corner (absolute positioned) -->
+      <div class={`absolute top-[8%] left-[10%] flex flex-col items-start leading-none ${colorClass}`}>
+        <span class={`${theme.rankFontClass} ${size === 'sm' ? 'text-base' : size === 'md' ? 'text-xl' : 'text-2xl'}`}>
+          {card.rank}
+        </span>
+        {isEmoji ? (
+          <span class={size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-base'}>
+            {suitIcon}
+          </span>
+        ) : (
+          <img 
+            src={suitIcon} 
+            alt={card.suit}
+            class={size === 'sm' ? 'w-3 h-3' : size === 'md' ? 'w-4 h-4' : 'w-5 h-5'}
+          />
+        )}
+      </div>
+
+      <!-- Center suit icon (absolute centered) -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        {isEmoji ? (
+          <span class={`${colorClass} ${size === 'sm' ? 'text-2xl' : size === 'md' ? 'text-4xl' : 'text-5xl'}`}>
+            {suitIcon}
+          </span>
+        ) : (
+          <img 
+            src={suitIcon} 
+            alt={card.suit}
+            class={size === 'sm' ? 'w-8 h-8' : size === 'md' ? 'w-12 h-12' : 'w-16 h-16'}
+          />
+        )}
+      </div>
+
+      <!-- Bottom-right corner (absolute positioned & rotated) -->
+      <div class={`absolute bottom-[8%] right-[10%] flex flex-col items-end leading-none rotate-180 ${colorClass}`}>
+        <span class={`${theme.rankFontClass} ${size === 'sm' ? 'text-base' : size === 'md' ? 'text-xl' : 'text-2xl'}`}>
+          {card.rank}
+        </span>
+        {isEmoji ? (
+          <span class={size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-base'}>
+            {suitIcon}
+          </span>
+        ) : (
+          <img 
+            src={suitIcon} 
+            alt={card.suit}
+            class={size === 'sm' ? 'w-3 h-3' : size === 'md' ? 'w-4 h-4' : 'w-5 h-5'}
+          />
+        )}
+      </div>
+    </div>
+  )}
+</div>
+
+<style>
+  /* Optional: Add flip animation for card reveals */
+  .card-flip {
+    animation: flip 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes flip {
+    0% {
+      transform: rotateY(0deg);
+    }
+    50% {
+      transform: rotateY(90deg);
+    }
+    100% {
+      transform: rotateY(0deg);
+    }
+  }
+</style>

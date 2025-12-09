@@ -1,0 +1,618 @@
+---
+// Blackjack - Casino-Lite Card Game
+// Phase 4 - Casino-Lite Visual System + CatnipCoin Integration
+
+import InfoLayout from "../../components/InfoLayout.astro";
+import TrackLink from "../../components/TrackLink.astro";
+import CardView from "../../components/casino/CardView.astro";
+import DeckSelector from "../../components/casino/DeckSelector.astro";
+import { DECK_THEMES, getDeckTheme, getSuitSet } from "../../config/decks";
+
+const title = "Blackjack Simulator";
+const description = "Practice blackjack strategy with our fictional casino simulator. Learn basic strategy, card counting concepts, and probability—all with zero risk and zero real money.";
+---
+
+<InfoLayout title={title} description={description}>
+  <main class="mx-auto max-w-5xl p-6 space-y-8">
+    <!-- Header -->
+    <header class="text-center space-y-4">
+      <h1 class="text-4xl font-bold" style="color: var(--text-primary);">
+        🎰 Blackjack Simulator
+      </h1>
+      <p class="text-lg max-w-2xl mx-auto" style="color: var(--text-secondary);">
+        Practice blackjack strategy in a risk-free environment. This is a fictional simulation for entertainment and education only—no real money, no real gambling.
+      </p>
+    </header>
+
+    <!-- Casino-Lite Disclaimer -->
+    <div class="p-6 rounded-xl" style="background: var(--surface-elevated); border-left: 4px solid var(--accent-warning);">
+      <h2 class="text-lg font-bold mb-2" style="color: var(--text-primary);">⚠️ Fictional Simulation Only</h2>
+      <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
+        <li>• <strong>No real money:</strong> This tool does not involve real wagering, payouts, or gambling.</li>
+        <li>• <strong>No prediction:</strong> Nothing here predicts real casino outcomes or improves your odds.</li>
+        <li>• <strong>Educational only:</strong> Use this to learn basic strategy, not to develop "winning systems."</li>
+        <li>• <strong>Responsible gaming:</strong> If you have a gambling problem, visit <a href="https://www.ncpgambling.org" class="underline" style="color: var(--accent-primary);" target="_blank" rel="noopener">ncpgambling.org</a> or call 1-800-522-4700.</li>
+      </ul>
+    </div>
+
+    <!-- Deck Selector & CatnipCoin Balance -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="p-6 rounded-xl" style="background: var(--surface-elevated);">
+        <DeckSelector themes={DECK_THEMES} selectedId="emoji-default" />
+      </div>
+      <div class="p-6 rounded-xl flex flex-col justify-center items-center gap-2" style="background: var(--surface-elevated); border: 2px solid var(--accent-secondary);">
+        <div class="text-sm font-semibold" style="color: var(--text-secondary);">Your CatnipCoin Balance</div>
+        <div id="catnip-balance" class="text-4xl font-bold" style="color: var(--accent-primary);">🪙 100 CC</div>
+        <div class="text-xs" style="color: var(--text-muted);">Fictional currency • No monetary value</div>
+        <div id="catnip-change" class="text-sm font-bold mt-2 hidden"></div>
+      </div>
+    </div>
+
+    <!-- Game Area -->
+    <div class="space-y-6">
+      <!-- Dealer Section -->
+      <div class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated);">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold" style="color: var(--text-primary);">
+            🎩 Dealer
+          </h2>
+          <div class="text-lg font-mono" style="color: var(--text-secondary);">
+            Total: <span id="dealer-total" class="font-bold" style="color: var(--text-primary);">0</span>
+          </div>
+        </div>
+        <div id="dealer-hand" class="flex gap-4 flex-wrap justify-center min-h-[120px] items-center">
+          <!-- Cards rendered here -->
+        </div>
+      </div>
+
+      <!-- Player Section -->
+      <div class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated); border: 2px solid var(--accent-primary);">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold" style="color: var(--text-primary);">
+            🎮 You
+          </h2>
+          <div class="text-lg font-mono" style="color: var(--text-secondary);">
+            Total: <span id="player-total" class="font-bold" style="color: var(--text-primary);">0</span>
+          </div>
+        </div>
+        <div id="player-hand" class="flex gap-4 flex-wrap justify-center min-h-[120px] items-center">
+          <!-- Cards rendered here -->
+        </div>
+      </div>
+
+      <!-- Game Controls -->
+      <div class="flex gap-3 flex-wrap justify-center">
+        <button
+          id="deal-btn"
+          class="px-8 py-3 rounded-lg font-bold text-lg transition-all transform hover:scale-105"
+          style="background: var(--accent-primary); color: var(--text-on-accent);"
+        >
+          Deal Cards
+        </button>
+        <button
+          id="hit-btn"
+          class="px-8 py-3 rounded-lg font-bold text-lg transition-all"
+          style="background: var(--surface-elevated); color: var(--text-primary); border: 2px solid var(--border-primary);"
+          disabled
+        >
+          Hit
+        </button>
+        <button
+          id="stand-btn"
+          class="px-8 py-3 rounded-lg font-bold text-lg transition-all"
+          style="background: var(--surface-elevated); color: var(--text-primary); border: 2px solid var(--border-primary);"
+          disabled
+        >
+          Stand
+        </button>
+        <button
+          id="double-btn"
+          class="px-8 py-3 rounded-lg font-bold text-lg transition-all"
+          style="background: var(--accent-secondary); color: var(--text-on-accent); border: 2px solid var(--accent-secondary);"
+          disabled
+        >
+          Double Down
+        </button>
+        <button
+          id="deal-again-btn"
+          class="px-8 py-3 rounded-lg font-bold text-lg transition-all transform hover:scale-105 hidden"
+          style="background: var(--accent-primary); color: var(--text-on-accent);"
+        >
+          🎲 Deal Again
+        </button>
+      </div>
+
+      <!-- Game Status -->
+      <div
+        id="game-status"
+        class="p-6 rounded-xl text-center hidden"
+        style="background: var(--surface-elevated);"
+      >
+        <p id="status-message" class="text-2xl font-bold mb-2" style="color: var(--text-primary);"></p>
+        <p id="status-detail" class="text-sm" style="color: var(--text-secondary);"></p>
+      </div>
+    </div>
+
+    <!-- How to Play -->
+    <div class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated);">
+      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">How to Play</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">🎯 Objective</h3>
+          <p style="color: var(--text-secondary);">
+            Get as close to 21 as possible without going over (busting). Beat the dealer's hand to win.
+          </p>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">🃏 Card Values</h3>
+          <ul class="text-sm space-y-1" style="color: var(--text-secondary);">
+            <li>• Number cards (2-10): Face value</li>
+            <li>• Face cards (J, Q, K): 10 points</li>
+            <li>• Ace: 1 or 11 (whichever is better)</li>
+          </ul>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">🎮 Actions</h3>
+          <ul class="text-sm space-y-1" style="color: var(--text-secondary);">
+            <li>• <strong>Hit:</strong> Take another card</li>
+            <li>• <strong>Stand:</strong> Keep your current hand</li>
+            <li>• <strong>Double Down:</strong> Double your bet, get exactly one card, then forced stand</li>
+            <li>• <strong>Blackjack:</strong> Ace + 10-value card pays 3:2 (1.5× your bet)</li>
+          </ul>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">🏠 Dealer Rules</h3>
+          <p class="text-sm" style="color: var(--text-secondary);">
+            Dealer must hit on 16 or less and stand on 17 or more. These are standard casino rules.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Educational Content -->
+    <div class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated);">
+      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">📚 Learn Blackjack Strategy</h2>
+      <div class="space-y-3 text-sm" style="color: var(--text-secondary);">
+        <p>
+          <strong style="color: var(--text-primary);">Basic Strategy:</strong> Mathematically optimal plays exist for every situation. Generally, hit on 11 or less, stand on 17 or more, and the middle range depends on the dealer's up-card.
+        </p>
+        <p>
+          <strong style="color: var(--text-primary);">House Edge:</strong> With perfect basic strategy, blackjack has one of the lowest house edges in casinos (~0.5%). Without strategy, the house edge increases significantly.
+        </p>
+        <p>
+          <strong style="color: var(--text-primary);">Card Counting Myth:</strong> While card counting can give a small edge, it requires extensive practice, is difficult to apply, and is banned in most casinos. This simulator does NOT teach or endorse card counting systems.
+        </p>
+        <p>
+          <strong style="color: var(--text-primary);">Variance Warning:</strong> Even with perfect play, you can lose many hands in a row due to variance. No strategy guarantees wins.
+        </p>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex gap-4 flex-wrap justify-center pt-4">
+      <TrackLink
+        href="/casino-lite"
+        label="Back to Casino-Lite Hub"
+        trackName="blackjack-to-casino-hub"
+        class="px-6 py-3 rounded-lg font-semibold transition-all"
+        style="background: var(--accent-primary); color: var(--text-on-accent);"
+      >
+        🎰 Casino-Lite Hub
+      </TrackLink>
+      <TrackLink
+        href="/tools/wheel-spinner"
+        label="Try Wheel Spinner"
+        trackName="blackjack-to-wheel"
+        class="px-6 py-3 rounded-lg font-semibold transition-all"
+        style="background: var(--surface-elevated); color: var(--text-primary); border: 2px solid var(--border-primary);"
+      >
+        🎡 Wheel Spinner
+      </TrackLink>
+      <TrackLink
+        href="/tools/raffle-picker"
+        label="Try Raffle Picker"
+        trackName="blackjack-to-raffle"
+        class="px-6 py-3 rounded-lg font-semibold transition-all"
+        style="background: var(--surface-elevated); color: var(--text-primary); border: 2px solid var(--border-primary);"
+      >
+        🎫 Raffle Picker
+      </TrackLink>
+      <TrackLink
+        href="/"
+        label="Back to Home"
+        trackName="blackjack-to-home"
+        class="px-6 py-3 rounded-lg font-semibold transition-all"
+        style="background: var(--surface-elevated); color: var(--text-primary); border: 2px solid var(--border-primary);"
+      >
+        🏠 Home
+      </TrackLink>
+    </div>
+  </main>
+</InfoLayout>
+
+<script>
+  import { generateStandardDeck, shuffleDeck, formatCard } from '../../utils/cardDeck';
+  import { getDeckTheme, getSuitSet } from '../../config/decks';
+  import type { Card } from '../../types/cards';
+  import {
+    getCatnipBalance,
+    addCatnip,
+    subtractCatnip,
+    formatCatnip
+  } from '../../utils/catnipCoin';
+
+  // Game state
+  let deck: Card[] = [];
+  let playerHand: Card[] = [];
+  let dealerHand: Card[] = [];
+  let gameOver = false;
+  let isDoubledDown = false;
+  let baseBet = 5; // Base CatnipCoin bet
+  let currentThemeId = 'emoji-default';
+
+  // Load saved theme
+  const savedTheme = localStorage.getItem('casino-deck-theme');
+  if (savedTheme) {
+    currentThemeId = savedTheme;
+  }
+
+  // Listen for theme changes
+  window.addEventListener('deckThemeChange', ((e: CustomEvent) => {
+    currentThemeId = e.detail;
+    renderHands();
+  }) as EventListener);
+
+  // Update CatnipCoin balance display
+  function updateBalanceDisplay() {
+    const balance = getCatnipBalance();
+    const balanceEl = document.getElementById('catnip-balance');
+    if (balanceEl) {
+      balanceEl.textContent = formatCatnip(balance);
+    }
+  }
+
+  // Show CatnipCoin change animation
+  function showCatnipChange(amount: number, reason: string) {
+    const changeEl = document.getElementById('catnip-change');
+    if (changeEl) {
+      const sign = amount > 0 ? '+' : '';
+      changeEl.textContent = `${sign}${amount} CC (${reason})`;
+      changeEl.style.color = amount > 0 ? 'var(--accent-success)' : 'var(--accent-warning)';
+      changeEl.classList.remove('hidden');
+      setTimeout(() => {
+        changeEl.classList.add('hidden');
+      }, 3000);
+    }
+  }
+
+  // Listen for balance changes
+  window.addEventListener('catnipBalanceChange', updateBalanceDisplay as EventListener);
+
+  // Calculate hand total
+  function calculateTotal(hand: Card[]): number {
+    let total = 0;
+    let aces = 0;
+
+    for (const card of hand) {
+      if (card.rank === 'A') {
+        aces++;
+        total += 11;
+      } else if (['J', 'Q', 'K'].includes(card.rank)) {
+        total += 10;
+      } else {
+        total += parseInt(card.rank);
+      }
+    }
+
+    // Adjust for aces
+    while (total > 21 && aces > 0) {
+      total -= 10;
+      aces--;
+    }
+
+    return total;
+  }
+
+  // Render a single card
+  function renderCard(card: Card, faceDown = false): string {
+    const theme = getDeckTheme(currentThemeId);
+    const suitSet = getSuitSet(theme.suitSetId);
+    const suitIcon = suitSet.icons[card.suit];
+    const isEmoji = !suitIcon.startsWith('/');
+    const cardColor = (card.suit === 'hearts' || card.suit === 'diamonds') ? 'text-red-600' : 'text-slate-900';
+    const ariaLabel = formatCard(card);
+
+    if (faceDown) {
+      return `
+        <div class="relative aspect-[3/4] w-24 ${theme.cardFrameClass}" role="img" aria-label="Face down card">
+          <div class="absolute inset-0 ${theme.backPattern || 'bg-emerald-700'} flex items-center justify-center">
+            <div class="text-white text-2xl opacity-20">🎴</div>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="relative aspect-[3/4] w-24 ${theme.cardFrameClass}" role="img" aria-label="${ariaLabel}">
+        <div class="absolute inset-0 ${theme.background || 'bg-white'} flex flex-col justify-between p-2">
+          <div class="flex flex-col items-start leading-none ${cardColor}">
+            <span class="${theme.rankFontClass} text-xl">${card.rank}</span>
+            <span class="text-sm">${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-4 h-4"/>`}</span>
+          </div>
+          <div class="flex justify-center items-center ${cardColor}">
+            <span class="text-4xl">${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-12 h-12"/>`}</span>
+          </div>
+          <div class="flex flex-col items-end leading-none rotate-180 ${cardColor}">
+            <span class="${theme.rankFontClass} text-xl">${card.rank}</span>
+            <span class="text-sm">${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-4 h-4"/>`}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Render hands
+  function renderHands() {
+    const playerHandEl = document.getElementById('player-hand');
+    const dealerHandEl = document.getElementById('dealer-hand');
+    const playerTotalEl = document.getElementById('player-total');
+    const dealerTotalEl = document.getElementById('dealer-total');
+
+    if (playerHandEl && dealerHandEl && playerTotalEl && dealerTotalEl) {
+      // Render player hand
+      playerHandEl.innerHTML = playerHand.map(card => renderCard(card)).join('');
+      playerTotalEl.textContent = calculateTotal(playerHand).toString();
+
+      // Render dealer hand (first card face down if game in progress)
+      if (dealerHand.length > 0 && !gameOver) {
+        dealerHandEl.innerHTML = renderCard(dealerHand[0], true) + dealerHand.slice(1).map(card => renderCard(card)).join('');
+        // Show only visible card total
+        const visibleTotal = calculateTotal(dealerHand.slice(1));
+        dealerTotalEl.textContent = visibleTotal.toString();
+      } else {
+        dealerHandEl.innerHTML = dealerHand.map(card => renderCard(card)).join('');
+        dealerTotalEl.textContent = calculateTotal(dealerHand).toString();
+      }
+    }
+  }
+
+  // Show status message
+  function showStatus(message: string, detail: string, type: 'win' | 'lose' | 'push') {
+    const statusEl = document.getElementById('game-status');
+    const messageEl = document.getElementById('status-message');
+    const detailEl = document.getElementById('status-detail');
+
+    if (statusEl && messageEl && detailEl) {
+      statusEl.classList.remove('hidden');
+      messageEl.textContent = message;
+      detailEl.textContent = detail;
+
+      // Color coding
+      if (type === 'win') {
+        messageEl.style.color = 'var(--accent-success)';
+      } else if (type === 'lose') {
+        messageEl.style.color = 'var(--accent-danger)';
+      } else {
+        messageEl.style.color = 'var(--accent-warning)';
+      }
+    }
+  }
+
+  // Hide status message
+  function hideStatus() {
+    const statusEl = document.getElementById('game-status');
+    if (statusEl) {
+      statusEl.classList.add('hidden');
+    }
+  }
+
+  // Check for blackjack
+  function hasBlackjack(hand: Card[]): boolean {
+    return hand.length === 2 && calculateTotal(hand) === 21;
+  }
+
+  // Dealer play
+  function dealerPlay() {
+    // Reveal dealer's hidden card
+    gameOver = true;
+    renderHands();
+
+    // Dealer hits on 16 or less
+    const hitDealer = () => {
+      if (calculateTotal(dealerHand) < 17) {
+        setTimeout(() => {
+          dealerHand.push(deck.pop()!);
+          renderHands();
+          hitDealer();
+        }, 600);
+      } else {
+        checkWinner();
+      }
+    };
+
+    hitDealer();
+  }
+
+  // Check winner
+  function checkWinner() {
+    const playerTotal = calculateTotal(playerHand);
+    const dealerTotal = calculateTotal(dealerHand);
+    const playerNatural = hasBlackjack(playerHand);
+    const dealerNatural = hasBlackjack(dealerHand);
+    
+    // Calculate payout multiplier (1x for normal win, 1.5x for natural blackjack, 2x for doubled down)
+    let winMultiplier = isDoubledDown ? 2 : 1;
+    let winAmount = baseBet * 2 * winMultiplier; // Return bet + win
+    let lossAmount = baseBet * (isDoubledDown ? 2 : 1);
+    let pushAmount = baseBet * (isDoubledDown ? 2 : 1); // Return bet
+
+    if (playerTotal > 21) {
+      showStatus('Bust! 💥', `You went over 21 with ${playerTotal}.`, 'lose');
+      subtractCatnip(lossAmount, isDoubledDown ? 'Blackjack doubled down bust' : 'Blackjack bust');
+      showCatnipChange(-lossAmount, 'Bust');
+    } else if (dealerTotal > 21) {
+      showStatus('You Win! 🎉', `Dealer busted with ${dealerTotal}.`, 'win');
+      addCatnip(winAmount, isDoubledDown ? 'Blackjack doubled down win' : 'Blackjack win');
+      showCatnipChange(+winAmount, isDoubledDown ? 'Doubled Win!' : 'Win');
+    } else if (playerNatural && !dealerNatural) {
+      // Natural blackjack pays 3:2 (1.5x the bet)
+      const naturalPayout = Math.floor(baseBet * 2.5); // Bet + 1.5x win
+      showStatus('Blackjack! 🎰', 'Natural 21 pays 3:2!', 'win');
+      addCatnip(naturalPayout, 'Blackjack natural 21');
+      showCatnipChange(+naturalPayout, 'Blackjack!');
+    } else if (dealerNatural && !playerNatural) {
+      showStatus('Dealer Blackjack 🎩', 'Dealer has natural 21.', 'lose');
+      subtractCatnip(lossAmount, 'Blackjack loss');
+      showCatnipChange(-lossAmount, 'Loss');
+    } else if (playerNatural && dealerNatural) {
+      showStatus('Push 🤝', 'Both have Blackjack!', 'push');
+      addCatnip(baseBet, 'Blackjack push');
+      showCatnipChange(+baseBet, 'Push');
+    } else if (playerTotal > dealerTotal) {
+      showStatus('You Win! 🎉', `${playerTotal} beats ${dealerTotal}.`, 'win');
+      addCatnip(winAmount, isDoubledDown ? 'Blackjack doubled down win' : 'Blackjack win');
+      showCatnipChange(+winAmount, isDoubledDown ? 'Doubled Win!' : 'Win');
+    } else if (dealerTotal > playerTotal) {
+      showStatus('Dealer Wins 🎩', `${dealerTotal} beats ${playerTotal}.`, 'lose');
+      subtractCatnip(lossAmount, 'Blackjack loss');
+      showCatnipChange(-lossAmount, 'Loss');
+    } else {
+      showStatus('Push 🤝', `Both have ${playerTotal}. It's a tie!`, 'push');
+      addCatnip(pushAmount, 'Blackjack push');
+      showCatnipChange(+pushAmount, 'Push');
+    }
+
+    updateButtons(false, false, false, true);
+  }
+
+  // Update button states
+  function updateButtons(hit: boolean, stand: boolean, doubleDown: boolean, deal: boolean) {
+    const hitBtn = document.getElementById('hit-btn') as HTMLButtonElement;
+    const standBtn = document.getElementById('stand-btn') as HTMLButtonElement;
+    const doubleBtn = document.getElementById('double-btn') as HTMLButtonElement;
+    const dealBtn = document.getElementById('deal-btn') as HTMLButtonElement;
+    const dealAgainBtn = document.getElementById('deal-again-btn') as HTMLButtonElement;
+
+    if (hitBtn) hitBtn.disabled = !hit;
+    if (standBtn) standBtn.disabled = !stand;
+    if (doubleBtn) doubleBtn.disabled = !doubleDown;
+    
+    // Show Deal Again instead of Deal Cards when game is over
+    if (dealBtn && dealAgainBtn) {
+      if (deal) {
+        dealBtn.classList.add('hidden');
+        dealAgainBtn.classList.remove('hidden');
+      } else {
+        dealBtn.classList.remove('hidden');
+        dealAgainBtn.classList.add('hidden');
+      }
+    }
+  }
+
+  // Deal new hand
+  function deal() {
+    hideStatus();
+    gameOver = false;
+    isDoubledDown = false;
+    deck = shuffleDeck(generateStandardDeck());
+    playerHand = [deck.pop()!, deck.pop()!];
+    dealerHand = [deck.pop()!, deck.pop()!];
+    renderHands();
+
+    // Check for immediate blackjacks
+    if (hasBlackjack(playerHand) || hasBlackjack(dealerHand)) {
+      gameOver = true;
+      renderHands();
+      checkWinner();
+      updateButtons(false, false, false, true);
+    } else {
+      // Enable double down on initial hand (2 cards, total 9-11 recommended but allowed on any)
+      const canDouble = playerHand.length === 2 && !isDoubledDown;
+      updateButtons(true, true, canDouble, false);
+    }
+  }
+
+  // Hit
+  function hit() {
+    playerHand.push(deck.pop()!);
+    renderHands();
+
+    const playerTotal = calculateTotal(playerHand);
+    if (playerTotal > 21) {
+      gameOver = true;
+      renderHands();
+      checkWinner();
+    } else if (playerTotal === 21) {
+      // Auto-stand on 21
+      stand();
+    }
+  }
+
+  // Stand
+  function stand() {
+    updateButtons(false, false, false, false);
+    dealerPlay();
+  }
+
+  // Double Down
+  function doubleDown() {
+    // Only allowed on first decision with 2 cards
+    if (playerHand.length !== 2 || isDoubledDown) {
+      return;
+    }
+
+    // Mark as doubled down
+    isDoubledDown = true;
+
+    // Deal exactly one card
+    playerHand.push(deck.pop()!);
+    renderHands();
+
+    // Disable all action buttons
+    updateButtons(false, false, false, false);
+
+    // Check if busted
+    const playerTotal = calculateTotal(playerHand);
+    if (playerTotal > 21) {
+      gameOver = true;
+      renderHands();
+      checkWinner();
+    } else {
+      // Forced stand after double down
+      dealerPlay();
+    }
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    const dealBtn = document.getElementById('deal-btn');
+    const dealAgainBtn = document.getElementById('deal-again-btn');
+    const hitBtn = document.getElementById('hit-btn');
+    const standBtn = document.getElementById('stand-btn');
+    const doubleBtn = document.getElementById('double-btn');
+
+    if (dealBtn) dealBtn.addEventListener('click', deal);
+    if (dealAgainBtn) dealAgainBtn.addEventListener('click', deal);
+    if (hitBtn) hitBtn.addEventListener('click', hit);
+    if (standBtn) standBtn.addEventListener('click', stand);
+    if (doubleBtn) doubleBtn.addEventListener('click', doubleDown);
+
+    // Initialize balance display
+    updateBalanceDisplay();
+
+    // Initial deal
+    deal();
+  });
+</script>
+
+<style>
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+</style>

@@ -1,0 +1,516 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import TrackLink from "../../components/TrackLink.astro";
+
+const title = "Wheel Spinner | Random Decision Maker";
+const description = "Spin a customizable wheel with 2-12 segments to make random decisions. Perfect for choosing between options, picking games, or making fun choices.";
+---
+
+<InfoLayout title={title} description={description}>
+  <div class="tool-container">
+    <header class="tool-header">
+      <h1>🎡 Wheel Spinner</h1>
+      <p class="tool-tagline">Let the wheel decide your fate</p>
+    </header>
+
+    <div class="tool-controls">
+      <div class="control-section">
+        <label for="segmentCount">Number of Segments (2-12):</label>
+        <input type="number" id="segmentCount" min="2" max="12" value="8" />
+      </div>
+
+      <div class="control-section">
+        <h3>Customize Your Segments:</h3>
+        <div id="segmentInputs" class="segment-inputs"></div>
+      </div>
+
+      <button id="spinButton" class="action-button">
+        🎡 SPIN THE WHEEL
+      </button>
+
+      <button id="resetButton" class="secondary-button">
+        Reset to Defaults
+      </button>
+    </div>
+
+    <div class="wheel-container">
+      <canvas id="wheelCanvas" width="400" height="400"></canvas>
+      <div id="wheelPointer" class="wheel-pointer">▼</div>
+    </div>
+
+    <div id="resultDisplay" class="result-display" style="display: none;">
+      <h2>🎉 Result</h2>
+      <div id="resultText" class="result-text"></div>
+    </div>
+
+    <section class="education-section">
+      <h2>📚 How It Works</h2>
+      <p>
+        The Wheel Spinner uses cryptographically secure random number generation 
+        to select a segment with perfectly equal probability. Each segment has 
+        exactly the same chance of being selected, regardless of color, position, 
+        or previous results.
+      </p>
+      <p>
+        <strong>Fair RNG:</strong> The wheel uses <code>crypto.getRandomValues()</code> 
+        for true randomness, not pseudo-random algorithms. The spinning animation 
+        is purely visual—the result is determined instantly when you click spin.
+      </p>
+      <p>
+        <strong>Use Cases:</strong> Perfect for deciding between restaurants, 
+        choosing teams, picking party games, or any scenario where you need an 
+        impartial random selection.
+      </p>
+    </section>
+
+    <section class="related-tools">
+      <h3>Related Tools</h3>
+      <div class="tool-links">
+        <TrackLink href="/casino-lite" eventName="casino_lite_hub_link">
+          🎰 Casino-Lite Hub
+        </TrackLink>
+        <TrackLink href="/tools/raffle-picker" eventName="raffle_picker_link">
+          Raffle Picker
+        </TrackLink>
+        <TrackLink href="/tools/dice-roller" eventName="dice_roller_link">
+          Dice Roller
+        </TrackLink>
+        <TrackLink href="/tools/coin-flip" eventName="coin_flip_link">
+          Coin Flip
+        </TrackLink>
+        <TrackLink href="/" eventName="home_link">
+          Lucky Number Generator
+        </TrackLink>
+      </div>
+    </section>
+  </div>
+</InfoLayout>
+
+<style>
+  .tool-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .tool-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .tool-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .tool-tagline {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+  }
+
+  .tool-controls {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-primary);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .control-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .control-section label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .control-section input[type="number"] {
+    width: 100%;
+    max-width: 200px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 2px solid var(--border-primary);
+    border-radius: 0.5rem;
+    background: var(--input-bg);
+    color: var(--text-primary);
+  }
+
+  .segment-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .segment-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .segment-input input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 2px solid var(--border-primary);
+    border-radius: 0.5rem;
+    background: var(--input-bg);
+    color: var(--text-primary);
+  }
+
+  .color-indicator {
+    width: 30px;
+    height: 30px;
+    border-radius: 0.25rem;
+    border: 2px solid var(--border-primary);
+  }
+
+  .action-button {
+    width: 100%;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 1rem;
+  }
+
+  .action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .action-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .secondary-button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 2px solid var(--border-primary);
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .secondary-button:hover {
+    background: var(--surface-elevated);
+  }
+
+  .wheel-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem 0;
+    padding: 2rem;
+    background: var(--surface-elevated);
+    border-radius: 1rem;
+  }
+
+  #wheelCanvas {
+    max-width: 100%;
+    height: auto;
+    transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+  }
+
+  .wheel-pointer {
+    position: absolute;
+    top: -10px;
+    font-size: 2rem;
+    color: var(--accent-primary);
+    z-index: 10;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+
+  .result-display {
+    background: var(--surface-elevated);
+    border: 2px solid var(--accent-primary);
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    animation: fadeIn 0.5s;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .result-text {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent-primary);
+    margin-top: 1rem;
+  }
+
+  .education-section {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-primary);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .education-section h2 {
+    margin-top: 0;
+  }
+
+  .education-section p {
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  .education-section code {
+    background: var(--surface);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-family: monospace;
+    color: var(--accent-primary);
+  }
+
+  .related-tools {
+    margin-top: 3rem;
+  }
+
+  .tool-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .tool-links a {
+    padding: 0.75rem 1.5rem;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-primary);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.3s;
+  }
+
+  .tool-links a:hover {
+    background: var(--accent-primary);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .tool-header h1 {
+      font-size: 2rem;
+    }
+
+    #wheelCanvas {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .segment-inputs {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  interface Segment {
+    label: string;
+    color: string;
+  }
+
+  const DEFAULT_COLORS = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A',
+    '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
+    '#F8B739', '#52B788', '#E07BE0', '#FF9EAA'
+  ];
+
+  const DEFAULT_LABELS = [
+    'Option 1', 'Option 2', 'Option 3', 'Option 4',
+    'Option 5', 'Option 6', 'Option 7', 'Option 8',
+    'Option 9', 'Option 10', 'Option 11', 'Option 12'
+  ];
+
+  let segments: Segment[] = [];
+  let currentRotation = 0;
+  let isSpinning = false;
+
+  function initializeSegments(count: number) {
+    segments = [];
+    for (let i = 0; i < count; i++) {
+      segments.push({
+        label: DEFAULT_LABELS[i],
+        color: DEFAULT_COLORS[i % DEFAULT_COLORS.length]
+      });
+    }
+    renderSegmentInputs();
+    drawWheel();
+  }
+
+  function renderSegmentInputs() {
+    const container = document.getElementById('segmentInputs');
+    if (!container) return;
+
+    container.innerHTML = '';
+    segments.forEach((segment, index) => {
+      const div = document.createElement('div');
+      div.className = 'segment-input';
+
+      const colorDiv = document.createElement('div');
+      colorDiv.className = 'color-indicator';
+      colorDiv.style.backgroundColor = segment.color;
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = segment.label;
+      input.placeholder = `Segment ${index + 1}`;
+      input.addEventListener('input', (e) => {
+        segment.label = (e.target as HTMLInputElement).value;
+        drawWheel();
+      });
+
+      div.appendChild(colorDiv);
+      div.appendChild(input);
+      container.appendChild(div);
+    });
+  }
+
+  function drawWheel() {
+    const canvas = document.getElementById('wheelCanvas') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = Math.min(centerX, centerY) - 20;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const anglePerSegment = (2 * Math.PI) / segments.length;
+
+    segments.forEach((segment, index) => {
+      const startAngle = index * anglePerSegment;
+      const endAngle = startAngle + anglePerSegment;
+
+      // Draw segment
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+      ctx.closePath();
+      ctx.fillStyle = segment.color;
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw text
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(startAngle + anglePerSegment / 2);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText(segment.label, radius - 20, 5);
+      ctx.restore();
+    });
+
+    // Draw center circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 30, 0, 2 * Math.PI);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+
+  function spinWheel() {
+    if (isSpinning) return;
+    isSpinning = true;
+
+    const spinButton = document.getElementById('spinButton') as HTMLButtonElement;
+    if (spinButton) spinButton.disabled = true;
+
+    // Use crypto RNG for true randomness
+    const randomArray = new Uint32Array(1);
+    crypto.getRandomValues(randomArray);
+    const randomIndex = randomArray[0] % segments.length;
+
+    // Calculate final rotation
+    const anglePerSegment = 360 / segments.length;
+    const targetAngle = 360 - (randomIndex * anglePerSegment + anglePerSegment / 2);
+    const spins = 5; // Number of full rotations
+    const finalRotation = currentRotation + (spins * 360) + targetAngle;
+
+    const canvas = document.getElementById('wheelCanvas') as HTMLCanvasElement;
+    if (canvas) {
+      canvas.style.transform = `rotate(${finalRotation}deg)`;
+    }
+
+    currentRotation = finalRotation % 360;
+
+    // Show result after animation
+    setTimeout(() => {
+      const resultDisplay = document.getElementById('resultDisplay');
+      const resultText = document.getElementById('resultText');
+      
+      if (resultDisplay && resultText) {
+        resultText.textContent = segments[randomIndex].label;
+        resultText.style.color = segments[randomIndex].color;
+        resultDisplay.style.display = 'block';
+        resultDisplay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      isSpinning = false;
+      if (spinButton) spinButton.disabled = false;
+    }, 3000);
+  }
+
+  // Initialize on load
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeSegments(8);
+
+    const segmentCountInput = document.getElementById('segmentCount') as HTMLInputElement;
+    segmentCountInput?.addEventListener('change', (e) => {
+      const count = parseInt((e.target as HTMLInputElement).value);
+      if (count >= 2 && count <= 12) {
+        initializeSegments(count);
+      }
+    });
+
+    document.getElementById('spinButton')?.addEventListener('click', spinWheel);
+
+    document.getElementById('resetButton')?.addEventListener('click', () => {
+      const segmentCountInput = document.getElementById('segmentCount') as HTMLInputElement;
+      if (segmentCountInput) {
+        segmentCountInput.value = '8';
+        initializeSegments(8);
+      }
+      const resultDisplay = document.getElementById('resultDisplay');
+      if (resultDisplay) resultDisplay.style.display = 'none';
+    });
+  });
+</script>
+</InfoLayout>

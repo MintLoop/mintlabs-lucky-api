@@ -57,6 +57,17 @@ const description = "Discover your personalized lucky profile combining birthsto
           <input type="hidden" id="selectedColor" name="color" required />
         </div>
 
+        <div class="form-section">
+          <h2>🦅 Your Animal Totem (Optional)</h2>
+          <p class="form-hint">Indigenous wisdom traditions connecting birth dates to animal guides</p>
+          <select id="animalTotem" name="animalTotem">
+            <option value="">Skip this section...</option>
+          </select>
+          <p class="totem-note">
+            ℹ️ These totems draw from various indigenous traditions. Presented with respect as cultural folklore, not spiritual claims.
+          </p>
+        </div>
+
         <div class="form-section filters-section">
           <h3>✨ Optional Spiritual Filters</h3>
           <p class="form-hint">Enhance your profile with additional wisdom traditions</p>
@@ -444,6 +455,16 @@ const description = "Discover your personalized lucky profile combining birthsto
     color: var(--text-secondary);
   }
 
+  .totem-note {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    background: var(--surface-elevated);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border-left: 3px solid var(--accent-primary);
+    margin-top: 0.5rem;
+  }
+
   @media (max-width: 768px) {
     .profile-header h1 {
       font-size: 2rem;
@@ -487,6 +508,23 @@ const description = "Discover your personalized lucky profile combining birthsto
       option.textContent = `${rashi.english} (${rashi.rashi}) - ${rashi.planet}`;
       rashiSelect.appendChild(option);
     });
+    
+    // Populate animal totem dropdown
+    const totemSelect = document.getElementById('animalTotem') as HTMLSelectElement;
+    fetch('/src/data/native-totems.json')
+      .then(res => res.json())
+      .then(data => {
+        data.totems.forEach((totem: any) => {
+          const option = document.createElement('option');
+          option.value = totem.name.toLowerCase();
+          option.textContent = `${totem.name} (${totem.date_range})`;
+          totemSelect.appendChild(option);
+        });
+      })
+      .catch(() => {
+        // Silent fail - totem section is optional
+        console.log('Animal totem data unavailable');
+      });
     
     // Populate color grid with auto-contrast text
     const colorGrid = document.getElementById('colorGrid') as HTMLDivElement;
