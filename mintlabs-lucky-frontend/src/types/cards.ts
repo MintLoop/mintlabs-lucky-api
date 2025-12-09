@@ -23,10 +23,15 @@ export interface DeckTheme {
   id: string;                // 'emoji-default', 'classic-green'
   label: string;
   suitSetId: string;         // ties into SuitSet
-  background?: string;       // CSS gradient or URL to image
+  background?: string;       // CSS gradient or URL to image (fallback)
   rankFontClass?: string;    // Tailwind font utility
   cardFrameClass?: string;   // Tailwind border/rounded/shadow utilities
-  backPattern?: string;      // Card back design (for face-down cards)
+  backPattern?: string;      // Card back design CSS (fallback for face-down cards)
+  
+  // Image-backed themes (Phase 4.3.x)
+  frontImage?: string;                        // Default front face image (WebP/PNG)
+  backImage?: string;                         // Default back face image (WebP/PNG)
+  frontBySuit?: Partial<Record<Suit, string>>; // Optional suit-specific front images
 }
 
 // Helper type for card values in game logic

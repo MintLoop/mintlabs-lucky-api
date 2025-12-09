@@ -16,11 +16,11 @@ interface Props {
 
 const { card, theme, suitSet, faceDown = false, size = 'md', class: className = '' } = Astro.props;
 
-// Size mappings
+// Size mappings (consistent widths for responsive design)
 const sizeClasses = {
-  sm: 'w-16 text-xs',
-  md: 'w-24 text-sm',
-  lg: 'w-32 text-base',
+  sm: 'w-[72px] sm:w-[80px] text-xs',
+  md: 'w-[88px] sm:w-[96px] text-sm',
+  lg: 'w-[104px] sm:w-[112px] text-base',
 };
 
 // Get suit icon
@@ -31,8 +31,12 @@ const isEmoji = !suitIcon.startsWith('/');
 const cardColor = getCardColor(card.suit);
 const colorClass = cardColor === 'red' ? 'text-red-600' : 'text-slate-900';
 
+// Compute front/back image sources (Phase 4.3.x)
+const frontSrc = theme.frontBySuit?.[card.suit] ?? theme.frontImage ?? null;
+const backSrc = theme.backImage ?? null;
+
 // Aria label for accessibility
-const ariaLabel = formatCard(card);
+const ariaLabel = faceDown ? 'Face down card' : formatCard(card);
 ---
 
 <div
@@ -41,64 +45,88 @@ const ariaLabel = formatCard(card);
   aria-label={ariaLabel}
 >
   {faceDown ? (
-    <!-- Card Back -->
-    <div class={`absolute inset-0 ${theme.backPattern || 'bg-emerald-700'} flex items-center justify-center overflow-hidden`}>
-      <div class="text-white text-2xl opacity-20">🎴</div>
-    </div>
+    <!-- Card Back (image or fallback pattern) -->
+    <>
+      {backSrc ? (
+        <div
+          class="absolute inset-0 bg-cover bg-center"
+          style={`background-image: url('${backSrc}')`}
+        />
+      ) : (
+        <div class={`absolute inset-0 ${theme.backPattern || 'bg-emerald-700'} flex items-center justify-center`}>
+          <div class="text-white text-2xl opacity-20">🎴</div>
+        </div>
+      )}
+    </>
   ) : (
-    <!-- Card Front -->
-    <div class={`absolute inset-0 ${theme.background || 'bg-white'} overflow-hidden`}>
-      <!-- Top-left corner (absolute positioned) -->
-      <div class={`absolute top-[8%] left-[10%] flex flex-col items-start leading-none ${colorClass}`}>
-        <span class={`${theme.rankFontClass} ${size === 'sm' ? 'text-base' : size === 'md' ? 'text-xl' : 'text-2xl'}`}>
-          {card.rank}
-        </span>
-        {isEmoji ? (
-          <span class={size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-base'}>
-            {suitIcon}
-          </span>
-        ) : (
-          <img 
-            src={suitIcon} 
-            alt={card.suit}
-            class={size === 'sm' ? 'w-3 h-3' : size === 'md' ? 'w-4 h-4' : 'w-5 h-5'}
-          />
-        )}
-      </div>
+    <!-- Card Front (image layer + rank/suit overlay) -->
+    <>
+      {/* Background Image Layer */}
+      {frontSrc ? (
+        <div
+          class="absolute inset-0 bg-cover bg-center"
+          style={`background-image: url('${frontSrc}')`}
+        />
+      ) : theme.background ? (
+        <div class={`absolute inset-0 ${theme.background}`} />
+      ) : (
+        <div class="absolute inset-0 bg-white" />
+      )}
 
-      <!-- Center suit icon (absolute centered) -->
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        {isEmoji ? (
-          <span class={`${colorClass} ${size === 'sm' ? 'text-2xl' : size === 'md' ? 'text-4xl' : 'text-5xl'}`}>
-            {suitIcon}
+      {/* Rank/Suit Overlay (always on top) */}
+      <div class="absolute inset-0 pointer-events-none">
+        <!-- Top-left corner -->
+        <div class={`absolute top-[8%] left-[10%] flex flex-col items-start leading-none ${colorClass}`}>
+          <span class={`${theme.rankFontClass} ${size === 'sm' ? 'text-base' : size === 'md' ? 'text-xl' : 'text-2xl'}`}>
+            {card.rank}
           </span>
-        ) : (
-          <img 
-            src={suitIcon} 
-            alt={card.suit}
-            class={size === 'sm' ? 'w-8 h-8' : size === 'md' ? 'w-12 h-12' : 'w-16 h-16'}
-          />
-        )}
-      </div>
+          {isEmoji ? (
+            <span class={size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-base'}>
+              {suitIcon}
+            </span>
+          ) : (
+            <img 
+              src={suitIcon} 
+              alt={card.suit}
+              class={size === 'sm' ? 'w-3 h-3' : size === 'md' ? 'w-4 h-4' : 'w-5 h-5'}
+            />
+          )}
+        </div>
 
-      <!-- Bottom-right corner (absolute positioned & rotated) -->
-      <div class={`absolute bottom-[8%] right-[10%] flex flex-col items-end leading-none rotate-180 ${colorClass}`}>
-        <span class={`${theme.rankFontClass} ${size === 'sm' ? 'text-base' : size === 'md' ? 'text-xl' : 'text-2xl'}`}>
-          {card.rank}
-        </span>
-        {isEmoji ? (
-          <span class={size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-base'}>
-            {suitIcon}
+        <!-- Center suit icon -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          {isEmoji ? (
+            <span class={`${colorClass} ${size === 'sm' ? 'text-2xl' : size === 'md' ? 'text-4xl' : 'text-5xl'}`}>
+              {suitIcon}
+            </span>
+          ) : (
+            <img 
+              src={suitIcon} 
+              alt={card.suit}
+              class={size === 'sm' ? 'w-8 h-8' : size === 'md' ? 'w-12 h-12' : 'w-16 h-16'}
+            />
+          )}
+        </div>
+
+        <!-- Bottom-right corner (rotated) -->
+        <div class={`absolute bottom-[8%] right-[10%] flex flex-col items-end leading-none rotate-180 ${colorClass}`}>
+          <span class={`${theme.rankFontClass} ${size === 'sm' ? 'text-base' : size === 'md' ? 'text-xl' : 'text-2xl'}`}>
+            {card.rank}
           </span>
-        ) : (
-          <img 
-            src={suitIcon} 
-            alt={card.suit}
-            class={size === 'sm' ? 'w-3 h-3' : size === 'md' ? 'w-4 h-4' : 'w-5 h-5'}
-          />
-        )}
+          {isEmoji ? (
+            <span class={size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-base'}>
+              {suitIcon}
+            </span>
+          ) : (
+            <img 
+              src={suitIcon} 
+              alt={card.suit}
+              class={size === 'sm' ? 'w-3 h-3' : size === 'md' ? 'w-4 h-4' : 'w-5 h-5'}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </>
   )}
 </div>
 

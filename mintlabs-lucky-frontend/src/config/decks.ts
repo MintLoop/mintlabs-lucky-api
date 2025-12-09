@@ -64,6 +64,35 @@ export const DECK_THEMES: DeckTheme[] = [
     cardFrameClass: 'rounded-lg border-2 border-purple-400 shadow-lg',
     backPattern: 'bg-gradient-to-br from-purple-600 to-purple-800',
   },
+  
+  // Image-backed themes (Phase 4.3.x)
+  {
+    id: 'emerald-velvet',
+    label: 'Emerald Velvet',
+    suitSetId: 'classic',
+    frontImage: '/cards/themes/emerald-velvet/front.svg',
+    backImage: '/cards/themes/emerald-velvet/back.svg',
+    rankFontClass: 'font-semibold text-emerald-50 drop-shadow-md',
+    cardFrameClass: 'rounded-2xl shadow-xl border-2 border-emerald-700',
+  },
+  {
+    id: 'linen-ivory',
+    label: 'Linen Ivory',
+    suitSetId: 'classic',
+    frontImage: '/cards/themes/linen-ivory/front.svg',
+    backImage: '/cards/themes/linen-ivory/back.svg',
+    rankFontClass: 'font-semibold text-slate-800',
+    cardFrameClass: 'rounded-2xl shadow-lg border-2 border-amber-300',
+  },
+  {
+    id: 'obsidian-back',
+    label: 'Obsidian Back',
+    suitSetId: 'classic',
+    backImage: '/cards/themes/obsidian/back.svg',
+    background: 'bg-white',
+    rankFontClass: 'font-bold text-slate-900',
+    cardFrameClass: 'rounded-2xl shadow-lg border-2 border-slate-400',
+  },
 ];
 
 // Helper to get suit set by ID with fallback
