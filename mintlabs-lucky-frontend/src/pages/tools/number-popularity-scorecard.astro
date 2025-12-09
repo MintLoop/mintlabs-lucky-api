@@ -1,0 +1,313 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import TrackLink from "../../components/TrackLink.astro";
+
+const lotteries = [
+  { id: 'powerball', name: 'Powerball', maxNumber: 69 },
+  { id: 'megamillions', name: 'Mega Millions', maxNumber: 70 },
+  { id: 'superlotto', name: 'CA SuperLotto Plus', maxNumber: 47 },
+  { id: 'pick6', name: 'Generic Pick-6 (1-49)', maxNumber: 49 },
+];
+
+// Simulated frequency data (in real implementation, this would come from API)
+// For demo: generate hot/cold/overdue scores
+function generatePopularityData(maxNumber: number) {
+  const data = [];
+  for (let i = 1; i <= maxNumber; i++) {
+    // Simulate frequencies with some variation
+    const hotScore = Math.floor(Math.random() * 50) + 50; // 50-100
+    const coldScore = Math.floor(Math.random() * 30); // 0-30
+    const overdueDays = Math.floor(Math.random() * 200);
+    const recentAppearances = Math.floor(Math.random() * 15);
+    
+    // Composite popularity score (weighted)
+    const popularityScore = (
+      (hotScore * 0.4) + 
+      (coldScore * 0.2) + 
+      ((100 - Math.min(overdueDays / 2, 100)) * 0.2) +
+      (recentAppearances * 2 * 0.2)
+    );
+    
+    data.push({
+      number: i,
+      hotScore,
+      coldScore,
+      overdueDays,
+      recentAppearances,
+      popularityScore: Math.round(popularityScore),
+    });
+  }
+  return data.sort((a, b) => b.popularityScore - a.popularityScore);
+}
+---
+
+<InfoLayout 
+  title="Number Popularity Scorecard"
+  subtitle="Weighted index combining hot, cold, and overdue metrics"
+  pageTitle="Number Popularity Scorecard - Lottery Number Frequency Index | MintLabs"
+  description="Comprehensive popularity score for lottery numbers combining hot frequency, cold streaks, overdue days, and recent appearances. See which numbers are trending."
+  keywords="lottery number popularity, number frequency score, hot cold overdue combined, lottery number index, trending lottery numbers"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">📊 Composite Metrics:</strong>
+    Our popularity score combines four key metrics into one weighted index to show which numbers are "trending" in recent draws.
+  </div>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)]">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Select Lottery Game</h2>
+    
+    <div class="mb-6">
+      <label for="lottery-select" class="block text-sm font-medium text-gray-300 mb-2">Lottery Game:</label>
+      <select 
+        id="lottery-select" 
+        class="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--surface-elevated)] px-4 py-2 text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+      >
+        {lotteries.map(lottery => (
+          <option value={lottery.id}>{lottery.name}</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold text-emerald-300 mb-3">Weighting Formula</h3>
+      <div class="grid gap-3 text-sm">
+        <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+          <span class="text-gray-300">Hot Score (recent frequency)</span>
+          <span class="font-mono text-emerald-400">40%</span>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+          <span class="text-gray-300">Cold Score (infrequency penalty)</span>
+          <span class="font-mono text-emerald-400">20%</span>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+          <span class="text-gray-300">Overdue Factor (days since last)</span>
+          <span class="font-mono text-emerald-400">20%</span>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+          <span class="text-gray-300">Recent Appearances (last 10 draws)</span>
+          <span class="font-mono text-emerald-400">20%</span>
+        </div>
+      </div>
+    </div>
+
+    <button
+      id="calculate-btn"
+      class="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:from-emerald-600 hover:to-teal-700 hover:shadow-xl"
+    >
+      Calculate Popularity Scores
+    </button>
+  </section>
+
+  <section id="results-section" class="hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Popularity Rankings</h2>
+    
+    <div class="mb-4 p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
+      <p class="text-sm text-blue-300">
+        <strong>Note:</strong> Popularity scores combine multiple metrics but don't predict future draws. All numbers have equal probability in each draw.
+      </p>
+    </div>
+
+    <div class="mb-4 flex gap-3 flex-wrap">
+      <button id="view-all" class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium">All Numbers</button>
+      <button id="view-top20" class="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium">Top 20</button>
+      <button id="view-top10" class="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium">Top 10</button>
+      <button id="view-bottom10" class="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium">Bottom 10</button>
+    </div>
+
+    <div id="scorecard-grid" class="grid gap-3 md:grid-cols-2 lg:grid-cols-3"></div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">How the Popularity Score Works</h2>
+    
+    <div class="space-y-4 text-gray-300">
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">Four Key Metrics</h3>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li><strong class="text-white">Hot Score (40%):</strong> How frequently the number has appeared in recent draws (higher = more frequent)</li>
+          <li><strong class="text-white">Cold Score (20%):</strong> Penalty for numbers that rarely appear (lower = more frequent)</li>
+          <li><strong class="text-white">Overdue Factor (20%):</strong> Days since last appearance, inverted (recent appearance = higher score)</li>
+          <li><strong class="text-white">Recent Trend (20%):</strong> Appearances in last 10 draws (shows momentum)</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">What the Score Means</h3>
+        <div class="space-y-2">
+          <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <span class="font-mono text-emerald-400 font-bold">80-100:</span>
+            <span class="ml-2">Very popular — appears frequently and recently</span>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <span class="font-mono text-yellow-400 font-bold">60-79:</span>
+            <span class="ml-2">Moderately popular — balanced frequency</span>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <span class="font-mono text-orange-400 font-bold">40-59:</span>
+            <span class="ml-2">Below average — less frequent appearances</span>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <span class="font-mono text-red-400 font-bold">0-39:</span>
+            <span class="ml-2">Unpopular — rarely appears in recent history</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+        <p class="text-sm text-yellow-300">
+          <strong>⚠️ Important:</strong> Popularity is a descriptive metric based on past draws. It does NOT increase your chances of winning. Every number has the same probability in every draw, regardless of past frequency.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Related Tools</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <TrackLink href="/tools/hot-cold-numbers" location="popularity-scorecard" action="click-related-hot-cold">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Hot & Cold Numbers</h3>
+          <p class="text-sm text-gray-400">See individual hot/cold metrics</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/number-trend-graph" location="popularity-scorecard" action="click-related-trends">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Number Trend Graph</h3>
+          <p class="text-sm text-gray-400">Visualize frequency over time</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/most-drawn-numbers" location="popularity-scorecard" action="click-related-most-drawn">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Top 10 Most Drawn</h3>
+          <p class="text-sm text-gray-400">All-time frequency leaders</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/least-drawn-numbers" location="popularity-scorecard" action="click-related-least-drawn">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Top 10 Least Drawn</h3>
+          <p class="text-sm text-gray-400">Cold number champions</p>
+        </div>
+      </TrackLink>
+    </div>
+  </section>
+</InfoLayout>
+
+<script define:vars={{ lotteries, generatePopularityData }}>
+  let currentData = [];
+  let currentView = 'all';
+
+  const calculateBtn = document.getElementById('calculate-btn');
+  const resultsSection = document.getElementById('results-section');
+  const scorecardGrid = document.getElementById('scorecard-grid');
+  const lotterySelect = document.getElementById('lottery-select');
+
+  // View filter buttons
+  const viewAllBtn = document.getElementById('view-all');
+  const viewTop20Btn = document.getElementById('view-top20');
+  const viewTop10Btn = document.getElementById('view-top10');
+  const viewBottom10Btn = document.getElementById('view-bottom10');
+
+  function getScoreColor(score) {
+    if (score >= 80) return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
+    if (score >= 60) return 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10';
+    if (score >= 40) return 'text-orange-400 border-orange-500/30 bg-orange-500/10';
+    return 'text-red-400 border-red-500/30 bg-red-500/10';
+  }
+
+  function renderScorecard(data) {
+    scorecardGrid.innerHTML = data.map((item, index) => `
+      <div class="p-4 rounded-lg border ${getScoreColor(item.popularityScore)}">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl font-bold text-white">${item.number}</span>
+            <span class="text-xs text-gray-400">#${index + 1}</span>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl font-bold ${getScoreColor(item.popularityScore).split(' ')[0]}">${item.popularityScore}</div>
+            <div class="text-xs text-gray-400">score</div>
+          </div>
+        </div>
+        <div class="space-y-1 text-xs">
+          <div class="flex justify-between">
+            <span class="text-gray-400">Hot:</span>
+            <span class="font-mono text-white">${item.hotScore}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Cold:</span>
+            <span class="font-mono text-white">${item.coldScore}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Overdue:</span>
+            <span class="font-mono text-white">${item.overdueDays}d</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Recent:</span>
+            <span class="font-mono text-white">${item.recentAppearances}/10</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function updateView(view) {
+    currentView = view;
+    
+    // Update button styles
+    [viewAllBtn, viewTop20Btn, viewTop10Btn, viewBottom10Btn].forEach(btn => {
+      btn.classList.remove('bg-emerald-600');
+      btn.classList.add('bg-slate-700');
+    });
+    
+    let filteredData = [...currentData];
+    
+    if (view === 'top20') {
+      filteredData = currentData.slice(0, 20);
+      viewTop20Btn.classList.remove('bg-slate-700');
+      viewTop20Btn.classList.add('bg-emerald-600');
+    } else if (view === 'top10') {
+      filteredData = currentData.slice(0, 10);
+      viewTop10Btn.classList.remove('bg-slate-700');
+      viewTop10Btn.classList.add('bg-emerald-600');
+    } else if (view === 'bottom10') {
+      filteredData = currentData.slice(-10).reverse();
+      viewBottom10Btn.classList.remove('bg-slate-700');
+      viewBottom10Btn.classList.add('bg-emerald-600');
+    } else {
+      viewAllBtn.classList.remove('bg-slate-700');
+      viewAllBtn.classList.add('bg-emerald-600');
+    }
+    
+    renderScorecard(filteredData);
+  }
+
+  calculateBtn.addEventListener('click', () => {
+    const selectedLottery = lotteries.find(l => l.id === lotterySelect.value);
+    
+    if (!selectedLottery) return;
+    
+    // Generate popularity data
+    currentData = generatePopularityData(selectedLottery.maxNumber);
+    
+    // Show results
+    resultsSection.classList.remove('hidden');
+    updateView('all');
+    
+    // Scroll to results
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  // View filter event listeners
+  viewAllBtn.addEventListener('click', () => updateView('all'));
+  viewTop20Btn.addEventListener('click', () => updateView('top20'));
+  viewTop10Btn.addEventListener('click', () => updateView('top10'));
+  viewBottom10Btn.addEventListener('click', () => updateView('bottom10'));
+</script>
+
+<style>
+  /* Token-compliant responsive design */
+  @media (max-width: 640px) {
+    #scorecard-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

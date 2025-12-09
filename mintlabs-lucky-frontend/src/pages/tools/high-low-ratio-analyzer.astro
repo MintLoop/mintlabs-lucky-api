@@ -1,0 +1,383 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import TrackLink from "../../components/TrackLink.astro";
+
+const games = [
+  { id: 'powerball', name: 'Powerball', maxNumber: 69, midpoint: 35 },
+  { id: 'megamillions', name: 'Mega Millions', maxNumber: 70, midpoint: 35 },
+  { id: 'superlotto', name: 'CA SuperLotto Plus', maxNumber: 47, midpoint: 24 },
+  { id: 'pick6', name: 'Generic Pick-6 (1-49)', maxNumber: 49, midpoint: 25 },
+];
+---
+
+<InfoLayout 
+  title="High/Low Ratio Analyzer"
+  subtitle="Analyze the distribution between high and low numbers"
+  pageTitle="High/Low Ratio Analyzer - Lottery Number Distribution Tool | MintLabs"
+  description="Analyze high vs low number distribution in your lottery picks. See how your numbers compare to typical draw patterns and statistical expectations."
+  keywords="high low lottery numbers, number distribution lottery, high low ratio, lottery balance analyzer, number range distribution"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">📊 Distribution Analysis:</strong>
+    Check if your numbers are balanced between high and low ranges. See what typical distributions look like in real draws.
+  </div>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)]">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Select Game & Enter Numbers</h2>
+    
+    <div class="mb-4">
+      <label for="game-select" class="block text-sm font-medium text-gray-300 mb-2">Lottery Game:</label>
+      <select 
+        id="game-select" 
+        class="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--surface-elevated)] px-4 py-2 text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+      >
+        {games.map(game => (
+          <option value={game.id}>{game.name}</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="mb-4" id="midpoint-display">
+      <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)] text-sm text-gray-300">
+        <strong class="text-white">Midpoint:</strong> Numbers 1-<span id="low-range">35</span> are <strong class="text-blue-400">Low</strong>, 
+        <span id="high-range">36</span>-69 are <strong class="text-orange-400">High</strong>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="numbers-input" class="block text-sm font-medium text-gray-300 mb-2">
+        Enter 5-7 numbers (comma or space separated):
+      </label>
+      <input 
+        type="text" 
+        id="numbers-input"
+        placeholder="e.g., 7, 23, 34, 45, 56, 67"
+        class="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--surface-elevated)] px-4 py-3 text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+      />
+    </div>
+
+    <button
+      id="analyze-btn"
+      class="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:from-emerald-600 hover:to-teal-700 hover:shadow-xl"
+    >
+      Analyze High/Low Ratio
+    </button>
+  </section>
+
+  <section id="results-section" class="hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Distribution Analysis</h2>
+    
+    <div id="numbers-display" class="mb-6"></div>
+
+    <div class="grid gap-6 md:grid-cols-2 mb-6">
+      <div class="p-6 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/30">
+        <div class="text-sm text-gray-400 mb-1">Low Numbers</div>
+        <div class="text-4xl font-bold text-blue-400" id="low-count">0</div>
+        <div class="mt-2 text-xs text-gray-400" id="low-range-display">1-35</div>
+        <div class="mt-3 text-sm text-gray-300" id="low-list"></div>
+      </div>
+      <div class="p-6 rounded-lg bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/30">
+        <div class="text-sm text-gray-400 mb-1">High Numbers</div>
+        <div class="text-4xl font-bold text-orange-400" id="high-count">0</div>
+        <div class="mt-2 text-xs text-gray-400" id="high-range-display">36-69</div>
+        <div class="mt-3 text-sm text-gray-300" id="high-list"></div>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold text-emerald-300 mb-3">Visual Distribution</h3>
+      <div class="relative h-12 rounded-lg overflow-hidden border border-[var(--border-primary)]">
+        <div id="low-bar" class="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold transition-all duration-500" style="width: 50%;">
+          <span id="low-percent">50%</span>
+        </div>
+        <div id="high-bar" class="absolute right-0 top-0 h-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center text-white font-semibold transition-all duration-500" style="width: 50%;">
+          <span id="high-percent">50%</span>
+        </div>
+      </div>
+      <div class="flex justify-between mt-2 text-sm text-gray-400">
+        <span>← Low</span>
+        <span>High →</span>
+      </div>
+    </div>
+
+    <div id="balance-assessment" class="p-4 rounded-lg border mb-6"></div>
+
+    <div class="space-y-4">
+      <h3 class="text-lg font-semibold text-emerald-300">Typical Patterns in Real Draws</h3>
+      <div class="grid gap-3">
+        <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)] flex items-center justify-between">
+          <span class="text-gray-300">3 Low / 3 High</span>
+          <span class="text-sm text-emerald-400 font-semibold">Most Common (~33%)</span>
+        </div>
+        <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)] flex items-center justify-between">
+          <span class="text-gray-300">4 Low / 2 High or 2 Low / 4 High</span>
+          <span class="text-sm text-yellow-400 font-semibold">Common (~23% each)</span>
+        </div>
+        <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)] flex items-center justify-between">
+          <span class="text-gray-300">5 Low / 1 High or 1 Low / 5 High</span>
+          <span class="text-sm text-orange-400 font-semibold">Less Common (~10% each)</span>
+        </div>
+        <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)] flex items-center justify-between">
+          <span class="text-gray-300">6 Low / 0 High or 0 Low / 6 High</span>
+          <span class="text-sm text-red-400 font-semibold">Rare (~1.5% each)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Understanding High/Low Distribution</h2>
+    
+    <div class="space-y-4 text-gray-300">
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">What Is High/Low Distribution?</h3>
+        <p>High/low distribution shows how your numbers are spread across the game's number range. The midpoint divides all possible numbers into two equal halves:</p>
+        <ul class="list-disc list-inside space-y-1 ml-4 mt-2">
+          <li><strong class="text-white">Powerball/Mega Millions:</strong> Low = 1-35, High = 36-69/70</li>
+          <li><strong class="text-white">SuperLotto Plus:</strong> Low = 1-24, High = 25-47</li>
+          <li><strong class="text-white">Generic Pick-6:</strong> Low = 1-25, High = 26-49</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">Why Balance Matters (Sort Of)</h3>
+        <p class="mb-3">Historical analysis shows:</p>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li><strong class="text-white">Balanced (3/3) is Most Common:</strong> Appears in ~33% of draws due to combinatorial probability</li>
+          <li><strong class="text-white">Slight Imbalance (4/2 or 2/4):</strong> Very common, ~46% combined</li>
+          <li><strong class="text-white">Heavy Imbalance (5/1 or 1/5):</strong> Uncommon but not rare, ~19% combined</li>
+          <li><strong class="text-white">Extreme (6/0 or 0/6):</strong> Very rare, only ~3% combined</li>
+        </ul>
+      </div>
+
+      <div class="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
+        <p class="text-sm text-blue-300">
+          <strong>📊 Mathematical Insight:</strong> Balanced distributions are more common simply because there are more ways to create a 3/3 split than a 6/0 split. It's not that the lottery "prefers" balance — it's pure combinatorial math.
+        </p>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">Should You Play Balanced Numbers?</h3>
+        <div class="space-y-2">
+          <p><strong class="text-white">The mathematical truth:</strong> Every specific combination has equal odds.</p>
+          <p>Examples with identical probability:</p>
+          <ul class="list-disc list-inside space-y-1 ml-4 text-sm">
+            <li><span class="font-mono text-emerald-400">1-2-3-4-5-6</span> (all low) = <span class="font-mono text-orange-400">64-65-66-67-68-69</span> (all high)</li>
+            <li>Both have <strong class="text-white">exact same odds</strong> as <span class="font-mono text-yellow-400">7-19-32-45-58-67</span> (balanced)</li>
+          </ul>
+          <p class="mt-3">However, if you're playing for fun and want to match typical patterns, a 3/3 or 4/2 split is statistically more "normal."</p>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+        <p class="text-sm text-yellow-300">
+          <strong>⚠️ Important:</strong> Playing balanced high/low numbers does NOT increase your winning chances. The lottery draw is completely random and doesn't favor any distribution pattern.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Related Tools</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <TrackLink href="/tools/even-odd-ratio-visualizer" location="highlow-analyzer" action="click-related-evenodd">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Even/Odd Ratio Visualizer</h3>
+          <p class="text-sm text-gray-400">Check even vs odd number balance</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/pattern-analyzer" location="highlow-analyzer" action="click-related-pattern">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Pattern Analyzer</h3>
+          <p class="text-sm text-gray-400">Complete pattern analysis with all metrics</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/number-spread-visualizer" location="highlow-analyzer" action="click-related-spread">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Number Spread Visualizer</h3>
+          <p class="text-sm text-gray-400">See overall dispersion across range</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/" location="highlow-analyzer" action="click-related-generator">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Lucky Number Generator</h3>
+          <p class="text-sm text-gray-400">Generate random picks for any lottery</p>
+        </div>
+      </TrackLink>
+    </div>
+  </section>
+</InfoLayout>
+
+<script define:vars={{ games }}>
+  const analyzeBtn = document.getElementById('analyze-btn');
+  const resultsSection = document.getElementById('results-section');
+  const numbersInput = document.getElementById('numbers-input');
+  const gameSelect = document.getElementById('game-select');
+  const numbersDisplay = document.getElementById('numbers-display');
+  const lowCount = document.getElementById('low-count');
+  const highCount = document.getElementById('high-count');
+  const lowList = document.getElementById('low-list');
+  const highList = document.getElementById('high-list');
+  const lowBar = document.getElementById('low-bar');
+  const highBar = document.getElementById('high-bar');
+  const lowPercent = document.getElementById('low-percent');
+  const highPercent = document.getElementById('high-percent');
+  const balanceAssessment = document.getElementById('balance-assessment');
+  const lowRangeDisplay = document.getElementById('low-range-display');
+  const highRangeDisplay = document.getElementById('high-range-display');
+  const lowRangeEl = document.getElementById('low-range');
+  const highRangeEl = document.getElementById('high-range');
+
+  let currentGame = games[0];
+
+  function updateMidpointDisplay() {
+    const game = games.find(g => g.id === gameSelect.value) || games[0];
+    currentGame = game;
+    lowRangeEl.textContent = game.midpoint;
+    highRangeEl.textContent = game.midpoint + 1;
+  }
+
+  gameSelect.addEventListener('change', updateMidpointDisplay);
+
+  function parseNumbers(input) {
+    return input
+      .split(/[,\s]+/)
+      .map(s => parseInt(s.trim()))
+      .filter(n => !isNaN(n) && n > 0)
+      .sort((a, b) => a - b);
+  }
+
+  function getBalanceInfo(lowCnt, highCnt) {
+    const ratio = `${lowCnt}/${highCnt}`;
+    
+    if (lowCnt === highCnt) {
+      return {
+        rating: 'Perfectly Balanced',
+        color: 'border-emerald-500/30 bg-emerald-500/10',
+        textColor: 'text-emerald-400',
+        message: `Your ${ratio} split is the most common pattern in lottery draws (~33%). This is a balanced, statistically typical selection.`,
+        icon: '✅'
+      };
+    } else if (Math.abs(lowCnt - highCnt) === 2) {
+      return {
+        rating: 'Slightly Imbalanced',
+        color: 'border-yellow-500/30 bg-yellow-500/10',
+        textColor: 'text-yellow-400',
+        message: `Your ${ratio} split is common in lottery draws (~23%). This represents a slight imbalance but is still very typical.`,
+        icon: '⚖️'
+      };
+    } else if (Math.abs(lowCnt - highCnt) === 4) {
+      return {
+        rating: 'Heavily Imbalanced',
+        color: 'border-orange-500/30 bg-orange-500/10',
+        textColor: 'text-orange-400',
+        message: `Your ${ratio} split is less common (~10% of draws). Heavy imbalances occur but are statistically rarer.`,
+        icon: '⚠️'
+      };
+    } else {
+      return {
+        rating: 'Extreme Imbalance',
+        color: 'border-red-500/30 bg-red-500/10',
+        textColor: 'text-red-400',
+        message: `Your ${ratio} split is very rare (~1.5% of draws). All-low or all-high sets almost never appear in lottery history.`,
+        icon: '🔴'
+      };
+    }
+  }
+
+  analyzeBtn.addEventListener('click', () => {
+    const input = numbersInput.value;
+    
+    if (!input.trim()) {
+      alert('Please enter some numbers first');
+      return;
+    }
+    
+    const numbers = parseNumbers(input);
+    
+    if (numbers.length < 5 || numbers.length > 7) {
+      alert('Please enter between 5 and 7 valid numbers');
+      return;
+    }
+    
+    const lows = numbers.filter(n => n <= currentGame.midpoint);
+    const highs = numbers.filter(n => n > currentGame.midpoint);
+    
+    const lowCnt = lows.length;
+    const highCnt = highs.length;
+    const total = numbers.length;
+    
+    const lowPct = Math.round((lowCnt / total) * 100);
+    const highPct = Math.round((highCnt / total) * 100);
+    
+    // Update range displays
+    lowRangeDisplay.textContent = `1-${currentGame.midpoint}`;
+    highRangeDisplay.textContent = `${currentGame.midpoint + 1}-${currentGame.maxNumber}`;
+    
+    // Display categorized numbers
+    numbersDisplay.innerHTML = `
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="space-y-2">
+          <div class="text-sm font-medium text-blue-400">Low Numbers (${lowCnt})</div>
+          <div class="flex flex-wrap gap-2">
+            ${lows.map(n => `
+              <div class="px-3 py-2 rounded-lg bg-blue-600/20 border border-blue-500/30 text-white font-bold">
+                ${n}
+              </div>
+            `).join('')}
+            ${lowCnt === 0 ? '<span class="text-gray-500 text-sm">None</span>' : ''}
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div class="text-sm font-medium text-orange-400">High Numbers (${highCnt})</div>
+          <div class="flex flex-wrap gap-2">
+            ${highs.map(n => `
+              <div class="px-3 py-2 rounded-lg bg-orange-600/20 border border-orange-500/30 text-white font-bold">
+                ${n}
+              </div>
+            `).join('')}
+            ${highCnt === 0 ? '<span class="text-gray-500 text-sm">None</span>' : ''}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Update counts
+    lowCount.textContent = lowCnt.toString();
+    highCount.textContent = highCnt.toString();
+    lowList.textContent = lows.length > 0 ? lows.join(', ') : 'None';
+    highList.textContent = highs.length > 0 ? highs.join(', ') : 'None';
+    
+    // Update visual bar
+    lowBar.style.width = `${lowPct}%`;
+    highBar.style.width = `${highPct}%`;
+    lowPercent.textContent = `${lowPct}%`;
+    highPercent.textContent = `${highPct}%`;
+    
+    // Balance assessment
+    const balance = getBalanceInfo(lowCnt, highCnt);
+    balanceAssessment.className = `p-4 rounded-lg border ${balance.color}`;
+    balanceAssessment.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div class="text-3xl">${balance.icon}</div>
+        <div class="flex-1">
+          <div class="text-lg font-semibold ${balance.textColor} mb-2">${balance.rating}</div>
+          <p class="text-sm text-gray-300">${balance.message}</p>
+        </div>
+      </div>
+    `;
+    
+    // Show results
+    resultsSection.classList.remove('hidden');
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>
+
+<style>
+  /* Token-compliant responsive design */
+  @media (max-width: 640px) {
+    #numbers-display > div {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

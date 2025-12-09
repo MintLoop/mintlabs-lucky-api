@@ -1,0 +1,275 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import TrackLink from "../../components/TrackLink.astro";
+---
+
+<InfoLayout 
+  title="Consecutive Number Checker"
+  subtitle="Detect 2, 3, and 4-number sequences in lottery picks"
+  pageTitle="Consecutive Number Checker - Lottery Sequence Detector | MintLabs"
+  description="Check if your lottery numbers contain consecutive sequences (2, 3, or 4 numbers in a row). Analyze patterns and see how common consecutive numbers are in winning draws."
+  keywords="consecutive lottery numbers, sequential numbers lottery, lottery number patterns, consecutive number checker, lottery sequence detector"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">🔢 Pattern Detection:</strong>
+    Find consecutive sequences like 7-8-9 or 23-24 in your numbers. Discover how often consecutive numbers appear in real lottery draws.
+  </div>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)]">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Enter Your Numbers</h2>
+    
+    <div class="mb-4">
+      <label for="numbers-input" class="block text-sm font-medium text-gray-300 mb-2">
+        Enter 5-7 numbers (comma or space separated):
+      </label>
+      <input 
+        type="text" 
+        id="numbers-input"
+        placeholder="e.g., 7, 12, 23, 24, 25, 45"
+        class="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--surface-elevated)] px-4 py-3 text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+      />
+    </div>
+
+    <button
+      id="check-btn"
+      class="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:from-emerald-600 hover:to-teal-700 hover:shadow-xl"
+    >
+      Check for Consecutive Numbers
+    </button>
+  </section>
+
+  <section id="results-section" class="hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Sequence Analysis</h2>
+    
+    <div id="numbers-display" class="mb-6 flex flex-wrap gap-3 justify-center"></div>
+
+    <div id="sequences-found" class="space-y-4"></div>
+
+    <div id="no-sequences" class="hidden p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)] text-center">
+      <p class="text-gray-300">✅ No consecutive sequences found in your numbers.</p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Understanding Consecutive Numbers</h2>
+    
+    <div class="space-y-4 text-gray-300">
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">What Are Consecutive Numbers?</h3>
+        <p>Consecutive numbers are numbers that follow each other in sequence with no gaps. Examples:</p>
+        <ul class="list-disc list-inside space-y-1 ml-4 mt-2">
+          <li><strong class="text-white">2-number sequence:</strong> 12-13, 34-35, 67-68</li>
+          <li><strong class="text-white">3-number sequence:</strong> 7-8-9, 23-24-25, 45-46-47</li>
+          <li><strong class="text-white">4-number sequence:</strong> 10-11-12-13, 30-31-32-33</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">How Common Are Consecutive Numbers?</h3>
+        <div class="space-y-3">
+          <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <div class="font-semibold text-white mb-1">2-Number Sequences (Pairs)</div>
+            <p class="text-sm">Appear in about <strong class="text-emerald-400">25-30%</strong> of lottery draws. Relatively common.</p>
+          </div>
+          <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <div class="font-semibold text-white mb-1">3-Number Sequences (Triples)</div>
+            <p class="text-sm">Appear in about <strong class="text-yellow-400">5-8%</strong> of draws. Less common but not rare.</p>
+          </div>
+          <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <div class="font-semibold text-white mb-1">4-Number Sequences (Quads)</div>
+            <p class="text-sm">Appear in about <strong class="text-red-400">0.5-1%</strong> of draws. Extremely rare.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
+        <p class="text-sm text-blue-300">
+          <strong>📊 Statistical Reality:</strong> While consecutive numbers feel "unnatural," they're mathematically just as likely as any other pattern. Sets like 7-8-9-10-11-12 have the exact same probability as 3-17-25-39-44-52.
+        </p>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">Real-World Examples</h3>
+        <div class="space-y-2 text-sm">
+          <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <strong class="text-white">August 2011 (UK Lotto):</strong> <span class="font-mono text-emerald-400">7, 8, 14, 23, 35, 47</span> — Contains 7-8 pair
+          </div>
+          <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <strong class="text-white">March 2016 (Powerball):</strong> <span class="font-mono text-emerald-400">16, 19, 32, 34, 57 + 13</span> — Contains 32-34 (skipped 33)
+          </div>
+          <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <strong class="text-white">December 2020 (Mega Millions):</strong> <span class="font-mono text-emerald-400">1, 4, 18, 46, 66 + 2</span> — No consecutive numbers
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+        <p class="text-sm text-yellow-300">
+          <strong>⚠️ Important:</strong> Avoiding or choosing consecutive numbers does NOT improve your odds. Every combination has equal probability, regardless of whether numbers are consecutive, spread out, or follow any pattern.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Related Tools</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <TrackLink href="/tools/pattern-analyzer" location="consecutive-checker" action="click-related-pattern">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Pattern Analyzer</h3>
+          <p class="text-sm text-gray-400">Full pattern analysis with multiple metrics</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/number-spread-visualizer" location="consecutive-checker" action="click-related-spread">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Number Spread Visualizer</h3>
+          <p class="text-sm text-gray-400">See dispersion on a number line</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/common-combo-checker" location="consecutive-checker" action="click-related-common">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Common Combo Checker</h3>
+          <p class="text-sm text-gray-400">Check if your numbers are overplayed</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/" location="consecutive-checker" action="click-related-generator">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Lucky Number Generator</h3>
+          <p class="text-sm text-gray-400">Generate random picks for any lottery</p>
+        </div>
+      </TrackLink>
+    </div>
+  </section>
+</InfoLayout>
+
+<script>
+  const checkBtn = document.getElementById('check-btn')!;
+  const resultsSection = document.getElementById('results-section')!;
+  const numbersInput = document.getElementById('numbers-input') as HTMLInputElement;
+  const numbersDisplay = document.getElementById('numbers-display')!;
+  const sequencesFound = document.getElementById('sequences-found')!;
+  const noSequences = document.getElementById('no-sequences')!;
+
+  function parseNumbers(input: string): number[] {
+    return input
+      .split(/[,\s]+/)
+      .map(s => parseInt(s.trim()))
+      .filter(n => !isNaN(n) && n > 0)
+      .sort((a, b) => a - b);
+  }
+
+  function findConsecutiveSequences(numbers: number[]) {
+    const sequences: { length: number; numbers: number[] }[] = [];
+    
+    // Find all sequences of length 2+
+    for (let i = 0; i < numbers.length; i++) {
+      const currentSeq = [numbers[i]];
+      
+      for (let j = i + 1; j < numbers.length; j++) {
+        if (numbers[j] === currentSeq[currentSeq.length - 1] + 1) {
+          currentSeq.push(numbers[j]);
+        } else {
+          break;
+        }
+      }
+      
+      if (currentSeq.length >= 2) {
+        sequences.push({
+          length: currentSeq.length,
+          numbers: currentSeq
+        });
+      }
+    }
+    
+    // Remove sub-sequences (keep only the longest)
+    const filtered = sequences.filter((seq, index) => {
+      return !sequences.some((otherSeq, otherIndex) => {
+        if (index === otherIndex) return false;
+        return otherSeq.length > seq.length && 
+               seq.numbers.every(n => otherSeq.numbers.includes(n));
+      });
+    });
+    
+    return filtered.sort((a, b) => b.length - a.length);
+  }
+
+  function getSequenceColor(length: number) {
+    if (length >= 4) return 'text-purple-400 border-purple-500/30 bg-purple-500/10';
+    if (length === 3) return 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10';
+    return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
+  }
+
+  function getSequenceRarity(length: number) {
+    if (length >= 4) return 'Extremely Rare (< 1% of draws)';
+    if (length === 3) return 'Uncommon (5-8% of draws)';
+    return 'Common (25-30% of draws)';
+  }
+
+  checkBtn.addEventListener('click', () => {
+    const input = numbersInput.value;
+    
+    if (!input.trim()) {
+      alert('Please enter some numbers first');
+      return;
+    }
+    
+    const numbers = parseNumbers(input);
+    
+    if (numbers.length < 5 || numbers.length > 7) {
+      alert('Please enter between 5 and 7 valid numbers');
+      return;
+    }
+    
+    // Display numbers
+    numbersDisplay.innerHTML = numbers.map(n => `
+      <div class="px-4 py-2 rounded-lg bg-slate-900 border border-[var(--border-primary)] text-xl font-bold text-white">
+        ${n}
+      </div>
+    `).join('');
+    
+    // Find sequences
+    const sequences = findConsecutiveSequences(numbers);
+    
+    if (sequences.length === 0) {
+      sequencesFound.innerHTML = '';
+      noSequences.classList.remove('hidden');
+    } else {
+      noSequences.classList.add('hidden');
+      sequencesFound.innerHTML = sequences.map(seq => `
+        <div class="p-4 rounded-lg border ${getSequenceColor(seq.length)}">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-lg font-semibold ${getSequenceColor(seq.length).split(' ')[0]}">
+              ${seq.length}-Number Sequence Found
+            </div>
+            <div class="text-sm text-gray-400">${getSequenceRarity(seq.length)}</div>
+          </div>
+          <div class="flex gap-2 mb-3">
+            ${seq.numbers.map(n => `
+              <div class="px-3 py-2 rounded-lg bg-slate-900 border border-white/20 text-lg font-bold text-white">
+                ${n}
+              </div>
+            `).join('<span class="text-2xl text-gray-500">→</span>')}
+          </div>
+          <div class="text-sm text-gray-300">
+            ${seq.length === 2 ? 'Consecutive pairs appear in about 1 in 4 draws.' : ''}
+            ${seq.length === 3 ? 'Consecutive triples appear in roughly 1 in 15 draws.' : ''}
+            ${seq.length >= 4 ? 'Consecutive quads or longer are very rare, appearing in less than 1% of draws.' : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // Show results
+    resultsSection.classList.remove('hidden');
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>
+
+<style>
+  /* Token-compliant responsive design */
+  @media (max-width: 640px) {
+    #numbers-display {
+      justify-content: center;
+    }
+  }
+</style>

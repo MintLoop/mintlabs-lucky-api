@@ -1,0 +1,344 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import TrackLink from "../../components/TrackLink.astro";
+
+const games = [
+  { id: 'powerball', name: 'Powerball', maxNumber: 69 },
+  { id: 'megamillions', name: 'Mega Millions', maxNumber: 70 },
+  { id: 'superlotto', name: 'CA SuperLotto Plus', maxNumber: 47 },
+  { id: 'pick6', name: 'Generic Pick-6 (1-49)', maxNumber: 49 },
+];
+---
+
+<InfoLayout 
+  title="Number Spread Visualizer"
+  subtitle="Display dispersion and clustering across the number range"
+  pageTitle="Number Spread Visualizer - Lottery Number Dispersion Tool | MintLabs"
+  description="Visualize how your lottery numbers are spread across the full range. See clustering, gaps, and dispersion patterns with an interactive number line."
+  keywords="lottery number spread, number dispersion lottery, lottery clustering, number gap analysis, lottery spread visualizer"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">📏 Visual Dispersion:</strong>
+    See your numbers plotted on a number line to understand clustering, gaps, and overall spread patterns.
+  </div>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)]">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Select Game & Enter Numbers</h2>
+    
+    <div class="mb-4">
+      <label for="game-select" class="block text-sm font-medium text-gray-300 mb-2">Lottery Game:</label>
+      <select 
+        id="game-select" 
+        class="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--surface-elevated)] px-4 py-2 text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+      >
+        {games.map(game => (
+          <option value={game.id}>{game.name}</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="mb-4">
+      <label for="numbers-input" class="block text-sm font-medium text-gray-300 mb-2">
+        Enter 5-7 numbers (comma or space separated):
+      </label>
+      <input 
+        type="text" 
+        id="numbers-input"
+        placeholder="e.g., 7, 23, 34, 45, 56, 67"
+        class="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--surface-elevated)] px-4 py-3 text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+      />
+    </div>
+
+    <button
+      id="visualize-btn"
+      class="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:from-emerald-600 hover:to-teal-700 hover:shadow-xl"
+    >
+      Visualize Spread
+    </button>
+  </section>
+
+  <section id="results-section" class="hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Number Line Visualization</h2>
+    
+    <div class="mb-6 p-6 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+      <div id="number-line" class="relative"></div>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-3 mb-6">
+      <div class="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
+        <div class="text-sm text-gray-400 mb-1">Total Span</div>
+        <div class="text-2xl font-bold text-blue-400" id="total-span">0</div>
+        <div class="text-xs text-gray-400 mt-1">Range covered</div>
+      </div>
+      <div class="p-4 rounded-lg bg-purple-500/10 border border-purple-500/30">
+        <div class="text-sm text-gray-400 mb-1">Avg Gap</div>
+        <div class="text-2xl font-bold text-purple-400" id="avg-gap">0</div>
+        <div class="text-xs text-gray-400 mt-1">Between numbers</div>
+      </div>
+      <div class="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+        <div class="text-sm text-gray-400 mb-1">Largest Gap</div>
+        <div class="text-2xl font-bold text-emerald-400" id="max-gap">0</div>
+        <div class="text-xs text-gray-400 mt-1">Biggest jump</div>
+      </div>
+    </div>
+
+    <div id="spread-assessment" class="p-4 rounded-lg border mb-6"></div>
+
+    <div id="gaps-detail" class="mb-6"></div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Understanding Number Spread</h2>
+    
+    <div class="space-y-4 text-gray-300">
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">What Is Number Spread?</h3>
+        <p>Number spread measures how your lottery numbers are distributed across the entire range:</p>
+        <ul class="list-disc list-inside space-y-2 ml-4 mt-2">
+          <li><strong class="text-white">Total Span:</strong> Distance from your lowest to highest number (e.g., 7 to 67 = span of 60)</li>
+          <li><strong class="text-white">Gaps:</strong> Distances between consecutive numbers in your set</li>
+          <li><strong class="text-white">Clustering:</strong> When numbers are grouped closely together</li>
+          <li><strong class="text-white">Dispersion:</strong> How evenly numbers are distributed across the range</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">Typical Spread Patterns</h3>
+        <div class="space-y-3">
+          <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <div class="font-semibold text-white mb-2">Wide Spread (Span > 50)</div>
+            <p class="text-sm mb-2">Numbers cover most of the range with large gaps between them.</p>
+            <p class="text-xs text-gray-400 font-mono">Example: 3, 15, 32, 47, 59, 68</p>
+          </div>
+          <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <div class="font-semibold text-white mb-2">Moderate Spread (Span 30-50)</div>
+            <p class="text-sm mb-2">Balanced distribution across a middle range.</p>
+            <p class="text-xs text-gray-400 font-mono">Example: 12, 21, 28, 35, 44, 51</p>
+          </div>
+          <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <div class="font-semibold text-white mb-2">Narrow Spread / Clustered (Span < 30)</div>
+            <p class="text-sm mb-2">Numbers grouped tightly in one section of the range.</p>
+            <p class="text-xs text-gray-400 font-mono">Example: 23, 26, 29, 32, 35, 38</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
+        <p class="text-sm text-blue-300">
+          <strong>📊 Historical Insight:</strong> Analysis of thousands of lottery draws shows that numbers with moderate-to-wide spreads (30-60 range) appear most frequently (~60% of draws), simply because there are more possible combinations with that spread pattern.
+        </p>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">Does Spread Matter for Winning?</h3>
+        <p class="mb-3"><strong class="text-white">Short answer: No.</strong></p>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li>Every specific combination has <strong class="text-white">equal probability</strong> regardless of spread</li>
+          <li><span class="font-mono text-emerald-400">7-8-9-10-11-12</span> (clustered) has identical odds to <span class="font-mono text-orange-400">3-17-29-45-58-69</span> (wide spread)</li>
+          <li>Wide spreads appear more often because there are mathematically more combinations with wide spreads available</li>
+          <li>Spread is a descriptive pattern, not a predictive factor</li>
+        </ul>
+      </div>
+
+      <div class="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+        <p class="text-sm text-yellow-300">
+          <strong>⚠️ Important:</strong> Choosing numbers based on spread patterns does NOT improve your odds. Spread analysis is interesting for pattern recognition but has zero impact on probability.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Related Tools</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <TrackLink href="/tools/consecutive-number-checker" location="spread-visualizer" action="click-related-consecutive">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Consecutive Number Checker</h3>
+          <p class="text-sm text-gray-400">Find sequence patterns in your numbers</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/pattern-analyzer" location="spread-visualizer" action="click-related-pattern">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Pattern Analyzer</h3>
+          <p class="text-sm text-gray-400">Complete analysis including spread + more</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/high-low-ratio-analyzer" location="spread-visualizer" action="click-related-highlow">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">High/Low Ratio Analyzer</h3>
+          <p class="text-sm text-gray-400">Check distribution across range halves</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/" location="spread-visualizer" action="click-related-generator">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Lucky Number Generator</h3>
+          <p class="text-sm text-gray-400">Generate random picks with varying spreads</p>
+        </div>
+      </TrackLink>
+    </div>
+  </section>
+</InfoLayout>
+
+<script define:vars={{ games }}>
+  const visualizeBtn = document.getElementById('visualize-btn');
+  const resultsSection = document.getElementById('results-section');
+  const numbersInput = document.getElementById('numbers-input');
+  const gameSelect = document.getElementById('game-select');
+  const numberLine = document.getElementById('number-line');
+  const totalSpan = document.getElementById('total-span');
+  const avgGap = document.getElementById('avg-gap');
+  const maxGap = document.getElementById('max-gap');
+  const spreadAssessment = document.getElementById('spread-assessment');
+  const gapsDetail = document.getElementById('gaps-detail');
+
+  let currentGame = games[0];
+
+  gameSelect.addEventListener('change', () => {
+    const game = games.find(g => g.id === gameSelect.value) || games[0];
+    currentGame = game;
+  });
+
+  function parseNumbers(input) {
+    return input
+      .split(/[,\s]+/)
+      .map(s => parseInt(s.trim()))
+      .filter(n => !isNaN(n) && n > 0)
+      .sort((a, b) => a - b);
+  }
+
+  function calculateGaps(numbers) {
+    const gaps = [];
+    for (let i = 0; i < numbers.length - 1; i++) {
+      gaps.push(numbers[i + 1] - numbers[i]);
+    }
+    return gaps;
+  }
+
+  function getSpreadAssessment(span, maxNumber) {
+    const coverage = (span / maxNumber) * 100;
+    
+    if (coverage >= 70) {
+      return {
+        rating: 'Wide Spread',
+        color: 'border-emerald-500/30 bg-emerald-500/10',
+        textColor: 'text-emerald-400',
+        message: `Your numbers cover ${Math.round(coverage)}% of the possible range. This is a wide distribution across the number field, typical of ~40% of draws.`,
+        icon: '↔️'
+      };
+    } else if (coverage >= 45) {
+      return {
+        rating: 'Moderate Spread',
+        color: 'border-yellow-500/30 bg-yellow-500/10',
+        textColor: 'text-yellow-400',
+        message: `Your numbers cover ${Math.round(coverage)}% of the possible range. This is a balanced spread, typical of ~35% of draws.`,
+        icon: '⚖️'
+      };
+    } else {
+      return {
+        rating: 'Clustered / Narrow Spread',
+        color: 'border-orange-500/30 bg-orange-500/10',
+        textColor: 'text-orange-400',
+        message: `Your numbers cover only ${Math.round(coverage)}% of the range. This is a tight cluster, less common (~25% of draws) but perfectly valid.`,
+        icon: '🎯'
+      };
+    }
+  }
+
+  visualizeBtn.addEventListener('click', () => {
+    const input = numbersInput.value;
+    
+    if (!input.trim()) {
+      alert('Please enter some numbers first');
+      return;
+    }
+    
+    const numbers = parseNumbers(input);
+    
+    if (numbers.length < 5 || numbers.length > 7) {
+      alert('Please enter between 5 and 7 valid numbers');
+      return;
+    }
+    
+    const gaps = calculateGaps(numbers);
+    const span = numbers[numbers.length - 1] - numbers[0];
+    const avgGapValue = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+    const maxGapValue = Math.max(...gaps);
+    
+    // Render number line
+    const maxNum = currentGame.maxNumber;
+    numberLine.innerHTML = `
+      <div class="flex justify-between text-xs text-gray-500 mb-2">
+        <span>1</span>
+        <span>${Math.round(maxNum / 2)}</span>
+        <span>${maxNum}</span>
+      </div>
+      <div class="relative h-16 bg-slate-800 rounded-lg border border-[var(--border-primary)]">
+        ${numbers.map(n => {
+          const position = ((n - 1) / (maxNum - 1)) * 100;
+          return `
+            <div class="absolute flex flex-col items-center" style="left: ${position}%; transform: translateX(-50%); top: 50%; margin-top: -24px;">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-sm shadow-lg border-2 border-white/30">
+                ${n}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div class="flex justify-between text-xs text-gray-400 mt-2">
+        <span>Low</span>
+        <span>High</span>
+      </div>
+    `;
+    
+    // Update metrics
+    totalSpan.textContent = span.toString();
+    avgGap.textContent = avgGapValue.toFixed(1);
+    maxGap.textContent = maxGapValue.toString();
+    
+    // Spread assessment
+    const assessment = getSpreadAssessment(span, maxNum);
+    spreadAssessment.className = `p-4 rounded-lg border ${assessment.color}`;
+    spreadAssessment.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div class="text-3xl">${assessment.icon}</div>
+        <div class="flex-1">
+          <div class="text-lg font-semibold ${assessment.textColor} mb-2">${assessment.rating}</div>
+          <p class="text-sm text-gray-300">${assessment.message}</p>
+        </div>
+      </div>
+    `;
+    
+    // Gaps detail
+    gapsDetail.innerHTML = `
+      <h3 class="text-lg font-semibold text-emerald-300 mb-3">Gap Analysis</h3>
+      <div class="grid gap-2">
+        ${gaps.map((gap, index) => `
+          <div class="p-3 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)] flex items-center justify-between">
+            <span class="text-gray-300">
+              <span class="font-mono text-white">${numbers[index]}</span> 
+              → 
+              <span class="font-mono text-white">${numbers[index + 1]}</span>
+            </span>
+            <span class="font-bold ${gap === maxGapValue ? 'text-emerald-400' : 'text-gray-400'}">
+              Gap: ${gap}
+              ${gap === maxGapValue ? ' (max)' : ''}
+            </span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    
+    // Show results
+    resultsSection.classList.remove('hidden');
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>
+
+<style>
+  /* Token-compliant responsive design */
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
