@@ -41,6 +41,118 @@ var init_tracking = __esm({
   }
 });
 
+// src/data/modeConfig.ts
+var MODE_CONFIG = {
+  zodiac: {
+    label: "Zodiac",
+    items: [
+      { key: "aries", label: "Aries", emoji: "\u2648", seed: "zodiac:aries" },
+      { key: "taurus", label: "Taurus", emoji: "\u2649", seed: "zodiac:taurus" },
+      { key: "gemini", label: "Gemini", emoji: "\u264A", seed: "zodiac:gemini" },
+      { key: "cancer", label: "Cancer", emoji: "\u264B", seed: "zodiac:cancer" },
+      { key: "leo", label: "Leo", emoji: "\u264C", seed: "zodiac:leo" },
+      { key: "virgo", label: "Virgo", emoji: "\u264D", seed: "zodiac:virgo" },
+      { key: "libra", label: "Libra", emoji: "\u264E", seed: "zodiac:libra" },
+      { key: "scorpio", label: "Scorpio", emoji: "\u264F", seed: "zodiac:scorpio" },
+      { key: "sagittarius", label: "Sagittarius", emoji: "\u2650", seed: "zodiac:sagittarius" },
+      { key: "capricorn", label: "Capricorn", emoji: "\u2651", seed: "zodiac:capricorn" },
+      { key: "aquarius", label: "Aquarius", emoji: "\u2652", seed: "zodiac:aquarius" },
+      { key: "pisces", label: "Pisces", emoji: "\u2653", seed: "zodiac:pisces" }
+    ]
+  },
+  chinese_zodiac: {
+    label: "Chinese Zodiac",
+    items: [
+      { key: "rat", label: "Rat", emoji: "\u{1F400}", seed: "chinese:rat" },
+      { key: "ox", label: "Ox", emoji: "\u{1F402}", seed: "chinese:ox" },
+      { key: "tiger", label: "Tiger", emoji: "\u{1F405}", seed: "chinese:tiger" },
+      { key: "rabbit", label: "Rabbit", emoji: "\u{1F407}", seed: "chinese:rabbit" },
+      { key: "dragon", label: "Dragon", emoji: "\u{1F409}", seed: "chinese:dragon" },
+      { key: "snake", label: "Snake", emoji: "\u{1F40D}", seed: "chinese:snake" },
+      { key: "horse", label: "Horse", emoji: "\u{1F40E}", seed: "chinese:horse" },
+      { key: "goat", label: "Goat", emoji: "\u{1F410}", seed: "chinese:goat" },
+      { key: "monkey", label: "Monkey", emoji: "\u{1F412}", seed: "chinese:monkey" },
+      { key: "rooster", label: "Rooster", emoji: "\u{1F413}", seed: "chinese:rooster" },
+      { key: "dog", label: "Dog", emoji: "\u{1F415}", seed: "chinese:dog" },
+      { key: "pig", label: "Pig", emoji: "\u{1F416}", seed: "chinese:pig" }
+    ]
+  },
+  favorite_color: {
+    label: "Color",
+    items: [
+      { key: "blue", label: "Blue", emoji: "\u{1F535}", seed: "color:blue", color: "blue" },
+      { key: "green", label: "Green", emoji: "\u{1F7E2}", seed: "color:green", color: "green" },
+      { key: "red", label: "Red", emoji: "\u{1F534}", seed: "color:red", color: "red" },
+      { key: "purple", label: "Purple", emoji: "\u{1F7E3}", seed: "color:purple", color: "purple" },
+      { key: "black", label: "Black", emoji: "\u26AB", seed: "color:black", color: "gray-800" },
+      { key: "yellow", label: "Yellow", emoji: "\u{1F7E1}", seed: "color:yellow", color: "yellow" }
+    ]
+  },
+  gemstone: {
+    label: "Gemstone",
+    items: [
+      { key: "ruby", label: "Ruby", emoji: "\u{1F48E}", seed: "gem:ruby" },
+      { key: "sapphire", label: "Sapphire", emoji: "\u{1F537}", seed: "gem:sapphire" },
+      { key: "emerald", label: "Emerald", emoji: "\u{1F49A}", seed: "gem:emerald" },
+      { key: "opal", label: "Opal", emoji: "\u{1F308}", seed: "gem:opal" },
+      { key: "topaz", label: "Topaz", emoji: "\u{1F7E6}", seed: "gem:topaz" },
+      { key: "amethyst", label: "Amethyst", emoji: "\u{1F7EA}", seed: "gem:amethyst" }
+    ]
+  },
+  jyotish: {
+    label: "Jyotish",
+    items: [
+      { key: "ashwini", label: "Ashwini", emoji: "\u{1F31F}", seed: "jyotish:ashwini" },
+      { key: "bharani", label: "Bharani", emoji: "\u{1F319}", seed: "jyotish:bharani" },
+      { key: "krittika", label: "Krittika", emoji: "\u{1F525}", seed: "jyotish:krittika" },
+      { key: "rohini", label: "Rohini", emoji: "\u{1F33E}", seed: "jyotish:rohini" },
+      { key: "mrigashira", label: "Mrigashira", emoji: "\u{1F33F}", seed: "jyotish:mrigashira" },
+      { key: "pushya", label: "Pushya", emoji: "\u{1F506}", seed: "jyotish:pushya" }
+    ]
+  },
+  birthstone: {
+    label: "Birth Month",
+    items: [
+      { key: "january", label: "January (Garnet)", emoji: "\u{1F48E}", seed: "birthstone:january" },
+      { key: "february", label: "February (Amethyst)", emoji: "\u{1F49C}", seed: "birthstone:february" },
+      { key: "march", label: "March (Aquamarine)", emoji: "\u{1F4A0}", seed: "birthstone:march" },
+      { key: "april", label: "April (Diamond)", emoji: "\u{1F48E}", seed: "birthstone:april" },
+      { key: "may", label: "May (Emerald)", emoji: "\u{1F49A}", seed: "birthstone:may" },
+      { key: "june", label: "June (Pearl)", emoji: "\u{1F90D}", seed: "birthstone:june" },
+      { key: "july", label: "July (Ruby)", emoji: "\u2764\uFE0F", seed: "birthstone:july" },
+      { key: "august", label: "August (Peridot)", emoji: "\u{1F49A}", seed: "birthstone:august" },
+      { key: "september", label: "September (Sapphire)", emoji: "\u{1F499}", seed: "birthstone:september" },
+      { key: "october", label: "October (Opal)", emoji: "\u{1F308}", seed: "birthstone:october" },
+      { key: "november", label: "November (Topaz)", emoji: "\u{1F7E1}", seed: "birthstone:november" },
+      { key: "december", label: "December (Turquoise)", emoji: "\u{1FA75}", seed: "birthstone:december" }
+    ]
+  },
+  rashi: {
+    label: "Indian Zodiac (Rashi)",
+    items: [
+      { key: "mesha", label: "Mesha (Aries)", emoji: "\u2648", seed: "rashi:mesha" },
+      { key: "vrishabha", label: "Vrishabha (Taurus)", emoji: "\u2649", seed: "rashi:vrishabha" },
+      { key: "mithuna", label: "Mithuna (Gemini)", emoji: "\u264A", seed: "rashi:mithuna" },
+      { key: "karka", label: "Karka (Cancer)", emoji: "\u264B", seed: "rashi:karka" },
+      { key: "simha", label: "Simha (Leo)", emoji: "\u264C", seed: "rashi:simha" },
+      { key: "kanya", label: "Kanya (Virgo)", emoji: "\u264D", seed: "rashi:kanya" },
+      { key: "tula", label: "Tula (Libra)", emoji: "\u264E", seed: "rashi:tula" },
+      { key: "vrishchika", label: "Vrishchika (Scorpio)", emoji: "\u264F", seed: "rashi:vrishchika" },
+      { key: "dhanu", label: "Dhanu (Sagittarius)", emoji: "\u2650", seed: "rashi:dhanu" },
+      { key: "makara", label: "Makara (Capricorn)", emoji: "\u2651", seed: "rashi:makara" },
+      { key: "kumbha", label: "Kumbha (Aquarius)", emoji: "\u2652", seed: "rashi:kumbha" },
+      { key: "meena", label: "Meena (Pisces)", emoji: "\u2653", seed: "rashi:meena" }
+    ]
+  },
+  // star_sign is an alias of zodiac for now — kept for compatibility
+  star_sign: {
+    label: "Star Sign",
+    items: []
+  }
+};
+MODE_CONFIG.star_sign.items = MODE_CONFIG.zodiac.items.slice();
+var modeConfig_default = MODE_CONFIG;
+
 // src/scripts/lucky.ts
 var metaEnv = import.meta?.env ?? {};
 var globalApi = typeof window !== "undefined" ? window.__LUCKY_API_BASE : void 0;
@@ -93,6 +205,7 @@ function readInitialGames() {
   const el = document.getElementById("initial-games");
   if (!el || !(el instanceof HTMLScriptElement)) return [];
   try {
+    const cfgAny = modeConfig_default;
     const parsed = JSON.parse(el.textContent || "[]");
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -121,6 +234,105 @@ function initLucky() {
   factsEl = document.getElementById("facts");
   submitBtn = document.getElementById("generateBtn") || document.querySelector('button[type="submit"]');
   if (!form || !out || !gameSel) return;
+  try {
+    let updateConditionalFields2 = function() {
+      try {
+        Object.values(map).forEach((id) => {
+          document.querySelectorAll("#" + id).forEach((el) => {
+            el.classList.add("hidden");
+            try {
+              el.style.display = "none";
+            } catch (e) {
+            }
+          });
+        });
+        const key = modeSelect instanceof HTMLSelectElement ? modeSelect.value : void 0;
+        if (key && map[key]) {
+          document.querySelectorAll("#" + map[key]).forEach((el) => {
+            el.classList.remove("hidden");
+            try {
+              el.style.display = "block";
+            } catch (e) {
+            }
+          });
+          if (map[key] === "modeKeyContainer") {
+            try {
+              const select = document.getElementById("modeKeySelect");
+              if (select) {
+                select.innerHTML = "";
+                const cfg = cfgAny[String(key)];
+                const items = cfg && cfg.items || [];
+                const placeholder = document.createElement("option");
+                placeholder.value = "";
+                placeholder.textContent = "Choose an option...";
+                placeholder.disabled = true;
+                placeholder.selected = true;
+                select.appendChild(placeholder);
+                items.forEach((it) => {
+                  const opt = document.createElement("option");
+                  opt.value = String(it.key);
+                  opt.textContent = `${it.emoji ? it.emoji + " " : ""}${it.label}`;
+                  select.appendChild(opt);
+                });
+                try {
+                  select.removeAttribute("disabled");
+                } catch (e) {
+                }
+                try {
+                  select.setAttribute("required", "required");
+                } catch (e) {
+                }
+                try {
+                  select.setAttribute("data-populated", "1");
+                } catch (e) {
+                }
+              }
+            } catch (e) {
+            }
+          }
+        }
+        return true;
+      } catch (err) {
+        return false;
+      }
+    };
+    var updateConditionalFields = updateConditionalFields2;
+    const modeSelect = document.getElementById("modeSelect");
+    const cfgAny = modeConfig_default;
+    const map = {
+      sum_target: "sumTargetField",
+      birthday: "birthdayField",
+      lucky: "luckyField",
+      wheel: "wheelField",
+      zodiac: "modeKeyContainer",
+      gemstone: "modeKeyContainer",
+      star_sign: "modeKeyContainer",
+      jyotish: "modeKeyContainer",
+      chinese_zodiac: "modeKeyContainer",
+      favorite_color: "modeKeyContainer"
+    };
+    try {
+      if (modeSelect) modeSelect.addEventListener("change", updateConditionalFields2);
+    } catch (e) {
+    }
+    try {
+      window._genFormUpdate = updateConditionalFields2;
+    } catch (e) {
+    }
+    try {
+      window.__GENFORM_READY = true;
+    } catch (e) {
+    }
+    try {
+      updateConditionalFields2();
+    } catch (e) {
+    }
+  } catch (err) {
+    try {
+      window.__GENFORM_ERROR = String(err);
+    } catch (e) {
+    }
+  }
   const _form = form;
   const _out = out;
   const _gameSel = gameSel;
@@ -189,6 +401,9 @@ function initLucky() {
       } else if (mode === "wheel") {
         const wheelType = fd.get("wheel_type");
         if (wheelType) payload.wheel_type = String(wheelType);
+      } else if (["zodiac", "gemstone", "star_sign", "jyotish", "chinese_zodiac", "favorite_color"].includes(mode)) {
+        const mk = fd.get("mode_key");
+        if (mk) payload.mode_key = String(mk);
       }
       const requests = Array.from(
         { length: sets },
@@ -233,6 +448,19 @@ function initLucky() {
         }
         const d = result.data;
         const modeDisplay = String(mode).replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+        let modeBadgeHtml = "";
+        try {
+          const actualMode = d && d.mode || mode;
+          const key = d && d.mode_key || (fd.get("mode_key") ? String(fd.get("mode_key")) : null);
+          if (key && actualMode) {
+            const cfg = modeConfig_default[actualMode];
+            if (cfg && cfg.items) {
+              const found = cfg.items.find((it) => String(it.key) === String(key));
+              if (found) modeBadgeHtml = `<div class="text-xs mt-1">Mode: <span class="font-semibold">${found.emoji ? found.emoji + " " : ""}${found.label}</span></div>`;
+            }
+          }
+        } catch (e2) {
+        }
         const numbersHtml = Array.isArray(d.numbers) ? d.numbers.map((n) => `<span class="text-emerald-400 font-semibold">${n}</span>`).join(", ") : d.numbers || "\u2014";
         const bonusHtml = d.bonus ? `<span class="text-emerald-400 font-semibold">${d.bonus}</span>` : "";
         let lastInfoHtml = "";
@@ -265,6 +493,7 @@ function initLucky() {
         _out.innerHTML += `
             <div class="result-card">
               <div class="text-sm" style="color: var(--text-secondary)">Set ${idx + 1} \u2022 ${modeDisplay}</div>
+            ${modeBadgeHtml}
               <div class="text-xl mt-1" style="color: var(--text-primary)">Numbers: <b>${numbersHtml}</b>${d.bonus ? ` | Bonus: <b>${bonusHtml}</b>` : ""}</div>
               <div class="text-xs mt-2" style="color: var(--text-muted)">
                 Odds: <span class="font-semibold odds-number">${singleOddsDisplay}</span> (${singlePct}% chance)

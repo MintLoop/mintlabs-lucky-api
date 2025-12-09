@@ -20,6 +20,7 @@ from .rng import (
     draw_birthday,
     draw_hot_cold,
     draw_lucky,
+    draw_personalized,
     draw_odd_even_mix,
     draw_pattern_avoid,
     draw_sum_target,
@@ -377,6 +378,7 @@ def root():
         "health": "/health",
         "games": "/games",
         "generate": "/generate",
+        "lucky_profiles": "/v1/lucky/birthstone-rashi",
     }
 
 
@@ -465,6 +467,26 @@ def generate(req: GenerateReq, request: Request):
             whites = draw_odd_even_mix(wmin, wmax, wcount, rng)
         elif req.mode == "pattern_avoid":
             whites = draw_pattern_avoid(wmin, wmax, wcount, rng)
+        elif req.mode in ("zodiac", "gemstone", "star_sign", "jyotish", "chinese_zodiac", "favorite_color"):
+            # Themed / personality modes are selected via a `mode_key` which
+            # maps to a stable seed profile. This prevents free-form inputs and
+            # makes behavior deterministically reproducible while keeping
+            # statistics uniform.
+            try:
+                from .mode_config import MODE_CONFIG
+                mode_map = MODE_CONFIG.get(req.mode, {})
+                items = mode_map.get('items', [])
+                # find the configured seed for the provided mode_key
+                seed = ''
+                if req.mode_key:
+                    for it in items:
+                        if it.get('key') == req.mode_key:
+                            seed = it.get('seed', '')
+                            break
+                # fallback empty seed -> behave like random
+            except Exception:
+                seed = ''
+            whites = draw_personalized(wmin, wmax, wcount, rng, seed)
         elif req.mode == "hot":
             whites = draw_hot_cold(wmin, wmax, wcount, rng, "hot")
         elif req.mode == "cold":
@@ -508,7 +530,10 @@ def generate(req: GenerateReq, request: Request):
 
         # Record analytics (in-memory counters)
         _record_generation(req.game_code, req.mode)
-        print(f"[GEN] {request_id} game={req.game_code} mode={req.mode} latency={latency}ms")
+        try:
+            print(f"[GEN] {request_id} game={req.game_code} mode={req.mode} mode_key={req.mode_key or ''} latency={latency}ms")
+        except Exception:
+            print(f"[GEN] {request_id} game={req.game_code} mode={req.mode} latency={latency}ms")
 
         # Calculate probabilities for the generated set
         try:
@@ -564,6 +589,7 @@ def generate(req: GenerateReq, request: Request):
         return GenerateResp(
             game=req.game_code,
             mode=req.mode,
+            mode_key=req.mode_key,
             numbers=whites,
             bonus=bonus,
             commitment=commit,

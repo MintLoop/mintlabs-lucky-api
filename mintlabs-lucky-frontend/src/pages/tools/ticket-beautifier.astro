@@ -263,11 +263,11 @@ const jsonLd = {
   }
 
   .num-input.bonus {
-    border-color: #f59e0b;
+    border-color: var(--accent-primary);
   }
 
   .num-input.bonus:focus {
-    border-color: #ef4444;
+    border-color: var(--accent-hover);
   }
 
   .options-row {
@@ -717,12 +717,12 @@ const jsonLd = {
     padding: 1.5rem;
     background: var(--surface);
     border-radius: 12px;
-    border-left: 4px solid #f59e0b;
+    border-left: 4px solid var(--accent-primary);
   }
 
   .disclaimer-box h3 {
     margin-bottom: 0.75rem;
-    color: #f59e0b;
+    color: var(--accent-primary);
   }
 
   .disclaimer-box p {
@@ -811,7 +811,7 @@ const jsonLd = {
         shadow: '0 12px 28px rgba(0,0,0,0.18)',
         headerColor: '#b45309',
         subtextColor: '#6b4f3e',
-        footerAccent: '#b45309',
+        footerAccent: '#7c2d12',
         ballFill: 'linear-gradient(180deg,#fffaf0 0%, #f3e5d0 100%)',
         ballStroke: '#d6a05c',
         ballText: '#3b2f2f',
@@ -853,7 +853,7 @@ const jsonLd = {
         shadow: '0 6px 18px rgba(0,0,0,0.06)',
         headerColor: '#0f172a',
         subtextColor: '#6b7280',
-        footerAccent: '#0f172a',
+        footerAccent: '#000000',
         ballFill: 'linear-gradient(180deg,#111827 0%, #1f2937 100%)',
         ballStroke: '#1f2937',
         ballText: '#f8fafc',
@@ -993,7 +993,11 @@ const jsonLd = {
       // Use footer accent (or canvas footer) color for the player label so it
       // remains legible on light backgrounds like the minimal theme.
       ctx.fillStyle = themeStyle.footerAccent || themeCfg.footer;
-      ctx.font = 'bold 16px Arial';
+      ctx.font = 'bold 18px Arial';
+      // Add a subtle stroke for player label to increase contrast on busy backgrounds
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      ctx.strokeText(player, width / 2, y);
       ctx.fillText(player, width / 2, y); // player (no emoji)
 
       // date
@@ -1170,6 +1174,25 @@ const jsonLd = {
       ctx.fillText(number, x, y);
     }
 
+    // Helper — extract a representative hex color from a fill string (supports solid hex or gradients)
+    function extractHexFromFill(fill: string): string | null {
+      if (!fill) return null;
+      // match the first 6-digit hex (#rrggbb)
+      const m = String(fill).match(/#([0-9a-fA-F]{6})/);
+      return m ? `#${m[1]}` : null;
+    }
+
+    function getContrastColor(hex: string): string {
+      if (!hex) return '#000';
+      const color = hex.replace('#', '');
+      if (color.length !== 6) return '#000';
+      const r = parseInt(color.substring(0, 2), 16);
+      const g = parseInt(color.substring(2, 4), 16);
+      const b = parseInt(color.substring(4, 6), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.6 ? '#000' : '#fff';
+    }
+
     function updateNumberFields() {
       const config = gameConfig[gameSelect.value];
       numberFields.innerHTML = '';
@@ -1254,12 +1277,17 @@ const jsonLd = {
 
       const style = themeStyles[theme] || themeStyles.classic;
 
-      let numbersHTML = mainNumbers.map(n =>
-        `<div class="ticket-ball" style="background:${style.ballFill};border-color:${style.ballStroke};color:${style.ballText}">${n}</div>`
-      ).join('');
+      let numbersHTML = mainNumbers.map(n => {
+        // Pick a readable text color for this ball using the fill color when possible
+        const rep = extractHexFromFill(style.ballFill) || style.ballText;
+        const textColor = getContrastColor(rep);
+        return `<div class="ticket-ball" style="background:${style.ballFill};border-color:${style.ballStroke};color:${textColor}">${n}</div>`;
+      }).join('');
 
       if (bonusNumber) {
-        numbersHTML += `<div class="ticket-ball bonus" style="background:${style.bonusFill};border-color:${style.bonusStroke};color:${style.bonusText}">${bonusNumber}</div>`;
+        const repB = extractHexFromFill(style.bonusFill) || style.bonusText;
+        const bonusTextColor = getContrastColor(repB);
+        numbersHTML += `<div class="ticket-ball bonus" style="background:${style.bonusFill};border-color:${style.bonusStroke};color:${bonusTextColor}">${bonusNumber}</div>`;
       }
 
       // clear previous previews and canvases
@@ -1329,8 +1357,16 @@ const jsonLd = {
         const copyPlayer = copies > 1 ? `${p.player} (${i + 1}/${copies})` : p.player;
 
         // build numbers markup for this payload
-        let payloadNumbersHTML = p.main.map(n => `<div class="ticket-ball" style="background:${style.ballFill};border-color:${style.ballStroke};color:${style.ballText}">${n}</div>`).join('');
-        if (p.bonus) payloadNumbersHTML += `<div class="ticket-ball bonus" style="background:${style.bonusFill};border-color:${style.bonusStroke};color:${style.bonusText}">${p.bonus}</div>`;
+        let payloadNumbersHTML = p.main.map(n => {
+          const rep = extractHexFromFill(style.ballFill) || style.ballText;
+          const textColor = getContrastColor(rep);
+          return `<div class="ticket-ball" style="background:${style.ballFill};border-color:${style.ballStroke};color:${textColor}">${n}</div>`;
+        }).join('');
+        if (p.bonus) {
+          const repB = extractHexFromFill(style.bonusFill) || style.bonusText;
+          const bonusTextColor = getContrastColor(repB);
+          payloadNumbersHTML += `<div class="ticket-ball bonus" style="background:${style.bonusFill};border-color:${style.bonusStroke};color:${bonusTextColor}">${p.bonus}</div>`;
+        }
 
         const previewHTML = `
           <div class="ticket-instance">
@@ -1343,7 +1379,12 @@ const jsonLd = {
                 ${payloadNumbersHTML}
               </div>
               <div class="ticket-footer">
-                <div class="ticket-player" style="color:${style.footerAccent}">${copyPlayer}</div>
+                <!-- Ensure player text contrasts with the ticket background -->
+                ${(() => {
+                  const bgRep = extractHexFromFill(style.bg) || style.bg || '#ffffff';
+                  const playerText = getContrastColor(bgRep);
+                  return `<div class="ticket-player" style="color:${playerText}">${copyPlayer}</div>`;
+                })()}
                 ${date ? `<div class="ticket-date" style="color:${style.subtextColor}">Draw: ${date}</div>` : ''}
                 ${notesValue ? `<div class="ticket-note" style="color:${style.subtextColor}">${notesValue}</div>` : ''}
                 ${showPin && pinValue ? `<div class="ticket-pin" style="color:${style.footerAccent}">PIN: ${pinValue}</div>` : ''}
@@ -1397,30 +1438,103 @@ const jsonLd = {
         const targetH = Math.round(rect.height * renderScale);
 
         // Prefer dom-to-image-more (often more faithful) but fall back to html2canvas
-        // if dom-to-image is unavailable or fails for some themes.
+        // if dom-to-image is unavailable or fails for some themes. To improve
+        // parity we clone the preview DOM, inline stylesheet rules, sanitize
+        // rendering-unsafe properties and render at the devicePixelRatio.
         let canvasNode: HTMLCanvasElement | null = null;
         try {
           const domtoimage: any = (await import('dom-to-image-more')).default;
-          // Request output in CSS pixels — we'll scale to device pixels when drawing
-          const dataUrl: string = await domtoimage.toPng(el, { bgcolor: null, width: Math.round(rect.width), height: Math.round(rect.height) });
+
+          // Clone preview node so we can mutate the copy for export without
+          // affecting the on-screen preview (remove filters, shadows, emoji
+          // differences, and inline stylesheets for consistent rendering).
+          const clone = el.cloneNode(true) as HTMLElement;
+
+          // Inline all same-origin stylesheet rules into the clone so dom-to-image
+          // has the exact styling to paint. Ignore cross-origin stylesheets.
+          let collectedCss = '';
+          for (const sheet of Array.from(document.styleSheets)) {
+            try {
+              if (!sheet.cssRules) continue;
+              for (const r of Array.from(sheet.cssRules)) collectedCss += r.cssText + '\n';
+            } catch (_) {
+              // Skip inaccessible / cross-origin sheets
+            }
+          }
+          if (collectedCss) {
+            const style = document.createElement('style');
+            style.type = 'text/css';
+            style.textContent = collectedCss;
+            clone.insertBefore(style, clone.firstChild);
+          }
+
+          // Sanitize the cloned DOM for rendering engines that struggle with
+          // heavy effects: remove text-shadow, filters, backdrop-filter, and
+          // reduce very large box shadows. We keep visual intent but ensure
+          // the export remains consistent.
+          function sanitizeNode(node: HTMLElement) {
+            node.style.textShadow = 'none';
+            node.style.filter = 'none';
+            // TS uses camelCase; set both just in case inline attr exists
+            (node.style as any).backdropFilter = 'none';
+            if (node.style.boxShadow) {
+              // reduce box-shadow to a simple, export-safe shadow
+              node.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)';
+            }
+            // remove heavy glow classes
+            node.classList.remove('neon-glow', 'heavy-glow');
+          }
+          clone.querySelectorAll<HTMLElement>('*').forEach(n => sanitizeNode(n));
+
+          // Apply DPR scaling to the clone so dom-to-image captures a scaled
+          // CSS-pixel rendering while we still ask for CSS-sized output. This
+          // hybrid keeps the capture faithful and high-res when we draw into
+          // a device-pixel canvas later.
+          clone.style.transform = `scale(${renderScale})`;
+          clone.style.transformOrigin = 'top left';
+          // lock native CSS size so scaled rendering is predictable
+          clone.style.width = `${rect.width}px`;
+          clone.style.height = `${rect.height}px`;
+
+          // Host the cloned element off-screen while we render
+          const host = document.createElement('div');
+          host.style.position = 'fixed';
+          host.style.left = '-99999px';
+          host.style.top = '0';
+          host.style.pointerEvents = 'none';
+          host.style.opacity = '0';
+          host.appendChild(clone);
+          document.body.appendChild(host);
+
+          // Request output in CSS pixels — dom-to-image will read the cloned
+          // node exactly as painted (scaled) and return a PNG we can convert
+          // to a device-pixel canvas.
+          const dataUrl: string = await domtoimage.toPng(clone, { bgcolor: null, width: Math.round(rect.width), height: Math.round(rect.height) });
           const img = document.createElement('img');
           img.src = dataUrl;
           await new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
 
           canvasNode = document.createElement('canvas');
-          // Use the natural pixel dimensions of the generated image
-          canvasNode.width = img.naturalWidth || Math.round(rect.width * renderScale);
-          canvasNode.height = img.naturalHeight || Math.round(rect.height * renderScale);
+          // Draw to a high-res canvas sized in device pixels
+          canvasNode.width = Math.round(rect.width * renderScale);
+          canvasNode.height = Math.round(rect.height * renderScale);
           const ctx = canvasNode.getContext('2d')!;
+          ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, canvasNode.width, canvasNode.height);
+
+          // Cleanup off-screen clone
+          host.remove();
         } catch (e) {
-          // fallback: dynamic import html2canvas at runtime
+          // fallback: dynamic import html2canvas at runtime. Use the original
+          // element (el) but render at devicePixelRatio for parity.
           const html2canvas: any = (await import('html2canvas')).default;
           canvasNode = await html2canvas(el, { backgroundColor: null, scale: renderScale, width: targetW, height: targetH });
         }
-        canvasNode.id = `ticketCanvas-${i}`;
-        canvasNode.style.display = 'none';
-        holder.appendChild(canvasNode);
+        if (canvasNode) {
+          canvasNode.id = `ticketCanvas-${i}`;
+          canvasNode.style.display = 'none';
+          holder.appendChild(canvasNode);
+        }
       }
 
       // Enable download controls - the last canvas will be the most recent

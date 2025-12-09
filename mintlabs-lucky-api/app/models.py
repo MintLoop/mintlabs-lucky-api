@@ -12,6 +12,10 @@ class GenerateReq(BaseModel):
     target_sum: Optional[int] = None
     birth_date: Optional[str] = None
     lucky_numbers: Optional[list[int]] = None
+    # When a themed mode is selected this identifies the chosen option key
+    # (e.g. mode='zodiac', mode_key='aries'). This is intentionally bounded
+    # to a small whitelist of known keys (see app/mode_config.py).
+    mode_key: Optional[str] = None
     wheel_type: Optional[str] = None
 
     @field_validator("mode")
@@ -29,6 +33,12 @@ class GenerateReq(BaseModel):
             "pattern_avoid",
             "hot",
             "cold",
+            "zodiac",
+            "gemstone",
+            "star_sign",
+            "jyotish",
+            "chinese_zodiac",
+            "favorite_color",
         }
         if value not in allowed_modes:
             allowed = ", ".join(sorted(allowed_modes))
@@ -49,6 +59,8 @@ class Draw(BaseModel):
 class GenerateResp(BaseModel):
     game: str
     mode: str
+    # when a themed mode is active, this returns the chosen option key
+    mode_key: Optional[str] = None
     numbers: list[int]
     bonus: Optional[int] = None
     commitment: str

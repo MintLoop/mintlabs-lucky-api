@@ -1,0 +1,729 @@
+---
+import InfoLayout from "../components/InfoLayout.astro";
+import TrackLink from "../components/TrackLink.astro";
+
+const title = "Lucky Profile Generator | Birthstone × Rashi × Color Wheel";
+const description = "Discover your personalized lucky profile combining birthstone energy, Indian zodiac (Rashi) wisdom, and color psychology. Get actionable insights, lucky numbers, and spiritual guidance.";
+---
+
+<InfoLayout title={title} description={description}>
+  <div class="lucky-profile-generator">
+    <header class="profile-header">
+      <h1>🌟 Lucky Profile Generator</h1>
+      <p class="tagline">
+        Discover Your Unique Energy Signature
+      </p>
+      <p class="description">
+        Combine the ancient wisdom of birthstones, Indian astrology (Jyotish), 
+        and color psychology to reveal your personalized lucky profile with 
+        actionable recommendations.
+      </p>
+    </header>
+
+    <div class="generator-container profile-form-wrapper">
+      <form id="luckyProfileForm" class="profile-form">
+        <div class="form-section">
+          <h2>🎂 Your Birth Month</h2>
+          <p class="form-hint">Each month carries unique gemstone energy</p>
+          <select id="birthMonth" name="birthMonth" required>
+            <option value="">Select your birth month...</option>
+          </select>
+        </div>
+
+        <div class="form-section">
+          <h2>♈ Your Rashi (Indian Zodiac)</h2>
+          <p class="form-hint">Vedic astrology sign based on moon position</p>
+          <select id="rashi" name="rashi" required>
+            <option value="">Select your rashi...</option>
+          </select>
+          <p class="rashi-help">
+            Don't know your Rashi? 
+            <TrackLink 
+              href="https://www.astrosage.com/rashifal/"
+              eventName="rashi_calculator_click"
+              external={true}
+            >
+              Calculate it here
+            </TrackLink>
+          </p>
+        </div>
+
+        <div class="form-section">
+          <h2>🎨 Your Color Energy</h2>
+          <p class="form-hint">Choose the color that resonates with you most</p>
+          <div id="colorGrid" class="color-grid">
+            <!-- Colors will be populated dynamically -->
+          </div>
+          <input type="hidden" id="selectedColor" name="color" required />
+        </div>
+
+        <div class="form-section filters-section">
+          <h3>✨ Optional Spiritual Filters</h3>
+          <p class="form-hint">Enhance your profile with additional wisdom traditions</p>
+          
+          <label class="filter-checkbox">
+            <input type="checkbox" name="numerology" checked />
+            <span>Numerology (Life Path & Destiny Numbers)</span>
+          </label>
+          
+          <label class="filter-checkbox">
+            <input type="checkbox" name="hindu" checked />
+            <span>Hindu/Vedic Wisdom (Mantras & Deities)</span>
+          </label>
+          
+          <label class="filter-checkbox">
+            <input type="checkbox" name="kabbalah" />
+            <span>Kabbalah (Sefirot & Mystical Judaism)</span>
+          </label>
+          
+          <label class="filter-checkbox">
+            <input type="checkbox" name="buddhist" />
+            <span>Buddhist Elements (Five Elements System)</span>
+          </label>
+          
+          <label class="filter-checkbox">
+            <input type="checkbox" name="christian" />
+            <span>Christian Symbolism (Biblical References)</span>
+          </label>
+        </div>
+
+        <button type="submit" class="generate-button">
+          ✨ Generate My Lucky Profile
+        </button>
+      </form>
+
+      <div id="profileResult" class="profile-result" style="display: none;">
+        <!-- Result will be populated dynamically -->
+      </div>
+
+      <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+        <p>Synthesizing your cosmic blueprint...</p>
+      </div>
+    </div>
+
+    <section class="info-grid">
+      <div class="info-card">
+        <h3>🔮 What is a Lucky Profile?</h3>
+        <p>
+          Your lucky profile is a personalized synthesis of three ancient 
+          wisdom systems: birthstone energy (mineral vibrations), Jyotish 
+          astrology (planetary influences), and color psychology 
+          (chromotherapy). Together, they reveal your unique energetic 
+          signature and provide actionable guidance.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h3>📿 Birthstones & Gemology</h3>
+        <p>
+          Each month's birthstone carries specific vibrational properties 
+          recognized across cultures. From ancient Egypt to medieval Europe, 
+          gemstones have been used for protection, healing, and manifestation. 
+          Your birthstone connects you to these timeless energies.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h3>🌙 Jyotish (Vedic Astrology)</h3>
+        <p>
+          Rashis are the 12 signs of Indian astrology, based on the moon's 
+          position at birth. Each rashi is governed by a planet (graha) and 
+          associated with specific deities, mantras, and gemstones. Jyotish 
+          has guided spiritual seekers for over 5,000 years.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h3>🎨 Color Psychology</h3>
+        <p>
+          Colors influence mood, energy, and consciousness. From the 12-spoke 
+          color wheel to Kabbalistic Sefirot and chakra correspondences, 
+          color wisdom appears across mystical traditions. Your chosen color 
+          reveals subconscious preferences and energetic needs.
+        </p>
+      </div>
+    </section>
+
+    <section class="affiliate-section">
+      <h2>🛍️ Explore Deeper</h2>
+      <div class="affiliate-grid">
+        <div class="affiliate-card">
+          <h3>Gemstone Retailers</h3>
+          <p>Find authentic birthstones and healing crystals</p>
+        </div>
+        <div class="affiliate-card">
+          <h3>Jyotish Readings</h3>
+          <p>Get your personalized Vedic astrology chart</p>
+        </div>
+        <div class="affiliate-card">
+          <h3>Numerology Courses</h3>
+          <p>Master the ancient science of numbers</p>
+        </div>
+        <div class="affiliate-card">
+          <h3>Color Therapy Tools</h3>
+          <p>LED lights, art supplies, and chromotherapy kits</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</InfoLayout>
+
+<style>
+  .lucky-profile-generator {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .profile-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .profile-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .tagline {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  .description {
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .generator-container {
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 3rem;
+  }
+
+  /* Slight lift for the generator container to improve readability across themes */
+  .profile-form-wrapper {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-primary-darker);
+    box-shadow: var(--card-shadow);
+  }
+
+  .profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .form-section h2 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+
+  .form-section h3 {
+    font-size: 1.25rem;
+    margin: 0;
+  }
+
+  .form-hint {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  select {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 2px solid var(--border-primary);
+    border-radius: 0.5rem;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  select:hover,
+  select:focus {
+    border-color: var(--accent-primary);
+    outline: none;
+  }
+
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .color-option {
+    aspect-ratio: 1;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .color-option:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .color-option.selected {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--card-bg), 0 0 0 4px var(--primary-color);
+  }
+
+  .color-option span {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.25rem;
+    font-size: 0.7rem;
+    text-align: center;
+  }
+
+  .filters-section {
+    background: var(--accent-bg);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+  }
+
+  .filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: background 0.2s;
+  }
+
+  .filter-checkbox:hover {
+    background: var(--hover-bg);
+  }
+
+  .filter-checkbox input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+  }
+
+  .generate-button {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .generate-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  }
+
+  .generate-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .loading-spinner {
+    text-align: center;
+    padding: 3rem;
+  }
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .profile-result {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: var(--surface);
+    border-radius: 1rem;
+    border: 1px solid var(--border-primary);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .info-card {
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-primary);
+  }
+
+  /* trait chips and color swatches */
+  .trait-badge {
+    display: inline-block;
+    padding: 0.35rem 0.65rem;
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    border-radius: 999px;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .info-card h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+  }
+
+  .affiliate-section {
+    text-align: center;
+    margin-top: 4rem;
+  }
+
+  .affiliate-section h2 {
+    margin-bottom: 2rem;
+  }
+
+  .affiliate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .affiliate-card {
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-primary);
+    transition: transform 0.2s;
+  }
+
+  .affiliate-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .rashi-help {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 768px) {
+    .profile-header h1 {
+      font-size: 2rem;
+    }
+
+    .color-grid {
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    }
+
+    .generator-container {
+      padding: 1.5rem;
+    }
+  }
+</style>
+
+<script>
+  // Pure client-side implementation - no API calls
+  import { buildLuckyProfile, type LuckyProfileInput } from '../lib/luckyProfile';
+  import { BIRTHSTONES, getAllBirthstones, type BirthstoneKey } from '../data/birthstones';
+  import { RASHIS, getAllRashis, type RashiKey } from '../data/rashis';
+  import { getAllColors, getColorByName } from '../data/colorWheel';
+
+  // Load static data and populate form (no API calls)
+  function loadMetadata() {
+    // Populate birth month dropdown
+    const monthSelect = document.getElementById('birthMonth') as HTMLSelectElement;
+    const birthstones = getAllBirthstones();
+    birthstones.forEach(stone => {
+      const option = document.createElement('option');
+      option.value = stone.month.toLowerCase();
+      option.textContent = `${stone.month} - ${stone.primary}`;
+      monthSelect.appendChild(option);
+    });
+    
+    // Populate rashi dropdown
+    const rashiSelect = document.getElementById('rashi') as HTMLSelectElement;
+    const rashis = getAllRashis();
+    rashis.forEach(rashi => {
+      const option = document.createElement('option');
+      option.value = rashi.rashi.toLowerCase();
+      option.textContent = `${rashi.english} (${rashi.rashi}) - ${rashi.planet}`;
+      rashiSelect.appendChild(option);
+    });
+    
+    // Populate color grid with auto-contrast text
+    const colorGrid = document.getElementById('colorGrid') as HTMLDivElement;
+    const colors = getAllColors();
+    colors.forEach(color => {
+      const colorDiv = document.createElement('div');
+      colorDiv.className = 'color-option';
+      colorDiv.dataset.color = color.name;
+      colorDiv.title = color.displayName;
+      colorDiv.style.backgroundColor = color.hex;
+      
+      const label = document.createElement('span');
+      label.textContent = color.displayName;
+      // Auto-calculate contrast color for text
+      label.style.color = getContrastColor(color.hex);
+      colorDiv.appendChild(label);
+      
+      colorDiv.addEventListener('click', () => selectColor(color.name));
+      colorGrid.appendChild(colorDiv);
+    });
+  }
+  
+  // Calculate contrast color (black or white) for background
+  function getContrastColor(hex: string): string {
+    const color = hex.replace('#', '');
+    const r = parseInt(color.substring(0, 2), 16);
+    const g = parseInt(color.substring(2, 4), 16);
+    const b = parseInt(color.substring(4, 6), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.6 ? 'black' : 'white';
+  }
+
+  function selectColor(color: string) {
+    // Remove previous selection
+    document.querySelectorAll('.color-option').forEach(el => {
+      el.classList.remove('selected');
+    });
+    
+    // Add selection to clicked color
+    const colorDiv = document.querySelector(`[data-color="${color}"]`);
+    if (colorDiv) {
+      colorDiv.classList.add('selected');
+      const hiddenInput = document.getElementById('selectedColor') as HTMLInputElement;
+      hiddenInput.value = color;
+    }
+  }
+
+  // Handle form submission (pure client-side, no API call)
+  document.getElementById('luckyProfileForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    
+    // Validate color selection
+    const selectedColor = formData.get('color');
+    if (!selectedColor) {
+      alert('Please select a color');
+      return;
+    }
+    
+    const birthMonth = formData.get('birthMonth') as string;
+    const rashi = formData.get('rashi') as string;
+    
+    if (!birthMonth || !rashi) {
+      alert('Please fill in all fields');
+      return;
+    }
+    
+    // Build input for pure client-side function
+    const input: LuckyProfileInput = {
+      birthMonth: birthMonth as BirthstoneKey,
+      rashi: rashi as RashiKey,
+      colorName: selectedColor as string,
+      filters: {
+        numerology: formData.get('numerology') === 'on',
+        hindu: formData.get('hindu') === 'on',
+        kabbalah: formData.get('kabbalah') === 'on',
+        buddhist: formData.get('buddhist') === 'on',
+        christian: formData.get('christian') === 'on',
+      }
+    };
+    
+    // Show loading spinner
+    const loadingSpinner = document.getElementById('loadingSpinner') as HTMLElement;
+    const profileResult = document.getElementById('profileResult') as HTMLElement;
+    const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    
+    loadingSpinner.style.display = 'block';
+    profileResult.style.display = 'none';
+    submitButton.disabled = true;
+    
+    try {
+      // Call pure client-side function (no network request)
+      const profile = buildLuckyProfile(input);
+      renderProfile(profile);
+      
+      // Track analytics event
+      if (typeof (window as any).gtag !== 'undefined') {
+        (window as any).gtag('event', 'lucky_profile_generated', {
+          birth_month: birthMonth,
+          rashi: rashi,
+          color: selectedColor,
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error generating profile:', error);
+      alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      loadingSpinner.style.display = 'none';
+      submitButton.disabled = false;
+    }
+  });
+
+  function renderProfile(profile: any) {
+    const resultDiv = document.getElementById('profileResult') as HTMLElement;
+    
+    const html = `
+      <div class="profile-display">
+        <h2 class="profile-title">✨ Your Lucky Profile</h2>
+        
+        <p class="profile-summary">${profile.combinedSummary}</p>
+        
+        <div class="lucky-focus-card">
+          <h3>🎯 Lucky Focus</h3>
+          <div class="focus-traits">
+            ${profile.luckyFocus.map((trait: string) => 
+              `<span class="trait-badge">${trait}</span>`
+            ).join('')}
+          </div>
+          <div class="focus-details">
+            <p><strong>Primary Color:</strong> <span class="color-swatch" style="background: ${profile.color.hex}"></span> ${profile.color.displayName}</p>
+            <p><strong>Birthstone:</strong> ${profile.birthstone.primary}</p>
+            <p><strong>Rashi Energy:</strong> ${profile.rashi.english} (${profile.rashi.rashi})</p>
+            ${profile.complementaryColor ? `<p><strong>Complementary Color:</strong> ${profile.complementaryColor.displayName}</p>` : ''}
+          </div>
+        </div>
+
+        <div class="profile-sections">
+          <div class="profile-section">
+            <h3>💎 Birthstone Profile</h3>
+            <p><strong>${profile.birthstone.primary}</strong></p>
+            <p style="color: ${profile.birthstone.hex}; font-size: 2rem;">●</p>
+            <p><strong>Month:</strong> ${profile.birthstone.month}</p>
+            ${profile.birthstone.element ? `<p><strong>Element:</strong> ${profile.birthstone.element}</p>` : ''}
+            <p><strong>Symbolism:</strong></p>
+            <ul>
+              ${profile.birthstone.symbolism.map((s: string) => `<li>${s}</li>`).join('')}
+            </ul>
+            ${profile.birthstone.alternatives.length > 0 ? `<p><strong>Alternatives:</strong> ${profile.birthstone.alternatives.join(', ')}</p>` : ''}
+          </div>
+
+          <div class="profile-section">
+            <h3>♈ Rashi Profile</h3>
+            <p><strong>${profile.rashi.rashi} (${profile.rashi.english})</strong></p>
+            <p><strong>Planet:</strong> ${profile.rashi.planet}</p>
+            ${profile.rashi.deity ? `<p><strong>Deity:</strong> ${profile.rashi.deity}</p>` : ''}
+            <p><strong>Traits:</strong></p>
+            <ul>
+              ${profile.rashi.traits.map((t: string) => `<li>${t}</li>`).join('')}
+            </ul>
+            <p><strong>Favorable Days:</strong> ${profile.rashi.favorableDays.join(', ')}</p>
+            <p><strong>Recommended Stones:</strong> ${profile.rashi.recommendedStones.join(', ')}</p>
+          </div>
+
+          <div class="profile-section">
+            <h3>🎨 Color Profile</h3>
+            <p><strong>${profile.color.displayName}</strong> (${profile.color.type})</p>
+            <p style="color: ${profile.color.hex}; font-size: 2rem;">●</p>
+            <p><strong>Traits:</strong></p>
+            <ul>
+              ${profile.color.traits.map((t: string) => `<li>${t}</li>`).join('')}
+            </ul>
+            ${profile.color.chakra ? `<p><strong>Chakra:</strong> ${profile.color.chakra}</p>` : ''}
+            ${profile.color.element ? `<p><strong>Element:</strong> ${profile.color.element}</p>` : ''}
+          </div>
+        </div>
+
+        <div class="recommended-actions">
+          <h3>📋 Suggested Actions</h3>
+          <ol>
+            ${profile.suggestedActions.map((action: string) => 
+              `<li>${action}</li>`
+            ).join('')}
+          </ol>
+        </div>
+
+        ${profile.luckyNumbers.length > 0 ? `
+          <div class="lucky-numbers">
+            <h3>🎲 Your Lucky Numbers</h3>
+            <div class="numbers-display">
+              ${profile.luckyNumbers.map((num: number) => 
+                `<span class="lucky-number">${num}</span>`
+              ).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        ${profile.religiousContext && Object.keys(profile.religiousContext).length > 0 ? `
+          <div class="spiritual-context">
+            <h3>🙏 Spiritual Context</h3>
+            ${Object.entries(profile.religiousContext).map(([key, value]) => `
+              <p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${value}</p>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+    
+    resultDiv.innerHTML = html;
+    resultDiv.style.display = 'block';
+    // color + chip contrast adjustments
+    try { adjustAutoContrast(resultDiv); } catch(e) { /* ignore */ }
+    
+    // Smooth scroll to result
+    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    loadMetadata();
+  });
+
+  function adjustAutoContrast(root: any = document) {
+    try {
+      const els = root.querySelectorAll('.trait-badge, .color-swatch');
+      els.forEach((el: Element) => {
+        const style = getComputedStyle(el);
+        const bg = style.backgroundColor || '';
+        if (!bg) return;
+        const rgb = bg.match(/\d+/g);
+        if (!rgb || rgb.length < 3) return;
+        const r = parseInt(rgb[0], 10), g = parseInt(rgb[1], 10), b = parseInt(rgb[2], 10);
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        (el as HTMLElement).style.color = luminance > 0.6 ? 'black' : 'white';
+      });
+    } catch (e) { /* ignore */ }
+  }
+</script>

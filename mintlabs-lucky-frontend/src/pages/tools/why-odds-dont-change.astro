@@ -1,0 +1,328 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import BackToGenerator from "../../components/BackToGenerator.astro";
+
+const title = "Why Lottery Odds Don't Change | Interactive Independence Demo";
+const description =
+  "See why past lottery results don't affect future odds. Interactive demonstration of independent events and gambler's fallacy explained with visual examples.";
+const keywords =
+  "gambler's fallacy explained, lottery independence, why odds don't change, independent events, past results don't matter, lottery probability";
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Why Lottery Odds Don't Change Demo",
+  description,
+  url: "https://lucky.mintloop.dev/tools/why-odds-dont-change",
+  applicationCategory: "EducationalApplication",
+  operatingSystem: "Any",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+};
+---
+
+<InfoLayout {title} {description} {keywords} {jsonLd}>
+  <BackToGenerator />
+
+  <div class="max-w-4xl mx-auto space-y-6">
+    {/* Header */}
+    <div class="text-center space-y-2">
+      <h1 class="text-3xl md:text-4xl font-bold">
+        🎲 Why Lottery Odds Don't Change
+      </h1>
+      <p class="text-lg theme-text-secondary max-w-2xl mx-auto">
+        Interactive demonstration proving past results have zero effect on future draws
+      </p>
+    </div>
+
+    {/* Concept Explanation */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">🧠 The Core Concept: Independence</h2>
+      <p class="theme-text-secondary">
+        Every lottery draw is an <strong>independent event</strong>. This means:
+      </p>
+      <ul class="list-disc list-inside space-y-2 theme-text-secondary ml-4">
+        <li>Past draws have <strong>zero</strong> influence on future draws</li>
+        <li>Numbers don't "remember" they were drawn recently</li>
+        <li>Numbers don't become "due" after not appearing</li>
+        <li>Each draw has the exact same probability: 1 in 292,201,338 (Powerball)</li>
+      </ul>
+    </div>
+
+    {/* Interactive Demo */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-6">
+      <div class="space-y-2">
+        <h2 class="text-xl font-semibold">🎯 Interactive Demo</h2>
+        <p class="theme-text-secondary">
+          Pick any number between 1 and 69. Watch how the probability stays the same, no matter what happened before.
+        </p>
+      </div>
+
+      {/* Number Input */}
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row gap-4 items-center">
+          <label for="chosen-number" class="font-medium whitespace-nowrap">
+            Your Number:
+          </label>
+          <input
+            type="number"
+            id="chosen-number"
+            min="1"
+            max="69"
+            value="7"
+            class="flex-1 px-4 py-2 rounded-lg border theme-border-primary theme-bg-input theme-text-primary"
+          />
+          <button
+            id="run-demo-btn"
+            class="px-6 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-colors whitespace-nowrap"
+          >
+            Run 10 Simulated Draws
+          </button>
+        </div>
+      </div>
+
+      {/* Results Display */}
+      <div id="demo-results" class="hidden space-y-4">
+        {/* Draw History */}
+        <div class="space-y-3">
+          <h3 class="font-semibold text-lg">📊 10 Simulated Draws</h3>
+          <div id="draw-list" class="space-y-2"></div>
+        </div>
+
+        {/* Statistics */}
+        <div class="grid md:grid-cols-3 gap-4 mt-6">
+          <div class="theme-bg-surface p-4 rounded-lg border theme-border-primary text-center">
+            <div class="text-sm theme-text-secondary mb-1">Times Your Number Appeared</div>
+            <div id="appearance-count" class="text-3xl font-bold text-emerald-400">0</div>
+          </div>
+          <div class="theme-bg-surface p-4 rounded-lg border theme-border-primary text-center">
+            <div class="text-sm theme-text-secondary mb-1">Expected Appearances</div>
+            <div class="text-3xl font-bold text-sky-400">0.72</div>
+            <div class="text-xs theme-text-muted mt-1">(10 draws × 5/69 ≈ 0.725)</div>
+          </div>
+          <div class="theme-bg-surface p-4 rounded-lg border theme-border-primary text-center">
+            <div class="text-sm theme-text-secondary mb-1">Probability Each Draw</div>
+            <div class="text-3xl font-bold text-purple-400">7.2%</div>
+            <div class="text-xs theme-text-muted mt-1">(5 balls out of 69)</div>
+          </div>
+        </div>
+
+        {/* Key Insight */}
+        <div class="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+          <div class="flex gap-3">
+            <div class="text-2xl">💡</div>
+            <div class="flex-1">
+              <div class="font-semibold text-amber-400 mb-1">Key Insight</div>
+              <p class="text-sm theme-text-secondary">
+                Notice how your number appeared <strong id="insight-count">0</strong> time(s).
+                Whether it appeared 0, 1, 2, or even 3+ times, the probability for the <strong>next</strong>
+                draw is still exactly 7.2%. Past results don't change this!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Common Misconceptions */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">🚫 Common Misconceptions</h2>
+      
+      <div class="space-y-4">
+        <div class="p-4 border-l-4 border-red-500 bg-red-500/5">
+          <div class="font-semibold text-red-400 mb-2">❌ "Number 7 hasn't appeared in 20 draws — it's due!"</div>
+          <p class="text-sm theme-text-secondary">
+            <strong>Wrong.</strong> The balls don't know or care what happened in the past 20 draws.
+            Number 7 has the exact same 7.2% chance as always.
+          </p>
+        </div>
+
+        <div class="p-4 border-l-4 border-red-500 bg-red-500/5">
+          <div class="font-semibold text-red-400 mb-2">❌ "Number 42 appeared twice this week — it's hot!"</div>
+          <p class="text-sm theme-text-secondary">
+            <strong>Wrong.</strong> Past appearances don't make a number more or less likely in future draws.
+            Number 42 still has a 7.2% chance on the next draw.
+          </p>
+        </div>
+
+        <div class="p-4 border-l-4 border-red-500 bg-red-500/5">
+          <div class="font-semibold text-red-400 mb-2">❌ "If I keep playing 1-2-3-4-5, it'll eventually hit"</div>
+          <p class="text-sm theme-text-secondary">
+            <strong>Technically true, but...</strong> 1-2-3-4-5 has the same probability as any other combination:
+            1 in 292 million. Playing it repeatedly doesn't improve your odds for any specific draw.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {/* Why This Matters */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">🎓 Why This Matters</h2>
+      <div class="space-y-3 theme-text-secondary">
+        <p>
+          Understanding independence protects you from the <strong>gambler's fallacy</strong>
+          — the false belief that past events influence future probability in random, independent systems.
+        </p>
+        <p>
+          <strong>Real-world impact:</strong>
+        </p>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li>You won't waste money chasing "due" numbers</li>
+          <li>You won't avoid "hot" numbers thinking they're used up</li>
+          <li>You'll make informed decisions based on actual math</li>
+          <li>You'll recognize systems or strategies claiming to predict draws as scams</li>
+        </ul>
+      </div>
+    </div>
+
+    {/* Mathematical Proof */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">📐 The Math</h2>
+      <div class="space-y-3 theme-text-secondary">
+        <p>
+          For Powerball white balls (choose 5 from 69):
+        </p>
+        <div class="p-4 theme-bg-surface rounded-lg border theme-border-primary font-mono text-sm">
+          P(specific number appears) = 5/69 ≈ 0.0725 (7.2%)
+        </div>
+        <p>
+          This probability is <strong>constant</strong> for every single draw, regardless of:
+        </p>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li>Whether the number appeared in the previous draw</li>
+          <li>Whether the number appeared 10 times in a row</li>
+          <li>Whether the number hasn't appeared in 100 draws</li>
+        </ul>
+        <p class="font-semibold text-amber-400">
+          Each draw is a fresh, independent event with no memory of the past.
+        </p>
+      </div>
+    </div>
+
+    {/* Related Tools */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">🔗 Related Tools</h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <a
+          href="/tools/probability-visualizer"
+          class="p-4 border theme-border-primary rounded-lg hover:bg-slate-800/50 transition-colors"
+        >
+          <div class="font-semibold text-rose-400 mb-1">📉 Probability Visualizer</div>
+          <div class="text-sm theme-text-secondary">See how rare lottery odds really are</div>
+        </a>
+        <a
+          href="/tools/hot-cold-numbers"
+          class="p-4 border theme-border-primary rounded-lg hover:bg-slate-800/50 transition-colors"
+        >
+          <div class="font-semibold text-amber-400 mb-1">🔥 Hot & Cold Numbers</div>
+          <div class="text-sm theme-text-secondary">View frequency data (for fun only!)</div>
+        </a>
+        <a
+          href="/lottery-odds#gamblers-fallacy"
+          class="p-4 border theme-border-primary rounded-lg hover:bg-slate-800/50 transition-colors"
+        >
+          <div class="font-semibold text-emerald-400 mb-1">📚 Gambler's Fallacy Guide</div>
+          <div class="text-sm theme-text-secondary">Deep dive into this cognitive bias</div>
+        </a>
+      </div>
+    </div>
+
+    {/* Disclaimer */}
+    <div class="p-4 bg-slate-800/30 border border-slate-700 rounded-lg text-sm theme-text-muted">
+      <strong>Educational Tool:</strong> This tool demonstrates the independence of random events
+      using simulated lottery draws. Actual lottery draws use physical balls or certified RNGs.
+      Past results never influence future probabilities in any fair random system.
+    </div>
+  </div>
+
+  <script>
+    function runDemo() {
+      const chosenNumber = parseInt((document.getElementById('chosen-number') as HTMLInputElement)?.value || '7');
+      const resultsDiv = document.getElementById('demo-results');
+      const drawList = document.getElementById('draw-list');
+      const appearanceCount = document.getElementById('appearance-count');
+      const insightCount = document.getElementById('insight-count');
+
+      if (!resultsDiv || !drawList || !appearanceCount || !insightCount) return;
+
+      // Validate input
+      if (chosenNumber < 1 || chosenNumber > 69) {
+        alert('Please choose a number between 1 and 69');
+        return;
+      }
+
+      // Generate 10 simulated draws
+      const draws: number[][] = [];
+      let appearances = 0;
+
+      for (let i = 0; i < 10; i++) {
+        const draw: number[] = [];
+        const available = Array.from({ length: 69 }, (_, i) => i + 1);
+        
+        // Pick 5 unique numbers
+        for (let j = 0; j < 5; j++) {
+          const idx = Math.floor(Math.random() * available.length);
+          draw.push(available[idx]);
+          available.splice(idx, 1);
+        }
+        
+        draw.sort((a, b) => a - b);
+        draws.push(draw);
+        
+        if (draw.includes(chosenNumber)) {
+          appearances++;
+        }
+      }
+
+      // Render draws
+      drawList.innerHTML = '';
+      draws.forEach((draw, idx) => {
+        const hasChosen = draw.includes(chosenNumber);
+        const drawEl = document.createElement('div');
+        drawEl.className = `flex items-center gap-3 p-3 rounded-lg border ${
+          hasChosen 
+            ? 'bg-emerald-500/10 border-emerald-500/30' 
+            : 'theme-bg-surface theme-border-primary'
+        }`;
+        
+        drawEl.innerHTML = `
+          <div class="font-semibold theme-text-secondary w-16">Draw ${idx + 1}:</div>
+          <div class="flex gap-2 flex-wrap">
+            ${draw.map(num => `
+              <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                num === chosenNumber 
+                  ? 'bg-emerald-500 text-white ring-2 ring-emerald-400'
+                  : 'bg-slate-700 text-slate-200'
+              }">
+                ${num}
+              </div>
+            `).join('')}
+          </div>
+          ${hasChosen ? '<div class="ml-auto text-emerald-400 font-semibold">✓ Match!</div>' : ''}
+        `;
+        
+        drawList.appendChild(drawEl);
+      });
+
+      // Update stats
+      appearanceCount.textContent = appearances.toString();
+      insightCount.textContent = appearances.toString();
+
+      // Show results
+      resultsDiv.classList.remove('hidden');
+      resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Attach event listener
+    document.getElementById('run-demo-btn')?.addEventListener('click', runDemo);
+
+    // Allow Enter key in input
+    document.getElementById('chosen-number')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        runDemo();
+      }
+    });
+  </script>
+</InfoLayout>

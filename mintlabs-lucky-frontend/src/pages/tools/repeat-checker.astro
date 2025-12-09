@@ -1085,6 +1085,9 @@ const jsonLd = {
           </div>
         </div>
       `;
+
+      // ensure color contrast for dynamically generated chips
+      adjustAutoContrast(resultsContainer);
     }
 
     function generateRandomNumbers() {
@@ -1123,5 +1126,26 @@ const jsonLd = {
     megamillionsBtn.addEventListener('click', () => switchGame('megamillions'));
     checkBtn.addEventListener('click', checkNumbers);
     randomBtn.addEventListener('click', generateRandomNumbers);
+
+    // ensure any static chips have correct contrast on page load
+    adjustAutoContrast(document);
   });
+
+  // Utility: adjust text color on colored elements to keep readable contrast
+  function adjustAutoContrast(root: any = document) {
+    try {
+      const elems = root.querySelectorAll('.number-chip, .status-chip, .result-ball, .trait-badge');
+      elems.forEach((el: Element) => {
+        const style = getComputedStyle(el);
+        const bg = style.backgroundColor || '';
+        if (!bg) return;
+        // parse rgb(a) or hex
+        const rgb = bg.match(/\d+/g);
+        if (!rgb || rgb.length < 3) return;
+        const r = parseInt(rgb[0], 10), g = parseInt(rgb[1], 10), b = parseInt(rgb[2], 10);
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        (el as HTMLElement).style.color = luminance > 0.6 ? 'black' : 'white';
+      });
+    } catch (e) { /* ignore */ }
+  }
 </script>

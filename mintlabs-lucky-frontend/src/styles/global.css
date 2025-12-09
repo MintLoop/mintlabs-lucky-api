@@ -16,6 +16,7 @@
   --surface: rgba(255,255,255,0.02);
   --surface-1: rgba(255,255,255,0.02);
   --surface-2: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.08); /* Interactive hover state */
   --accent-primary: #10b981; /* emerald-500 */
   --accent: var(--accent-primary);
   /* default accent rgb (emerald-500) — used by some components */
@@ -37,6 +38,7 @@
   --surface: rgba(6,95,70,0.06);
   --surface-1: rgba(6,95,70,0.06);
   --surface-2: rgba(6,95,70,0.09);
+  --surface-hover: rgba(6,95,70,0.15);
   --accent-primary: #10b981; /* emerald-500 */
   --accent: var(--accent-primary);
   --accent-rgb: 16,185,129;
@@ -98,6 +100,7 @@
   --surface: rgba(241,245,249,0.7);
   --surface-1: rgba(241,245,249,0.6);
   --surface-2: rgba(241,245,249,0.8);
+  --surface-hover: rgba(226,232,240,0.9);
   --accent-primary: #10b981; /* emerald-500 */
   --accent: var(--accent-primary);
   --accent-rgb: 16,185,129;
@@ -281,6 +284,13 @@
   --card-text: #0f172a;
   --odds-muted: rgba(0,0,0,0.72);
   --card-shadow: 0 6px 18px rgba(2,6,23,0.06);
+  /* contrast helpers and elevated surface tokens */
+  --border-primary-darker: color-mix(in srgb, var(--border-primary) 60%, var(--text-primary) 20%);
+  --surface-elevated: color-mix(in srgb, var(--surface) 85%, var(--text-primary) 5%);
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  /* standard sizing tokens for Lucky UI */
+  --card-radius: 0.75rem; /* default card radius */
+  --card-padding: 1rem; /* default card padding */
 }
 
 html[data-theme="dark"],
@@ -289,7 +299,10 @@ html[data-theme="dark"],
   --card-border: rgba(255,255,255,0.06);
   --card-text: #f8fafc;
   --odds-muted: rgba(255,255,255,0.72);
-  --card-shadow: 0 6px 18px rgba(2,6,23,0.5);
+  --border-primary-darker: color-mix(in srgb, var(--border-primary) 70%, var(--text-primary) 30%);
+  --surface-elevated: color-mix(in srgb, var(--surface) 80%, var(--text-primary) 10%);
+  --card-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  /* slightly stronger elevated surface in dark to lift elements */
 }
 
 /* results card */
@@ -298,8 +311,8 @@ html[data-theme="dark"],
   color: var(--text-primary);
   border: 1px solid var(--border-primary);
   box-shadow: var(--card-shadow, 0 4px 12px rgba(0,0,0,0.1));
-  border-radius: 10px;
-  padding: 1rem;
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
   transition: background-color .18s ease, color .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 
@@ -375,7 +388,10 @@ body[data-theme="dark"] .odds-number {
 /* Apply theme variables to Tailwind utilities */
 .theme-bg-primary { background-color: var(--bg-primary); }
 .theme-bg-secondary { background-color: var(--bg-secondary); }
-.theme-bg-card { background-color: var(--bg-card); }
+.theme-bg-card { background-color: var(--surface); }
+.theme-surface { background-color: var(--surface); }
+.theme-surface-hover { background-color: var(--surface-hover); }
+.readable-text { color: var(--text-primary); }
 .theme-text-primary { color: var(--text-primary); }
 .theme-text-secondary { color: var(--text-secondary); }
 .theme-text-muted { color: var(--text-muted); }
@@ -383,6 +399,35 @@ body[data-theme="dark"] .odds-number {
 .theme-accent-primary { background-color: var(--accent-primary); }
 .theme-accent-hover:hover { background-color: var(--accent-hover); }
 .theme-input-bg { background-color: var(--input-bg); }
+
+/* Reusable elevated card utility for homepage components */
+.card-elevated {
+  background: var(--surface-elevated) !important;
+  border: 1px solid var(--border-primary-darker) !important;
+  box-shadow: var(--card-shadow) !important;
+  border-radius: var(--card-radius) !important;
+  padding: var(--card-padding) !important;
+}
+
+/* small helper to slightly increase elevation without a new token */
+.card-elevated-strong { box-shadow: 0 8px 28px rgba(0,0,0,0.12) !important; }
+
+/* default dropdown/select/readable controls */
+select,
+.dropdown,
+.select-control {
+  background: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+
+/* hover state for controls */
+.select-control:hover,
+select:hover {
+  background: var(--surface-hover) !important;
+}
 
 /* Force odds color with !important for light themes */
 .odds-number,

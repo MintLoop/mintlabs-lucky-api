@@ -67,15 +67,15 @@ const sortedByOdds = [...allGames].sort((a, b) => parseOdds(a.jackpotOdds) - par
   </div>
 
   <!-- Quick Comparison Cards -->
-  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
-    <h2 class="text-xl font-semibold text-emerald-300 mb-4">🏆 Quick Comparison: Best to Worst Odds</h2>
+  <section class="rounded-2xl p-6 shadow-xl theme-surface border border-[var(--border-primary)]">
+    <h2 class="text-xl font-semibold readable-text mb-4">🏆 Quick Comparison: Best to Worst Odds</h2>
     
     <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
       {sortedByOdds.slice(0, 6).map((game, index) => (
-        <div class={`rounded-xl p-4 border ${index === 0 ? 'border-emerald-500 bg-emerald-900/30' : 'border-slate-700 bg-slate-900/50'}`}>
+        <div class={`rounded-xl p-4 border ${index === 0 ? 'border-[var(--accent-primary)] bg-[color-mix(in srgb, var(--accent-primary) 20%, transparent)]' : 'border-[var(--border-primary)] bg-[var(--surface)]'}`}>
           <div class="flex items-center justify-between mb-2">
             <span class="font-semibold text-gray-200">{game.name}</span>
-            {index === 0 && <span class="text-xs bg-emerald-600 text-white px-2 py-0.5 rounded">Best Odds</span>}
+            {index === 0 && <span class="text-xs px-2 py-0.5 rounded" style={{background: 'var(--accent-primary)', color:'var(--bg-primary)', fontWeight:700}}>Best Odds</span>}
           </div>
           <div class="text-lg font-bold text-emerald-400">{game.jackpotOdds}</div>
           <div class="text-xs text-gray-400 mt-1">Min jackpot: {game.minJackpot}</div>
@@ -91,30 +91,30 @@ const sortedByOdds = [...allGames].sort((a, b) => parseOdds(a.jackpotOdds) - par
 
   <!-- Detailed Comparison Tables -->
   {lotteries.map(category => (
-    <section class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
-      <h2 class="text-xl font-semibold text-emerald-300 mb-4">{category.category}</h2>
+    <section class="rounded-2xl p-6 shadow-xl theme-surface border border-[var(--border-primary)]">
+      <h2 class="text-xl font-semibold readable-text mb-4">{category.category}</h2>
       
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
-            <tr class="border-b border-slate-700 text-left">
-              <th class="pb-3 text-gray-400 font-medium">Game</th>
-              <th class="pb-3 text-gray-400 font-medium">Jackpot Odds</th>
-              <th class="pb-3 text-gray-400 font-medium">Any Prize</th>
-              <th class="pb-3 text-gray-400 font-medium hidden md:table-cell">Min Jackpot</th>
-              <th class="pb-3 text-gray-400 font-medium hidden lg:table-cell">Ticket</th>
-              <th class="pb-3 text-gray-400 font-medium hidden lg:table-cell">Format</th>
+            <tr class="border-b border-[var(--border-primary)] text-left">
+              <th class="pb-3 text-[var(--text-secondary)] font-medium">Game</th>
+              <th class="pb-3 text-[var(--text-secondary)] font-medium">Jackpot Odds</th>
+              <th class="pb-3 text-[var(--text-secondary)] font-medium">Any Prize</th>
+              <th class="pb-3 text-[var(--text-secondary)] font-medium hidden md:table-cell">Min Jackpot</th>
+              <th class="pb-3 text-[var(--text-secondary)] font-medium hidden lg:table-cell">Ticket</th>
+              <th class="pb-3 text-[var(--text-secondary)] font-medium hidden lg:table-cell">Format</th>
             </tr>
           </thead>
           <tbody>
             {category.games.map(game => (
-              <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors">
-                <td class="py-3 font-medium text-gray-200">{game.name}</td>
-                <td class="py-3 text-emerald-400 font-mono text-xs">{game.jackpotOdds}</td>
-                <td class="py-3 text-blue-400">{game.anyPrize}</td>
-                <td class="py-3 text-gray-300 hidden md:table-cell">{game.minJackpot}</td>
-                <td class="py-3 text-gray-300 hidden lg:table-cell">{game.ticketCost}</td>
-                <td class="py-3 text-gray-400 font-mono text-xs hidden lg:table-cell">{game.format}</td>
+              <tr class="border-b border-[var(--border-primary)]/50 hover:bg-[var(--surface-hover)] transition-colors">
+                <td class="py-3 font-medium readable-text">{game.name}</td>
+                <td class="py-3 text-[var(--accent-primary)] font-mono text-xs">{game.jackpotOdds}</td>
+                <td class="py-3 text-[var(--text-secondary)]">{game.anyPrize}</td>
+                <td class="py-3 text-[var(--text-secondary)] hidden md:table-cell">{game.minJackpot}</td>
+                <td class="py-3 text-[var(--text-secondary)] hidden lg:table-cell">{game.ticketCost}</td>
+                <td class="py-3 text-[var(--text-secondary)] font-mono text-xs hidden lg:table-cell">{game.format}</td>
               </tr>
             ))}
           </tbody>
@@ -186,8 +186,8 @@ const sortedByOdds = [...allGames].sort((a, b) => parseOdds(a.jackpotOdds) - par
   </section>
 
   <!-- Key Takeaways -->
-  <section class="rounded-2xl border border-slate-700 bg-gradient-to-r from-emerald-900/30 to-blue-900/30 p-6 shadow-xl">
-    <h2 class="text-xl font-semibold text-emerald-300 mb-4">🎓 Key Takeaways</h2>
+  <section class="rounded-2xl p-6 shadow-xl theme-surface border border-[var(--border-primary)]">
+    <h2 class="text-xl font-semibold readable-text mb-4">🎓 Key Takeaways</h2>
     <div class="grid gap-4 md:grid-cols-2">
       <div class="flex items-start gap-3">
         <span class="text-2xl">🎯</span>

@@ -1,30 +1,33 @@
-# Phase 4 — Product Features & UX Expansion
+# Phase 4 — Lucky Numbers Core Launch (Updated)
 
-**Goal:** Transform Lucky from a single generator into a comprehensive lottery education hub with 50+ tools, superior SEO authority, and ethical monetization.
+**Goal:** Ship a polished, discoverable, multi-tool Lucky Numbers ecosystem under `lucky.mintloop.dev`, including the Lucky Profile Generator, themed RNG modes, Casino-Lite scaffolding, MintyCatnipCoin simulation, microtools expansion, discoverability systems, and comprehensive documentation.
 
 **Owner:** TBD  
 **Branch:** `phase-4-usability-ux`  
-**Status:** Phase 4.1 ✅ Complete | Phase 4.2 🔄 In Progress | Phase 4.3 ⏳ Pending | Phase 4.4 ⏳ Pending  
+**Status:** Phase 4.1 ✅ Complete | Phase 4.2 🔄 In Progress | Phase 4.3 ⏳ Pending | Phase 4.4 ⏳ Pending | Phase 4.5 ⏳ Pending  
 **Dependencies:** Phase 3 (Security Hardening) ✅
 
 ---
 
 ## Strategy Overview
 
-Phase 4 is split into **4 micro-phases** for stability and maintainability:
+Phase 4 is split into **5 micro-phases** for stability, maintainability, and comprehensive feature delivery:
 
 | Phase | Purpose | Scope |
 |-------|---------|-------|
 | **4.1** | Core Tools & UX Foundation | 14 primary tools + infrastructure ✅ |
-| **4.2** | Microtools Expansion (50+ tools) | Massive SEO surface area explosion |
-| **4.3** | Navigation, SEO Hierarchy & Monetization | Mega menu, structured data, affiliates |
-| **4.4** | UX Polish & Experience Optimization | Layout consistency, mobile, interactions |
+| **4.2** | Microtools Expansion (50+ tools) | Massive SEO surface area explosion 🔄 |
+| **4.3** | Lucky Profile + Themed RNG Modes | Cultural/personalized experience layer |
+| **4.4** | Casino-Lite + MintyCatnipCoin | Gamification & engagement suite |
+| **4.5** | Discoverability + Navigation System | Mandatory crosslinking, SEO, monetization |
 
 **Why split?**
 - Keeps repo stable between pushes
 - Allows testing each wave independently
 - Clear ownership boundaries for agent handoff
 - Google crawls incremental updates better than massive single deploys
+- Casino-Lite and Lucky Profile are distinct feature sets requiring focused attention
+- Discoverability is mission-critical and deserves dedicated phase
 
 ---
 
@@ -107,18 +110,24 @@ Small UX and accessibility polish completed for `/tools/probability-visualizer` 
 
 ## Recent UX / QA updates (ticket-beautifier)
 
-Small but important improvements landed in the Ticket Beautifier during the Phase 4.2 UX sweep. These are delivery-focused items that improve export parity, usability for raffles, and testability for QA:
+After a detailed parity sweep we upgraded the Ticket Beautifier export pipeline and theme-readability guarantees. These changes improve human and automated parity (what you see vs what you download) and reduce flaky/visual differences across headless environments.
 
-- Exports now rasterize the actual preview DOM using html2canvas so downloaded PNGs match the on-screen preview exactly (backgrounds, borders, shadows, fonts and embedded QR images).
-- Switched QR generation to in-browser (no remote dependence) and inject QR image elements into the preview so rasterization includes them.
-- Copies behavior: when generating multiple copies the tool now produces randomized tickets but guarantees exactly one duplicated pair (useful for raffle/winner workflows). A future toggle can allow identical copies on demand.
-- Filenames and QA: human-readable theme names are not included in the filename. Instead we use deterministic short theme codes (3-digit) plus a tiny color marker drawn in the exported image for automated QA verification.
+- Export engine: switched to a dom-to-image-more-first workflow (html2canvas as fallback). This gives a much more faithful DOM capture for complex themes and embedded assets.
+- Preview → Export parity: when exporting we clone the preview node, inline same-origin stylesheet rules, and sanitize rendering-unsafe properties (text-shadow, heavy filters/backdrop-filter, large glows) so the rasterizer sees a deterministic, export-safe DOM.
+- Device pixel ratio (DPR) scaling: the export pipeline renders at window.devicePixelRatio and produces a high-resolution canvas sized in device pixels — exported PNGs match the preview at native pixel density in headless and retina contexts.
+- Theme tokens & readability: replaced remaining hard-coded ticket colors with theme variables and added automatic contrast for dynamic elements (number balls, player text, footer) so all themes remain legible without manual color overrides.
+- Accessibility/visual quality: added a subtle player name stroke and stronger contrast choices so name text never blends into busy backgrounds.
 
-Recommended follow-ups / tests:
+Automated tests added:
 
-- Add Playwright tests to assert downloaded file names use the internal numeric theme id and do not contain the human theme name.
-- Add an e2e test for the Download All flow verifying the number of downloaded assets matches requested copies (or add a zip option for batch downloads to avoid multiple browser prompts).
-- Optional pixel-check test: check that exported PNG contains the tiny theme color marker or rendered QR when enabled.
+- Playwright parity tests: DPR-based assertions that exported canvas dimensions == preview bounding box × DPR across the most used themes (minimal, neon, etc.). These tests pass locally and were added to `tests/ticket-beautifier.spec.ts`.
+- Visual regression scaffolding: pixelmatch + pngjs devDependencies were added to the project to enable future pixel-level comparisons (pixel-diff tests). The pixel-diff harness is staged and will be wired into CI for nightly visual checks.
+
+Next recommended-tests / follow-ups:
+
+- Add full pixel-diff visual tests for every theme in the pipeline (CI friendly — compare exported PNG vs an approved golden image with pixelmatch thresholds).
+- Add Playwright tests that assert filenames / Download All behavior across browsers (including headless CI flows). Optionally provide a zip export to avoid multiple browser download prompts.
+- Add a lightweight QA utility to verify the small theme color marker is present in exported images (useful for automated acceptance testing).
 
 
 ---
@@ -269,20 +278,746 @@ For maximum SEO + session length, build in this sequence:
 
 ---
 
-# Phase 4.3 — Navigation, SEO Authority & Monetization 🔄
+# Phase 4.3 — Lucky Profile Generator + Themed RNG Modes 🌟
 
-**Status:** PENDING (requires 4.2 substantial progress)  
-**Purpose:** Polish the massive tool ecosystem into a cohesive, discoverable product.
+**Status:** ✅ COMPLETE (Pure client-side implementation)  
+**Purpose:** Add cultural/personalized layer to number generation without changing odds or requiring database.
 
-## Deliverables
+## Overview
 
-### Navigation Overhaul
+Lucky Profile Generator combines three ancient wisdom systems into personalized number recommendations:
+- **Birthstones** (12 months with gemological properties)
+- **Rashis** (Indian zodiac with planetary influences)
+- **Color Wheel** (18 colors with psychology + spiritual correspondences)
 
-**Problem:** With 50+ tools, current nav won't scale.
+**Critical:** This is **entertainment/education only**. NO implied improved odds. NO database. Pure client-side TypeScript.
+
+---
+
+## 4.3.1 Lucky Profile Generator (Client-Side)
+
+### Implementation (Completed ✅)
+
+**Files Created:**
+- `src/data/birthstones.ts` — 12 months with stones, chakras, numerology
+- `src/data/rashis.ts` — 12 Indian zodiac signs with deities, mantras, planets
+- `src/data/colorWheel.ts` — 18 colors with Kabbalah, chakras, Buddhist elements
+- `src/lib/buildLuckyProfile.ts` — Pure function synthesizing profile
+- `src/pages/lucky-profile.astro` — Main UI page
+
+### Profile Synthesis Logic
+
+```typescript
+export interface LuckyProfileOutput {
+  birthstone: BirthstoneData;
+  rashi: RashiData;
+  color: ColorData;
+  combinedSummary: string;
+  suggestedActions: string[];
+  luckyNumbers: number[];
+  filters: { numerology: boolean; hindu: boolean; kabbalah: boolean };
+}
+```
+
+**Features:**
+- Combines traits from all three sources (deduplicates, ranks top 5)
+- Generates 6 lucky numbers from combined numerology
+- Actionable recommendations (stone wearing, color accents, mantras)
+- Complementary color suggestions
+- Optional spiritual filters (Hindu mantras, Kabbalah, Buddhist, Christian)
+
+### UI Requirements
+
+**Page Structure:**
+1. **3-Part Selector**
+   - Birth month dropdown
+   - Rashi dropdown (Sanskrit + English names)
+   - Color grid (visual picker with 18 options)
+
+2. **Spiritual Filters** (Checkboxes)
+   - Numerology (default: on)
+   - Hindu/Vedic wisdom (default: on)
+   - Kabbalah (opt-in)
+   - Buddhist elements (opt-in)
+   - Christian symbolism (opt-in)
+
+3. **Profile Display Cards**
+   - Lucky Focus (top traits + primary color swatch)
+   - Birthstone Profile (symbolism, lore, chakra, element)
+   - Rashi Profile (deity, planet, symbol, direction, mantra)
+   - Color Profile (psychology, Kabbalah, chakra)
+   - Recommended Actions (bulleted list)
+   - Lucky Numbers (visual badges)
+   - Favorable Days
+
+**Style Alignment:**
+- Match existing microtool patterns (cards, spacing, typography)
+- Use `InfoLayout` component
+- Educational disclaimers: "For fun — doesn't change odds"
+- Mobile-responsive color grid
+
+### Educational Content
+
+**Info Cards (4):**
+1. "What is a Lucky Profile?" — Synthesis explanation
+2. "Birthstones & Gemology" — Historical context
+3. "Jyotish (Vedic Astrology)" — 5000-year tradition
+4. "Color Psychology" — Chromotherapy + mystical correspondences
+
+### Acceptance Criteria
+
+- [x] Pure client-side (no API calls, no database)
+- [x] 3 data files with complete information (12 birthstones, 12 rashis, 18 colors)
+- [x] Profile synthesis function generates deterministic results
+- [x] Lucky numbers derived from combined numerology
+- [x] UI displays all profile components clearly
+- [x] Educational content explains each system
+- [x] Spiritual filters work correctly
+- [x] Mobile responsive
+- [x] Disclaimers present ("entertainment only")
+- [x] SEO metadata (title, description, OG tags)
+
+---
+
+## 4.3.2 Themed RNG Modes (Main Generator Enhancement)
+
+### Overview
+
+Add 2-4 culturally-inspired **cosmetic** modes to the main Lucky Numbers Generator. These adjust UI styling and provide educational flavor — **RNG outcomes remain identical**.
+
+### Modes to Implement
+
+| Mode | Count | Description |
+|------|-------|-------------|
+| **Birthstone** | 12 | January (Garnet), February (Amethyst), etc. |
+| **Indian Zodiac (Rashi)** | 12 | Mesha (Aries), Vrishabha (Taurus), etc. |
+| **Native American Zodiac** | 12 | Otter, Wolf, Hawk, Beaver, etc. |
+| **Color Wheel** (optional) | 12-18 | Red, Orange, Yellow, Green, Blue, Violet, etc. |
+
+### Behavior
+
+**UI Changes:**
+- Themed color accents (e.g., garnet = deep red, aquamarine = turquoise)
+- Icon overlays (gemstone SVG, zodiac symbol, animal silhouette)
+- Card border styling matches theme
+- Educational flavor text below generator
+
+**RNG Behavior:**
+- ⚠️ **NO CHANGE TO ODDS** — RNG logic is 100% identical
+- Theme selection is purely cosmetic
+- Each mode includes disclaimer: "Theme is for fun — doesn't affect probability"
+
+### Implementation
+
+**Generator Form Updates:**
+1. Add theme selector dropdown (after game selector)
+2. Mode options populate from shared config (`src/data/modeConfig.ts`)
+3. Selected theme adjusts CSS variables dynamically
+4. Generated results display theme badge
+
+**Config File:**
+```typescript
+// src/data/modeConfig.ts
+export const THEMED_MODES = {
+  birthstone: { /* 12 months with colors/icons */ },
+  rashi: { /* 12 signs with colors/icons */ },
+  nativeZodiac: { /* 12 animals with colors/icons */ },
+  colorWheel: { /* 12-18 colors with hex values */ }
+};
+```
+
+### Acceptance Criteria
+
+- [ ] Theme selector added to generator form
+- [ ] 2-4 themed modes implemented
+- [ ] UI accents change dynamically with theme
+- [ ] Educational flavor text displays for each mode
+- [ ] Disclaimers prominent ("cosmetic only, no odds change")
+- [ ] RNG logic remains unchanged (tests verify identical output)
+- [ ] Theme badge appears on results
+- [ ] Mobile responsive
+- [ ] Analytics track theme selection
+
+---
+
+## 4.3.3 Integration Points
+
+### With Lucky Numbers Generator
+- Profile's lucky numbers can pre-fill generator
+- "Use My Lucky Numbers" button on profile page
+- Best days suggestion ("Play on Tuesdays based on your Rashi")
+
+### With Microtools
+- Link from profile to relevant tools:
+  - Combination Calculator (test lucky number sets)
+  - Pattern Analyzer (analyze lucky number patterns)
+  - Hot/Cold Explorer (check lucky number frequency)
+
+### SEO Expansion (Phase 5)
+
+**Individual Pages (42+ pages):**
+1. Birthstone Pages (12): `/birthstones/january-garnet`, etc.
+2. Rashi Pages (12): `/rashis/mesha-aries`, etc.
+3. Color Pages (18): `/colors/red-meaning`, etc.
+
+**Guide Pages:**
+- `/guides/best-crystal-for-zodiac`
+- `/guides/best-color-for-rashi`
+- `/guides/numerology-color-guide`
+- `/guides/birthstone-color-cheat-sheet`
+
+All auto-generated from TypeScript data using Astro's static generation.
+
+---
+
+## Phase 4.3 Acceptance Summary
+
+- [x] Lucky Profile Generator live (pure client-side)
+- [x] 3 data files complete (birthstones, rashis, colors)
+- [x] Profile synthesis logic working
+- [x] UI matches microtool style
+- [x] Educational content added
+- [ ] 2-4 themed modes added to main generator
+- [ ] Theme selector functional
+- [ ] Disclaimers prominent on all themed content
+- [ ] Analytics tracking mode/theme selection
+- [ ] Documentation updated (FEATURE_lucky_profile.md)
+- [ ] Tests passing (Playwright e2e)
+
+---
+
+# Phase 4.4 — Casino-Lite Suite + MintyCatnipCoin 🎰
+
+**Status:** PENDING  
+**Purpose:** Add gamified, RNG-based casino-lite experiments and fictional currency system for engagement.
+
+## Overview
+
+Casino-Lite is a **free, fictional, educational** suite of RNG-based casino simulators. NO real gambling. NO real money. NO database (Phase 4 — localStorage only).
+
+**URL:** `lucky.mintloop.dev/casino-lite/`
+
+---
+
+## 4.4.1 Casino-Lite Scaffolding
+
+### Core Principles
+
+1. **Educational First** — Every tool teaches probability
+2. **No Real Money** — 100% fictional, 100% free
+3. **Pure RNG** — Client-side JavaScript only
+4. **Microtool Style** — Consistent with lottery tools
+5. **MintLoop Flavor** — Fridgy, cats, MintLabs branding
+
+### Initial Tools (Choose 3-5 for Phase 4)
+
+| # | Tool | Description | Complexity |
+|---|------|-------------|------------|
+| 1 | **Mini Roulette** | 18-number wheel (1-18, 0, 00) | Low |
+| 2 | **3-Reel Lucky Slots** | Classic 3-reel slot with 3-5 symbols | Low |
+| 3 | **Keno-Lite Quick Picker** | Pick 1-10 numbers, 20 drawn | Low |
+| 4 | **Dice Duel** | Roll 2-5 dice, compare outcomes | Low |
+| 5 | **Lucky Card Draw** | Draw 1-5 cards, show probabilities | Medium |
+| 6 | **Blackjack-Lite** | Simplified 1-hand blackjack | Medium |
+| 7 | **5-Reel "Mega Mint" Slots** | Advanced 5-reel slot with paylines | Medium |
+| 8 | **Fridgy's Jackpot Wheel** | Spin wheel with MintLoop characters | Low |
+| 9 | **Cat's Out! Scratch Simulator** | Virtual scratch card | Low |
+| 10 | **MintChinko** (Pachinko-lite) | Pins, balls, probabilistic paths | High |
+
+**Phase 4 Target:** Build 1-3 tools (mini roulette, 3-reel slots, dice duel)
+
+### Casino-Lite Hub Page
+
+**URL:** `/casino-lite/`
+
+**Content:**
+- Hero: "Free Casino Probability Experiments"
+- Grid of available tools (cards with icons)
+- Educational intro: "Learn casino math risk-free"
+- Disclaimers: "No real gambling, no real money"
+- Links to probability resources
+
+---
+
+## 4.4.2 MintyCatnipCoin — Fictional Currency Simulation
+
+### Overview
+
+MintyCatnipCoin (MCC) is an **in-game, fictional currency** used across Casino-Lite and Lucky tools for gamification.
+
+**Phase 4 Scope:** Lightweight, localStorage-only implementation.
+
+### Core Features
+
+**1. Currency Basics**
+- Starting balance: 1000 MCC
+- Price changes: RNG-driven ±0-5% every 5-10 minutes
+- Occasional volatility events: ±10-20% spikes/crashes
+
+**2. Mini-Events (RNG Triggers)**
+- "Fridgy hacks the market!" (+15% spike)
+- "Cats Out! characters dump coins" (-12% crash)
+- "Lucky Streak Event" (+5% for 1 hour)
+- Events appear randomly, 2-3x per day
+
+**3. Daily Quests (localStorage Tracking)**
+Simple daily tasks:
+- Play 3 casino-lite tools
+- Check coin price 3 times
+- Hit a "lucky streak" (win 3 times in a row)
+
+Rewards: +50-100 MCC per completed quest
+
+**4. Local Leaderboard**
+- Track highest MCC balance achieved
+- Display top 5 local records
+- "Share your score" (social proof)
+
+### Implementation
+
+**Storage:**
+```typescript
+// localStorage schema
+{
+  "mcc_balance": 1250,
+  "mcc_price": 42.67,
+  "mcc_price_history": [40.12, 41.83, 42.67],
+  "mcc_last_updated": 1702082400000,
+  "mcc_daily_quests": {
+    "play_3_tools": false,
+    "check_price_3x": 1,
+    "lucky_streak": false
+  },
+  "mcc_leaderboard": [
+    { "balance": 5600, "date": "2025-12-08" },
+    { "balance": 4200, "date": "2025-12-07" }
+  ]
+}
+```
+
+**Price Update Logic:**
+```typescript
+function updateMCCPrice() {
+  const lastPrice = getMCCPrice();
+  const change = (Math.random() - 0.5) * 0.1; // ±5%
+  const eventChance = Math.random();
+  
+  if (eventChance < 0.01) {
+    // Rare spike/crash event
+    return triggerVolatilityEvent(lastPrice);
+  }
+  
+  return lastPrice * (1 + change);
+}
+```
+
+### UI Components
+
+**1. MCC Ticker** (Global Header)
+- Shows current MCC price
+- Color-coded: green (up), red (down), yellow (stable)
+- Click to expand full chart
+
+**2. MCC Dashboard** (`/casino-lite/mintycatnipcoin`)
+- Price chart (last 24 hours)
+- Current balance
+- Daily quests checklist
+- Local leaderboard
+- Event log (last 10 events)
+
+**3. Mini MCC Widget** (Casino Tools)
+- Shows balance
+- "Bet MCC" button (fictional stakes)
+- Win/loss updates balance
+
+### Disclaimers (Critical)
+
+**Everywhere MCC appears:**
+> ⚠️ MintyCatnipCoin is **100% fictional**. No blockchain. No real value. No exchange. For entertainment only.
+
+### Acceptance Criteria
+
+- [ ] MCC price simulation running (RNG-based)
+- [ ] localStorage persistence working
+- [ ] Daily quests system functional
+- [ ] Local leaderboard displays top 5
+- [ ] Mini-events trigger randomly
+- [ ] MCC ticker in global header
+- [ ] Dashboard page created
+- [ ] At least 1 casino tool uses MCC
+- [ ] Disclaimers prominent everywhere
+- [ ] No confusion about fictional nature
+
+---
+
+## Phase 4.4 Acceptance Summary
+
+- [ ] Casino-Lite hub page live
+- [ ] 1-3 initial casino tools built
+- [ ] All tools use microtool styling
+- [ ] MCC currency simulation working
+- [ ] Price updates every 5-10 minutes
+- [ ] Daily quests system functional
+- [ ] Local leaderboard tracking
+- [ ] Disclaimers on every page
+- [ ] Educational content explaining probability
+- [ ] Mobile responsive
+- [ ] Analytics tracking tool usage
+
+---
+
+# Phase 4.5 — Discoverability & Navigation System (MANDATORY) 🔗
+
+**Status:** PENDING (but CRITICAL for Phase 4 success)  
+**Purpose:** Make the massive tool ecosystem discoverable, interconnected, and SEO-optimized.
+
+## Overview
+
+With 50-70+ pages, discoverability is **not optional**. This phase ensures every page drives traffic to 3-5 other pages, maximizing session time and SEO authority.
+
+---
+
+## 4.5.1 Crosslinking System (Mandatory)
+
+**Principle:** Every page must link to 3-5 other relevant pages.
+
+### Reusable Components
+
+**`<CrosslinkBlock />`**
+```astro
+<!-- Usage on any tool page -->
+<CrosslinkBlock 
+  title="More Tools You'll Love"
+  links={[
+    { title: "Pattern Analyzer", href: "/tools/pattern-analyzer" },
+    { title: "Hot/Cold Explorer", href: "/tools/hot-cold-numbers" },
+    { title: "Combination Calculator", href: "/tools/combination-calculator" }
+  ]}
+/>
+```
+
+**`<ToolsSuiteFooter />`**
+- Global footer component
+- Lists all tool categories
+- Links to main generator, Lucky Profile, Casino-Lite
+- Newsletter signup
+- Social links
+
+**`<PreviewCard />`**
+```astro
+<!-- Generates OG image-compatible cards -->
+<PreviewCard 
+  title="Pattern Analyzer"
+  description="Find patterns in your lottery numbers"
+  image="/og/pattern-analyzer.png"
+/>
+```
+
+**`<SEOHead />` wrapper**
+- Centralizes meta tags
+- Auto-generates canonical URLs
+- Injects JSON-LD schema
+- Handles OG tags
+
+### Crosslink Rules (Per Page Type)
+
+| Page Type | Must Link To |
+|-----------|--------------|
+| **Generator** | 3 educational tools, 1 calculator, odds page |
+| **Calculator Tool** | 2 related tools, 1 category page, main generator |
+| **Analysis Tool** | Hot/cold explorer, frequency tools, 1 calculator |
+| **Fun Tool** | 2 other fun tools, main generator, 1 educational |
+| **Lucky Profile** | Main generator, combination calc, pattern analyzer |
+| **Casino-Lite** | Probability playground, EV calculator, MCC dashboard |
+| **Hub/Category** | All tools in category, 2 related categories |
+
+### Link Placement Strategy
+
+1. **"You May Also Like" section** — Below each tool (3-4 cards)
+2. **Inline text links** — Educational content mentions other tools
+3. **Footer links** — ToolsSuiteFooter on every page
+4. **Sidebar** — "Quick Links" on desktop (collapsed on mobile)
+
+---
+
+## 4.5.2 Navigation Overhaul
+
+**Problem:** With 70+ pages, flat navigation doesn't scale.
 
 **Solution:** Category-based mega menu
 
+### Desktop Mega Menu
+
 ```
+Tools ▾
+├── 🎲 Generators
+│   ├── Main Generator
+│   ├── Lucky Profile Generator ⭐
+│   ├── Pick-3/Pick-4
+│   ├── QuickPick Machine
+│   ├── Multi-Ticket Generator
+│   └── Themed Modes
+├── 🔍 Analysis
+│   ├── Pattern Analyzer
+│   ├── Hot/Cold/Overdue
+│   ├── Frequency Tools
+│   ├── Streak Analyzer
+│   └── Combo Checker
+├── 🎮 Fun & Games
+│   ├── Number Wheel
+│   ├── Birthdate Mapper
+│   ├── Zodiac/Element Mappers
+│   ├── Ticket Beautifier
+│   └── Casino-Lite ⭐
+├── 📊 Probability & Math
+│   ├── Combination Calculator
+│   ├── EV Calculator
+│   ├── Odds Comparison
+│   ├── Probability Playground
+│   └── Flash Cards
+└── 💰 Money Calculators
+    ├── Payout Calculator
+    ├── Budget Planner
+    ├── Jackpot Splitter
+    ├── Annuity Visualizer
+    └── Loss Calculator
+```
+
+### Mobile Navigation
+
+- Hamburger menu
+- Collapsible categories
+- Search bar at top
+- "Popular Tools" section
+- Recent tools (localStorage)
+
+---
+
+## 4.5.3 SEO & Preview Images
+
+### Preview Image Generation
+
+**Every tool needs a shareable preview image (1200×630 PNG/WebP)**
+
+**Batch Generation Script:**
+```bash
+npm run generate-previews
+```
+
+Generates:
+- `/og/pattern-analyzer.png`
+- `/og/combination-calculator.png`
+- `/og/lucky-profile.png`
+- ... etc.
+
+**Design Template:**
+- Lucky branding/logo
+- Tool name (large, bold)
+- 1-sentence description
+- Visual element (chart, numbers, icon)
+
+### SEO Metadata Audit
+
+**Every page must have:**
+- `<title>` (50-60 chars, includes "Lucky Numbers")
+- `<meta description>` (150-160 chars, includes CTA)
+- `<link rel="canonical">` (proper URL)
+- Open Graph tags (og:title, og:description, og:image)
+- Twitter Card tags
+- JSON-LD structured data
+
+**JSON-LD Schema Types:**
+- Tools: `SoftwareApplication`
+- Educational pages: `Article` or `HowTo`
+- Category pages: `ItemList`
+- FAQ: `FAQPage`
+
+### Sitemap Updates
+
+**Auto-generate comprehensive sitemap:**
+```xml
+<!-- /sitemap.xml -->
+<urlset>
+  <!-- Main pages -->
+  <url><loc>/</loc><priority>1.0</priority></url>
+  <url><loc>/lucky-profile</loc><priority>0.9</priority></url>
+  <url><loc>/casino-lite</loc><priority>0.9</priority></url>
+  
+  <!-- Tool pages (50+) -->
+  <url><loc>/tools/pattern-analyzer</loc><priority>0.8</priority></url>
+  <!-- ... -->
+  
+  <!-- Category pages -->
+  <url><loc>/tools/generators</loc><priority>0.7</priority></url>
+  <!-- ... -->
+</urlset>
+```
+
+---
+
+## 4.5.4 Content Audit (Mandatory)
+
+**Audit ALL pages for:**
+
+1. **Crosslinks** — Does every page link to 3-5 others?
+2. **SEO metadata** — Title, description, OG tags complete?
+3. **Preview image** — Shareable OG image exists?
+4. **Disclaimers** — Ethical gambling disclaimers present?
+5. **Call-to-action** — Clear next steps for users?
+6. **Mobile responsive** — Works on 320px screens?
+7. **Load time** — < 2 seconds on 3G?
+
+**Tools to audit:**
+- All 50+ microtools
+- Lucky Profile Generator
+- Main generator with themed modes
+- Casino-Lite tools (1-3)
+- Category/hub pages
+- Educational content pages
+
+---
+
+## 4.5.5 Hub Pages
+
+### Main Hubs
+
+**1. Tools Hub** (`/tools`)
+- Grid of all tools (6 categories)
+- Search bar
+- Popularity badges ("Popular", "New", "Staff Pick")
+- "Start Here" guide link
+
+**2. Casino-Lite Hub** (`/casino-lite`)
+- Grid of casino tools
+- MintyCatnipCoin ticker
+- Disclaimers prominent
+- Link to probability resources
+
+**3. Lucky Universe Hub** (`/lucky`)
+- Lucky Profile Generator
+- Birthstone/Rashi/Color guides
+- Themed RNG modes
+- Crosslinks to related tools
+
+### Category Pages (5)
+
+1. `/tools/generators` — All generator tools
+2. `/tools/analysis` — Analysis & frequency tools
+3. `/tools/fun` — Fun & gamified tools
+4. `/tools/probability` — Math & probability tools
+5. `/tools/money` — Financial calculators
+
+**Each category page includes:**
+- Intro paragraph (SEO-optimized)
+- Grid of tools in category (cards with icons)
+- "Why use these tools?" section
+- Crosslinks to other categories
+- Footer with full tool suite
+
+---
+
+## 4.5.6 Internal Linking Audit Script
+
+**Automated audit script:**
+```bash
+npm run audit-links
+```
+
+**Checks:**
+- [ ] Every page has 3-5 internal links
+- [ ] No broken links (404s)
+- [ ] Links use descriptive anchor text (not "click here")
+- [ ] Links open in same tab (not new window)
+- [ ] Links include proper rel attributes
+
+**Output:**
+```
+✅ /tools/pattern-analyzer — 5 internal links
+⚠️  /tools/combination-calculator — Only 2 internal links (add 1-3 more)
+❌ /tools/old-tool — 404 not found (remove from nav)
+```
+
+---
+
+## Phase 4.5 Acceptance Criteria
+
+### Components
+- [ ] `<CrosslinkBlock />` built and reusable
+- [ ] `<ToolsSuiteFooter />` on all pages
+- [ ] `<PreviewCard />` component working
+- [ ] `<SEOHead />` wrapper centralized
+
+### Navigation
+- [ ] Mega menu with 5 categories
+- [ ] Mobile hamburger menu functional
+- [ ] Search bar added (if time permits)
+- [ ] "Popular Tools" section visible
+
+### SEO
+- [ ] All pages have complete metadata
+- [ ] Preview images generated for all tools
+- [ ] Sitemap includes all 70+ pages
+- [ ] JSON-LD schema on all tools
+- [ ] Canonical URLs correct
+
+### Crosslinking
+- [ ] Every tool links to 3-5 other pages
+- [ ] Category pages created (5)
+- [ ] Hub pages created (3)
+- [ ] ToolsSuiteFooter on 100% of pages
+- [ ] Internal linking audit script passing
+
+### Content Audit
+- [ ] All tools audited for crosslinks
+- [ ] Lucky Profile audited
+- [ ] Casino-Lite tools audited
+- [ ] Main generator audited
+- [ ] Educational pages audited
+
+### Performance
+- [ ] Lighthouse scores > 90 on all pages
+- [ ] Mobile responsive (320px+)
+- [ ] Load time < 2 seconds
+
+---
+
+## Phase 4.5 Expected Outcomes
+
+**Before Phase 4.5:**
+- Session time: 30-90 seconds
+- Pages per session: 1-2
+- Bounce rate: 70%+
+
+**After Phase 4.5:**
+- Session time: 5+ minutes
+- Pages per session: 4-6
+- Bounce rate: < 40%
+
+**SEO Impact:**
+- Internal link density matches/exceeds competitors
+- Every page is a potential entry point
+- "Hub and spoke" architecture for topical authority
+- Long-tail keyword coverage (200+ targets)
+
+---
+
+# Legacy Content: Themed / Personality Modes (Phase 4.x)
+
+We introduced a bounded, theme-based selection flow for personalized generator modes (zodiac, gemstone, color, jyotish, chinese_zodiac, star_sign). These changes are intended to improve UX and reduce misuse while keeping RNG math unchanged.
+
+Highlights:
+
+- Replace freeform/custom seed inputs with bounded dropdown selectors.
+- Centralized config: `src/data/modeConfig.ts` (frontend) and `app/mode_config.py` (backend).
+- API: `GenerateReq` now accepts `mode_key` for styled options; `GenerateResp` includes `mode_key` so the UI can show a small badge when a themed option is used.
+- Copy: "Themes are just for fun — they don’t change lottery odds." added near the generator controls and in the FAQ.
+
+Compliance & Acceptance:
+
+1. No free-text seeds in the UI.
+2. Backend validation uses the configured list of keys; unknown keys fall back to random behavior.
+3. Analytics events added: `mode_selected` (client) and `mode_session_generate` (counts per-mode usage).
+
 Tools ▾
 ├── 🎲 Generators
 │   ├── Main Generator
@@ -455,12 +1190,12 @@ Acceptance notes for Phase 4 light analytics/newsletter:
 
 ---
 
-# Phase 4.4 — UX Polish & Experience Optimization ✨
+# Phase 4.6 — UX Polish & Experience Optimization ✨
 
-**Status:** PENDING (after 4.3)  
+**Status:** PENDING (after 4.5)  
 **Purpose:** Unify the experience across 50+ tools into a cohesive, polished product.
 
-## Why Phase 4.4 Exists
+## Why Phase 4.6 Exists
 
 With 70+ pages, the site needs one focused sweep on:
 - Layout consistency
@@ -476,7 +1211,7 @@ With 70+ pages, the site needs one focused sweep on:
 
 ---
 
-## 4.4.1 Layout & Component Consistency
+## 4.6.1 Layout & Component Consistency
 
 Audit and normalize across all tools:
 
@@ -493,7 +1228,7 @@ Audit and normalize across all tools:
 
 ---
 
-## 4.4.2 Navigation & Site Structure Polish
+## 4.6.2 Navigation & Site Structure Polish
 
 Improve discoverability:
 
@@ -512,7 +1247,7 @@ Improve discoverability:
 
 ---
 
-## 4.4.3 Mobile Optimization Sweep
+## 4.6.3 Mobile Optimization Sweep
 
 Audit entire site for:
 
@@ -529,7 +1264,7 @@ Audit entire site for:
 
 ---
 
-## 4.4.4 Interaction Polish
+## 4.6.4 Interaction Polish
 
 Add or refine micro-interactions:
 
@@ -547,7 +1282,7 @@ Add or refine micro-interactions:
 
 ---
 
-## 4.4.5 Visual Hierarchy & Typography
+## 4.6.5 Visual Hierarchy & Typography
 
 Apply consistent design system:
 
@@ -564,7 +1299,7 @@ Apply consistent design system:
 
 ---
 
-## 4.4.6 Internal Linking Enhancements
+## 4.6.6 Internal Linking Enhancements
 
 Add linking modules throughout:
 
@@ -580,7 +1315,7 @@ Add linking modules throughout:
 
 ---
 
-## 4.4.7 Accessibility & Semantics
+## 4.6.7 Accessibility & Semantics
 
 Check and fix:
 
@@ -597,7 +1332,7 @@ Check and fix:
 
 ---
 
-## 4.4.8 Branding Touch-Up (Optional)
+## 4.6.8 Branding Touch-Up (Optional)
 
 Strengthen brand identity:
 
@@ -613,7 +1348,7 @@ Strengthen brand identity:
 
 ---
 
-## 4.4.9 Feedback & Engagement
+## 4.6.9 Feedback & Engagement
 
 Add engagement elements:
 
@@ -629,7 +1364,7 @@ Add engagement elements:
 
 ---
 
-## Phase 4.4 Acceptance Criteria
+## Phase 4.6 Acceptance Criteria
 
 - [ ] All tools share consistent UI and spacing system
 - [ ] Mobile experience feels intentional, not accidental
@@ -650,14 +1385,11 @@ Add engagement elements:
 |-------|------|-------|-------|
 | 4.1 | Core Tools | Frontend Agent | ✅ COMPLETE |
 | 4.2 | Microtools Expansion | Frontend Agent | `src/pages/tools/`, 50+ tools |
-| 4.3 | Navigation | Frontend Agent | Header, mega menu, mobile nav |
-| 4.3 | Category Pages | Frontend Agent | `src/pages/tools/[category].astro` |
-| 4.3 | SEO Schema | Frontend Agent | JSON-LD, breadcrumbs |
-| 4.3 | Monetization | Frontend Agent | AffiliateGrid placements |
-| 4.3 | Recommendations | Frontend Agent | New component + integration |
-| 4.4 | UX Polish | Frontend Agent | Entire frontend audit |
-| 4.4 | Mobile Sweep | Frontend Agent | Responsive fixes |
-| 4.4 | Accessibility | Frontend Agent | WCAG compliance |
+| 4.3 | Lucky Profile + Themed RNG | Frontend Agent | Profile page (✅), themed modes (pending) |
+| 4.4 | Casino-Lite + MintyCatnipCoin | Frontend Agent | 1–3 casino tools, coin simulation |
+| 4.5 | Discoverability System | Frontend Agent | Crosslinks, navigation, SEO, hub pages |
+| 4.6 | UX Polish | Frontend Agent | Layout consistency, mobile, accessibility |
+| 4.7 | Performance Hardening | Frontend + Infra | Bundle size, caching, Lighthouse, load tests |
 
 ---
 
@@ -680,21 +1412,50 @@ Add engagement elements:
 - [ ] `npm run build` passes
 
 ## Phase 4.3
-- [ ] Mega menu implemented
-- [ ] 5 category pages created
+- [x] Lucky Profile page live (✅ complete)
+- [ ] Themed RNG modes implemented (birthstone/rashi/native zodiac/color)
+- [ ] Themed mode UI in main generator
+- [ ] Profile persistence (localStorage)
+- [ ] Profile-aware result filtering
+
+## Phase 4.4
+- [ ] 1–3 Casino-Lite tools built (mini roulette, slots, dice duel)
+- [ ] MintyCatnipCoin simulation active (localStorage)
+- [ ] Price chart UI with volatility events
+- [ ] Daily quests system (3 simple tasks/day)
+- [ ] Event notifications (bonuses, crashes)
+- [ ] Leaderboard UI (top 10 holders)
+
+## Phase 4.5 (MANDATORY)
+- [ ] `<CrosslinkBlock />` component created
+- [ ] `<ToolsSuiteFooter />` component created
+- [ ] Crosslinking deployed to 100% of pages
+- [ ] Mega menu with 5 categories implemented
+- [ ] 5 category hub pages created
 - [ ] Breadcrumbs on all tools
-- [ ] Recommendations on 100% of tools
-- [ ] Affiliate placements active
+- [ ] SEO preview images (1200×630) for all pages
+- [ ] Internal linking audit script run
 - [ ] "Start Here" page live
 - [ ] Lighthouse SEO > 90
 
-## Phase 4.4
+## Phase 4.6
 - [ ] Layout consistency audit complete
 - [ ] Mobile optimization sweep complete
 - [ ] Interaction polish complete
-- [ ] Accessibility audit complete
-- [ ] Internal linking enhanced
+- [ ] Accessibility audit complete (WCAG AA)
+- [ ] Typography rhythm audit
 - [ ] Lighthouse all scores > 90
+
+## Phase 4.7
+- [ ] Bundle size < 80 KB JS per page
+- [ ] CSS optimized < 25 KB per page
+- [ ] Images optimized (WebP, lazy, sized)
+- [ ] Lighthouse Performance ≥ 85 all pages
+- [ ] LCP < 2.5s mobile
+- [ ] CLS < 0.1 all pages
+- [ ] Performance budget documented
+- [ ] Load test passed (100 concurrent users)
+- [ ] CDN cache hit rate > 90%
 - [ ] PR reviewed and merged to `main`
 - [ ] `docs/AGENT_TRACKER.md` updated
 
@@ -706,10 +1467,13 @@ Add engagement elements:
 |-------|--------|----------|
 | 4.1 | ✅ Complete | Done |
 | 4.2 | High | 4–6 sessions (50+ tools) |
-| 4.3 | Medium-High | 2–3 sessions |
-| 4.4 | Medium | 2–3 sessions |
+| 4.3 | Low-Medium | 1–2 sessions (profile ✅, add themed modes) |
+| 4.4 | Medium | 2–3 sessions (casino tools + coin sim) |
+| 4.5 | High | 3–4 sessions (MANDATORY discoverability) |
+| 4.6 | Medium | 2–3 sessions (UX polish) |
+| 4.7 | Medium | 1–2 sessions (performance) |
 
-**Total Phase 4:** ~8–12 agent sessions from current state.
+**Total Phase 4:** ~13–20 agent sessions from current state.
 
 ---
 
@@ -731,15 +1495,15 @@ Phase 4.2's 50+ tools achieve:
 
 ---
 
-# Phase 4.5 — Performance Sweeps (Pre-Scale Hardening)
+# Phase 4.7 — Performance Sweeps (Pre-Scale Hardening)
 
-> **⚠️ Phase 4.5 is not optional — this is the performance hardening pass before scaling traffic.**
+> **⚠️ Phase 4.7 is not optional — this is the performance hardening pass before scaling traffic.**
 
 Before aggressively driving traffic to 50+ tools, we need to ensure the site loads fast, stays responsive, and doesn't collapse under load. This phase is the "make it fast" sweep before "make it popular."
 
 ---
 
-## 4.5.1 Bundle Size Reduction
+## 4.7.1 Bundle Size Reduction
 
 Audit and minimize JavaScript shipped to users:
 
@@ -755,7 +1519,7 @@ Audit and minimize JavaScript shipped to users:
 
 ---
 
-## 4.5.2 Astro Partial Hydration Audit
+## 4.7.2 Astro Partial Hydration Audit
 
 Ensure we're using Astro's islands architecture correctly:
 
@@ -771,7 +1535,7 @@ Ensure we're using Astro's islands architecture correctly:
 
 ---
 
-## 4.5.3 Client-Side Caching Strategy
+## 4.7.3 Client-Side Caching Strategy
 
 Implement aggressive caching:
 
@@ -790,7 +1554,7 @@ Implement aggressive caching:
 
 ---
 
-## 4.5.4 CSS Optimization
+## 4.7.4 CSS Optimization
 
 Reduce CSS payload and improve render performance:
 
@@ -806,7 +1570,7 @@ Reduce CSS payload and improve render performance:
 
 ---
 
-## 4.5.5 Image Optimization
+## 4.7.5 Image Optimization
 
 Ensure all images are performant:
 
@@ -823,7 +1587,7 @@ Ensure all images are performant:
 
 ---
 
-## 4.5.6 Lighthouse Sweeps
+## 4.7.6 Lighthouse Sweeps
 
 Run Lighthouse audits on all pages:
 
@@ -843,7 +1607,7 @@ Run Lighthouse audits on all pages:
 
 ---
 
-## 4.5.7 Core Web Vitals Targets
+## 4.7.7 Core Web Vitals Targets
 
 Optimize for Google's ranking signals:
 
@@ -857,7 +1621,7 @@ Optimize for Google's ranking signals:
 
 ---
 
-## 4.5.8 Performance Budget Definition
+## 4.7.8 Performance Budget Definition
 
 Create `/docs/PERFORMANCE_BUDGET.md`:
 
@@ -889,7 +1653,7 @@ Create `/docs/PERFORMANCE_BUDGET.md`:
 
 ---
 
-## 4.5.9 Font Loading Optimization
+## 4.7.9 Font Loading Optimization
 
 Ensure fonts don't block render:
 
@@ -903,7 +1667,7 @@ Ensure fonts don't block render:
 
 ---
 
-## 4.5.10 Pre-Phase-5 Load Testing
+## 4.7.10 Pre-Phase-5 Load Testing
 
 Validate the site handles traffic before marketing:
 
@@ -918,7 +1682,7 @@ Validate the site handles traffic before marketing:
 
 ---
 
-## Phase 4.5 Acceptance Criteria
+## Phase 4.7 Acceptance Criteria
 
 - [ ] All tool pages < 80 KB JS (gzipped)
 - [ ] All tool pages < 25 KB CSS (gzipped)
@@ -935,7 +1699,7 @@ Validate the site handles traffic before marketing:
 
 ---
 
-## Agent Assignment (Phase 4.5)
+## Agent Assignment (Phase 4.7)
 
 | Task | Agent | Scope |
 |------|-------|-------|
@@ -950,7 +1714,7 @@ Validate the site handles traffic before marketing:
 
 ---
 
-## Definition of Done (Phase 4.5)
+## Definition of Done (Phase 4.7)
 
 - [ ] Bundle size audit complete
 - [ ] Hydration audit complete
@@ -972,11 +1736,13 @@ Validate the site handles traffic before marketing:
 |-------|--------|----------|--------|
 | 4.1 | ✅ Complete | Done | ✅ |
 | 4.2 | High | 4–6 sessions | Ready |
-| 4.3 | Medium-High | 2–3 sessions | Pending |
-| 4.4 | Medium | 2–3 sessions | Pending |
-| 4.5 | Medium | 1–2 sessions | Pending |
+| 4.3 | Low-Medium | 1–2 sessions | Partially Complete (profile ✅, themed modes pending) |
+| 4.4 | Medium | 2–3 sessions | Ready |
+| 4.5 | High | 3–4 sessions | **MANDATORY** — Ready |
+| 4.6 | Medium | 2–3 sessions | Ready |
+| 4.7 | Medium | 1–2 sessions | Ready |
 
-**Total Phase 4:** ~9–14 agent sessions from current state.
+**Total Phase 4:** ~13–20 agent sessions from current state.
 
 ---
 
@@ -985,8 +1751,12 @@ Validate the site handles traffic before marketing:
 Recommended sequence:
 
 1. **Phase 4.2** — Build the content (50+ tools)
-2. **Phase 4.3** — Organize and link (navigation, SEO)
-3. **Phase 4.4** — Polish the experience (UX sweep)
-4. **Phase 4.5** — Harden for scale (performance)
+2. **Phase 4.3** — Complete themed RNG modes (Lucky Profile already ✅)
+3. **Phase 4.4** — Add Casino-Lite suite + MintyCatnipCoin
+4. **Phase 4.5** — **MANDATORY** Discoverability system (crosslinks, navigation, SEO)
+5. **Phase 4.6** — Polish the experience (UX sweep)
+6. **Phase 4.7** — Harden for scale (performance)
 
-> **Note:** Phase 4.5 can run in parallel with 4.3/4.4 for efficiency, but must complete before Phase 5 marketing push.
+> **Critical Path:** Phase 4.5 (Discoverability) is MANDATORY and must complete before Phase 5 marketing push. This is the system that ensures users can find and navigate between all 70+ tools.
+
+> **Note:** Phases 4.6 and 4.7 can run in parallel with earlier phases for efficiency, but both must complete before Phase 5.

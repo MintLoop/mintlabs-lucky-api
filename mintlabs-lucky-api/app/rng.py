@@ -231,6 +231,45 @@ def draw_lucky(
     return picks
 
 
+def draw_personalized(minv: int, maxv: int, count: int, rng: SecureRng, seed_value: str = None) -> list[int]:
+    """Generate deterministic-looking numbers derived from a user-provided seed string.
+
+    This is useful for modes like `zodiac`, `gemstone`, `favorite_color` where the
+    input is a short tag (e.g., 'aries', 'ruby', 'blue'). The generation is
+    deterministic for the same seed and game definition, but still returns valid
+    numbers in the requested range. Uses SHA256 -> int to seed a local RNG.
+    """
+    if not seed_value:
+        # fallback to a normal random sample
+        return rng.sample_unique(minv, maxv, count)
+
+    import hashlib
+
+    # Hash the seed_value to obtain a predictable integer
+    seed_hash = hashlib.sha256(seed_value.encode('utf-8')).hexdigest()
+    seed_int = int(seed_hash[:16], 16)
+
+    # Use a local deterministic RNG so we don't interfere with SecureRng state
+    local = random.Random(seed_int)
+
+    pool = list(range(minv, maxv + 1))
+    if count >= len(pool):
+        return sorted(pool)
+
+    picks = set()
+    attempts = 0
+    while len(picks) < count and attempts < 200:
+        picks.add(local.choice(pool))
+        attempts += 1
+
+    # fill missing picks from SecureRng to avoid infinite loops
+    if len(picks) < count:
+        extras = rng.sample_unique(minv, maxv, count - len(picks))
+        picks.update(extras)
+
+    return sorted(list(picks))
+
+
 def draw_wheel(
     minv: int, maxv: int, count: int, rng: SecureRng, wheel_type: str = "full"
 ) -> list[int]:
