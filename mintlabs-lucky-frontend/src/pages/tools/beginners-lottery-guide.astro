@@ -1,0 +1,375 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import TrackLink from "../../components/TrackLink.astro";
+
+const sections = [
+  {
+    id: 'myths',
+    title: 'Common Myths vs Facts',
+    icon: '❌',
+    slides: [
+      {
+        myth: '"Hot" numbers are more likely to win',
+        fact: 'Every number has equal probability in every draw, regardless of past frequency.',
+        explanation: 'Past draws don\'t influence future outcomes. Each draw is independent with equal odds for all numbers.'
+      },
+      {
+        myth: 'You should avoid numbers that recently won',
+        fact: 'Numbers that appeared last week have the exact same odds as any other numbers.',
+        explanation: 'The lottery machine has no memory. 7-8-9-10-11-12 has identical odds to last week\'s winning numbers.'
+      },
+      {
+        myth: 'Picking consecutive numbers is a bad strategy',
+        fact: 'Consecutive numbers (7-8-9) have the same probability as spread-out numbers.',
+        explanation: 'Pattern doesn\'t affect odds. Any specific combination has equal probability.'
+      },
+      {
+        myth: 'Playing the same numbers every week increases your chances',
+        fact: 'Same numbers vs different numbers makes zero difference to your odds.',
+        explanation: 'Consistency is fine for convenience, but it doesn\'t improve probability.'
+      },
+      {
+        myth: 'Quick Pick numbers have worse odds than self-picked',
+        fact: 'Quick Picks and manual picks have identical winning probability.',
+        explanation: 'The drawing doesn\'t care how you selected your numbers.'
+      }
+    ]
+  },
+  {
+    id: 'odds',
+    title: 'Understanding the Odds',
+    icon: '📊',
+    slides: [
+      {
+        myth: 'Powerball odds: 1 in 292 million',
+        fact: 'That\'s about the same as flipping a coin and getting heads 28 times in a row.',
+        explanation: 'To put it in perspective: If you bought 1 ticket per week, you\'d win jackpot once every 5.6 million years on average.'
+      },
+      {
+        myth: 'Buying more tickets significantly improves my odds',
+        fact: 'Buying 100 tickets changes odds from 1-in-292M to 100-in-292M (still essentially zero).',
+        explanation: 'You\'d need to buy millions of tickets to make a meaningful difference.'
+      },
+      {
+        myth: 'I\'m "due" for a win after playing for years',
+        fact: 'Probability doesn\'t accumulate. Each draw is independent with the same odds.',
+        explanation: 'Past losses don\'t increase future winning chances. This is the gambler\'s fallacy.'
+      },
+      {
+        myth: 'Smaller prize odds are reasonable',
+        fact: 'Even matching 4 numbers (Powerball) is 1 in 36,525 — once per century if you play weekly.',
+        explanation: 'Lower tier prizes have better odds than jackpot but are still extremely unlikely.'
+      }
+    ]
+  },
+  {
+    id: 'money',
+    title: 'The Money Reality',
+    icon: '💰',
+    slides: [
+      {
+        myth: 'The lottery is an investment',
+        fact: 'The lottery has negative expected value — on average, you lose 50% of every dollar spent.',
+        explanation: 'For every $2 ticket, the average return is about $1. It\'s entertainment, not investment.'
+      },
+      {
+        myth: 'I only spend $10/week, it\'s harmless',
+        fact: '$10/week = $520/year = $26,000 over 50 years (without considering opportunity cost).',
+        explanation: 'That $26k invested at 7% annual return would grow to $240,000.'
+      },
+      {
+        myth: 'Winning the lottery solves all problems',
+        fact: '70% of lottery winners go bankrupt within a few years.',
+        explanation: 'Sudden wealth without financial literacy often leads to worse outcomes than before winning.'
+      },
+      {
+        myth: 'Bigger jackpot = better value ticket',
+        fact: 'Higher jackpots attract more players, increasing chance of split prizes.',
+        explanation: 'The "expected value" calculation shows even billion-dollar jackpots have negative return.'
+      }
+    ]
+  },
+  {
+    id: 'strategies',
+    title: 'What Actually Matters',
+    icon: '✅',
+    slides: [
+      {
+        myth: 'There are "smart" number selection strategies',
+        fact: 'The ONLY strategy that matters: Avoid commonly picked numbers to reduce split risk.',
+        explanation: 'Picking 1-2-3-4-5-6 doesn\'t hurt odds, but if you win, you\'ll split with many others. Choose unpopular combinations.'
+      },
+      {
+        myth: 'You should play when jackpot is high',
+        fact: 'High jackpots have worse expected value due to increased ticket sales.',
+        explanation: 'More players = higher chance of splitting. Smaller jackpots often have better relative value.'
+      },
+      {
+        myth: 'Join a lottery pool to improve odds',
+        fact: 'Pools DO improve odds (more tickets) but split the prize.',
+        explanation: 'This is the ONLY legitimate way to improve winning probability without spending more yourself.'
+      },
+      {
+        myth: 'Play responsibly means "play smartly"',
+        fact: 'Play responsibly means: Set strict budget limits, treat it as entertainment cost.',
+        explanation: 'Never spend money you can\'t afford to lose. Never chase losses. Never expect to win.'
+      }
+    ]
+  },
+  {
+    id: 'takeaway',
+    title: 'Key Takeaways',
+    icon: '🎯',
+    slides: [
+      {
+        myth: 'Should I play the lottery?',
+        fact: 'If you enjoy it as entertainment and can afford it, fine. But never expect to win.',
+        explanation: 'Treat lottery tickets like movie tickets — entertainment cost, not investment.'
+      },
+      {
+        myth: 'What\'s the smartest way to play?',
+        fact: 'Set a strict monthly budget. Avoid commonly picked numbers. Never chase losses.',
+        explanation: 'Budget example: $20/month maximum, no exceptions. Track your spending.'
+      },
+      {
+        myth: 'When should I expect to win?',
+        fact: 'Statistically, never. But someone has to win, and it\'s okay to dream a little.',
+        explanation: 'Playing for fun with eyes wide open is fine. Playing expecting to win is dangerous.'
+      },
+      {
+        myth: 'What if I do win?',
+        fact: 'Take the lump sum, hire a financial advisor immediately, tell almost no one.',
+        explanation: 'Most winners fail due to poor planning and social pressure. Professional help is essential.'
+      }
+    ]
+  }
+];
+---
+
+<InfoLayout 
+  title="Beginner's Lottery Guide"
+  subtitle="Interactive myths vs facts about lottery odds and strategies"
+  pageTitle="Beginner's Lottery Guide - Myths vs Facts | MintLabs Lucky Numbers"
+  description="Learn the truth about lottery odds, common myths, and what actually matters. Interactive guide separating lottery facts from fiction for beginners."
+  keywords="lottery for beginners, lottery myths, lottery facts, how lottery works, lottery probability explained, lottery tips beginners"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">🎓 Truth Revealed:</strong>
+    Separate lottery myths from facts. Learn what really matters and what's just wishful thinking.
+  </div>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)]">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Choose a Topic</h2>
+    
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {sections.map(section => (
+        <button
+          data-section={section.id}
+          class="section-btn p-6 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 hover:border-emerald-500/50 transition-all text-left"
+        >
+          <div class="text-4xl mb-3">{section.icon}</div>
+          <h3 class="font-semibold text-emerald-300 text-lg mb-2">{section.title}</h3>
+          <p class="text-sm text-gray-400">{section.slides.length} facts</p>
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <section id="slideshow-section" class="hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold text-emerald-300" id="section-title">Topic</h2>
+      <button id="close-btn" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm transition-colors">
+        ← Back to Topics
+      </button>
+    </div>
+
+    <div id="slide-container" class="mb-6">
+      <!-- Slides inserted here -->
+    </div>
+
+    <div class="flex items-center justify-between">
+      <button id="prev-btn" class="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        ← Previous
+      </button>
+      <div class="text-sm text-gray-400">
+        <span id="current-slide">1</span> / <span id="total-slides">1</span>
+      </div>
+      <button id="next-btn" class="px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        Next →
+      </button>
+    </div>
+
+    <div class="flex gap-2 mt-4 justify-center">
+      <div id="progress-dots" class="flex gap-2">
+        <!-- Dots inserted here -->
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Quick Reference Guide</h2>
+    
+    <div class="space-y-4 text-gray-300">
+      <div class="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+        <h3 class="font-semibold text-emerald-300 mb-2">✅ What You SHOULD Know</h3>
+        <ul class="list-disc list-inside space-y-1 text-sm">
+          <li>Every number combination has equal probability</li>
+          <li>Past draws don't affect future draws (independent events)</li>
+          <li>Expected value is negative (you lose money on average)</li>
+          <li>Quick Pick vs manual pick makes zero difference</li>
+          <li>Lottery is entertainment, not investment</li>
+        </ul>
+      </div>
+
+      <div class="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+        <h3 class="font-semibold text-red-300 mb-2">❌ What You Should IGNORE</h3>
+        <ul class="list-disc list-inside space-y-1 text-sm">
+          <li>"Hot" and "cold" number predictions</li>
+          <li>"Due" numbers or overdue patterns</li>
+          <li>Lucky number systems or astrology</li>
+          <li>Any strategy claiming to improve odds</li>
+          <li>Patterns, sequences, or "balance" requirements</li>
+        </ul>
+      </div>
+
+      <div class="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+        <h3 class="font-semibold text-yellow-300 mb-2">⚠️ Responsible Play Guidelines</h3>
+        <ul class="list-disc list-inside space-y-1 text-sm">
+          <li>Set strict monthly budget (e.g., $20/month max)</li>
+          <li>Never spend money you need for bills or essentials</li>
+          <li>Never chase losses or "invest" winnings</li>
+          <li>Track your spending — most people underestimate it</li>
+          <li>If it stops being fun, stop playing</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Related Tools</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <TrackLink href="/tools/probability-visualizer" location="beginners-guide" action="click-related-probability">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Probability Visualizer</h3>
+          <p class="text-sm text-gray-400">See lottery odds compared to real-life events</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/expected-value-calculator" location="beginners-guide" action="click-related-ev">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Expected Value Calculator</h3>
+          <p class="text-sm text-gray-400">Calculate mathematical expected loss</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/lottery-budget" location="beginners-guide" action="click-related-budget">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Budget Planner</h3>
+          <p class="text-sm text-gray-400">See annual cost of lottery spending</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/why-odds-dont-change" location="beginners-guide" action="click-related-odds">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Why Odds Don't Change</h3>
+          <p class="text-sm text-gray-400">Interactive gambler's fallacy demo</p>
+        </div>
+      </TrackLink>
+    </div>
+  </section>
+</InfoLayout>
+
+<script define:vars={{ sections }}>
+  const sectionBtns = document.querySelectorAll('.section-btn');
+  const slideshowSection = document.getElementById('slideshow-section')!;
+  const sectionTitle = document.getElementById('section-title')!;
+  const slideContainer = document.getElementById('slide-container')!;
+  const prevBtn = document.getElementById('prev-btn')!;
+  const nextBtn = document.getElementById('next-btn')!;
+  const closeBtn = document.getElementById('close-btn')!;
+  const currentSlideEl = document.getElementById('current-slide')!;
+  const totalSlidesEl = document.getElementById('total-slides')!;
+  const progressDots = document.getElementById('progress-dots')!;
+
+  let currentSection: typeof sections[0] | null = null;
+  let currentSlideIndex = 0;
+
+  function renderSlide(slideIndex: number) {
+    if (!currentSection) return;
+    
+    const slide = currentSection.slides[slideIndex];
+    slideContainer.innerHTML = `
+      <div class="p-6 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)] min-h-[300px] flex flex-col justify-center">
+        <div class="mb-6">
+          <div class="inline-block px-3 py-1 rounded-full bg-red-500/20 border border-red-500/30 text-red-300 text-sm font-semibold mb-4">
+            ❌ MYTH
+          </div>
+          <p class="text-xl font-semibold text-gray-200 mb-4">"${slide.myth}"</p>
+        </div>
+        <div class="mb-6">
+          <div class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-sm font-semibold mb-4">
+            ✅ FACT
+          </div>
+          <p class="text-xl font-semibold text-emerald-300 mb-4">${slide.fact}</p>
+        </div>
+        <div class="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
+          <p class="text-sm text-blue-200">${slide.explanation}</p>
+        </div>
+      </div>
+    `;
+    
+    currentSlideEl.textContent = (slideIndex + 1).toString();
+    prevBtn.disabled = slideIndex === 0;
+    nextBtn.disabled = slideIndex === currentSection.slides.length - 1;
+    
+    // Update progress dots
+    progressDots.innerHTML = currentSection.slides.map((_, i) => `
+      <div class="w-2 h-2 rounded-full ${i === slideIndex ? 'bg-emerald-400' : 'bg-slate-600'}"></div>
+    `).join('');
+  }
+
+  function loadSection(sectionId: string) {
+    currentSection = sections.find(s => s.id === sectionId) || null;
+    if (!currentSection) return;
+    
+    currentSlideIndex = 0;
+    sectionTitle.textContent = currentSection.title;
+    totalSlidesEl.textContent = currentSection.slides.length.toString();
+    
+    renderSlide(0);
+    slideshowSection.classList.remove('hidden');
+    slideshowSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  sectionBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sectionId = btn.getAttribute('data-section');
+      if (sectionId) loadSection(sectionId);
+    });
+  });
+
+  prevBtn.addEventListener('click', () => {
+    if (currentSlideIndex > 0) {
+      currentSlideIndex--;
+      renderSlide(currentSlideIndex);
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (currentSection && currentSlideIndex < currentSection.slides.length - 1) {
+      currentSlideIndex++;
+      renderSlide(currentSlideIndex);
+    }
+  });
+
+  closeBtn.addEventListener('click', () => {
+    slideshowSection.classList.add('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+
+<style>
+  /* Token-compliant responsive design */
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

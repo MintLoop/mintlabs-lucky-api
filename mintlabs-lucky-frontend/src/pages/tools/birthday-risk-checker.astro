@@ -1,0 +1,414 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import TrackLink from "../../components/TrackLink.astro";
+
+const games = [
+  { id: 'powerball', name: 'Powerball', maxNumber: 69, needCount: 5 },
+  { id: 'megamillions', name: 'Mega Millions', maxNumber: 70, needCount: 5 },
+  { id: 'superlotto', name: 'CA SuperLotto Plus', maxNumber: 47, needCount: 5 },
+  { id: 'pick6', name: 'Generic Pick-6 (1-49)', maxNumber: 49, needCount: 6 },
+];
+
+// Birthday popularity data (1-31)
+// Higher values = more popular (more people likely to pick these numbers)
+const birthdayPopularity = [
+  { num: 1, popularity: 95, reason: 'Very common (1st of month)' },
+  { num: 2, popularity: 88, reason: 'Common (2nd of month)' },
+  { num: 3, popularity: 90, reason: 'Common (3rd of month)' },
+  { num: 4, popularity: 85, reason: 'Common date' },
+  { num: 5, popularity: 87, reason: 'Common date' },
+  { num: 6, popularity: 83, reason: 'Moderately common' },
+  { num: 7, popularity: 93, reason: 'Very popular (lucky 7 + 7th of month)' },
+  { num: 8, popularity: 86, reason: 'Common date' },
+  { num: 9, popularity: 84, reason: 'Common date' },
+  { num: 10, popularity: 91, reason: 'Very common (10th of month)' },
+  { num: 11, popularity: 89, reason: 'Common (11th of month)' },
+  { num: 12, popularity: 92, reason: 'Very common (December, 12th)' },
+  { num: 13, popularity: 78, reason: 'Less common (superstition)' },
+  { num: 14, popularity: 87, reason: 'Common (Valentine\'s Day)' },
+  { num: 15, popularity: 90, reason: 'Very common (mid-month)' },
+  { num: 16, popularity: 82, reason: 'Moderately common' },
+  { num: 17, popularity: 85, reason: 'Common date' },
+  { num: 18, popularity: 84, reason: 'Common date' },
+  { num: 19, popularity: 81, reason: 'Moderately common' },
+  { num: 20, popularity: 88, reason: 'Common (20th of month)' },
+  { num: 21, popularity: 86, reason: 'Common (legal age)' },
+  { num: 22, popularity: 83, reason: 'Moderately common' },
+  { num: 23, popularity: 80, reason: 'Moderately common' },
+  { num: 24, popularity: 85, reason: 'Common (Christmas Eve)' },
+  { num: 25, popularity: 89, reason: 'Very common (Christmas)' },
+  { num: 26, popularity: 79, reason: 'Moderately common' },
+  { num: 27, popularity: 81, reason: 'Moderately common' },
+  { num: 28, popularity: 82, reason: 'Moderately common' },
+  { num: 29, popularity: 77, reason: 'Less common (not all months)' },
+  { num: 30, popularity: 83, reason: 'Moderately common' },
+  { num: 31, popularity: 80, reason: 'Moderately common (not all months)' },
+];
+---
+
+<InfoLayout 
+  title="Birthday Risk Checker"
+  subtitle="See how birthday-based numbers affect your split-risk if you win"
+  pageTitle="Birthday Risk Checker - Lottery Split Probability Calculator | MintLabs"
+  description="Calculate how using birthday numbers (1-31) increases your risk of sharing a jackpot. See popularity scores and expected split multipliers."
+  keywords="birthday lottery numbers, lottery split risk, birthday number popularity, lottery number sharing, jackpot split calculator"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">🎂 Birthday Bias:</strong>
+    Numbers 1-31 are overplayed because people use birthdays. Check your split risk if you win!
+  </div>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)]">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Enter Your Numbers</h2>
+    
+    <div class="mb-4">
+      <label for="game-select" class="block text-sm font-medium text-gray-300 mb-2">Lottery Game:</label>
+      <select 
+        id="game-select" 
+        class="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--surface-elevated)] px-4 py-2 text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+      >
+        {games.map(game => (
+          <option value={game.id}>{game.name}</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="mb-4">
+      <label for="numbers-input" class="block text-sm font-medium text-gray-300 mb-2">
+        Enter your numbers (comma or space separated):
+      </label>
+      <input 
+        type="text" 
+        id="numbers-input"
+        placeholder="e.g., 7, 12, 23, 25, 31"
+        class="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--surface-elevated)] px-4 py-3 text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+      />
+    </div>
+
+    <button
+      id="check-btn"
+      class="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:from-emerald-600 hover:to-teal-700 hover:shadow-xl"
+    >
+      Check Birthday Risk
+    </button>
+  </section>
+
+  <section id="results-section" class="hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Risk Analysis</h2>
+    
+    <div id="numbers-display" class="mb-6 flex flex-wrap gap-3 justify-center"></div>
+
+    <div id="overall-risk" class="mb-6 p-6 rounded-lg border text-center"></div>
+
+    <div class="space-y-4 mb-6">
+      <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+        <h3 class="font-semibold text-white mb-3">Your Numbers by Risk Level</h3>
+        <div id="risk-breakdown"></div>
+      </div>
+    </div>
+
+    <div class="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
+      <h3 class="font-semibold text-blue-300 mb-2">💡 What This Means</h3>
+      <p id="interpretation" class="text-sm text-blue-200"></p>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Why Birthday Numbers Matter</h2>
+    
+    <div class="space-y-4 text-gray-300">
+      <div class="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+        <p class="text-sm text-yellow-300">
+          <strong>⚠️ Key Point:</strong> Birthday numbers (1-31) don't reduce your odds of winning, but they dramatically increase your odds of <strong>sharing the jackpot</strong> if you do win.
+        </p>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">The Birthday Bias</h3>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li><strong class="text-white">Popularity Clustering:</strong> Numbers 1-31 are disproportionately picked because people use birth dates</li>
+          <li><strong class="text-white">Month/Day Pattern:</strong> Popular dates like 7 (7/7), 12 (December), 25 (Christmas) are even more overplayed</li>
+          <li><strong class="text-white">Limited Range:</strong> Most lotteries go up to 49-70, but birthday pickers only use 1-31 (less than half the range)</li>
+        </ul>
+      </div>
+
+      <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+        <h3 class="font-semibold text-white mb-2">Real Example</h3>
+        <p class="mb-2"><strong class="text-emerald-400">High-Risk Ticket:</strong> 7, 12, 25, 14, 31, 10</p>
+        <p class="text-sm mb-3">All birthday numbers, including highly popular dates (7, 12, 25). If you win, expect to share with multiple people.</p>
+        
+        <p class="mb-2"><strong class="text-emerald-400">Low-Risk Ticket:</strong> 37, 44, 58, 63, 67, 52</p>
+        <p class="text-sm">All above 31 (impossible as birth dates). If you win, likely fewer winners sharing the pot.</p>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">Historical Evidence</h3>
+        <p class="mb-2">Lottery commissions have reported:</p>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li><strong class="text-white">Split Rates:</strong> Jackpots with winning numbers all ≤ 31 tend to have 2-5x more winners</li>
+          <li><strong class="text-white">Number Distribution:</strong> In player data, 1-31 are picked at roughly 2-3x the rate of 32+</li>
+          <li><strong class="text-white">"Lucky" Numbers:</strong> 7, 11, and round numbers (10, 20, 25) show extreme popularity spikes</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">How to Reduce Split Risk</h3>
+        <div class="space-y-2">
+          <div class="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+            <p class="text-sm text-emerald-300"><strong>✅ Use Quick Pick:</strong> Random generation avoids human biases entirely</p>
+          </div>
+          <div class="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+            <p class="text-sm text-emerald-300"><strong>✅ Mix High Numbers:</strong> Include at least 2-3 numbers above 31</p>
+          </div>
+          <div class="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+            <p class="text-sm text-emerald-300"><strong>✅ Avoid Patterns:</strong> No sequences (1-2-3), no multiples of 5, no grid patterns</p>
+          </div>
+          <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+            <p class="text-sm text-red-300"><strong>❌ Avoid All Birthdays:</strong> Using your family's birth dates guarantees high split risk</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
+        <p class="text-sm text-blue-300">
+          <strong>📊 The Math:</strong> If 70% of players use birthday numbers, and you win with an all-birthday ticket, you're statistically more likely to share with others. Using numbers above 31 moves you into the less-crowded 30% of player space.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Related Tools</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <TrackLink href="/tools/common-combo-checker" location="birthday-risk-checker" action="click-related-common">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Common Combo Checker</h3>
+          <p class="text-sm text-gray-400">See if your numbers are overplayed</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/number-popularity-scorecard" location="birthday-risk-checker" action="click-related-popularity">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Number Popularity Scorecard</h3>
+          <p class="text-sm text-gray-400">Check frequency patterns</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/is-my-ticket-balanced" location="birthday-risk-checker" action="click-related-balance">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Is My Ticket Balanced?</h3>
+          <p class="text-sm text-gray-400">Multi-metric balance checker</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/" location="birthday-risk-checker" action="click-related-generator">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Lucky Number Generator</h3>
+          <p class="text-sm text-gray-400">Generate truly random numbers</p>
+        </div>
+      </TrackLink>
+    </div>
+  </section>
+</InfoLayout>
+
+<script define:vars={{ games, birthdayPopularity }}>
+  const checkBtn = document.getElementById('check-btn');
+  const resultsSection = document.getElementById('results-section');
+  const numbersInput = document.getElementById('numbers-input');
+  const gameSelect = document.getElementById('game-select');
+  const numbersDisplay = document.getElementById('numbers-display');
+  const overallRisk = document.getElementById('overall-risk');
+  const riskBreakdown = document.getElementById('risk-breakdown');
+  const interpretation = document.getElementById('interpretation');
+
+  let currentGame = games[0];
+
+  gameSelect.addEventListener('change', () => {
+    currentGame = games.find(g => g.id === gameSelect.value) || games[0];
+  });
+
+  function parseNumbers(input) {
+    return input
+      .split(/[,\s]+/)
+      .map(s => parseInt(s.trim()))
+      .filter(n => !isNaN(n) && n > 0)
+      .sort((a, b) => a - b);
+  }
+
+  function getPopularity(num) {
+    const data = birthdayPopularity.find(d => d.num === num);
+    if (data) return data;
+    
+    // Numbers above 31 have much lower popularity
+    if (num > 31) {
+      return { num, popularity: 45, reason: 'Above birthday range (safer)' };
+    }
+    
+    return { num, popularity: 80, reason: 'Birthday range' };
+  }
+
+  function getRiskLevel(popularity) {
+    if (popularity >= 90) return { level: 'Very High', color: 'red', icon: '⚠️' };
+    if (popularity >= 85) return { level: 'High', color: 'orange', icon: '⚠️' };
+    if (popularity >= 75) return { level: 'Moderate', color: 'yellow', icon: '⚡' };
+    if (popularity >= 60) return { level: 'Low', color: 'emerald', icon: '✓' };
+    return { level: 'Very Low', color: 'emerald', icon: '✓✓' };
+  }
+
+  function getColorClasses(color) {
+    const colors = {
+      emerald: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
+      yellow: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400',
+      orange: 'border-orange-500/30 bg-orange-500/10 text-orange-400',
+      red: 'border-red-500/30 bg-red-500/10 text-red-400'
+    };
+    return colors[color] || colors.emerald;
+  }
+
+  checkBtn.addEventListener('click', () => {
+    const input = numbersInput.value;
+    
+    if (!input.trim()) {
+      alert('Please enter some numbers first');
+      return;
+    }
+    
+    const numbers = parseNumbers(input);
+    
+    if (numbers.length < currentGame.needCount || numbers.length > 7) {
+      alert(`Please enter ${currentGame.needCount}-7 valid numbers`);
+      return;
+    }
+    
+    // Analyze each number
+    const analysis = numbers.map(num => ({
+      num,
+      ...getPopularity(num),
+      risk: getRiskLevel(getPopularity(num).popularity)
+    }));
+    
+    // Calculate overall risk
+    const avgPopularity = analysis.reduce((sum, a) => sum + a.popularity, 0) / analysis.length;
+    const birthdayCount = analysis.filter(a => a.num <= 31).length;
+    const birthdayPct = (birthdayCount / numbers.length) * 100;
+    
+    let overallLevel, overallColor, splitMultiplier;
+    if (birthdayPct === 100 && avgPopularity >= 85) {
+      overallLevel = 'Very High Risk';
+      overallColor = 'red';
+      splitMultiplier = '3-5x';
+    } else if (birthdayPct >= 80 || avgPopularity >= 85) {
+      overallLevel = 'High Risk';
+      overallColor = 'orange';
+      splitMultiplier = '2-3x';
+    } else if (birthdayPct >= 50 || avgPopularity >= 75) {
+      overallLevel = 'Moderate Risk';
+      overallColor = 'yellow';
+      splitMultiplier = '1.5-2x';
+    } else if (birthdayPct >= 25 || avgPopularity >= 60) {
+      overallLevel = 'Low Risk';
+      overallColor = 'emerald';
+      splitMultiplier = '1-1.5x';
+    } else {
+      overallLevel = 'Very Low Risk';
+      overallColor = 'emerald';
+      splitMultiplier = '~1x';
+    }
+    
+    // Display numbers with risk indicators
+    numbersDisplay.innerHTML = analysis.map(a => `
+      <div class="text-center">
+        <div class="px-4 py-3 rounded-lg ${a.num <= 31 ? 'bg-gradient-to-br from-orange-500 to-red-600' : 'bg-gradient-to-br from-emerald-500 to-teal-600'} text-white font-bold text-xl shadow-lg mb-2">
+          ${a.num}
+        </div>
+        <div class="text-xs ${a.risk.color === 'red' || a.risk.color === 'orange' ? 'text-' + a.risk.color + '-400' : 'text-emerald-400'}">${a.risk.icon} ${a.risk.level}</div>
+      </div>
+    `).join('');
+    
+    // Overall risk display
+    overallRisk.className = `mb-6 p-6 rounded-lg border text-center ${getColorClasses(overallColor)}`;
+    overallRisk.innerHTML = `
+      <div class="text-4xl font-bold mb-2">${overallLevel}</div>
+      <div class="text-lg mb-3">${birthdayCount} of ${numbers.length} numbers are birthday dates (1-31)</div>
+      <div class="text-xl font-semibold">Expected Split Multiplier: ${splitMultiplier}</div>
+      <p class="text-sm mt-3 opacity-80">If you win, you're likely to share with ${splitMultiplier} more people than a random ticket</p>
+    `;
+    
+    // Risk breakdown
+    const veryHigh = analysis.filter(a => a.risk.level === 'Very High');
+    const high = analysis.filter(a => a.risk.level === 'High');
+    const moderate = analysis.filter(a => a.risk.level === 'Moderate');
+    const low = analysis.filter(a => a.risk.level === 'Low' || a.risk.level === 'Very Low');
+    
+    let breakdownHTML = '<div class="space-y-3">';
+    
+    if (veryHigh.length > 0) {
+      breakdownHTML += `
+        <div class="p-3 rounded-lg ${getColorClasses('red')}">
+          <div class="font-semibold mb-1">⚠️ Very High Risk (${veryHigh.length})</div>
+          <div class="text-sm font-mono">${veryHigh.map(a => a.num).join(', ')}</div>
+          <p class="text-xs mt-1 opacity-90">Extremely popular dates</p>
+        </div>
+      `;
+    }
+    
+    if (high.length > 0) {
+      breakdownHTML += `
+        <div class="p-3 rounded-lg ${getColorClasses('orange')}">
+          <div class="font-semibold mb-1">⚠️ High Risk (${high.length})</div>
+          <div class="text-sm font-mono">${high.map(a => a.num).join(', ')}</div>
+          <p class="text-xs mt-1 opacity-90">Common birthday dates</p>
+        </div>
+      `;
+    }
+    
+    if (moderate.length > 0) {
+      breakdownHTML += `
+        <div class="p-3 rounded-lg ${getColorClasses('yellow')}">
+          <div class="font-semibold mb-1">⚡ Moderate Risk (${moderate.length})</div>
+          <div class="text-sm font-mono">${moderate.map(a => a.num).join(', ')}</div>
+          <p class="text-xs mt-1 opacity-90">Still in birthday range</p>
+        </div>
+      `;
+    }
+    
+    if (low.length > 0) {
+      breakdownHTML += `
+        <div class="p-3 rounded-lg ${getColorClasses('emerald')}">
+          <div class="font-semibold mb-1">✓ Low Risk (${low.length})</div>
+          <div class="text-sm font-mono">${low.map(a => a.num).join(', ')}</div>
+          <p class="text-xs mt-1 opacity-90">Outside birthday range or less popular</p>
+        </div>
+      `;
+    }
+    
+    breakdownHTML += '</div>';
+    riskBreakdown.innerHTML = breakdownHTML;
+    
+    // Interpretation
+    let interpretText = '';
+    if (birthdayPct === 100) {
+      interpretText = `All your numbers are in the birthday range (1-31). This ticket is likely picked by many other players. If you win, expect to share the jackpot with multiple winners, significantly reducing your payout.`;
+    } else if (birthdayPct >= 80) {
+      interpretText = `Most of your numbers (${birthdayCount} of ${numbers.length}) are birthday dates. While not as risky as all-birthday tickets, you're still in crowded number space. Consider mixing in more numbers above 31.`;
+    } else if (birthdayPct >= 50) {
+      interpretText = `About half your numbers are birthday dates. Your split risk is moderate. Adding more high numbers (32+) would reduce overlap with other players.`;
+    } else if (birthdayPct > 0) {
+      interpretText = `You have ${birthdayCount} birthday number(s) but mostly use higher numbers. Your split risk is relatively low compared to all-birthday tickets.`;
+    } else {
+      interpretText = `Excellent! All your numbers are above 31, meaning they cannot be birth dates. This puts you in the less-crowded player space and minimizes split risk if you win.`;
+    }
+    
+    interpretation.textContent = interpretText;
+    
+    // Show results
+    resultsSection.classList.remove('hidden');
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>
+
+<style>
+  /* Token-compliant responsive design */
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

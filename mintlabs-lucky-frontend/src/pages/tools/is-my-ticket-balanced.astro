@@ -1,0 +1,365 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import TrackLink from "../../components/TrackLink.astro";
+
+const games = [
+  { id: 'powerball', name: 'Powerball', maxNumber: 69 },
+  { id: 'megamillions', name: 'Mega Millions', maxNumber: 70 },
+  { id: 'superlotto', name: 'CA SuperLotto Plus', maxNumber: 47 },
+  { id: 'pick6', name: 'Generic Pick-6 (1-49)', maxNumber: 49 },
+];
+---
+
+<InfoLayout 
+  title="Is My Ticket Balanced? Analyzer"
+  subtitle="Check your numbers against multiple balance heuristics"
+  pageTitle="Is My Ticket Balanced? - Lottery Balance Checker | MintLabs"
+  description="Analyze your lottery ticket for balance across multiple metrics: even/odd, high/low, sum range, spread, and consecutive numbers. See how 'balanced' your picks are."
+  keywords="balanced lottery numbers, lottery balance checker, lottery ticket analyzer, lottery strategy checker, number balance analysis"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">⚖️ Multi-Metric Analysis:</strong>
+    Check if your numbers are "balanced" using 5 common heuristics. But remember: balance doesn't improve odds!
+  </div>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)]">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Enter Your Ticket</h2>
+    
+    <div class="mb-4">
+      <label for="game-select" class="block text-sm font-medium text-gray-300 mb-2">Lottery Game:</label>
+      <select 
+        id="game-select" 
+        class="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--surface-elevated)] px-4 py-2 text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+      >
+        {games.map(game => (
+          <option value={game.id}>{game.name}</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="mb-4">
+      <label for="numbers-input" class="block text-sm font-medium text-gray-300 mb-2">
+        Enter 5-7 numbers (comma or space separated):
+      </label>
+      <input 
+        type="text" 
+        id="numbers-input"
+        placeholder="e.g., 7, 23, 34, 45, 56, 67"
+        class="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--surface-elevated)] px-4 py-3 text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+      />
+    </div>
+
+    <button
+      id="analyze-btn"
+      class="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:from-emerald-600 hover:to-teal-700 hover:shadow-xl"
+    >
+      Analyze Balance
+    </button>
+  </section>
+
+  <section id="results-section" class="hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Balance Analysis</h2>
+    
+    <div id="numbers-display" class="mb-6 flex flex-wrap gap-3 justify-center"></div>
+
+    <div id="overall-score" class="mb-6 p-6 rounded-lg border text-center"></div>
+
+    <div class="space-y-4" id="metrics-container">
+      <!-- Metrics inserted here -->
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Understanding "Balance"</h2>
+    
+    <div class="space-y-4 text-gray-300">
+      <div class="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+        <p class="text-sm text-yellow-300">
+          <strong>⚠️ Critical Disclaimer:</strong> "Balance" is a purely descriptive pattern. Balanced tickets do NOT have better odds than unbalanced tickets. Every specific combination has equal probability.
+        </p>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">What We Check</h3>
+        <div class="space-y-3">
+          <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <h4 class="font-semibold text-white mb-2">1. Even/Odd Ratio</h4>
+            <p class="text-sm">Balanced = 3 even, 3 odd. Unbalanced = all even or all odd.</p>
+          </div>
+          <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <h4 class="font-semibold text-white mb-2">2. High/Low Distribution</h4>
+            <p class="text-sm">Balanced = numbers spread across low and high ranges (e.g., 3 low / 3 high).</p>
+          </div>
+          <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <h4 class="font-semibold text-white mb-2">3. Sum Range</h4>
+            <p class="text-sm">Balanced = sum falls in middle 70% of possible sums. Extreme sums are rarer but equally valid.</p>
+          </div>
+          <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <h4 class="font-semibold text-white mb-2">4. Number Spread</h4>
+            <p class="text-sm">Balanced = numbers cover 40-70% of the range. Clustered or extremely wide spreads are less common.</p>
+          </div>
+          <div class="p-4 rounded-lg bg-slate-900/50 border border-[var(--border-primary-darker)]">
+            <h4 class="font-semibold text-white mb-2">5. Consecutive Numbers</h4>
+            <p class="text-sm">Balanced = no long sequences. 3+ consecutive numbers are less common (but equally probable).</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">Why Balance Appears More Often</h3>
+        <p class="mb-2">Balanced combinations appear more frequently in draws for a simple mathematical reason:</p>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li><strong class="text-white">Combinatorial Math:</strong> There are more ways to create a 3/3 even/odd split than a 6/0 split</li>
+          <li><strong class="text-white">Not Preference:</strong> The lottery doesn't "prefer" balance — there are simply more balanced combinations available</li>
+          <li><strong class="text-white">Equal Individual Odds:</strong> Each specific combination (balanced or not) has identical probability</li>
+        </ul>
+      </div>
+
+      <div class="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
+        <p class="text-sm text-blue-300">
+          <strong>📊 Example:</strong> <span class="font-mono text-white">1-2-3-4-5-6</span> (perfectly unbalanced) has the exact same odds as <span class="font-mono text-emerald-400">7-19-32-45-58-67</span> (perfectly balanced). Both are 1 in 292 million for Powerball.
+        </p>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-300 mb-2">Should You Play Balanced Numbers?</h3>
+        <p class="mb-3"><strong class="text-white">Short answer:</strong> It doesn't matter for odds, but here are considerations:</p>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li><strong class="text-white">For Entertainment:</strong> If "balanced" tickets feel better psychologically, play them. Your odds don't change.</li>
+          <li><strong class="text-white">Avoid Common Patterns:</strong> The ONLY strategy that matters is avoiding commonly picked combinations (like 1-2-3-4-5-6) to reduce split risk if you win.</li>
+          <li><strong class="text-white">Random is Best:</strong> Quick Pick or truly random selection avoids unconscious biases.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface-elevated)] p-6 shadow-[var(--card-shadow)] mt-6">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Related Tools</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <TrackLink href="/tools/even-odd-ratio-visualizer" location="balance-analyzer" action="click-related-evenodd">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Even/Odd Ratio Visualizer</h3>
+          <p class="text-sm text-gray-400">Deep dive into even/odd balance</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/high-low-ratio-analyzer" location="balance-analyzer" action="click-related-highlow">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">High/Low Ratio Analyzer</h3>
+          <p class="text-sm text-gray-400">Analyze distribution across range</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/pattern-analyzer" location="balance-analyzer" action="click-related-pattern">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Pattern Analyzer</h3>
+          <p class="text-sm text-gray-400">Complete pattern analysis suite</p>
+        </div>
+      </TrackLink>
+      <TrackLink href="/tools/common-combo-checker" location="balance-analyzer" action="click-related-common">
+        <div class="p-4 rounded-lg border border-[var(--border-primary)] bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+          <h3 class="font-semibold text-emerald-300 mb-1">Common Combo Checker</h3>
+          <p class="text-sm text-gray-400">Check if your numbers are overplayed</p>
+        </div>
+      </TrackLink>
+    </div>
+  </section>
+</InfoLayout>
+
+<script define:vars={{ games }}>
+  const analyzeBtn = document.getElementById('analyze-btn');
+  const resultsSection = document.getElementById('results-section');
+  const numbersInput = document.getElementById('numbers-input');
+  const gameSelect = document.getElementById('game-select');
+  const numbersDisplay = document.getElementById('numbers-display');
+  const overallScore = document.getElementById('overall-score');
+  const metricsContainer = document.getElementById('metrics-container');
+
+  let currentGame = games[0];
+
+  gameSelect.addEventListener('change', () => {
+    currentGame = games.find(g => g.id === gameSelect.value) || games[0];
+  });
+
+  function parseNumbers(input) {
+    return input
+      .split(/[,\s]+/)
+      .map(s => parseInt(s.trim()))
+      .filter(n => !isNaN(n) && n > 0)
+      .sort((a, b) => a - b);
+  }
+
+  function checkEvenOdd(numbers) {
+    const evens = numbers.filter(n => n % 2 === 0).length;
+    const odds = numbers.length - evens;
+    const diff = Math.abs(evens - odds);
+    
+    if (diff === 0) return { score: 100, rating: 'Perfect', color: 'emerald' };
+    if (diff === 2) return { score: 80, rating: 'Good', color: 'yellow' };
+    if (diff === 4) return { score: 50, rating: 'Imbalanced', color: 'orange' };
+    return { score: 20, rating: 'Extreme', color: 'red' };
+  }
+
+  function checkHighLow(numbers, maxNumber) {
+    const midpoint = Math.floor(maxNumber / 2);
+    const lows = numbers.filter(n => n <= midpoint).length;
+    const highs = numbers.length - lows;
+    const diff = Math.abs(lows - highs);
+    
+    if (diff === 0) return { score: 100, rating: 'Perfect', color: 'emerald' };
+    if (diff === 2) return { score: 80, rating: 'Good', color: 'yellow' };
+    if (diff === 4) return { score: 50, rating: 'Imbalanced', color: 'orange' };
+    return { score: 20, rating: 'Extreme', color: 'red' };
+  }
+
+  function checkSumRange(numbers, maxNumber) {
+    const sum = numbers.reduce((a, b) => a + b, 0);
+    const count = numbers.length;
+    const minPossible = (count * (count + 1)) / 2; // 1+2+3+...+count
+    const maxPossible = (maxNumber * count) - ((count - 1) * count) / 2; // max-(count-1)...max
+    const idealMin = minPossible + (maxPossible - minPossible) * 0.15;
+    const idealMax = minPossible + (maxPossible - minPossible) * 0.85;
+    
+    if (sum >= idealMin && sum <= idealMax) return { score: 100, rating: 'Balanced', color: 'emerald', sum };
+    if (sum >= idealMin * 0.9 && sum <= idealMax * 1.1) return { score: 70, rating: 'Acceptable', color: 'yellow', sum };
+    return { score: 40, rating: 'Extreme', color: 'orange', sum };
+  }
+
+  function checkSpread(numbers, maxNumber) {
+    const span = numbers[numbers.length - 1] - numbers[0];
+    const coverage = (span / maxNumber) * 100;
+    
+    if (coverage >= 40 && coverage <= 70) return { score: 100, rating: 'Balanced', color: 'emerald', span };
+    if (coverage >= 25 && coverage <= 85) return { score: 75, rating: 'Acceptable', color: 'yellow', span };
+    return { score: 40, rating: 'Extreme', color: 'orange', span };
+  }
+
+  function checkConsecutive(numbers) {
+    let maxSeq = 1;
+    let currentSeq = 1;
+    
+    for (let i = 1; i < numbers.length; i++) {
+      if (numbers[i] === numbers[i - 1] + 1) {
+        currentSeq++;
+        maxSeq = Math.max(maxSeq, currentSeq);
+      } else {
+        currentSeq = 1;
+      }
+    }
+    
+    if (maxSeq === 1) return { score: 100, rating: 'No Sequences', color: 'emerald', maxSeq };
+    if (maxSeq === 2) return { score: 80, rating: 'One Pair', color: 'yellow', maxSeq };
+    if (maxSeq === 3) return { score: 50, rating: 'Triple', color: 'orange', maxSeq };
+    return { score: 20, rating: 'Long Sequence', color: 'red', maxSeq };
+  }
+
+  function getColorClasses(color) {
+    const colors = {
+      emerald: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
+      yellow: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400',
+      orange: 'border-orange-500/30 bg-orange-500/10 text-orange-400',
+      red: 'border-red-500/30 bg-red-500/10 text-red-400'
+    };
+    return colors[color] || colors.emerald;
+  }
+
+  analyzeBtn.addEventListener('click', () => {
+    const input = numbersInput.value;
+    
+    if (!input.trim()) {
+      alert('Please enter some numbers first');
+      return;
+    }
+    
+    const numbers = parseNumbers(input);
+    
+    if (numbers.length < 5 || numbers.length > 7) {
+      alert('Please enter between 5 and 7 valid numbers');
+      return;
+    }
+    
+    // Display numbers
+    numbersDisplay.innerHTML = numbers.map(n => `
+      <div class="px-4 py-3 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-bold text-xl shadow-lg">
+        ${n}
+      </div>
+    `).join('');
+    
+    // Run all checks
+    const evenOdd = checkEvenOdd(numbers);
+    const highLow = checkHighLow(numbers, currentGame.maxNumber);
+    const sumRange = checkSumRange(numbers, currentGame.maxNumber);
+    const spread = checkSpread(numbers, currentGame.maxNumber);
+    const consecutive = checkConsecutive(numbers);
+    
+    const totalScore = Math.round((evenOdd.score + highLow.score + sumRange.score + spread.score + consecutive.score) / 5);
+    
+    // Overall score
+    let overallRating, overallColor;
+    if (totalScore >= 85) { overallRating = 'Very Balanced'; overallColor = 'emerald'; }
+    else if (totalScore >= 70) { overallRating = 'Moderately Balanced'; overallColor = 'yellow'; }
+    else if (totalScore >= 50) { overallRating = 'Somewhat Unbalanced'; overallColor = 'orange'; }
+    else { overallRating = 'Very Unbalanced'; overallColor = 'red'; }
+    
+    overallScore.className = `mb-6 p-6 rounded-lg border text-center ${getColorClasses(overallColor)}`;
+    overallScore.innerHTML = `
+      <div class="text-5xl font-bold mb-2">${totalScore}/100</div>
+      <div class="text-xl font-semibold">${overallRating}</div>
+      <p class="text-sm mt-3 opacity-80">Remember: Balance does NOT improve your odds of winning!</p>
+    `;
+    
+    // Metrics
+    metricsContainer.innerHTML = `
+      <div class="p-4 rounded-lg border ${getColorClasses(evenOdd.color)}">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-semibold text-white">Even/Odd Ratio</h3>
+          <span class="font-bold">${evenOdd.score}/100</span>
+        </div>
+        <p class="text-sm opacity-90">${evenOdd.rating}</p>
+      </div>
+      
+      <div class="p-4 rounded-lg border ${getColorClasses(highLow.color)}">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-semibold text-white">High/Low Distribution</h3>
+          <span class="font-bold">${highLow.score}/100</span>
+        </div>
+        <p class="text-sm opacity-90">${highLow.rating}</p>
+      </div>
+      
+      <div class="p-4 rounded-lg border ${getColorClasses(sumRange.color)}">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-semibold text-white">Sum Range (${sumRange.sum})</h3>
+          <span class="font-bold">${sumRange.score}/100</span>
+        </div>
+        <p class="text-sm opacity-90">${sumRange.rating} — Sum falls in typical range</p>
+      </div>
+      
+      <div class="p-4 rounded-lg border ${getColorClasses(spread.color)}">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-semibold text-white">Number Spread (${spread.span})</h3>
+          <span class="font-bold">${spread.score}/100</span>
+        </div>
+        <p class="text-sm opacity-90">${spread.rating} — Numbers cover ${Math.round((spread.span / currentGame.maxNumber) * 100)}% of range</p>
+      </div>
+      
+      <div class="p-4 rounded-lg border ${getColorClasses(consecutive.color)}">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-semibold text-white">Consecutive Numbers</h3>
+          <span class="font-bold">${consecutive.score}/100</span>
+        </div>
+        <p class="text-sm opacity-90">${consecutive.rating} — Longest sequence: ${consecutive.maxSeq}</p>
+      </div>
+    `;
+    
+    // Show results
+    resultsSection.classList.remove('hidden');
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>
+
+<style>
+  /* Token-compliant responsive design */
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
