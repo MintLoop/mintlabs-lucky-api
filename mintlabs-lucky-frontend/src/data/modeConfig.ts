@@ -36,34 +36,82 @@ export const MODE_CONFIG = {
   favorite_color: {
     label: 'Color',
     items: [
-      { key: 'blue', label: 'Blue', emoji: '🔵', seed: 'color:blue', color: 'blue' },
-      { key: 'green', label: 'Green', emoji: '🟢', seed: 'color:green', color: 'green' },
+      // Primary Colors
       { key: 'red', label: 'Red', emoji: '🔴', seed: 'color:red', color: 'red' },
-      { key: 'purple', label: 'Purple', emoji: '🟣', seed: 'color:purple', color: 'purple' },
-      { key: 'black', label: 'Black', emoji: '⚫', seed: 'color:black', color: 'gray-800' },
       { key: 'yellow', label: 'Yellow', emoji: '🟡', seed: 'color:yellow', color: 'yellow' },
+      { key: 'blue', label: 'Blue', emoji: '🔵', seed: 'color:blue', color: 'blue' },
+      // Secondary Colors
+      { key: 'orange', label: 'Orange', emoji: '🟠', seed: 'color:orange', color: 'orange' },
+      { key: 'green', label: 'Green', emoji: '🟢', seed: 'color:green', color: 'green' },
+      { key: 'purple', label: 'Purple', emoji: '🟣', seed: 'color:purple', color: 'purple' },
+      // Tertiary Colors
+      { key: 'vermilion', label: 'Vermilion (Red-Orange)', emoji: '🔶', seed: 'color:vermilion', color: 'orange' },
+      { key: 'amber', label: 'Amber (Yellow-Orange)', emoji: '🟨', seed: 'color:amber', color: 'amber' },
+      { key: 'chartreuse', label: 'Chartreuse (Yellow-Green)', emoji: '💚', seed: 'color:chartreuse', color: 'lime' },
+      { key: 'teal', label: 'Teal (Blue-Green)', emoji: '🩵', seed: 'color:teal', color: 'teal' },
+      { key: 'violet', label: 'Violet (Blue-Purple)', emoji: '💜', seed: 'color:violet', color: 'violet' },
+      { key: 'magenta', label: 'Magenta (Red-Purple)', emoji: '🩷', seed: 'color:magenta', color: 'fuchsia' },
+      // Neutrals
+      { key: 'white', label: 'White', emoji: '⚪', seed: 'color:white', color: 'gray-100' },
+      { key: 'black', label: 'Black', emoji: '⚫', seed: 'color:black', color: 'gray-800' },
+      { key: 'gray', label: 'Gray', emoji: '⚫', seed: 'color:gray', color: 'gray' },
     ],
   },
   gemstone: {
     label: 'Gemstone',
     items: [
-      { key: 'ruby', label: 'Ruby', emoji: '💎', seed: 'gem:ruby' },
-      { key: 'sapphire', label: 'Sapphire', emoji: '🔷', seed: 'gem:sapphire' },
-      { key: 'emerald', label: 'Emerald', emoji: '💚', seed: 'gem:emerald' },
-      { key: 'opal', label: 'Opal', emoji: '🌈', seed: 'gem:opal' },
-      { key: 'topaz', label: 'Topaz', emoji: '🟦', seed: 'gem:topaz' },
-      { key: 'amethyst', label: 'Amethyst', emoji: '🟪', seed: 'gem:amethyst' },
+      // Traditional Birthstones
+      { key: 'garnet', label: 'Garnet (January)', emoji: '💎', seed: 'gem:garnet' },
+      { key: 'amethyst', label: 'Amethyst (February)', emoji: '🟪', seed: 'gem:amethyst' },
+      { key: 'aquamarine', label: 'Aquamarine (March)', emoji: '💠', seed: 'gem:aquamarine' },
+      { key: 'diamond', label: 'Diamond (April)', emoji: '💎', seed: 'gem:diamond' },
+      { key: 'emerald', label: 'Emerald (May)', emoji: '💚', seed: 'gem:emerald' },
+      { key: 'pearl', label: 'Pearl (June)', emoji: '🤍', seed: 'gem:pearl' },
+      { key: 'ruby', label: 'Ruby (July)', emoji: '❤️', seed: 'gem:ruby' },
+      { key: 'peridot', label: 'Peridot (August)', emoji: '💚', seed: 'gem:peridot' },
+      { key: 'sapphire', label: 'Sapphire (September)', emoji: '🔷', seed: 'gem:sapphire' },
+      { key: 'opal', label: 'Opal (October)', emoji: '🌈', seed: 'gem:opal' },
+      { key: 'topaz', label: 'Topaz (November)', emoji: '🟦', seed: 'gem:topaz' },
+      { key: 'turquoise', label: 'Turquoise (December)', emoji: '🩵', seed: 'gem:turquoise' },
+      // Popular Variations & Precious Stones
+      { key: 'alexandrite', label: 'Alexandrite (June alt.)', emoji: '🔮', seed: 'gem:alexandrite' },
+      { key: 'moonstone', label: 'Moonstone (June alt.)', emoji: '🌙', seed: 'gem:moonstone' },
+      { key: 'citrine', label: 'Citrine (November alt.)', emoji: '🟡', seed: 'gem:citrine' },
+      { key: 'tanzanite', label: 'Tanzanite (December alt.)', emoji: '💜', seed: 'gem:tanzanite' },
+      { key: 'jade', label: 'Jade', emoji: '💚', seed: 'gem:jade' },
+      { key: 'onyx', label: 'Onyx', emoji: '⚫', seed: 'gem:onyx' },
     ],
   },
   jyotish: {
-    label: 'Jyotish',
+    label: 'Nakshatra (Jyotish)',
     items: [
       { key: 'ashwini', label: 'Ashwini', emoji: '🌟', seed: 'jyotish:ashwini' },
       { key: 'bharani', label: 'Bharani', emoji: '🌙', seed: 'jyotish:bharani' },
       { key: 'krittika', label: 'Krittika', emoji: '🔥', seed: 'jyotish:krittika' },
       { key: 'rohini', label: 'Rohini', emoji: '🌾', seed: 'jyotish:rohini' },
-      { key: 'mrigashira', label: 'Mrigashira', emoji: '🌿', seed: 'jyotish:mrigashira' },
+      { key: 'mrigashira', label: 'Mrigashira', emoji: '🦌', seed: 'jyotish:mrigashira' },
+      { key: 'ardra', label: 'Ardra', emoji: '💧', seed: 'jyotish:ardra' },
+      { key: 'punarvasu', label: 'Punarvasu', emoji: '🏹', seed: 'jyotish:punarvasu' },
       { key: 'pushya', label: 'Pushya', emoji: '🔆', seed: 'jyotish:pushya' },
+      { key: 'ashlesha', label: 'Ashlesha', emoji: '🐍', seed: 'jyotish:ashlesha' },
+      { key: 'magha', label: 'Magha', emoji: '👑', seed: 'jyotish:magha' },
+      { key: 'purva_phalguni', label: 'Purva Phalguni', emoji: '🛏️', seed: 'jyotish:purva_phalguni' },
+      { key: 'uttara_phalguni', label: 'Uttara Phalguni', emoji: '🤝', seed: 'jyotish:uttara_phalguni' },
+      { key: 'hasta', label: 'Hasta', emoji: '✋', seed: 'jyotish:hasta' },
+      { key: 'chitra', label: 'Chitra', emoji: '✨', seed: 'jyotish:chitra' },
+      { key: 'swati', label: 'Swati', emoji: '🌬️', seed: 'jyotish:swati' },
+      { key: 'vishakha', label: 'Vishakha', emoji: '⚖️', seed: 'jyotish:vishakha' },
+      { key: 'anuradha', label: 'Anuradha', emoji: '🌺', seed: 'jyotish:anuradha' },
+      { key: 'jyeshtha', label: 'Jyeshtha', emoji: '☂️', seed: 'jyotish:jyeshtha' },
+      { key: 'mula', label: 'Mula', emoji: '🌱', seed: 'jyotish:mula' },
+      { key: 'purva_ashadha', label: 'Purva Ashadha', emoji: '🌊', seed: 'jyotish:purva_ashadha' },
+      { key: 'uttara_ashadha', label: 'Uttara Ashadha', emoji: '🏔️', seed: 'jyotish:uttara_ashadha' },
+      { key: 'shravana', label: 'Shravana', emoji: '👂', seed: 'jyotish:shravana' },
+      { key: 'dhanishta', label: 'Dhanishta', emoji: '🥁', seed: 'jyotish:dhanishta' },
+      { key: 'shatabhisha', label: 'Shatabhisha', emoji: '💫', seed: 'jyotish:shatabhisha' },
+      { key: 'purva_bhadrapada', label: 'Purva Bhadrapada', emoji: '⚡', seed: 'jyotish:purva_bhadrapada' },
+      { key: 'uttara_bhadrapada', label: 'Uttara Bhadrapada', emoji: '🐉', seed: 'jyotish:uttara_bhadrapada' },
+      { key: 'revati', label: 'Revati', emoji: '🐠', seed: 'jyotish:revati' },
     ],
   },
   birthstone: {
@@ -83,6 +131,23 @@ export const MODE_CONFIG = {
       { key: 'december', label: 'December (Turquoise)', emoji: '🩵', seed: 'birthstone:december' },
     ],
   },
+  native_american: {
+    label: 'Native American Zodiac',
+    items: [
+      { key: 'otter', label: 'Otter (Jan 20-Feb 18)', emoji: '🦦', seed: 'native:otter' },
+      { key: 'wolf', label: 'Wolf (Feb 19-Mar 20)', emoji: '🐺', seed: 'native:wolf' },
+      { key: 'falcon', label: 'Falcon (Mar 21-Apr 19)', emoji: '🦅', seed: 'native:falcon' },
+      { key: 'beaver', label: 'Beaver (Apr 20-May 20)', emoji: '🦫', seed: 'native:beaver' },
+      { key: 'deer', label: 'Deer (May 21-Jun 20)', emoji: '🦌', seed: 'native:deer' },
+      { key: 'woodpecker', label: 'Woodpecker (Jun 21-Jul 21)', emoji: '🐦', seed: 'native:woodpecker' },
+      { key: 'salmon', label: 'Salmon (Jul 22-Aug 21)', emoji: '🐟', seed: 'native:salmon' },
+      { key: 'bear', label: 'Bear (Aug 22-Sep 21)', emoji: '🐻', seed: 'native:bear' },
+      { key: 'raven', label: 'Raven (Sep 22-Oct 22)', emoji: '🐦‍⬛', seed: 'native:raven' },
+      { key: 'snake', label: 'Snake (Oct 23-Nov 22)', emoji: '🐍', seed: 'native:snake' },
+      { key: 'owl', label: 'Owl (Nov 23-Dec 21)', emoji: '🦉', seed: 'native:owl' },
+      { key: 'goose', label: 'Goose (Dec 22-Jan 19)', emoji: '🦆', seed: 'native:goose' },
+    ],
+  },
   rashi: {
     label: 'Indian Zodiac (Rashi)',
     items: [
@@ -100,14 +165,24 @@ export const MODE_CONFIG = {
       { key: 'meena', label: 'Meena (Pisces)', emoji: '♓', seed: 'rashi:meena' },
     ],
   },
-  // star_sign is an alias of zodiac for now — kept for compatibility
+  // star_sign uses lunar/planetary themes instead of direct zodiac duplicate
   star_sign: {
-    label: 'Star Sign',
-    items: [],
+    label: 'Celestial Bodies',
+    items: [
+      { key: 'sun', label: 'Sun (Leo)', emoji: '☀️', seed: 'celestial:sun' },
+      { key: 'moon', label: 'Moon (Cancer)', emoji: '🌙', seed: 'celestial:moon' },
+      { key: 'mercury', label: 'Mercury (Gemini/Virgo)', emoji: '☿️', seed: 'celestial:mercury' },
+      { key: 'venus', label: 'Venus (Taurus/Libra)', emoji: '♀️', seed: 'celestial:venus' },
+      { key: 'mars', label: 'Mars (Aries/Scorpio)', emoji: '♂️', seed: 'celestial:mars' },
+      { key: 'jupiter', label: 'Jupiter (Sagittarius/Pisces)', emoji: '♃', seed: 'celestial:jupiter' },
+      { key: 'saturn', label: 'Saturn (Capricorn/Aquarius)', emoji: '♄', seed: 'celestial:saturn' },
+      { key: 'uranus', label: 'Uranus (Aquarius)', emoji: '♅', seed: 'celestial:uranus' },
+      { key: 'neptune', label: 'Neptune (Pisces)', emoji: '♆', seed: 'celestial:neptune' },
+      { key: 'pluto', label: 'Pluto (Scorpio)', emoji: '♇', seed: 'celestial:pluto' },
+      { key: 'north_node', label: 'North Node (Rahu)', emoji: '☊', seed: 'celestial:north_node' },
+      { key: 'south_node', label: 'South Node (Ketu)', emoji: '☋', seed: 'celestial:south_node' },
+    ],
   },
 };
-
-// alias star_sign to zebra (copy zodiac items) to keep both references valid
-MODE_CONFIG.star_sign.items = MODE_CONFIG.zodiac.items.slice();
 
 export default MODE_CONFIG;
