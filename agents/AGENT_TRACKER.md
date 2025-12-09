@@ -18,16 +18,26 @@ Responsibilities Matrix
 
 Current Tasks In Progress (Phase 4 — Microtool Expansion)
 ---------------------------------------------------------
+**Sprint 1 Complete (Lightweight RNG):**
+- [x] Dice Roller (d4-d20 with history tracking)
+- [x] Coin Flip (3D animation with streak tracking)
+- [x] Card Picker (52-card deck with replacement modes)
+
+**Sprint 2 In Progress (Color & Personalization):**
+- [x] Lucky Colors by Birth Month (birthstone meanings + traits)
+- [ ] Lucky Colors by Zodiac (rashi data integration)
+- [ ] Personality Trait Mapper (numerology calculations)
+
 **Claude Sonnet 4.5 continuation tasks:**
-- [ ] Build next set of microtools (Sonnet to define specific tools in commits)
+- [x] Ensure ALL new tools use global tokens (no hardcoded colors) — verified all tools
+- [x] Register new microtools in EduGrid (not homepage carousel per user preference)
 - [ ] Integrate casino-lite experimental tools under `/casino-lite` route
-- [ ] Ensure ALL new tools use global tokens (no hardcoded colors)
-- [ ] Minimal custom CSS — use `<ToolCard>` wrappers and theme tokens
-- [ ] Register new microtools in carousel config (if carousel-eligible)
+- [ ] Build visualization microtools (odds charts, distribution graphs)
 
 **Previous Phase 4 UX tasks (baseline):**
 - [x] Contrast token refinement: --surface-elevated / --border-primary-darker / --card-shadow (contrast-agent)
 - [x] Homepage elevation polish: apply token updates to tool-cards and Lucky Profile (homepage-agent)
+- [x] EduCard component created (boilerplate for other projects)
 - [ ] Visual smoke tests for homepage + lucky-profile (audit-agent) — ongoing per microtool
 
 Tasks Pending Review
@@ -44,6 +54,11 @@ Completed Tasks for This Branch
 - [x] Recovered Phase 4 visualizer work from stash
 - [x] Updated agent briefs for Phase 4 continuation (contrast, homepage, audit agents)
 - [x] Established token compliance rules for Sonnet microtool expansion
+- [x] Created tools audit document (docs/TOOLS_AUDIT_PHASE4.md)
+- [x] Sprint 1: Delivered 3 lightweight RNG microtools
+- [x] EduCard component (boilerplate, not used on homepage per user preference)
+- [x] Added microtools to EduGrid instead of homepage carousel
+- [x] Created 9 education documentation stubs
 
 Cross-Agent Dependencies
 ------------------------
