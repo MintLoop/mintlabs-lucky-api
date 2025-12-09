@@ -1,5 +1,6 @@
 ---
 import InfoLayout from "../../components/InfoLayout.astro";
+import EduCard from "../../components/EduCard.astro";
 
 const pageTitle = "Coin Flip Simulator | Fair Digital Coin Toss";
 const description = "Flip a fair digital coin with instant results. Track heads/tails streaks and total flip statistics. Perfect for making decisions or probability experiments.";
@@ -93,6 +94,15 @@ const jsonLd = {
         Reset Statistics
       </button>
     </div>
+  </section>
+
+  <section class="edu-section">
+    <EduCard
+      title="The Science of Coin Flips"
+      description="Understand the gambler's fallacy, law of large numbers, and why streaks don't predict future outcomes."
+      link="/docs/education/coin-flip-explained"
+      icon="🪙"
+    />
   </section>
 
   <section class="info-section">
@@ -318,6 +328,10 @@ const jsonLd = {
 
   .reset-btn:hover {
     background: var(--surface-hover);
+  }
+
+  .edu-section {
+    margin-top: 1.5rem;
   }
 
   .info-section {

@@ -67,3 +67,4 @@ For EACH new microtool added to homepage:
 - [ ] Does not disrupt Lucky Profile anchor position
 - [ ] Does not modify hero area layout
 - [ ] Session randomization works correctly (if carousel-eligible)
+- [ ] **EduCard present** under microtool section with meaningful educational link

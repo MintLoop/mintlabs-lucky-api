@@ -147,23 +147,35 @@ import TrackLink from "./TrackLink.astro";
 
   {/* Quick Generators */}
   <h3 class="text-sm font-semibold theme-text-secondary mb-3 mt-6 flex items-center gap-2">
-    <span>🎲</span> Quick Generators
+    <span>🎲</span> Quick Generators & Fun Tools
   </h3>
-  <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+  <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
     <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
       <h4 class="font-semibold mb-1"><TrackLink href="/tools/pick-generator" class="text-teal-400 hover:text-teal-300" event="tool_card_click" props={{ tool: 'pick-generator' }}>3️⃣ Pick-3/Pick-4</TrackLink></h4>
       <p class="text-sm theme-text-secondary">Generate quick picks for daily number games.</p>
     </article>
     <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
-      <h4 class="font-semibold mb-1"><TrackLink href="/tools/probability-visualizer" class="text-rose-400 hover:text-rose-300" event="tool_card_click" props={{ tool: 'probability-visualizer' }}>📉 Probability Viz</TrackLink></h4>
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/dice-roller" class="text-blue-400 hover:text-blue-300" event="tool_card_click" props={{ tool: 'dice-roller' }}>🎲 Dice Roller</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Roll d4, d6, d8, d10, d12, d20 dice with history tracking.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/coin-flip" class="text-amber-400 hover:text-amber-300" event="tool_card_click" props={{ tool: 'coin-flip' }}>🪙 Coin Flip</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Flip a fair coin with streak tracking and statistics.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/card-picker" class="text-rose-400 hover:text-rose-300" event="tool_card_click" props={{ tool: 'card-picker' }}>🃏 Card Picker</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Draw random cards from a standard 52-card deck.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/probability-visualizer" class="text-purple-400 hover:text-purple-300" event="tool_card_click" props={{ tool: 'probability-visualizer' }}>📉 Probability Viz</TrackLink></h4>
       <p class="text-sm theme-text-secondary">Compare lottery odds to real-world analogies and events.</p>
     </article>
     <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
-      <h4 class="font-semibold mb-1"><TrackLink href="/tools/how-rare-is-this" class="text-purple-400 hover:text-purple-300" event="tool_card_click" props={{ tool: 'how-rare-is-this' }}>🔎 How Rare Is This?</TrackLink></h4>
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/how-rare-is-this" class="text-emerald-400 hover:text-emerald-300" event="tool_card_click" props={{ tool: 'how-rare-is-this' }}>🔎 How Rare Is This?</TrackLink></h4>
       <p class="text-sm theme-text-secondary">Convert odds into percent, per-million, and relatable analogies.</p>
     </article>
     <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
-      <h4 class="font-semibold mb-1"><a href="/faq" class="text-purple-400 hover:text-purple-300">❓ FAQ</a></h4>
+      <h4 class="font-semibold mb-1"><a href="/faq" class="text-indigo-400 hover:text-indigo-300">❓ FAQ</a></h4>
       <p class="text-sm theme-text-secondary">Clear answers to common questions about lottery odds.</p>
     </article>
   </div>

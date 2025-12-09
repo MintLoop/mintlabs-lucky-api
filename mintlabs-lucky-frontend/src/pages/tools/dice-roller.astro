@@ -1,5 +1,6 @@
 ---
 import InfoLayout from "../../components/InfoLayout.astro";
+import EduCard from "../../components/EduCard.astro";
 
 const pageTitle = "Dice Roller | Roll Multiple Dice Online";
 const description = "Roll multiple dice of any size online. Supports d4, d6, d8, d10, d12, and d20 with instant results and roll history.";
@@ -100,6 +101,15 @@ const jsonLd = {
       <button id="clearHistoryBtn" class="text-btn">Clear History</button>
       <div id="history-list" class="history-list" role="list"></div>
     </div>
+  </section>
+
+  <section class="edu-section">
+    <EduCard
+      title="How Dice Probability Works"
+      description="Learn about uniform distributions, independence, and why each die roll is truly random regardless of previous results."
+      link="/docs/education/dice-probability"
+      icon="🎲"
+    />
   </section>
 
   <section class="info-section">
@@ -356,6 +366,10 @@ const jsonLd = {
     text-decoration: underline;
     cursor: pointer;
     font-size: 0.875rem;
+  }
+
+  .edu-section {
+    margin-top: 1.5rem;
   }
 
   .info-section {

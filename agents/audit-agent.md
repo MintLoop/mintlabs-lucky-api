@@ -69,6 +69,9 @@ For EVERY new microtool, run this audit before merge approval:
 - [ ] **Mobile (320px):** Tool usable on smallest viewport
 - [ ] **Tablet (768px):** Tool adapts correctly to medium viewport
 - [ ] **Desktop (1024px+):** Tool uses available space appropriately
+- [ ] **EduCard present:** Verify EduCard appears on tool page and homepage group
+- [ ] **EduCard link valid:** Educational link navigates to correct documentation
+- [ ] **EduCard readable:** Card meets spacing and accessibility guidelines in all themes
 - [ ] **Appended to docs/visual-audit-phase-4.md:** New section added with screenshots and pass/fail notes
 
 Notes

@@ -100,31 +100,56 @@ getContrastColor()        /* dynamic text colors */
 ### Step 1: Create New Microtool
 ```bash
 # Create under /src/pages/tools/<tool-name>.astro
-# Use <ToolCard> wrapper
+# Use InfoLayout component (standard pattern)
 # Apply ONLY global tokens (no custom CSS)
 ```
 
-### Step 2: Register Tool
+### Step 2: Add EduCard (REQUIRED)
+**ALL microtools must include an EduCard:**
+```astro
+import EduCard from "../../components/EduCard.astro";
+
+<section class="edu-section">
+  <EduCard
+    title="Educational Title"
+    description="Brief 1-2 sentence explanation of what users learn."
+    link="/docs/education/<topic>"
+    icon="🎓"
+  />
+</section>
+```
+
+**EduCard Requirements:**
+- [ ] EduCard present on tool page
+- [ ] Educational link points to `/docs/education/<topic>.md`
+- [ ] Documentation stub created in `/docs/education/`
+- [ ] EduCard uses token-compliant styling (inherits from component)
+
+### Step 3: Register Tool
 - Add to tools index
 - Mark as carousel-eligible (if applicable)
 - Add to homepage agent registry
+- **Add EduCard to homepage section** (if tool group expanded)
 
-### Step 3: Contrast Agent Review
+### Step 4: Contrast Agent Review
 - [ ] No hardcoded colors
 - [ ] Uses `--surface*`, `--border*`, `--card-shadow`
 - [ ] Dynamic colors use `getContrastColor()`
 - [ ] Tested in light + dark themes
+- [ ] **EduCard readable in both themes**
 
-### Step 4: Audit Agent Review
+### Step 5: Audit Agent Review
 - [ ] Visual audit across 320px-1024px+ viewports
 - [ ] Theme parity (light/dark)
 - [ ] Mobile responsiveness
+- [ ] **EduCard present and functional**
+- [ ] **Educational link valid**
 - [ ] Append results to `docs/visual-audit-phase-4.md`
 
-### Step 5: Commit & Build
+### Step 6: Commit & Build
 ```bash
-git add src/pages/tools/<tool-name>.astro
-git commit -m "Add new microtool: <name> (Phase 4)"
+git add src/pages/tools/<tool-name>.astro docs/education/<topic>.md
+git commit -m "Add microtool: <name> with EduCard (Phase 4)"
 npm run build  # Verify no regressions
 ```
 
@@ -183,16 +208,26 @@ Every new microtool must pass:
 - ✅ Token compliance verified
 - ✅ No hardcoded colors detected
 - ✅ Light/dark theme tested
+- ✅ **EduCard component readable in all themes**
 
 ### Audit Agent
 - ✅ Visual audit complete (`docs/visual-audit-phase-4.md` updated)
 - ✅ Mobile responsive (320px-768px)
 - ✅ Desktop optimized (1024px+)
+- ✅ **EduCard present on tool page**
+- ✅ **Educational documentation exists**
+
+### EduCard Requirements (NEW - Phase 4 Standard)
+- ✅ **At least one EduCard** on the microtool page
+- ✅ **Corresponding markdown file** in `/docs/education/`
+- ✅ **Carousel-eligible flag** set for homepage agent
+- ✅ **Mobile-responsive layout** under 800px width
+- ✅ **Educational link valid** and navigable
 
 ### Build Verification
 - ✅ `npm run build` succeeds
 - ✅ No new errors or warnings
-- ✅ Page count matches expected (38 + new tools)
+- ✅ Page count matches expected (41 + new tools)
 
 ---
 
@@ -246,13 +281,15 @@ git push origin feature/ui-contrast-phase-4
 
 1. **Review this document** and all updated agent briefs
 2. **Choose first microtool** from backlog categories
-3. **Create tool scaffold** using `<ToolCard>` and global tokens
-4. **Run contrast checklist** (no hardcoded colors)
-5. **Build and verify** (`npm run build`)
-6. **Commit with clear message** (`git commit -m "Add microtool: <name> (Phase 4)"`)
-7. **Run audit checklist** (light/dark + mobile/desktop)
-8. **Update visual-audit-phase-4.md** with results
-9. **Repeat** for next microtool
+3. **Create tool scaffold** using InfoLayout and global tokens
+4. **Add EduCard section** with educational link (REQUIRED)
+5. **Create documentation stub** in `/docs/education/`
+6. **Run contrast checklist** (no hardcoded colors)
+7. **Build and verify** (`npm run build`)
+8. **Commit with clear message** (`git commit -m "Add microtool: <name> with EduCard (Phase 4)"`)
+9. **Run audit checklist** (light/dark + mobile/desktop + EduCard validation)
+10. **Update visual-audit-phase-4.md** with results
+11. **Repeat** for next microtool
 
 ---
 

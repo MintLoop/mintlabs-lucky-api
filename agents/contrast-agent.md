@@ -88,3 +88,4 @@ For EACH new microtool, the Contrast Agent must verify:
 - [ ] Dynamic colors use `getContrastColor()` utility
 - [ ] Tested in BOTH light and dark themes
 - [ ] No custom gradients without audit approval
+- [ ] **EduCard component** uses proper token contrast and is readable in all themes

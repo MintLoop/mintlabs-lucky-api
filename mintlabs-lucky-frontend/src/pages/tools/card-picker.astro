@@ -1,5 +1,6 @@
 ---
 import InfoLayout from "../../components/InfoLayout.astro";
+import EduCard from "../../components/EduCard.astro";
 
 const pageTitle = "Playing Card Picker | Random Card Generator";
 const description = "Draw random playing cards from a standard 52-card deck. Perfect for card games, magic tricks, and probability demonstrations.";
@@ -91,6 +92,15 @@ const jsonLd = {
         </div>
       </div>
     </div>
+  </section>
+
+  <section class="edu-section">
+    <EduCard
+      title="Card Drawing Probability"
+      description="Explore sampling with and without replacement, deck composition probabilities, and conditional probability basics."
+      link="/docs/education/card-drawing-probability"
+      icon="🃏"
+    />
   </section>
 
   <section class="info-section">
@@ -330,6 +340,10 @@ const jsonLd = {
     border-radius: 0.375rem;
     color: #92400e;
     text-align: center;
+  }
+
+  .edu-section {
+    margin-top: 1.5rem;
   }
 
   .info-section {
