@@ -54,7 +54,13 @@ const apiBase = API ? String(API).replace(/\/$/, '') : '';
 
       <!-- Lucky Profile Feature (moved down the page) - kept same id/anchor semantics when needed -->
 
-      <!-- quick tools carousel to give visitors one-click access to high-value tools -->
+      <section id="results" class="space-y-3"></section>
+
+      <div id="facts" class="mt-3">
+        {current && <GameFacts game={current} />}
+      </div>
+
+      <!-- quick tools carousel moved below results for better UX flow -->
       <section id="tools-quick" class="mt-6">
         <h3 class="text-lg font-semibold mb-2">Explore our tools</h3>
         <div class="tools-carousel" aria-label="Featured tools carousel">
@@ -91,12 +97,6 @@ const apiBase = API ? String(API).replace(/\/$/, '') : '';
           <script is:inline>try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){console.warn('AdSense failed:',e);}</script>
         </>
       )}
-
-      <section id="results" class="space-y-3"></section>
-
-      <div id="facts" class="mt-3">
-        {current && <GameFacts game={current} />}
-      </div>
 
       <!-- core tools now appear earlier; place Lucky Profile lower in the page as a deeper feature -->
         <section id="lucky-profile-feature" class="card-elevated mt-8">

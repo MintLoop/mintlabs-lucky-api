@@ -1,4 +1,5 @@
 import MODE_CONFIG from '../data/modeConfig';
+import MODE_EDUCATION from '../data/modeEducation';
 
 const metaEnv = (import.meta as any)?.env ?? {};
 const globalApi = typeof window !== 'undefined' ? (window as any).__LUCKY_API_BASE : undefined;
@@ -155,6 +156,23 @@ export function initLucky() {
                 try { select.removeAttribute('disabled'); } catch(e){}
                 try { select.setAttribute('required','required'); } catch(e){}
                 try { select.setAttribute('data-populated', '1'); } catch(e){}
+                
+                // Add event listener to show educational text when option selected
+                select.addEventListener('change', () => {
+                  const educationContainer = document.getElementById('themeEducation');
+                  const educationText = document.getElementById('themeEducationText');
+                  if (educationContainer && educationText && select.value) {
+                    const modeType = String(key);
+                    const optionKey = select.value;
+                    const educationData = (MODE_EDUCATION as any)[modeType];
+                    if (educationData && educationData[optionKey]) {
+                      educationText.textContent = educationData[optionKey];
+                      educationContainer.classList.remove('hidden');
+                    } else {
+                      educationContainer.classList.add('hidden');
+                    }
+                  }
+                });
               }
             } catch(e){}
           }

@@ -79,7 +79,14 @@ const { games = [] } = Astro.props;
       <select id="modeKeySelect" name="mode_key" class="mt-1 w-full theme-input-bg rounded-lg p-2 theme-text-primary">
         <!-- options populated by /scripts/lucky.ts using src/data/modeConfig -->
       </select>
-      <span class="text-xs theme-text-muted">Themes are for fun — they do not change your odds.</span>
+      <div class="mt-2 p-2 rounded-lg bg-blue-500/10 border border-blue-500/30">
+        <p class="text-xs text-blue-300">
+          <strong>ℹ️ Theme Disclaimer:</strong> Themes are cosmetic only and do not affect probability. All RNG outputs have identical odds regardless of theme selection.
+        </p>
+      </div>
+      <div id="themeEducation" class="hidden mt-2 p-2 rounded-lg bg-slate-800/50 border border-slate-700">
+        <p class="text-xs theme-text-secondary" id="themeEducationText"></p>
+      </div>
     </label>
   </div>
 

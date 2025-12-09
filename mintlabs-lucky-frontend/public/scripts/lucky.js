@@ -153,6 +153,91 @@ var MODE_CONFIG = {
 MODE_CONFIG.star_sign.items = MODE_CONFIG.zodiac.items.slice();
 var modeConfig_default = MODE_CONFIG;
 
+// src/data/modeEducation.ts
+var MODE_EDUCATION = {
+  zodiac: {
+    aries: "Aries (Mar 21-Apr 19): Fire sign ruled by Mars. Associated with courage, initiative, and boldness.",
+    taurus: "Taurus (Apr 20-May 20): Earth sign ruled by Venus. Associated with stability, patience, and determination.",
+    gemini: "Gemini (May 21-Jun 20): Air sign ruled by Mercury. Associated with communication, adaptability, and curiosity.",
+    cancer: "Cancer (Jun 21-Jul 22): Water sign ruled by the Moon. Associated with emotion, intuition, and nurturing.",
+    leo: "Leo (Jul 23-Aug 22): Fire sign ruled by the Sun. Associated with confidence, creativity, and leadership.",
+    virgo: "Virgo (Aug 23-Sep 22): Earth sign ruled by Mercury. Associated with analysis, precision, and service.",
+    libra: "Libra (Sep 23-Oct 22): Air sign ruled by Venus. Associated with balance, harmony, and diplomacy.",
+    scorpio: "Scorpio (Oct 23-Nov 21): Water sign ruled by Pluto. Associated with intensity, transformation, and mystery.",
+    sagittarius: "Sagittarius (Nov 22-Dec 21): Fire sign ruled by Jupiter. Associated with adventure, philosophy, and optimism.",
+    capricorn: "Capricorn (Dec 22-Jan 19): Earth sign ruled by Saturn. Associated with discipline, ambition, and structure.",
+    aquarius: "Aquarius (Jan 20-Feb 18): Air sign ruled by Uranus. Associated with innovation, independence, and humanitarianism.",
+    pisces: "Pisces (Feb 19-Mar 20): Water sign ruled by Neptune. Associated with compassion, imagination, and spirituality."
+  },
+  chinese_zodiac: {
+    rat: "Rat (\u9F20): First of the zodiac cycle. Associated with intelligence, adaptability, and resourcefulness.",
+    ox: "Ox (\u725B): Second sign. Associated with diligence, dependability, and strength.",
+    tiger: "Tiger (\u864E): Third sign. Associated with bravery, competitiveness, and confidence.",
+    rabbit: "Rabbit (\u5154): Fourth sign. Associated with gentleness, elegance, and kindness.",
+    dragon: "Dragon (\u9F8D): Fifth sign. Associated with power, wisdom, and good fortune.",
+    snake: "Snake (\u86C7): Sixth sign. Associated with wisdom, mystery, and intuition.",
+    horse: "Horse (\u99AC): Seventh sign. Associated with energy, independence, and enthusiasm.",
+    goat: "Goat (\u7F8A): Eighth sign. Associated with creativity, peace, and perseverance.",
+    monkey: "Monkey (\u7334): Ninth sign. Associated with cleverness, curiosity, and playfulness.",
+    rooster: "Rooster (\u96DE): Tenth sign. Associated with confidence, punctuality, and honesty.",
+    dog: "Dog (\u72D7): Eleventh sign. Associated with loyalty, honesty, and justice.",
+    pig: "Pig (\u8C6C): Twelfth sign. Associated with generosity, compassion, and diligence."
+  },
+  favorite_color: {
+    blue: "Blue: Associated with calmness, trust, stability, and depth. Psychologically linked to serenity and wisdom.",
+    green: "Green: Associated with nature, growth, harmony, and renewal. Psychologically linked to balance and healing.",
+    red: "Red: Associated with passion, energy, power, and vitality. Psychologically linked to excitement and boldness.",
+    purple: "Purple: Associated with royalty, mystery, spirituality, and luxury. Psychologically linked to creativity and wisdom.",
+    black: "Black: Associated with sophistication, power, elegance, and mystery. Psychologically linked to strength and formality.",
+    yellow: "Yellow: Associated with optimism, joy, intellect, and energy. Psychologically linked to happiness and clarity."
+  },
+  gemstone: {
+    ruby: "Ruby: July birthstone. Associated with passion, vitality, and the sun. Traditionally believed to bring courage and energy.",
+    sapphire: "Sapphire: September birthstone. Associated with wisdom, royalty, and divine favor. Symbolizes truth and sincerity.",
+    emerald: "Emerald: May birthstone. Associated with fertility, rebirth, and love. Known as the stone of successful relationships.",
+    opal: "Opal: October birthstone. Associated with creativity, inspiration, and imagination. Displays unique play-of-color.",
+    topaz: "Topaz: November birthstone. Associated with strength, wisdom, and courage. Believed to bring calmness and healing.",
+    amethyst: "Amethyst: February birthstone. Associated with peace, stability, and inner strength. Traditionally used for protection."
+  },
+  jyotish: {
+    ashwini: "Ashwini (\u0905\u0936\u094D\u0935\u093F\u0928\u0940): First nakshatra. Ruled by Ketu. Associated with healing, speed, and new beginnings.",
+    bharani: "Bharani (\u092D\u0930\u0923\u0940): Second nakshatra. Ruled by Venus. Associated with transformation, restraint, and creativity.",
+    krittika: "Krittika (\u0915\u0943\u0924\u094D\u0924\u093F\u0915\u093E): Third nakshatra. Ruled by Sun. Associated with purification, determination, and sharpness.",
+    rohini: "Rohini (\u0930\u094B\u0939\u093F\u0923\u0940): Fourth nakshatra. Ruled by Moon. Associated with growth, beauty, and material abundance.",
+    mrigashira: "Mrigashira (\u092E\u0943\u0917\u0936\u0940\u0930\u094D\u0937): Fifth nakshatra. Ruled by Mars. Associated with curiosity, seeking, and exploration.",
+    pushya: "Pushya (\u092A\u0941\u0937\u094D\u092F): Eighth nakshatra. Ruled by Saturn. Associated with nourishment, spirituality, and prosperity."
+  },
+  birthstone: {
+    january: "Garnet (January): Deep red stone associated with passion, energy, and regeneration. Symbolizes friendship and trust.",
+    february: "Amethyst (February): Purple stone associated with peace, clarity, and protection. Traditionally worn for sobriety.",
+    march: "Aquamarine (March): Blue-green stone associated with courage, calm, and clarity. Named for sea water ('aqua marina').",
+    april: "Diamond (April): Clear stone associated with strength, purity, and eternal love. Hardest natural substance on Earth.",
+    may: "Emerald (May): Green stone associated with fertility, rebirth, and wisdom. Prized by Cleopatra and ancient civilizations.",
+    june: "Pearl (June): Organic gem associated with purity, innocence, and wisdom. Formed naturally in oysters and mussels.",
+    july: "Ruby (July): Red stone associated with passion, vitality, and protection. Called 'ratnaraj' (king of gems) in Sanskrit.",
+    august: "Peridot (August): Lime-green stone associated with strength, healing, and prosperity. Formed deep in Earth's mantle.",
+    september: "Sapphire (September): Blue stone associated with wisdom, loyalty, and nobility. Worn by royalty throughout history.",
+    october: "Opal (October): Multi-colored stone associated with creativity, imagination, and spontaneity. Displays unique color play.",
+    november: "Topaz (November): Golden stone associated with strength, wisdom, and abundance. Name may derive from Sanskrit 'tapas' (fire).",
+    december: "Turquoise (December): Blue-green stone associated with protection, healing, and good fortune. Sacred to many Native American tribes."
+  },
+  rashi: {
+    mesha: "Mesha (\u092E\u0947\u0937 - Aries): First rashi. Ruled by Mars (Mangal). Associated with courage, leadership, and initiative.",
+    vrishabha: "Vrishabha (\u0935\u0943\u0937\u092D - Taurus): Second rashi. Ruled by Venus (Shukra). Associated with stability, beauty, and prosperity.",
+    mithuna: "Mithuna (\u092E\u093F\u0925\u0941\u0928 - Gemini): Third rashi. Ruled by Mercury (Budha). Associated with communication, intellect, and duality.",
+    karka: "Karka (\u0915\u0930\u094D\u0915 - Cancer): Fourth rashi. Ruled by Moon (Chandra). Associated with emotion, nurturing, and intuition.",
+    simha: "Simha (\u0938\u093F\u0902\u0939 - Leo): Fifth rashi. Ruled by Sun (Surya). Associated with power, dignity, and authority.",
+    kanya: "Kanya (\u0915\u0928\u094D\u092F\u093E - Virgo): Sixth rashi. Ruled by Mercury (Budha). Associated with purity, service, and discrimination.",
+    tula: "Tula (\u0924\u0941\u0932\u093E - Libra): Seventh rashi. Ruled by Venus (Shukra). Associated with balance, justice, and partnership.",
+    vrishchika: "Vrishchika (\u0935\u0943\u0936\u094D\u091A\u093F\u0915 - Scorpio): Eighth rashi. Ruled by Mars (Mangal). Associated with transformation, intensity, and mystery.",
+    dhanu: "Dhanu (\u0927\u0928\u0941 - Sagittarius): Ninth rashi. Ruled by Jupiter (Guru). Associated with wisdom, philosophy, and expansion.",
+    makara: "Makara (\u092E\u0915\u0930 - Capricorn): Tenth rashi. Ruled by Saturn (Shani). Associated with discipline, ambition, and karma.",
+    kumbha: "Kumbha (\u0915\u0941\u092E\u094D\u092D - Aquarius): Eleventh rashi. Ruled by Saturn (Shani). Associated with service, innovation, and humanitarianism.",
+    meena: "Meena (\u092E\u0940\u0928 - Pisces): Twelfth rashi. Ruled by Jupiter (Guru). Associated with spirituality, compassion, and transcendence."
+  }
+};
+var modeEducation_default = MODE_EDUCATION;
+
 // src/scripts/lucky.ts
 var metaEnv = import.meta?.env ?? {};
 var globalApi = typeof window !== "undefined" ? window.__LUCKY_API_BASE : void 0;
@@ -286,6 +371,21 @@ function initLucky() {
                   select.setAttribute("data-populated", "1");
                 } catch (e) {
                 }
+                select.addEventListener("change", () => {
+                  const educationContainer = document.getElementById("themeEducation");
+                  const educationText = document.getElementById("themeEducationText");
+                  if (educationContainer && educationText && select.value) {
+                    const modeType = String(key);
+                    const optionKey = select.value;
+                    const educationData = modeEducation_default[modeType];
+                    if (educationData && educationData[optionKey]) {
+                      educationText.textContent = educationData[optionKey];
+                      educationContainer.classList.remove("hidden");
+                    } else {
+                      educationContainer.classList.add("hidden");
+                    }
+                  }
+                });
               }
             } catch (e) {
             }
