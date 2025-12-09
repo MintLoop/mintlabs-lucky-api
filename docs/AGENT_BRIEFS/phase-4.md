@@ -319,6 +319,21 @@ export interface LuckyProfileOutput {
 }
 ```
 
+---
+
+## Phase 4 — Handoff / QA Summary (short)
+
+Branch: `feature/ui-contrast-phase-4` — This branch is scoped to UX/readability only (no new games or microtools). It contains token refinements, elevation utilities, homepage polish, contrast fixes, and recovered Phase‑4 visualizer work. It's ready for a handoff review focused on visual QA and accessibility.
+
+Handoff QA checklist
+- [ ] Build passes locally (frontend): cd mintlabs-lucky-frontend && npm run build
+- [ ] Playwright DPR parity tests pass for ticket-beautifier (run headful for DPR checks)
+- [ ] Manual visual sweep across themes: homepage, ticket-beautifier, lucky-profile (light + dark, desktop + mobile)
+- [ ] Confirm no new features are present in the branch (feature scope enforcement)
+- [ ] Confirm pixel-diff scaffolding is acceptable for Phase 4 (pixelmatch devDeps staged; CI wiring is separate)
+
+If all checks pass, mark the branch PR ready and assign to Phase 4 owner for merge.
+
 **Features:**
 - Combines traits from all three sources (deduplicates, ranks top 5)
 - Generates 6 lucky numbers from combined numerology
