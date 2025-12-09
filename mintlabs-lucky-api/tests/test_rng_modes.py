@@ -13,6 +13,7 @@ from app.rng import (
     draw_pattern_avoid,
     draw_sum_target,
     draw_wheel,
+    draw_personalized,
 )
 
 
@@ -70,6 +71,15 @@ def test_lucky_numbers_filter(rng):
     assert len(picks) == 6
 
 
+def test_personalized_seed_modes(rng):
+    # Ensure personalized-style seeds return the right count and valid ranges
+    seeds = ["aries", "leo", "ruby", "sapphire", "blue", "jyotish-asc", "rat"]
+    for s in seeds:
+        picks = draw_personalized(1, 49, 6, rng, s)
+        assert len(picks) == 6
+        assert all(1 <= n <= 49 for n in picks)
+
+
 def test_wheel_modes(rng):
     for wheel_type in ("key", "abbreviated", "full"):
         picks = draw_wheel(1, 49, 6, rng, wheel_type)
@@ -89,3 +99,12 @@ def test_apply_filters_allows_repeat_flags(rng):
 )
     assert len(result) == len(numbers)
     assert all(1 <= value <= 20 for value in result)
+
+
+def test_odd_even_mix_stability(rng):
+    # Run several trials to ensure odd/even mix is reasonably balanced
+    trials = 50
+    for _ in range(trials):
+        picks = draw_odd_even_mix(1, 49, 6, rng)
+        odds = sum(1 for n in picks if n % 2 == 1)
+        assert 1 <= odds <= 5  # allow some flexibility across trials

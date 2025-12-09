@@ -1,0 +1,373 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import BackToGenerator from "../../components/BackToGenerator.astro";
+
+const title = "Top 10 Most Drawn Lottery Numbers | Historical Frequency Data";
+const description =
+  "See the most frequently drawn Powerball and Mega Millions numbers. Explore which numbers appear most often in lottery history with detailed statistics and charts.";
+const keywords =
+  "most common powerball numbers, most drawn lottery numbers, frequent lottery numbers, powerball hot numbers, mega millions most drawn, lottery number frequency";
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Top 10 Most Drawn Lottery Numbers",
+  description,
+  url: "https://lucky.mintloop.dev/tools/most-drawn-numbers",
+  applicationCategory: "EducationalApplication",
+  operatingSystem: "Any",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+};
+---
+
+<InfoLayout {title} {description} {keywords} {jsonLd}>
+  <BackToGenerator />
+
+  <div class="max-w-6xl mx-auto space-y-6">
+    {/* Header */}
+    <div class="text-center space-y-2">
+      <h1 class="text-3xl md:text-4xl font-bold">
+        🔥 Top 10 Most Drawn Numbers
+      </h1>
+      <p class="text-lg theme-text-secondary max-w-2xl mx-auto">
+        The most frequently appearing lottery numbers based on historical draw data
+      </p>
+    </div>
+
+    {/* Game Selector */}
+    <div class="theme-bg-card p-6 rounded-xl">
+      <div class="flex flex-col sm:flex-row gap-4 items-center">
+        <label for="game-select" class="font-medium whitespace-nowrap">
+          Select Game:
+        </label>
+        <select
+          id="game-select"
+          class="flex-1 px-4 py-2 rounded-lg border theme-border-primary theme-bg-input theme-text-primary"
+        >
+          <option value="powerball">Powerball</option>
+          <option value="megamillions">Mega Millions</option>
+        </select>
+      </div>
+    </div>
+
+    {/* Top 10 Display */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-6">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-semibold">Top 10 Most Frequent Numbers</h2>
+        <div class="text-sm theme-text-muted">
+          Based on <span id="sample-size">1,000</span> draws
+        </div>
+      </div>
+
+      {/* Podium View */}
+      <div class="grid md:grid-cols-3 gap-4">
+        {/* 2nd Place */}
+        <div class="order-2 md:order-1 theme-bg-surface p-6 rounded-xl border-2 border-slate-600 text-center space-y-3">
+          <div class="text-4xl">🥈</div>
+          <div class="text-lg theme-text-secondary">#2</div>
+          <div id="rank-2" class="text-5xl font-bold text-slate-300">--</div>
+          <div class="text-sm theme-text-muted">
+            <span id="freq-2">--</span> appearances
+          </div>
+          <div class="text-xs theme-text-muted">
+            <span id="pct-2">--</span>% frequency
+          </div>
+        </div>
+
+        {/* 1st Place */}
+        <div class="order-1 md:order-2 theme-bg-surface p-8 rounded-xl border-2 border-amber-500 text-center space-y-3 transform md:scale-110">
+          <div class="text-5xl">🏆</div>
+          <div class="text-xl text-amber-400 font-semibold">#1 Most Drawn</div>
+          <div id="rank-1" class="text-6xl font-bold text-amber-400">--</div>
+          <div class="text-sm theme-text-muted">
+            <span id="freq-1">--</span> appearances
+          </div>
+          <div class="text-xs theme-text-muted">
+            <span id="pct-1">--</span>% frequency
+          </div>
+        </div>
+
+        {/* 3rd Place */}
+        <div class="order-3 theme-bg-surface p-6 rounded-xl border-2 border-amber-700 text-center space-y-3">
+          <div class="text-4xl">🥉</div>
+          <div class="text-lg theme-text-secondary">#3</div>
+          <div id="rank-3" class="text-5xl font-bold text-amber-700">--</div>
+          <div class="text-sm theme-text-muted">
+            <span id="freq-3">--</span> appearances
+          </div>
+          <div class="text-xs theme-text-muted">
+            <span id="pct-3">--</span>% frequency
+          </div>
+        </div>
+      </div>
+
+      {/* Remaining 7 Numbers */}
+      <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {[4, 5, 6, 7, 8, 9, 10].map((rank) => (
+          <div class="theme-bg-surface p-4 rounded-lg border theme-border-primary text-center space-y-2">
+            <div class="text-sm theme-text-secondary">#{rank}</div>
+            <div id={`rank-${rank}`} class="text-3xl font-bold text-emerald-400">--</div>
+            <div class="text-xs theme-text-muted">
+              <span id={`freq-${rank}`}>--</span> times (<span id={`pct-${rank}`}>--</span>%)
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Frequency Bar Chart */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">Visual Frequency Comparison</h2>
+      <div id="bar-chart" class="space-y-2">
+        {/* Will be populated by JavaScript */}
+      </div>
+    </div>
+
+    {/* Important Warning */}
+    <div class="p-6 bg-amber-500/10 border-2 border-amber-500/30 rounded-xl">
+      <div class="flex gap-4">
+        <div class="text-3xl">⚠️</div>
+        <div class="flex-1 space-y-3">
+          <div class="font-semibold text-amber-400 text-xl">These Numbers Have No Advantage</div>
+          <p class="theme-text-secondary">
+            While these numbers have appeared most frequently in the past, <strong>they do not have better odds
+            in future draws</strong>. Every number has exactly the same probability each draw.
+          </p>
+          <p class="theme-text-secondary">
+            Frequency differences are caused by <strong>random clustering</strong>, not any underlying pattern.
+            Past performance does not predict future results.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {/* Why This Happens */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">📊 Why Do Some Numbers Appear More Often?</h2>
+      <div class="space-y-3 theme-text-secondary">
+        <p>
+          In any truly random process, <strong>temporary clustering</strong> is normal and expected:
+        </p>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li>Random data naturally has streaks and clusters</li>
+          <li>With enough draws, all numbers will have similar frequencies</li>
+          <li>Current leaders may become "cold" numbers tomorrow</li>
+          <li>Differences between top and bottom numbers decrease over time</li>
+        </ul>
+        
+        <div class="p-4 theme-bg-surface rounded-lg border theme-border-primary mt-4">
+          <div class="font-semibold mb-2">📈 Mathematical Expectation</div>
+          <p class="text-sm">
+            For Powerball (5 balls from 69), each number should appear in approximately <strong>7.2%</strong> of draws.
+            With 1,000 draws, that's about 72 appearances. Seeing 80 or 65 is well within normal random variation.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {/* Strategy Note */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">🎯 Should You Play These Numbers?</h2>
+      <div class="space-y-3 theme-text-secondary">
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="p-4 bg-rose-500/10 border border-rose-500/30 rounded-lg">
+            <div class="font-semibold text-rose-400 mb-2">❌ Not Recommended</div>
+            <p class="text-sm">
+              Playing these numbers because they're "hot" is the <strong>gambler's fallacy</strong>.
+              They have no mathematical advantage.
+            </p>
+          </div>
+          <div class="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+            <div class="font-semibold text-emerald-400 mb-2">✓ For Fun Only</div>
+            <p class="text-sm">
+              If it's fun for you to track and play popular numbers, go ahead! Just know it doesn't improve your odds.
+            </p>
+          </div>
+        </div>
+        
+        <p class="mt-4">
+          <strong>Better strategy:</strong> Play numbers that are meaningful to you, or use truly random picks.
+          Avoid patterns everyone else plays (like 1-2-3-4-5) to reduce jackpot split risk.
+        </p>
+      </div>
+    </div>
+
+    {/* Related Tools */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">🔗 Related Tools</h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <a
+          href="/tools/least-drawn-numbers"
+          class="p-4 border theme-border-primary rounded-lg hover:bg-slate-800/50 transition-colors"
+        >
+          <div class="font-semibold text-sky-400 mb-1">❄️ Top 10 Least Drawn</div>
+          <div class="text-sm theme-text-secondary">See the coldest numbers</div>
+        </a>
+        <a
+          href="/tools/hot-cold-numbers"
+          class="p-4 border theme-border-primary rounded-lg hover:bg-slate-800/50 transition-colors"
+        >
+          <div class="font-semibold text-amber-400 mb-1">🔥 Hot & Cold Numbers</div>
+          <div class="text-sm theme-text-secondary">Full frequency analysis</div>
+        </a>
+        <a
+          href="/tools/why-odds-dont-change"
+          class="p-4 border theme-border-primary rounded-lg hover:bg-slate-800/50 transition-colors"
+        >
+          <div class="font-semibold text-emerald-400 mb-1">🎲 Why Odds Don't Change</div>
+          <div class="text-sm theme-text-secondary">Understand independence</div>
+        </a>
+      </div>
+    </div>
+
+    {/* Disclaimer */}
+    <div class="p-4 bg-slate-800/30 border border-slate-700 rounded-lg text-sm theme-text-muted">
+      <strong>Educational Tool:</strong> This tool uses simulated historical data to demonstrate
+      frequency patterns typical in lottery draws. Actual lottery frequency data shows similar
+      random clustering. Frequency does not predict future outcomes.
+    </div>
+  </div>
+
+  <script>
+    interface NumberFrequency {
+      number: number;
+      count: number;
+      frequency: number;
+    }
+
+    let currentGame = 'powerball';
+    const TOTAL_DRAWS = 1000;
+
+    function init() {
+      const gameSelect = document.getElementById('game-select') as HTMLSelectElement;
+      gameSelect?.addEventListener('change', handleGameChange);
+      
+      generateAndDisplay();
+    }
+
+    function handleGameChange() {
+      const gameSelect = document.getElementById('game-select') as HTMLSelectElement;
+      currentGame = gameSelect?.value || 'powerball';
+      generateAndDisplay();
+    }
+
+    function generateAndDisplay() {
+      // Update sample size display
+      const sampleSizeEl = document.getElementById('sample-size');
+      if (sampleSizeEl) {
+        sampleSizeEl.textContent = TOTAL_DRAWS.toLocaleString();
+      }
+
+      const maxNumbers = currentGame === 'powerball' ? 69 : 70;
+      const frequencies = generateFrequencyData(maxNumbers);
+      
+      // Sort by frequency descending
+      frequencies.sort((a, b) => b.count - a.count);
+      
+      // Get top 10
+      const top10 = frequencies.slice(0, 10);
+      
+      // Display top 10
+      displayTop10(top10);
+      
+      // Display bar chart
+      displayBarChart(top10);
+    }
+
+    function generateFrequencyData(maxNumbers: number): NumberFrequency[] {
+      const frequencies: NumberFrequency[] = [];
+      
+      // Simulate frequency data with realistic variation
+      for (let num = 1; num <= maxNumbers; num++) {
+        // Expected frequency is 5/maxNumbers per draw
+        const expectedCount = (5 / maxNumbers) * TOTAL_DRAWS;
+        
+        // Add random variation (±15% of expected)
+        const variation = (Math.random() - 0.5) * 0.3;
+        const count = Math.round(expectedCount * (1 + variation));
+        const frequency = (count / TOTAL_DRAWS) * 100;
+        
+        frequencies.push({ number: num, count, frequency });
+      }
+      
+      return frequencies;
+    }
+
+    function displayTop10(top10: NumberFrequency[]) {
+      top10.forEach((item, index) => {
+        const rank = index + 1;
+        const numberEl = document.getElementById(`rank-${rank}`);
+        const freqEl = document.getElementById(`freq-${rank}`);
+        const pctEl = document.getElementById(`pct-${rank}`);
+        
+        if (numberEl) numberEl.textContent = item.number.toString();
+        if (freqEl) freqEl.textContent = item.count.toString();
+        if (pctEl) pctEl.textContent = item.frequency.toFixed(2);
+      });
+    }
+
+    function displayBarChart(top10: NumberFrequency[]) {
+      const chartContainer = document.getElementById('bar-chart');
+      if (!chartContainer) return;
+      
+      chartContainer.innerHTML = '';
+      
+      const maxCount = top10[0].count;
+      
+      top10.forEach((item, index) => {
+        const barWrapper = document.createElement('div');
+        barWrapper.className = 'flex items-center gap-3';
+        
+        const rank = document.createElement('div');
+        rank.className = 'w-12 text-right theme-text-secondary font-semibold';
+        rank.textContent = `#${index + 1}`;
+        
+        const number = document.createElement('div');
+        number.className = 'w-16 text-center font-bold text-lg';
+        number.textContent = item.number.toString();
+        
+        const barContainer = document.createElement('div');
+        barContainer.className = 'flex-1 theme-bg-surface rounded-full h-8 relative overflow-hidden';
+        
+        const bar = document.createElement('div');
+        bar.className = 'h-full rounded-full transition-all duration-1000';
+        const width = (item.count / maxCount) * 100;
+        bar.style.width = `${width}%`;
+        
+        // Color gradient for top 3
+        if (index === 0) {
+          bar.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+        } else if (index === 1) {
+          bar.style.background = 'linear-gradient(90deg, #94a3b8, #cbd5e1)';
+        } else if (index === 2) {
+          bar.style.background = 'linear-gradient(90deg, #b45309, #d97706)';
+        } else {
+          bar.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+        }
+        
+        const label = document.createElement('div');
+        label.className = 'absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-white drop-shadow';
+        label.textContent = `${item.count} (${item.frequency.toFixed(1)}%)`;
+        
+        bar.appendChild(label);
+        barContainer.appendChild(bar);
+        
+        barWrapper.appendChild(rank);
+        barWrapper.appendChild(number);
+        barWrapper.appendChild(barContainer);
+        
+        chartContainer.appendChild(barWrapper);
+      });
+    }
+
+    // Initialize on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</InfoLayout>

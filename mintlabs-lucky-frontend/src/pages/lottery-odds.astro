@@ -1,12 +1,164 @@
 ---
 import InfoLayout from "../components/InfoLayout.astro";
+import AffiliateGrid from "../components/AffiliateGrid.astro";
+
+// Game-specific odds data
+const gameOdds: Record<string, { name: string; jackpot: string; tiers: { match: string; odds: string; prize: string }[] }> = {
+  powerball: {
+    name: "Powerball",
+    jackpot: "1 in 292,201,338",
+    tiers: [
+      { match: "5 + Powerball", odds: "1 in 292,201,338", prize: "Jackpot" },
+      { match: "5", odds: "1 in 11,688,054", prize: "$1,000,000" },
+      { match: "4 + Powerball", odds: "1 in 913,129", prize: "$50,000" },
+      { match: "4", odds: "1 in 36,525", prize: "$100" },
+      { match: "3 + Powerball", odds: "1 in 14,494", prize: "$100" },
+      { match: "3", odds: "1 in 580", prize: "$7" },
+      { match: "2 + Powerball", odds: "1 in 701", prize: "$7" },
+      { match: "1 + Powerball", odds: "1 in 92", prize: "$4" },
+      { match: "Powerball only", odds: "1 in 38", prize: "$4" },
+    ]
+  },
+  megamillions: {
+    name: "Mega Millions",
+    jackpot: "1 in 302,575,350",
+    tiers: [
+      { match: "5 + Mega Ball", odds: "1 in 302,575,350", prize: "Jackpot" },
+      { match: "5", odds: "1 in 12,607,306", prize: "$1,000,000" },
+      { match: "4 + Mega Ball", odds: "1 in 931,001", prize: "$10,000" },
+      { match: "4", odds: "1 in 38,792", prize: "$500" },
+      { match: "3 + Mega Ball", odds: "1 in 14,547", prize: "$200" },
+      { match: "3", odds: "1 in 606", prize: "$10" },
+      { match: "2 + Mega Ball", odds: "1 in 693", prize: "$10" },
+      { match: "1 + Mega Ball", odds: "1 in 89", prize: "$4" },
+      { match: "Mega Ball only", odds: "1 in 37", prize: "$2" },
+    ]
+  },
+  ca_superlotto: {
+    name: "CA SuperLotto Plus",
+    jackpot: "1 in 41,416,353",
+    tiers: [
+      { match: "5 + Mega", odds: "1 in 41,416,353", prize: "Jackpot" },
+      { match: "5", odds: "1 in 1,592,937", prize: "$25,000+" },
+      { match: "4 + Mega", odds: "1 in 197,221", prize: "$1,500+" },
+      { match: "4", odds: "1 in 7,585", prize: "$60+" },
+      { match: "3 + Mega", odds: "1 in 4,810", prize: "$25+" },
+      { match: "3", odds: "1 in 185", prize: "$10" },
+      { match: "2 + Mega", odds: "1 in 361", prize: "$10" },
+      { match: "1 + Mega", odds: "1 in 74", prize: "$1" },
+    ]
+  }
+};
+
+// Parse query parameter
+const url = new URL(Astro.request.url);
+const gameParam = url.searchParams.get("game")?.toLowerCase() || "";
+const selectedGame = gameOdds[gameParam] || null;
+
+// SEO structured data
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Lottery Odds Explained - Complete Guide to Winning Probabilities",
+  "description": "Understand the real odds of winning Powerball, Mega Millions, and other lotteries. Complete prize tier breakdowns and probability calculations.",
+  "author": {
+    "@type": "Organization",
+    "name": "MintLabs"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "MintLabs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://lucky.mintlabs.dev/mintlab.png"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://lucky.mintlabs.dev/lottery-odds"
+  }
+};
 ---
 
-<InfoLayout title="Lottery Odds, Simply Explained" subtitle="Independence, patterns, and filters.">
+<InfoLayout 
+  title="Lottery Odds, Simply Explained" 
+  subtitle="Independence, patterns, and filters."
+  pageTitle="Lottery Odds Explained - Powerball, Mega Millions Probability Guide"
+  description="Complete guide to lottery odds for Powerball (1 in 292M), Mega Millions (1 in 302M), and more. Prize tier breakdowns, probability math, and honest expectations."
+  keywords="lottery odds, powerball odds, mega millions odds, lottery probability, winning lottery chances, jackpot odds"
+  jsonLd={jsonLd}
+>
   <div slot="teaser">
     <strong class="text-emerald-400">Big idea:</strong>
     Each lottery draw is independent. Past results do not change future odds.
   </div>
+
+  {/* Game-specific odds section - shown when ?game= param is present */}
+  {selectedGame && (
+    <section id="game-odds" class="rounded-2xl border border-emerald-600 bg-gradient-to-r from-emerald-900/30 to-blue-900/30 p-8 shadow-xl backdrop-blur-sm">
+      <h2 class="mb-4 text-3xl font-semibold text-emerald-300">{selectedGame.name} Odds</h2>
+      <p class="mb-4 text-lg text-gray-300">
+        Jackpot odds: <span class="font-bold text-emerald-400">{selectedGame.jackpot}</span>
+      </p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-600">
+              <th class="py-2 text-left text-emerald-300">Match</th>
+              <th class="py-2 text-left text-emerald-300">Odds</th>
+              <th class="py-2 text-left text-emerald-300">Prize</th>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedGame.tiers.map((tier) => (
+              <tr class="border-b border-slate-700/50">
+                <td class="py-2 text-gray-300">{tier.match}</td>
+                <td class="py-2 font-mono text-blue-300">{tier.odds}</td>
+                <td class="py-2 text-gray-300">{tier.prize}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4 text-xs text-gray-400">
+        Overall odds of winning any prize vary by game. Check official lottery sites for current rules.
+      </p>
+    </section>
+  )}
+
+  {/* Major game odds comparison */}
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl">
+    <h2 class="mb-6 text-3xl font-semibold text-blue-300">Jackpot odds comparison</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-600">
+            <th class="py-2 text-left text-emerald-300">Game</th>
+            <th class="py-2 text-left text-emerald-300">Jackpot Odds</th>
+            <th class="py-2 text-left text-emerald-300">Any Prize</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-slate-700/50">
+            <td class="py-2"><a href="?game=powerball" class="text-emerald-400 hover:underline">Powerball</a></td>
+            <td class="py-2 font-mono text-blue-300">1 in 292,201,338</td>
+            <td class="py-2 text-gray-300">1 in 24.9</td>
+          </tr>
+          <tr class="border-b border-slate-700/50">
+            <td class="py-2"><a href="?game=megamillions" class="text-emerald-400 hover:underline">Mega Millions</a></td>
+            <td class="py-2 font-mono text-blue-300">1 in 302,575,350</td>
+            <td class="py-2 text-gray-300">1 in 24</td>
+          </tr>
+          <tr class="border-b border-slate-700/50">
+            <td class="py-2"><a href="?game=ca_superlotto" class="text-emerald-400 hover:underline">CA SuperLotto Plus</a></td>
+            <td class="py-2 font-mono text-blue-300">1 in 41,416,353</td>
+            <td class="py-2 text-gray-300">1 in 23</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-4 text-xs text-gray-400">Click a game name to see full prize tier breakdown.</p>
+  </section>
 
   <section class="rounded-2xl border border-slate-700 bg-gradient-to-r from-emerald-900/20 to-blue-900/20 p-8 shadow-xl backdrop-blur-sm">
     <h2 class="mb-6 text-3xl font-semibold text-emerald-300">Quick summary</h2>
@@ -91,4 +243,23 @@ import InfoLayout from "../components/InfoLayout.astro";
       <li>Use filters to keep tickets organized, not to chase certainty.</li>
     </ul>
   </section>
+
+  {/* Cross-links to other content */}
+  <section class="rounded-2xl border border-slate-700 bg-slate-900/40 p-6">
+    <h3 class="mb-4 text-xl font-semibold text-gray-200">Learn more</h3>
+    <div class="flex flex-wrap gap-3">
+      <a href="/lottery-math" class="rounded-full border border-emerald-600 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors">
+        Lottery Math →
+      </a>
+      <a href="/faq" class="rounded-full border border-blue-600 px-4 py-2 text-sm text-blue-400 hover:bg-blue-600 hover:text-white transition-colors">
+        FAQ →
+      </a>
+      <a href="/" class="rounded-full border border-purple-600 px-4 py-2 text-sm text-purple-400 hover:bg-purple-600 hover:text-white transition-colors">
+        Generate Numbers →
+      </a>
+    </div>
+  </section>
+
+  {/* Affiliate resources */}
+  <AffiliateGrid placement="lottery-odds" />
 </InfoLayout>

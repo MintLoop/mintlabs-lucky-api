@@ -1,10 +1,38 @@
 ---
 import InfoLayout from "../components/InfoLayout.astro";
+import AffiliateGrid from "../components/AffiliateGrid.astro";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Lottery Math Explained - Combinations, Probability & Odds Formulas",
+  "description": "Learn the mathematics behind lottery probability. Understand combinations vs permutations, how to calculate odds, and the formulas used for lottery games.",
+  "author": {
+    "@type": "Organization",
+    "name": "MintLabs"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "MintLabs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://lucky.mintlabs.dev/mintlab.png"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://lucky.mintlabs.dev/lottery-math"
+  }
+};
 ---
 
 <InfoLayout
   title="Lottery Math Explained"
   subtitle="Deep dive into the mathematics behind lottery probability and odds calculation."
+  pageTitle="Lottery Math Explained - Probability, Combinations & Odds Formulas"
+  description="Master lottery mathematics: combinations vs permutations, probability formulas, expected value calculations. Learn how lottery odds are really calculated."
+  keywords="lottery math, lottery probability, combinations formula, permutations, lottery odds calculation, expected value lottery"
+  jsonLd={jsonLd}
 >
   <div slot="teaser">
     <strong class="text-emerald-400">🔢 Key Formula:</strong>
@@ -145,4 +173,23 @@ import InfoLayout from "../components/InfoLayout.astro";
       <p class="mt-2 text-sm text-gray-400">Probability with multiple tickets.</p>
     </div>
   </section>
+
+  {/* Cross-links to other content */}
+  <section class="rounded-2xl border border-slate-700 bg-slate-900/40 p-6">
+    <h3 class="mb-4 text-xl font-semibold text-gray-200">Continue learning</h3>
+    <div class="flex flex-wrap gap-3">
+      <a href="/lottery-odds" class="rounded-full border border-emerald-600 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors">
+        Lottery Odds →
+      </a>
+      <a href="/faq" class="rounded-full border border-blue-600 px-4 py-2 text-sm text-blue-400 hover:bg-blue-600 hover:text-white transition-colors">
+        FAQ →
+      </a>
+      <a href="/" class="rounded-full border border-purple-600 px-4 py-2 text-sm text-purple-400 hover:bg-purple-600 hover:text-white transition-colors">
+        Generate Numbers →
+      </a>
+    </div>
+  </section>
+
+  {/* Affiliate resources */}
+  <AffiliateGrid placement="lottery-math" />
 </InfoLayout>

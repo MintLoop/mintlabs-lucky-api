@@ -7,20 +7,21 @@ const {
   desc,
   cta,
   href,
-  disclaimer = "Affiliate link. We may earn a commission.",
+  disclaimer = "",
 } = Astro.props;
 ---
-<aside class="rounded-xl2 bg-ink-900/70 border border-mint-700 shadow-card p-5">
-  <h4 class="text-base font-semibold text-mint-300">{title}</h4>
-  <p class="mt-2 text-ink-100/90">{desc}</p>
+<article class="rounded-xl border border-slate-700 bg-slate-800/50 p-4 hover:border-emerald-600/50 transition-colors">
+  <h4 class="text-sm font-semibold text-emerald-300">{title}</h4>
+  <p class="mt-2 text-sm text-gray-400 leading-relaxed">{desc}</p>
   <TrackLink
     href={href}
     rel="nofollow sponsored noopener"
     event="affiliate_click"
     props={{ id, title }}
-    class="inline-flex items-center gap-2 rounded-xl2 px-4 py-2 bg-mint-500 text-white hover:bg-mint-600 transition shadow-card mt-3"
+    class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 bg-emerald-600 text-white text-sm hover:bg-emerald-500 transition mt-3"
   >
     {cta}
+    <span class="text-xs">→</span>
   </TrackLink>
-  <p class="mt-2 text-xs text-ink-400">{disclaimer}</p>
-</aside>
+  {disclaimer && <p class="mt-2 text-xs text-gray-500">{disclaimer}</p>}
+</article>

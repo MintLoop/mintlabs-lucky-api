@@ -1,0 +1,94 @@
+---
+// NOTE: avoid module-style TypeScript casts inside the inline script — the
+// inline block runs as plain JS in the browser. Use window.track to access
+// the runtime tracking function exposed by the app boot.
+---
+
+<div id="newsletter-root">
+  <button id="openNewsletter" class="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-sm hover:bg-emerald-500 transition">Subscribe</button>
+
+  <div id="newsletterModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-6">
+    <div class="max-w-xl w-full bg-slate-900 border border-slate-700 p-6 rounded-xl">
+      <h3 class="text-xl font-semibold mb-2">Join our newsletter</h3>
+      <p class="text-sm theme-text-muted mb-4">Get tool updates, promotions, and new tool announcements. We only store your email for this purpose — no raw inputs or numbers will be tracked without consent.</p>
+
+      <div class="grid gap-3">
+        <input id="newsletterEmail" type="email" placeholder="you@example.com" class="w-full p-3 rounded-md bg-slate-800 border border-slate-700" />
+        <div class="flex items-center gap-3">
+          <label class="text-sm theme-text-muted"><input id="newsletterConsent" type="checkbox" /> I agree to receive occasional emails.</label>
+        </div>
+        <div class="flex items-center gap-3 justify-end">
+          <button id="newsletterCancel" class="px-3 py-1 rounded-lg border border-slate-700">Cancel</button>
+          <button id="newsletterSubmit" class="px-3 py-1 rounded-lg bg-emerald-500 text-white">Subscribe</button>
+        </div>
+        <p id="newsletterMessage" class="text-xs text-yellow-300 hidden"></p>
+        <p class="text-xs theme-text-muted mt-3">We use a front-end only signup flow for now — emails are queued locally until backend subscription service is ready (Phase 5). You can opt out at any time.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  // Lightweight modal + local queueing for newsletter
+  (function () {
+    const open = document.getElementById('openNewsletter');
+    const modal = document.getElementById('newsletterModal');
+    const cancel = document.getElementById('newsletterCancel');
+    const submit = document.getElementById('newsletterSubmit');
+    const emailInput = document.getElementById('newsletterEmail');
+    const consent = document.getElementById('newsletterConsent');
+    const msg = document.getElementById('newsletterMessage');
+
+    function show(q=true) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      try { if (q && typeof window.track === 'function') window.track('newsletter_open', {}); } catch(e) { /* noop */ }
+    }
+
+    function hide() {
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+
+    function enqueue(email) {
+      try {
+        const key = 'newsletter_queue_v1';
+        const q = JSON.parse(localStorage.getItem(key) || '[]');
+        q.push({ email, ts: Date.now() });
+        localStorage.setItem(key, JSON.stringify(q));
+        return true;
+      } catch (err) {
+        console.warn('newsletter enqueue failed', err);
+        return false;
+      }
+    }
+
+    if (open) open.addEventListener('click', () => show(true));
+    if (cancel) cancel.addEventListener('click', hide);
+
+    if (submit) submit.addEventListener('click', () => {
+      const email = (emailInput && emailInput.value || '').trim();
+      const ok = !!(consent && consent.checked);
+      if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        if (msg) { msg.classList.remove('hidden'); msg.textContent = 'Please enter a valid email address.'; }
+        return;
+      }
+      if (!ok) {
+        if (msg) { msg.classList.remove('hidden'); msg.textContent = 'Please check the consent box to subscribe.'; }
+        return;
+      }
+
+      // Track an anonymous subscribe intent — do NOT send user input to analytics
+      try { if (typeof window.track === 'function') window.track('newsletter_submitted', { method: 'frontend_local' }); } catch(e) {}
+
+      const success = enqueue(email);
+      if (success) {
+        if (msg) { msg.classList.remove('hidden'); msg.textContent = 'Thanks — your email is queued. We will add backend delivery in Phase 5.'; }
+        try { if (typeof window.track === 'function') window.track('newsletter_queued', { }); } catch(e) {}
+        setTimeout(hide, 1200);
+      } else {
+        if (msg) { msg.classList.remove('hidden'); msg.textContent = 'Failed to queue your email — try again later.'; }
+      }
+    });
+  })();
+</script>

@@ -1,0 +1,754 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Jackpot Break-Even Calculator | When Is a Lottery Ticket Worth Buying?";
+const description = "Calculate the exact jackpot amount where a lottery ticket becomes mathematically 'fair'. Understand expected value and why even giant jackpots aren't great bets.";
+const keywords = "lottery break even, jackpot expected value, when to buy lottery tickets, lottery ev calculator, lottery math, lottery investment calculator";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Jackpot Break-Even Calculator",
+  "description": description,
+  "applicationCategory": "Lottery Tool",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<InfoLayout
+  title="Break-Even Calculator"
+  subtitle="When does a lottery ticket become a 'fair' bet?"
+  pageTitle={pageTitle}
+  description={description}
+  keywords={keywords}
+  jsonLd={jsonLd}
+>
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Find out how big the jackpot needs to be for your ticket to have positive expected value.
+      <strong>Spoiler:</strong> It's a lot bigger than you think, and even then, you probably won't win.
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="game-selector">
+      <button class="game-btn active" data-game="powerball">Powerball</button>
+      <button class="game-btn" data-game="megamillions">Mega Millions</button>
+      <button class="game-btn" data-game="custom">Custom Game</button>
+    </div>
+
+    <div id="customInputs" class="custom-inputs hidden">
+      <div class="input-row">
+        <div class="input-group">
+          <label for="customOdds">Jackpot Odds (1 in ...):</label>
+          <input type="number" id="customOdds" value="292201338" min="1">
+        </div>
+        <div class="input-group">
+          <label for="customTicketPrice">Ticket Price ($):</label>
+          <input type="number" id="customTicketPrice" value="2" min="1" step="1">
+        </div>
+      </div>
+    </div>
+
+    <div class="jackpot-input">
+      <label for="currentJackpot">Current Advertised Jackpot:</label>
+      <div class="jackpot-field">
+        <span class="currency">$</span>
+        <input type="number" id="currentJackpot" value="500000000" min="0" step="1000000">
+        <span class="unit">million</span>
+      </div>
+      <div class="quick-amounts">
+        <button class="quick-btn" data-amount="100000000">$100M</button>
+        <button class="quick-btn" data-amount="500000000">$500M</button>
+        <button class="quick-btn active" data-amount="1000000000">$1B</button>
+        <button class="quick-btn" data-amount="2000000000">$2B</button>
+      </div>
+    </div>
+
+    <div class="options-panel">
+      <h4>Calculation Options</h4>
+      <div class="options-grid">
+        <label class="option-item">
+          <input type="checkbox" id="useCashOption" checked>
+          <span>Use Cash Option (~60% of advertised)</span>
+        </label>
+        <label class="option-item">
+          <input type="checkbox" id="applyTaxes" checked>
+          <span>Apply Federal Taxes (37%)</span>
+        </label>
+        <label class="option-item">
+          <input type="checkbox" id="estimateSplitting" checked>
+          <span>Estimate Jackpot Splitting</span>
+        </label>
+      </div>
+    </div>
+
+    <button id="calculateBtn" class="calculate-btn">
+      🧮 Calculate Break-Even
+    </button>
+
+    <div id="results" class="results-panel"></div>
+  </section>
+
+  <section class="edu-section">
+    <h2>Understanding Lottery Expected Value</h2>
+    
+    <div class="ev-explainer">
+      <div class="ev-formula">
+        <h4>The Simple Formula</h4>
+        <div class="formula">
+          EV = (Prize × Probability) − Ticket Cost
+        </div>
+        <p class="formula-note">
+          If EV is negative, you lose money on average. If positive, you "profit" on average 
+          (though you'll almost certainly never see that profit).
+        </p>
+      </div>
+    </div>
+
+    <div class="reality-checks">
+      <h3>Reality Checks</h3>
+      
+      <div class="check-grid">
+        <div class="check-card">
+          <span class="check-icon">💰</span>
+          <h4>Cash vs Annuity</h4>
+          <p>
+            The advertised jackpot is the annuity value paid over 30 years. The cash option 
+            is typically <strong>50-60% less</strong>. This dramatically affects EV.
+          </p>
+        </div>
+        
+        <div class="check-card">
+          <span class="check-icon">🏛️</span>
+          <h4>Taxes Take a Bite</h4>
+          <p>
+            Federal tax is <strong>37% on winnings over ~$500K</strong>. Many states add 
+            another 5-13%. A $1B jackpot might become $300M after taxes.
+          </p>
+        </div>
+        
+        <div class="check-card">
+          <span class="check-icon">🤝</span>
+          <h4>Splitting the Prize</h4>
+          <p>
+            Big jackpots attract more players. A $2B jackpot might have 3-5 winners 
+            splitting it. This effect is hard to predict but very real.
+          </p>
+        </div>
+        
+        <div class="check-card">
+          <span class="check-icon">📉</span>
+          <h4>Secondary Prizes</h4>
+          <p>
+            We ignore them in break-even calculations, but they add small value back. 
+            Still not enough to make lotteries good investments.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-line">
+      <h3>🎯 The Bottom Line</h3>
+      <p>
+        Even when the theoretical EV goes positive, it's still a terrible "investment" because:
+      </p>
+      <ul>
+        <li><strong>Variance is astronomical.</strong> You need to buy millions of tickets to "realize" that positive EV.</li>
+        <li><strong>One ticket = almost certain loss.</strong> Your ticket will almost certainly be worth $0.</li>
+        <li><strong>Risk of ruin is 99.9999997%.</strong> That's your chance of NOT winning the jackpot.</li>
+        <li><strong>Opportunity cost matters.</strong> $2 invested in the S&P 500 has actual expected gains.</li>
+      </ul>
+      <p class="final-note">
+        <strong>Play for entertainment, not profit.</strong> If $2 of fun is worth it to you, go ahead. 
+        Just don't call it an investment strategy.
+      </p>
+    </div>
+  </section>
+</InfoLayout>
+
+<style>
+  .tool-section {
+    padding: 2rem;
+    background: var(--surface);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+  }
+
+  .game-selector {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .game-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .game-btn:hover {
+    border-color: var(--accent);
+  }
+
+  .game-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .custom-inputs {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--bg);
+    border-radius: 8px;
+  }
+
+  .custom-inputs.hidden {
+    display: none;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .input-group {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1rem;
+  }
+
+  .jackpot-input {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .jackpot-input > label {
+    display: block;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .jackpot-field {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .currency {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .jackpot-field input {
+    width: 200px;
+    padding: 1rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .unit {
+    font-size: 1rem;
+    color: var(--text-secondary);
+  }
+
+  .quick-amounts {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .quick-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .quick-btn:hover {
+    border-color: var(--accent);
+  }
+
+  .quick-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .options-panel {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--bg);
+    border-radius: 8px;
+  }
+
+  .options-panel h4 {
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+  }
+
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .option-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+  }
+
+  .option-item input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  .calculate-btn {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 2rem;
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+  }
+
+  .calculate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+  }
+
+  .results-panel {
+    min-height: 50px;
+  }
+
+  .results-panel:empty::before {
+    content: "Click 'Calculate Break-Even' to see results";
+    display: block;
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 1rem;
+    font-style: italic;
+  }
+
+  .result-card {
+    padding: 2rem;
+    background: var(--bg);
+    border-radius: 12px;
+    text-align: center;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-main {
+    margin-bottom: 2rem;
+  }
+
+  .result-label {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  .result-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  .result-value.positive {
+    color: #10b981;
+  }
+
+  .result-value.negative {
+    color: #ef4444;
+  }
+
+  .result-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+  }
+
+  .result-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .breakdown-item {
+    padding: 1rem;
+    background: var(--surface);
+    border-radius: 8px;
+  }
+
+  .breakdown-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    display: block;
+  }
+
+  .breakdown-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+  }
+
+  .breakeven-info {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--surface);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+  }
+
+  .edu-section {
+    padding: 2rem;
+  }
+
+  .edu-section h2 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .ev-explainer {
+    margin-bottom: 2rem;
+  }
+
+  .ev-formula {
+    padding: 2rem;
+    background: var(--surface);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .ev-formula h4 {
+    margin-bottom: 1rem;
+  }
+
+  .formula {
+    font-family: monospace;
+    font-size: 1.25rem;
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .formula-note {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .reality-checks h3 {
+    margin-bottom: 1rem;
+  }
+
+  .check-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .check-card {
+    padding: 1.5rem;
+    background: var(--surface);
+    border-radius: 12px;
+  }
+
+  .check-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .check-card h4 {
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+  }
+
+  .check-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .bottom-line {
+    padding: 2rem;
+    background: var(--surface);
+    border-radius: 12px;
+    border-left: 4px solid #ef4444;
+  }
+
+  .bottom-line h3 {
+    margin-bottom: 1rem;
+  }
+
+  .bottom-line ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+  }
+
+  .bottom-line li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .bottom-line li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #ef4444;
+  }
+
+  .final-note {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    .result-value {
+      font-size: 1.75rem;
+    }
+
+    .jackpot-field input {
+      width: 150px;
+      font-size: 1.25rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const gameButtons = document.querySelectorAll('.game-btn') as NodeListOf<HTMLButtonElement>;
+    const customInputs = document.getElementById('customInputs') as HTMLDivElement;
+    const customOdds = document.getElementById('customOdds') as HTMLInputElement;
+    const customTicketPrice = document.getElementById('customTicketPrice') as HTMLInputElement;
+    const currentJackpot = document.getElementById('currentJackpot') as HTMLInputElement;
+    const quickButtons = document.querySelectorAll('.quick-btn') as NodeListOf<HTMLButtonElement>;
+    const useCashOption = document.getElementById('useCashOption') as HTMLInputElement;
+    const applyTaxes = document.getElementById('applyTaxes') as HTMLInputElement;
+    const estimateSplitting = document.getElementById('estimateSplitting') as HTMLInputElement;
+    const calculateBtn = document.getElementById('calculateBtn') as HTMLButtonElement;
+    const resultsPanel = document.getElementById('results') as HTMLDivElement;
+
+    const gameData: Record<string, { odds: number, ticketPrice: number, name: string }> = {
+      powerball: { odds: 292201338, ticketPrice: 2, name: 'Powerball' },
+      megamillions: { odds: 302575350, ticketPrice: 2, name: 'Mega Millions' },
+      custom: { odds: 292201338, ticketPrice: 2, name: 'Custom Game' }
+    };
+
+    let currentGame = 'powerball';
+
+    function formatCurrency(num: number): string {
+      if (num >= 1e9) return '$' + (num / 1e9).toFixed(2) + 'B';
+      if (num >= 1e6) return '$' + (num / 1e6).toFixed(2) + 'M';
+      if (num >= 1e3) return '$' + (num / 1e3).toFixed(2) + 'K';
+      return '$' + num.toFixed(2);
+    }
+
+    function switchGame(game: string) {
+      currentGame = game;
+      gameButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.game === game);
+      });
+      
+      if (game === 'custom') {
+        customInputs.classList.remove('hidden');
+      } else {
+        customInputs.classList.add('hidden');
+      }
+    }
+
+    function setQuickAmount(amount: number) {
+      currentJackpot.value = amount.toString();
+      quickButtons.forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.amount || '0') === amount);
+      });
+    }
+
+    function estimateSplits(jackpot: number): number {
+      // Very rough estimate: higher jackpots = more players = more likely splits
+      // Based on historical data, mega jackpots often have 2-5 winners
+      if (jackpot < 200e6) return 1;
+      if (jackpot < 500e6) return 1.2;
+      if (jackpot < 1e9) return 1.8;
+      if (jackpot < 1.5e9) return 2.5;
+      return 3.5;
+    }
+
+    function calculateEV() {
+      const config = currentGame === 'custom' 
+        ? { odds: parseInt(customOdds.value), ticketPrice: parseFloat(customTicketPrice.value), name: 'Custom Game' }
+        : gameData[currentGame];
+      
+      let jackpot = parseFloat(currentJackpot.value);
+      const originalJackpot = jackpot;
+      
+      // Apply cash option (typically 50-60% of advertised)
+      const cashOptionRate = 0.58;
+      if (useCashOption.checked) {
+        jackpot = jackpot * cashOptionRate;
+      }
+      
+      // Apply federal taxes (37% top bracket)
+      const taxRate = 0.37;
+      if (applyTaxes.checked) {
+        jackpot = jackpot * (1 - taxRate);
+      }
+      
+      // Estimate splitting
+      let expectedSplits = 1;
+      if (estimateSplitting.checked) {
+        expectedSplits = estimateSplits(originalJackpot);
+      }
+      jackpot = jackpot / expectedSplits;
+      
+      // Calculate expected value
+      const winProbability = 1 / config.odds;
+      const expectedWinnings = jackpot * winProbability;
+      const ev = expectedWinnings - config.ticketPrice;
+      const evPercentage = (ev / config.ticketPrice) * 100;
+      
+      // Calculate break-even jackpot
+      let breakEvenJackpot = config.ticketPrice * config.odds;
+      // Reverse the adjustments
+      if (estimateSplitting.checked) breakEvenJackpot *= 2; // Assume 2 winners at break-even
+      if (applyTaxes.checked) breakEvenJackpot /= (1 - taxRate);
+      if (useCashOption.checked) breakEvenJackpot /= cashOptionRate;
+      
+      const isPositive = ev >= 0;
+      
+      resultsPanel.innerHTML = `
+        <div class="result-card">
+          <div class="result-main">
+            <div class="result-label">Expected Value Per Ticket</div>
+            <div class="result-value ${isPositive ? 'positive' : 'negative'}">
+              ${ev >= 0 ? '+' : ''}${formatCurrency(ev)}
+            </div>
+            <div class="result-subtitle">
+              ${isPositive ? '✅ Positive EV (theoretically favorable)' : '❌ Negative EV (unfavorable)'}
+              <br>Return: ${evPercentage.toFixed(2)}% per dollar
+            </div>
+          </div>
+          
+          <div class="result-breakdown">
+            <div class="breakdown-item">
+              <span class="breakdown-label">Advertised Jackpot</span>
+              <span class="breakdown-value">${formatCurrency(originalJackpot)}</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">After Cash Option</span>
+              <span class="breakdown-value">${formatCurrency(originalJackpot * (useCashOption.checked ? cashOptionRate : 1))}</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">After Taxes</span>
+              <span class="breakdown-value">${formatCurrency(originalJackpot * (useCashOption.checked ? cashOptionRate : 1) * (applyTaxes.checked ? (1 - taxRate) : 1))}</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Expected Split</span>
+              <span class="breakdown-value">${expectedSplits.toFixed(1)} winner(s)</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Your Expected Share</span>
+              <span class="breakdown-value">${formatCurrency(jackpot)}</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Win Probability</span>
+              <span class="breakdown-value">1 in ${config.odds.toLocaleString()}</span>
+            </div>
+          </div>
+          
+          <div class="breakeven-info">
+            <strong>Break-Even Jackpot:</strong> The advertised jackpot would need to be approximately 
+            <strong>${formatCurrency(breakEvenJackpot)}</strong> for the ticket to have zero expected loss.
+            <br><br>
+            <em>Note: Even at positive EV, you'd need to buy millions of tickets to statistically 
+            "realize" that edge. One ticket is still almost certainly worth $0.</em>
+          </div>
+        </div>
+      `;
+    }
+
+    gameButtons.forEach(btn => {
+      btn.addEventListener('click', () => switchGame(btn.dataset.game || 'powerball'));
+    });
+
+    quickButtons.forEach(btn => {
+      btn.addEventListener('click', () => setQuickAmount(parseInt(btn.dataset.amount || '0')));
+    });
+
+    calculateBtn.addEventListener('click', calculateEV);
+
+    // Initialize
+    setQuickAmount(500000000);
+  });
+</script>

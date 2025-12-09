@@ -1,0 +1,662 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Lottery Expected Value Calculator | EV Calculator for Any Lottery Game";
+const description = "Calculate the expected value (EV) of any lottery game. Find out the mathematical expected loss per ticket and understand if lottery tickets are worth buying.";
+const keywords = "lottery expected value, EV calculator, lottery expected loss, lottery mathematics, lottery value calculator, expected value formula";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Lottery Expected Value Calculator",
+  "description": description,
+  "applicationCategory": "CalculatorApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<InfoLayout
+  title="Expected Value Calculator"
+  subtitle="What's the mathematical value of a lottery ticket?"
+  pageTitle={pageTitle}
+  description={description}
+  keywords={keywords}
+  jsonLd={jsonLd}
+>
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Calculate the <strong>expected value (EV)</strong> of any lottery game to understand the mathematical
+      reality behind lottery tickets. Every game has a negative expected value, meaning you lose money
+      over time. <strong>This calculator shows you exactly how much.</strong>
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="calculator-container">
+      <div class="input-section">
+        <h3>Lottery Game Parameters</h3>
+
+        <div class="input-group">
+          <label for="ticketPrice">Ticket Price ($):</label>
+          <input type="number" id="ticketPrice" min="0.01" step="0.01" value="2.00" placeholder="2.00">
+          <span class="help-text">Cost of one ticket</span>
+        </div>
+
+        <div class="input-group">
+          <label for="jackpotAmount">Jackpot Amount ($):</label>
+          <input type="number" id="jackpotAmount" min="1000000" step="1000000" value="100000000" placeholder="100000000">
+          <span class="help-text">Current jackpot prize</span>
+        </div>
+
+        <div class="input-group">
+          <label for="totalCombinations">Total Combinations:</label>
+          <input type="number" id="totalCombinations" min="1" value="292201338" placeholder="292201338">
+          <span class="help-text">Total possible number combinations (C(n,k))</span>
+        </div>
+
+        <div class="input-group">
+          <label for="secondPrizes">Second Prize Tiers:</label>
+          <div class="prize-inputs">
+            <div class="prize-tier">
+              <input type="number" id="secondPrizeAmount" min="0" step="1000" value="1000000" placeholder="1000000">
+              <span>×</span>
+              <input type="number" id="secondPrizeCount" min="0" value="1" placeholder="1">
+              <span>winners</span>
+            </div>
+          </div>
+          <span class="help-text">Optional: Second prize amount and number of winners</span>
+        </div>
+
+        <button id="calculateBtn" class="calculate-btn">Calculate Expected Value</button>
+      </div>
+
+      <div class="results-section">
+        <h3>Expected Value Analysis</h3>
+
+        <div id="results" class="results-display" style="display: none;">
+          <div class="main-result">
+            <div class="result-card negative">
+              <div class="result-label">Expected Value per Ticket</div>
+              <div id="expectedValue" class="result-value">--</div>
+              <div class="result-subtitle">You lose this much on average</div>
+            </div>
+          </div>
+
+          <div class="breakdown-grid">
+            <div class="breakdown-item">
+              <span class="breakdown-label">Your Odds:</span>
+              <span id="odds" class="breakdown-value">--</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Expected Jackpot Win:</span>
+              <span id="expectedJackpot" class="breakdown-value">--</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Expected Second Prize:</span>
+              <span id="expectedSecond" class="breakdown-value">--</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Break-Even Jackpot:</span>
+              <span id="breakEven" class="breakdown-value">--</span>
+            </div>
+          </div>
+
+          <div class="interpretation">
+            <h4>What This Means</h4>
+            <p id="interpretationText"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="popular-games">
+      <h3>Popular Lottery Games</h3>
+      <div class="game-buttons">
+        <button class="game-preset" data-price="2" data-jackpot="100000000" data-combinations="292201338" data-second-amount="1000000" data-second-count="1">Powerball</button>
+        <button class="game-preset" data-price="2" data-jackpot="80000000" data-combinations="302575350" data-second-amount="1000000" data-second-count="1">Mega Millions</button>
+        <button class="game-preset" data-price="3" data-jackpot="150000000" data-combinations="139838160" data-second-amount="1000000" data-second-count="1">EuroMillions</button>
+        <button class="game-preset" data-price="2" data-jackpot="4000000" data-combinations="13983816" data-second-amount="100000" data-second-count="10">Lotto 6/49</button>
+        <button class="game-preset" data-price="1" data-jackpot="120" data-combinations="120" data-second-amount="0" data-second-count="0">Pick 3 (Straight)</button>
+        <button class="game-preset" data-price="1" data-jackpot="1000" data-combinations="1000" data-second-amount="0" data-second-count="0">Pick 4 (Straight)</button>
+      </div>
+    </div>
+
+    <div class="educational-content">
+      <h3>Understanding Expected Value</h3>
+
+      <div class="math-explanation">
+        <p>
+          <strong>Expected Value (EV)</strong> is the average outcome of a random event if you repeated
+          it many times. For lotteries, it's always negative because the probability of winning is
+          extremely low.
+        </p>
+
+        <div class="formula-box">
+          <strong>EV = (Probability of Winning × Prize) + (Probability of Losing × Loss)</strong>
+        </div>
+
+        <p>
+          For a lottery ticket:
+        </p>
+        <ul>
+          <li><strong>Probability of winning jackpot:</strong> 1 / total combinations</li>
+          <li><strong>Prize if you win:</strong> Jackpot amount (minus taxes)</li>
+          <li><strong>Probability of losing:</strong> 1 - (1 / total combinations)</li>
+          <li><strong>Loss if you lose:</strong> Ticket price</li>
+        </ul>
+      </div>
+
+      <div class="examples">
+        <h4>Real Examples:</h4>
+        <div class="example-grid">
+          <div class="example-item">
+            <h5>Powerball ($2 ticket, $100M jackpot)</h5>
+            <p><strong>EV:</strong> -$1.66 per ticket</p>
+            <p><strong>Break-even jackpot:</strong> $584 million</p>
+          </div>
+          <div class="example-item">
+            <h5>Mega Millions ($2 ticket, $80M jackpot)</h5>
+            <p><strong>EV:</strong> -$1.68 per ticket</p>
+            <p><strong>Break-even jackpot:</strong> $605 million</p>
+          </div>
+          <div class="example-item">
+            <h5>Pick 3 ($1 ticket, $500 prize)</h5>
+            <p><strong>EV:</strong> -$0.50 per ticket</p>
+            <p><strong>Break-even odds:</strong> 1 in 2</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="key-insights">
+        <h4>Key Insights</h4>
+        <ul>
+          <li><strong>All lotteries have negative EV:</strong> You always lose money over time</li>
+          <li><strong>House edge:</strong> Lotteries keep 40-60% of ticket sales as profit</li>
+          <li><strong>Break-even jackpot:</strong> The jackpot needed to make EV positive</li>
+          <li><strong>Second prizes matter:</strong> They slightly improve EV but not enough</li>
+          <li><strong>Entertainment value:</strong> Some play for fun, knowing they'll lose money</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</InfoLayout>
+
+<style>
+  .calculator-container {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .input-section, .results-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .input-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border-primary);
+    border-radius: 8px;
+    font-size: 1.1rem;
+    transition: border-color 0.2s;
+    background: var(--input-bg);
+    color: var(--text-primary);
+  }
+
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+  }
+
+  .help-text {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  .prize-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .prize-tier {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .prize-tier input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--border-primary);
+    border-radius: 4px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+  }
+
+  .calculate-btn {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+    color: var(--bg-primary);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .calculate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .results-display {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-primary);
+  }
+
+  .main-result {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .result-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 2px solid #dc2626;
+    display: inline-block;
+    min-width: 250px;
+    color: var(--text-primary);
+  }
+
+  .result-card.negative {
+    border-color: #dc2626;
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(185, 28, 28, 0.25));
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+  }
+
+  .result-label {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .result-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .result-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .breakdown-item {
+    background: var(--bg-card);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+  }
+
+  .breakdown-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .breakdown-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .interpretation {
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-success);
+  }
+
+  .interpretation h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+  }
+
+  .interpretation p {
+    margin: 0;
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+
+  .popular-games {
+    margin-bottom: 3rem;
+  }
+
+  .game-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .game-preset {
+    background: var(--bg-card);
+    border: 2px solid var(--border-primary);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    color: var(--text-primary);
+  }
+
+  .game-preset:hover {
+    background: var(--bg-secondary);
+    border-color: var(--accent-primary);
+  }
+
+  .educational-content {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-primary);
+  }
+
+  .formula-box {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.1rem;
+    margin: 1rem 0;
+    border: 1px solid var(--border-primary);
+  }
+
+  .examples {
+    margin-top: 2rem;
+  }
+
+  .example-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .example-item {
+    background: var(--bg-card);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+  }
+
+  .example-item h5 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+  }
+
+  .example-item p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+  }
+
+  .key-insights {
+    margin-top: 2rem;
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-warning);
+  }
+
+  .key-insights h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+  }
+
+  .key-insights ul {
+    margin: 0;
+    padding-left: 1.5rem;
+  }
+
+  .key-insights li {
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 768px) {
+    .calculator-container {
+      grid-template-columns: 1fr;
+    }
+
+    .game-buttons {
+      grid-template-columns: 1fr;
+    }
+
+    .breakdown-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .example-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  // Calculate expected value for a lottery
+  function calculateExpectedValue(
+    ticketPrice: number,
+    jackpotAmount: number,
+    totalCombinations: number,
+    secondPrizeAmount: number = 0,
+    secondPrizeCount: number = 0
+  ): {
+    expectedValue: number;
+    odds: string;
+    expectedJackpotWin: number;
+    expectedSecondPrizeWin: number;
+    breakEvenJackpot: number;
+  } {
+    const jackpotProbability = 1 / totalCombinations;
+    const secondPrizeProbability = secondPrizeCount / totalCombinations;
+
+    // Expected value calculation
+    const expectedJackpotWin = jackpotProbability * jackpotAmount;
+    const expectedSecondPrizeWin = secondPrizeProbability * secondPrizeAmount;
+    const expectedLoss = (1 - jackpotProbability - secondPrizeProbability) * (-ticketPrice);
+
+    const expectedValue = expectedJackpotWin + expectedSecondPrizeWin + expectedLoss;
+
+    // Break-even jackpot calculation
+    const breakEvenJackpot = ticketPrice * totalCombinations;
+
+    return {
+      expectedValue,
+      odds: `1 in ${totalCombinations.toLocaleString()}`,
+      expectedJackpotWin,
+      expectedSecondPrizeWin,
+      breakEvenJackpot
+    };
+  }
+
+  // Format currency
+  function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  }
+
+  // Generate interpretation text
+  function generateInterpretation(
+    expectedValue: number,
+    ticketPrice: number,
+    breakEvenJackpot: number,
+    jackpotAmount: number
+  ): string {
+    const lossAmount = Math.abs(expectedValue);
+    const lossPercentage = (lossAmount / ticketPrice) * 100;
+
+    let interpretation = `For every $${ticketPrice.toFixed(2)} ticket you buy, you can expect to lose $${lossAmount.toFixed(2)} on average (${lossPercentage.toFixed(1)}% of the ticket price). `;
+
+    if (jackpotAmount < breakEvenJackpot) {
+      const neededIncrease = breakEvenJackpot - jackpotAmount;
+      interpretation += `The jackpot would need to be ${formatCurrency(breakEvenJackpot)} (${formatCurrency(neededIncrease)} higher) to make this a fair game with zero expected value.`;
+    } else {
+      interpretation += `Interestingly, this jackpot makes the expected value less negative than usual, but you still lose money over time.`;
+    }
+
+    return interpretation;
+  }
+
+  // Main calculation function
+  function calculate(): void {
+    const ticketPriceInput = document.getElementById('ticketPrice') as HTMLInputElement;
+    const jackpotAmountInput = document.getElementById('jackpotAmount') as HTMLInputElement;
+    const totalCombinationsInput = document.getElementById('totalCombinations') as HTMLInputElement;
+    const secondPrizeAmountInput = document.getElementById('secondPrizeAmount') as HTMLInputElement;
+    const secondPrizeCountInput = document.getElementById('secondPrizeCount') as HTMLInputElement;
+
+    if (!ticketPriceInput || !jackpotAmountInput || !totalCombinationsInput) return;
+
+    const ticketPrice = parseFloat(ticketPriceInput.value);
+    const jackpotAmount = parseFloat(jackpotAmountInput.value);
+    const totalCombinations = parseInt(totalCombinationsInput.value);
+    const secondPrizeAmount = secondPrizeAmountInput ? parseFloat(secondPrizeAmountInput.value) : 0;
+    const secondPrizeCount = secondPrizeCountInput ? parseInt(secondPrizeCountInput.value) : 0;
+
+    if (isNaN(ticketPrice) || isNaN(jackpotAmount) || isNaN(totalCombinations) ||
+        ticketPrice <= 0 || jackpotAmount <= 0 || totalCombinations <= 0) {
+      alert('Please enter valid positive numbers for all fields.');
+      return;
+    }
+
+    const result = calculateExpectedValue(
+      ticketPrice,
+      jackpotAmount,
+      totalCombinations,
+      secondPrizeAmount,
+      secondPrizeCount
+    );
+
+    // Update UI
+    const resultsEl = document.getElementById('results');
+    const expectedValueEl = document.getElementById('expectedValue');
+    const oddsEl = document.getElementById('odds');
+    const expectedJackpotEl = document.getElementById('expectedJackpot');
+    const expectedSecondEl = document.getElementById('expectedSecond');
+    const breakEvenEl = document.getElementById('breakEven');
+    const interpretationTextEl = document.getElementById('interpretationText');
+
+    if (resultsEl) resultsEl.style.display = 'block';
+    if (expectedValueEl) expectedValueEl.textContent = formatCurrency(result.expectedValue);
+    if (oddsEl) oddsEl.textContent = result.odds;
+    if (expectedJackpotEl) expectedJackpotEl.textContent = formatCurrency(result.expectedJackpotWin);
+    if (expectedSecondEl) expectedSecondEl.textContent = formatCurrency(result.expectedSecondPrizeWin);
+    if (breakEvenEl) breakEvenEl.textContent = formatCurrency(result.breakEvenJackpot);
+
+    if (interpretationTextEl) {
+      interpretationTextEl.textContent = generateInterpretation(
+        result.expectedValue,
+        ticketPrice,
+        result.breakEvenJackpot,
+        jackpotAmount
+      );
+    }
+  }
+
+  // Set up event listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    const calculateBtn = document.getElementById('calculateBtn');
+    if (calculateBtn) {
+      calculateBtn.addEventListener('click', calculate);
+    }
+
+    // Game presets
+    document.querySelectorAll('.game-preset').forEach((btn) => {
+      btn.addEventListener('click', function(this: HTMLElement) {
+        const ticketPrice = parseFloat(this.dataset.price || '0');
+        const jackpotAmount = parseFloat(this.dataset.jackpot || '0');
+        const totalCombinations = parseInt(this.dataset.combinations || '0');
+        const secondPrizeAmount = parseFloat(this.dataset.secondAmount || '0');
+        const secondPrizeCount = parseInt(this.dataset.secondCount || '0');
+
+        const ticketPriceInput = document.getElementById('ticketPrice') as HTMLInputElement;
+        const jackpotAmountInput = document.getElementById('jackpotAmount') as HTMLInputElement;
+        const totalCombinationsInput = document.getElementById('totalCombinations') as HTMLInputElement;
+        const secondPrizeAmountInput = document.getElementById('secondPrizeAmount') as HTMLInputElement;
+        const secondPrizeCountInput = document.getElementById('secondPrizeCount') as HTMLInputElement;
+
+        if (ticketPriceInput) ticketPriceInput.value = ticketPrice.toString();
+        if (jackpotAmountInput) jackpotAmountInput.value = jackpotAmount.toString();
+        if (totalCombinationsInput) totalCombinationsInput.value = totalCombinations.toString();
+        if (secondPrizeAmountInput) secondPrizeAmountInput.value = secondPrizeAmount.toString();
+        if (secondPrizeCountInput) secondPrizeCountInput.value = secondPrizeCount.toString();
+
+        calculate();
+      });
+    });
+
+    // Auto-calculate on input change (with debounce)
+    let timeout: number | undefined;
+
+    const inputs = ['ticketPrice', 'jackpotAmount', 'totalCombinations', 'secondPrizeAmount', 'secondPrizeCount'];
+    inputs.forEach(id => {
+      const input = document.getElementById(id) as HTMLInputElement;
+      if (input) {
+        input.addEventListener('input', function() {
+          clearTimeout(timeout);
+          timeout = window.setTimeout(calculate, 500);
+        });
+      }
+    });
+  });
+</script>

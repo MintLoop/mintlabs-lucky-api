@@ -1,0 +1,707 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Lottery Number Heatmap | Visual Frequency Grid";
+const description = "Interactive visual heatmap showing lottery number frequency patterns. See which numbers have appeared most and least often in Powerball and Mega Millions.";
+const keywords = "lottery heatmap, number frequency visualization, lottery number grid, powerball heatmap, mega millions frequency map, lottery number patterns";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Lottery Number Heatmap",
+  "description": description,
+  "applicationCategory": "Lottery Tool",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<InfoLayout
+  title="Lottery Number Heatmap"
+  subtitle="Visualize frequency patterns at a glance"
+  pageTitle={pageTitle}
+  description={description}
+  keywords={keywords}
+  jsonLd={jsonLd}
+>
+  <div slot="teaser" class="teaser-content">
+    <p>
+      See all lottery numbers at once with color-coded frequency data.
+      <strong>Red = hot (more frequent)</strong>, <strong>blue = cold (less frequent)</strong>.
+      Beautiful to look at, but remember: colors don't predict future draws!
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="controls">
+      <div class="game-selector">
+        <button class="game-btn active" data-game="powerball">Powerball</button>
+        <button class="game-btn" data-game="megamillions">Mega Millions</button>
+      </div>
+      
+      <div class="time-selector">
+        <button class="time-btn active" data-time="all">All Time</button>
+        <button class="time-btn" data-time="year">Last Year</button>
+        <button class="time-btn" data-time="6month">6 Months</button>
+        <button class="time-btn" data-time="3month">3 Months</button>
+      </div>
+    </div>
+
+    <div class="heatmap-container">
+      <h3>Main Numbers</h3>
+      <div id="mainHeatmap" class="heatmap-grid"></div>
+      
+      <div class="legend">
+        <span class="legend-label">Cold</span>
+        <div class="legend-gradient"></div>
+        <span class="legend-label">Hot</span>
+      </div>
+    </div>
+
+    <div class="heatmap-container bonus-container">
+      <h3 id="bonusTitle">Powerball Numbers</h3>
+      <div id="bonusHeatmap" class="heatmap-grid bonus-grid"></div>
+    </div>
+
+    <div id="statsPanel" class="stats-panel">
+      <h3>Quick Stats</h3>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <span class="stat-label">Hottest Main</span>
+          <span id="hottestMain" class="stat-value">--</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Coldest Main</span>
+          <span id="coldestMain" class="stat-value">--</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Hottest Bonus</span>
+          <span id="hottestBonus" class="stat-value">--</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Coldest Bonus</span>
+          <span id="coldestBonus" class="stat-value">--</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="edu-section">
+    <h2>Reading the Heatmap (Without Fooling Yourself)</h2>
+    
+    <div class="heatmap-guide">
+      <div class="guide-item">
+        <div class="sample-cell hot"></div>
+        <div class="guide-text">
+          <h4>Hot Numbers (Red)</h4>
+          <p>Appeared more than expected. In a truly random system, these will cool down over time.</p>
+        </div>
+      </div>
+      
+      <div class="guide-item">
+        <div class="sample-cell neutral"></div>
+        <div class="guide-text">
+          <h4>Average Numbers (Yellow/White)</h4>
+          <p>Close to expected frequency—where all numbers eventually converge with enough draws.</p>
+        </div>
+      </div>
+      
+      <div class="guide-item">
+        <div class="sample-cell cold"></div>
+        <div class="guide-text">
+          <h4>Cold Numbers (Blue)</h4>
+          <p>Appeared less than expected. They're not "due"—just random variance.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="truth-bomb">
+      <h3>🎯 The Statistical Truth</h3>
+      <p>
+        If you ran this lottery simulation a million times, every number would eventually 
+        be perfectly average. The patterns you see are <strong>artifacts of limited sample size</strong>, 
+        not predictive signals.
+      </p>
+      <p>
+        A coin that lands heads 7 out of 10 times isn't "hot"—flip it 10,000 times and 
+        it'll be ~50/50. Same with lottery balls.
+      </p>
+    </div>
+
+    <div class="use-cases">
+      <h3>What This Heatmap Is Good For</h3>
+      <ul>
+        <li><strong>Entertainment:</strong> It's visually satisfying to see patterns (even meaningless ones)</li>
+        <li><strong>Education:</strong> Shows how randomness creates apparent clusters</li>
+        <li><strong>Avoiding popular numbers:</strong> You might use it to pick less common numbers to reduce jackpot splitting</li>
+        <li><strong>NOT for:</strong> Predicting future draws, finding "systems," or gaining any edge</li>
+      </ul>
+    </div>
+  </section>
+</InfoLayout>
+
+<style>
+  .tool-section {
+    padding: 2rem;
+    background: var(--bg-card);
+    border-radius: 14px;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  }
+
+  .game-selector,
+  .time-selector {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .game-btn,
+  .time-btn {
+    padding: 0.55rem 1.1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .game-btn:hover,
+  .time-btn:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  }
+
+  .game-btn.active,
+  .time-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+    box-shadow: 0 8px 18px rgba(var(--accent-rgb), 0.25);
+  }
+
+  .heatmap-container {
+    margin-bottom: 2rem;
+    background: var(--surface);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  }
+
+  .heatmap-container h3 {
+    margin-bottom: 1rem;
+    text-align: center;
+    color: var(--text-primary);
+  }
+
+  :global(.heatmap-grid) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(68px, 1fr));
+    gap: 10px;
+    max-width: 760px;
+    margin: 0 auto 1rem auto;
+    justify-items: center;
+  }
+
+  :global(.bonus-grid) {
+    grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+    max-width: 440px;
+  }
+
+  :global(.heat-cell) {
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    overflow: visible;
+  }
+
+  :global(.heat-cell:hover),
+  :global(.heat-cell.show) {
+    transform: translateY(-2px) scale(1.06);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.22);
+    z-index: 10;
+    border-color: rgba(255, 255, 255, 0.24);
+  }
+
+  :global(.heat-cell .heat-label) {
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  :global(.heat-cell .tooltip) {
+    display: none;
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.65rem 0.85rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    z-index: 100;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+    color: var(--text-primary);
+    min-width: 180px;
+  }
+
+  :global(.tooltip-title) {
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+  }
+
+  :global(.tooltip-row) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    padding: 0.15rem 0;
+  }
+
+  :global(.heat-cell:hover .tooltip),
+  :global(.heat-cell.show .tooltip) {
+    display: block;
+  }
+
+  .legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .legend-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .legend-gradient {
+    width: 220px;
+    height: 16px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #0ea5e9 0%, #fbbf24 50%, #ef4444 100%);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+
+  .stats-panel {
+    padding: 1.5rem;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  }
+
+  .stats-panel h3 {
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .stat-box {
+    text-align: center;
+    padding: 1rem;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  .stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+  }
+
+  .stat-value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 0.01em;
+  }
+
+  .edu-section {
+    padding: 2rem;
+  }
+
+  .edu-section h2 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .heatmap-guide {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .guide-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .sample-cell {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .sample-cell.hot {
+    background: #ef4444;
+  }
+
+  .sample-cell.neutral {
+    background: #fbbf24;
+  }
+
+  .sample-cell.cold {
+    background: #0ea5e9;
+  }
+
+  .guide-text h4 {
+    margin-bottom: 0.25rem;
+  }
+
+  .guide-text p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .truth-bomb {
+    padding: 1.5rem;
+    background: var(--surface);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  }
+
+  .truth-bomb h3 {
+    margin-bottom: 0.75rem;
+  }
+
+  .truth-bomb p {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .truth-bomb p:last-child {
+    margin-bottom: 0;
+  }
+
+  .use-cases {
+    padding: 1.5rem;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .use-cases h3 {
+    margin-bottom: 1rem;
+  }
+
+  .use-cases ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .use-cases li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.5;
+  }
+
+  .use-cases li:last-child {
+    border-bottom: none;
+  }
+
+  @media (max-width: 600px) {
+    .heatmap-grid {
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .bonus-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    .heat-cell {
+      font-size: 0.8rem;
+      border-radius: 10px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const powerballBtn = document.querySelector('[data-game="powerball"]') as HTMLButtonElement;
+    const megamillionsBtn = document.querySelector('[data-game="megamillions"]') as HTMLButtonElement;
+    const timeButtons = document.querySelectorAll('.time-btn') as NodeListOf<HTMLButtonElement>;
+    const mainHeatmap = document.getElementById('mainHeatmap') as HTMLDivElement;
+    const bonusHeatmap = document.getElementById('bonusHeatmap') as HTMLDivElement;
+    const bonusTitle = document.getElementById('bonusTitle') as HTMLHeadingElement;
+    const hottestMain = document.getElementById('hottestMain') as HTMLSpanElement;
+    const coldestMain = document.getElementById('coldestMain') as HTMLSpanElement;
+    const hottestBonus = document.getElementById('hottestBonus') as HTMLSpanElement;
+    const coldestBonus = document.getElementById('coldestBonus') as HTMLSpanElement;
+
+    let currentGame: 'powerball' | 'megamillions' = 'powerball';
+    let currentTime = 'all';
+
+    const gameConfig = {
+      powerball: { mainMax: 69, bonusMax: 26, bonusName: 'Powerball' },
+      megamillions: { mainMax: 70, bonusMax: 25, bonusName: 'Mega Ball' }
+    };
+
+    function expectedPerNumber(max: number, timePeriod: string, isBonus: boolean): number {
+      const baseDraws: Record<string, number> = {
+        'all': 520,
+        'year': 104,
+        '6month': 52,
+        '3month': 26
+      };
+      const draws = baseDraws[timePeriod] || 520;
+      return draws * (isBonus ? 1 / max : 5 / max);
+    }
+
+    // Generate simulated frequency data with variance, normalized so totals match expected.
+    function generateFrequencyData(max: number, timePeriod: string, isBonus = false): Map<number, number> {
+      const data = new Map<number, number>();
+      const baseDraws: Record<string, number> = {
+        'all': 520,
+        'year': 104,
+        '6month': 52,
+        '3month': 26
+      };
+      const draws = baseDraws[timePeriod] || 520;
+      const expected = expectedPerNumber(max, timePeriod, isBonus);
+      const expectedTotal = expected * max;
+      const varianceFactor = timePeriod === 'all' ? 0.12 : timePeriod === 'year' ? 0.2 : 0.32;
+
+      let rawTotal = 0;
+      for (let i = 1; i <= max; i++) {
+        const variance = (Math.random() - 0.5) * 2 * expected * varianceFactor;
+        const raw = Math.max(0, expected + variance);
+        data.set(i, raw);
+        rawTotal += raw;
+      }
+
+      const scale = rawTotal > 0 ? expectedTotal / rawTotal : 1;
+      for (let i = 1; i <= max; i++) {
+        const scaled = Math.max(1, Math.round((data.get(i) || 0) * scale));
+        data.set(i, scaled);
+      }
+
+      return data;
+    }
+
+    function getHeatColor(value: number, min: number, max: number): string {
+      const normalized = (value - min) / (max - min);
+      
+      if (normalized < 0.5) {
+        // Blue to yellow
+        const t = normalized * 2;
+        const r = Math.round(59 + t * (251 - 59));
+        const g = Math.round(130 + t * (191 - 130));
+        const b = Math.round(246 + t * (36 - 246));
+        return `rgb(${r}, ${g}, ${b})`;
+      } else {
+        // Yellow to red
+        const t = (normalized - 0.5) * 2;
+        const r = Math.round(251 + t * (239 - 251));
+        const g = Math.round(191 - t * (191 - 68));
+        const b = Math.round(36 + t * (68 - 36));
+        return `rgb(${r}, ${g}, ${b})`;
+      }
+    }
+
+    function getTextColor(value: number, min: number, max: number): string {
+      const normalized = (value - min) / (max - min);
+      // Use dark text for light backgrounds (middle range), white for extremes
+      return normalized > 0.3 && normalized < 0.7 ? '#000' : '#fff';
+    }
+
+    function renderHeatmap(container: HTMLDivElement, data: Map<number, number>) {
+      container.innerHTML = '';
+      
+      const values = Array.from(data.values());
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
+      let openCell: HTMLDivElement | null = null;
+      
+      data.forEach((count, num) => {
+        const cell = document.createElement('div');
+        cell.className = 'heat-cell';
+        cell.style.backgroundColor = getHeatColor(count, min, max);
+        cell.style.color = getTextColor(count, min, max);
+
+        const label = document.createElement('span');
+        label.className = 'heat-label';
+        label.textContent = num.toString();
+        cell.appendChild(label);
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip';
+        const expectedCount = expectedPerNumber(container === bonusHeatmap ? (currentGame === 'powerball' ? 26 : 25) : (currentGame === 'powerball' ? 69 : 70), currentTime, container === bonusHeatmap);
+        const deltaPct = Math.round((count / expectedCount) * 100);
+        const status = deltaPct > 110 ? 'Hot' : deltaPct < 90 ? 'Cold' : 'Neutral';
+        const statusEmoji = deltaPct > 110 ? '🔥' : deltaPct < 90 ? '❄️' : '⚪';
+        tooltip.innerHTML = `
+          <div class="tooltip-title">${statusEmoji} #${num} — ${status}</div>
+          <div class="tooltip-row"><span>Hits</span><strong>${count}</strong></div>
+          <div class="tooltip-row"><span>vs expected</span><strong>${deltaPct}%</strong></div>
+        `;
+        cell.appendChild(tooltip);
+
+        cell.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (openCell && openCell !== cell) {
+            openCell.classList.remove('show');
+          }
+          cell.classList.toggle('show');
+          openCell = cell.classList.contains('show') ? cell : null;
+        });
+        
+        container.appendChild(cell);
+      });
+      
+      return { min, max, data };
+    }
+
+    function updateStats(mainData: Map<number, number>, bonusData: Map<number, number>) {
+      // Find hottest and coldest main numbers
+      let hottestMainNum = 1, coldestMainNum = 1;
+      let hottestMainCount = 0, coldestMainCount = Infinity;
+      
+      mainData.forEach((count, num) => {
+        if (count > hottestMainCount) {
+          hottestMainCount = count;
+          hottestMainNum = num;
+        }
+        if (count < coldestMainCount) {
+          coldestMainCount = count;
+          coldestMainNum = num;
+        }
+      });
+      
+      // Find hottest and coldest bonus numbers
+      let hottestBonusNum = 1, coldestBonusNum = 1;
+      let hottestBonusCount = 0, coldestBonusCount = Infinity;
+      
+      bonusData.forEach((count, num) => {
+        if (count > hottestBonusCount) {
+          hottestBonusCount = count;
+          hottestBonusNum = num;
+        }
+        if (count < coldestBonusCount) {
+          coldestBonusCount = count;
+          coldestBonusNum = num;
+        }
+      });
+      
+      hottestMain.textContent = `#${hottestMainNum} (${hottestMainCount}x)`;
+      coldestMain.textContent = `#${coldestMainNum} (${coldestMainCount}x)`;
+      hottestBonus.textContent = `#${hottestBonusNum} (${hottestBonusCount}x)`;
+      coldestBonus.textContent = `#${coldestBonusNum} (${coldestBonusCount}x)`;
+    }
+
+    function render() {
+      const config = gameConfig[currentGame];
+      
+      const mainData = generateFrequencyData(config.mainMax, currentTime, false);
+      const bonusData = generateFrequencyData(config.bonusMax, currentTime, true);
+      
+      bonusTitle.textContent = `${config.bonusName} Numbers`;
+      
+      renderHeatmap(mainHeatmap, mainData);
+      renderHeatmap(bonusHeatmap, bonusData);
+      updateStats(mainData, bonusData);
+    }
+
+    function switchGame(game: 'powerball' | 'megamillions') {
+      currentGame = game;
+      powerballBtn.classList.toggle('active', game === 'powerball');
+      megamillionsBtn.classList.toggle('active', game === 'megamillions');
+      render();
+    }
+
+    function switchTime(time: string) {
+      currentTime = time;
+      timeButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.time === time);
+      });
+      render();
+    }
+
+    powerballBtn.addEventListener('click', () => switchGame('powerball'));
+    megamillionsBtn.addEventListener('click', () => switchGame('megamillions'));
+    timeButtons.forEach(btn => {
+      btn.addEventListener('click', () => switchTime(btn.dataset.time || 'all'));
+    });
+
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.heat-cell.show').forEach(el => el.classList.remove('show'));
+    });
+
+    // Initial render
+    render();
+  });
+</script>

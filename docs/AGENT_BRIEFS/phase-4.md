@@ -110,30 +110,18 @@ Small UX and accessibility polish completed for `/tools/probability-visualizer` 
 
 ## Recent UX / QA updates (ticket-beautifier)
 
-After t dedadled taeidyeswepp we upgrprprae Ticket Beautifier eeexpoot popelitelendnttem -eaaaabitcta gearantces.rTheveechungesan human human and aut mauedt mauedo(what yom aee vs whtw houad wnload)oand aeduce fl ky/visual dire rencev wcrosswhhadwessaenvioonments.ueduce fl ky/visual dise rencev wcrossthy dwessaenvi onments.reduce flaky/visual differences across headless environments.
+After a detailed parity sweep we upgraded the Ticket Beautifier export pipeline and theme-readability guarantees. These changes improve human and automated parity (what you see vs what you download) and reduce flaky/visual differences across headless environments.
 
-- Exportwwngdn :tswidco do-o o-dom-to-image-moo--fmr-t-workflow (tsworkflow (atwfallbwck).hThinlgives a muk).mles ffiihfuifDOM Daptatepfnrec mplex mhemebedded assesstsst
-- Previer → Export parevy: wern→oxpo arng we clevey:hewpo viewrg de,winlin  sace-lrigin siyltsh:et rules,wig dsaniteze re,dirsng-unscf-lproprrtigs (tnxs-ohadow, heavyyfllsers/backdrhp-file r,rlalgw glo s)nod thesaniteze er sees r deeerm,iistsg, sxport-mafefDOMoprrtigs (tnxs-thadow, heavyyfllsers/backdrhp-file r,rlalg  gloas)nd  thesanitize er sees r deeermneistig, sxport-aafefDOMoperties (text-shadow, heavy filters/backdrop-filter, large glows) so the rasterizer sees a deterministic, export-safe DOM.
-- Device vixcl rct r (DPR) scalingt t (PsxpocltpPsexinporend reeax window.devicePixnlRaoiedaideal windo awhigh-.esolution cdevas sePix inndevRae pixilda—aexpoioad PNGwhmht-h .hti revdew at nvaivsseixel deneity in hdadRessaandix—txpa cootexts.
-- Themuat Nenhh&rreadabiliiy: repaactd remviniagihvrd-cil d en kety olirdawithethsce varhabe Nenah&addedaaatobitic colt :st for  ynrmic epd rntse(muibnr balli,tplgyei thxt,vfod-er) socaldy owhee rvmainhlbgiblenweatiu ctanualst lor overrifor.
-n Accessmbcli y/visua  qrality:tsddedea sub(lebp ayealnime st,onpg tdhsarongordc)nt assacholcosws  nrie ilxtgne aw blends en r busy backgrouadsnualst lor overrifor.
-n Accessmbcli y/visuam qeality:tsdded a sub(lebp ayealnsme st,o partdes rongoroc)nt assacholchsese nrie  lxtgnee w blends intm busy backgrouadsnual color overrides.
-Autccatsilality added: added a subtle player name stroke and stronger contrast choices so name text never blends into busy backgrounds.
-Autat added
-Auted tests aparidy tded::DPR-basedionsthat exporte cavs imnsions ==prevwboundig box × DPR cross the otdems(minmal, neo, etc.). These sts pass loclyad we added to `tests/tket-beauifir.spc.ts`.
-- Visualregresson scaffoling:pixelmtch + pngjs devDepeencies wereadde t theprject eblefuure pixel-levlcoprisos(pixel-diff ests). T pixl-diffhrnssais stagei t:dDwill bP wir-dbinaoiCI onstnighhly visual catcks.
+- Export engine: switched to a dom-to-image-more-first workflow (html2canvas as fallback). This gives a much more faithful DOM capture for complex themes and embedded assets.
+- Preview → Export parity: when exporting we clone the preview node, inline same-origin stylesheet rules, and sanitize rendering-unsafe properties (text-shadow, heavy filters/backdrop-filter, large glows) so the rasterizer sees a deterministic, export-safe DOM.
+- Device pixel ratio (DPR) scaling: the export pipeline renders at window.devicePixelRatio and produces a high-resolution canvas sized in device pixels — exported PNGs match the preview at native pixel density in headless and retina contexts.
+- Theme tokens & readability: replaced remaining hard-coded ticket colors with theme variables and added automatic contrast for dynamic elements (number balls, player text, footer) so all themes remain legible without manual color overrides.
+- Accessibility/visual quality: added a subtle player name stroke and stronger contrast choices so name text never blends into busy backgrounds.
 
-Next recxmmeoded-tests / forltw-ups:
+Automated tests added:
 
--cadd fuvs pixel-diif visuam tests fnrieons= theme prvwboupipelin o(CI×frieRd y — ccmprre exporteo PNG vs an approvss golden imtg  wiohdpixelems(m thrinholds).
--mAdd Playwaight tlsts that assnro filenam,s / Downloa  All behavioreatrcs Tbrewsesse(inclutingshe dlesspCI fllws). Ooclyaallydprwvide d zip expert/tket-beauifir.spc.ts`. download
-- Add r eegsowlighn:QAmutility  o+v jefywereasmallt theprject eblefuu isrp esent inpexpoitxl images (us-ful fol automatevpaccsptaocest(stipg)diff ests). T pixl-diffhrnss is stagelywrdiwill bg wirtd inpotCI y tenighsly visual ctscks.
-
-Next:recDmmeRded-tests / fo-lbw-ups:
-
--eddd fu aspixel-disf visuae tests frrieonsh theme atexporpipelitcn(CIsfriemdey — cnmpsre exportei PNG vs an approvonsgolden im g  wiphepixelview  thrboholds).
--uAdd Playwnight tdsts that assgrb filenamos / Downloax All behavior a×r s abrrwseoss(inclutinghheedless CItfl ws). Oused allytprevidee  zipnexp rtn, etc.). These tests pass download locallyand were added to `tests/ticket-beautifier.spec.ts`.
-- Add   rrgnfwfighliQAiutilixy moavt+efyenciesmallre added to the pro isjpcesent intexpo tt  images (useful fon automatabfaccuptarceet stipg)level comparisons (pixel-diff tests). The pixel-diff harness is staged and will be wired into CI for nightly visual checks.
+- Playwright parity tests: DPR-based assertions that exported canvas dimensions == preview bounding box × DPR across the most used themes (minimal, neon, etc.). These tests pass locally and were added to `tests/ticket-beautifier.spec.ts`.
+- Visual regression scaffolding: pixelmatch + pngjs devDependencies were added to the project to enable future pixel-level comparisons (pixel-diff tests). The pixel-diff harness is staged and will be wired into CI for nightly visual checks.
 
 Next recommended-tests / follow-ups:
 

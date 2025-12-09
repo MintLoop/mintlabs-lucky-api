@@ -1,3 +1,5 @@
+import MODE_CONFIG from '../data/modeConfig';
+
 const metaEnv = (import.meta as any)?.env ?? {};
 const globalApi = typeof window !== 'undefined' ? (window as any).__LUCKY_API_BASE : undefined;
 const API_ENV = metaEnv.PUBLIC_API_BASE ?? globalApi ?? '';
@@ -60,6 +62,8 @@ function readInitialGames(): any[] {
   const el = document.getElementById('initial-games');
   if (!el || !(el instanceof HTMLScriptElement)) return [];
   try {
+    // client-side config for themed modes (imported statically at module top)
+    const cfgAny: any = MODE_CONFIG as any;
     const parsed = JSON.parse(el.textContent || '[]');
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -96,6 +100,73 @@ export function initLucky() {
     || document.querySelector('button[type="submit"]') as HTMLButtonElement | null;
 
   if (!form || !out || !gameSel) return;
+
+  // Initialize conditional field toggles for the generator form. We keep the
+  // logic in a central external script (initLucky) so it's available when the
+  // page is served and executed by the module entry bundle — this is more
+  // reliable across SSR/preview environments than inline scripts.
+  try {
+    const modeSelect = document.getElementById('modeSelect') as HTMLSelectElement | null;
+    const cfgAny: any = MODE_CONFIG as any;
+    const map: Record<string,string> = {
+      sum_target: 'sumTargetField',
+      birthday: 'birthdayField',
+      lucky: 'luckyField',
+      wheel: 'wheelField',
+      zodiac: 'modeKeyContainer',
+      gemstone: 'modeKeyContainer',
+      star_sign: 'modeKeyContainer',
+      jyotish: 'modeKeyContainer',
+      chinese_zodiac: 'modeKeyContainer',
+      favorite_color: 'modeKeyContainer',
+    };
+    function updateConditionalFields() {
+      try {
+        Object.values(map).forEach(id => { document.querySelectorAll('#' + id).forEach(el=>{ el.classList.add('hidden'); try { (el as HTMLElement).style.display='none'; } catch(e){} }); });
+        const key = (modeSelect instanceof HTMLSelectElement) ? modeSelect.value : undefined;
+        if (key && map[key]) {
+          document.querySelectorAll('#' + map[key]).forEach(el=>{ el.classList.remove('hidden'); try { (el as HTMLElement).style.display='block'; } catch(e){} });
+
+          // if we're requesting a themed mode, populate the modeKey select
+          if (map[key] === 'modeKeyContainer') {
+            try {
+              const select = document.getElementById('modeKeySelect') as HTMLSelectElement | null;
+              if (select) {
+                // clear existing
+                select.innerHTML = '';
+                const cfg = cfgAny[String(key)];
+                const items = (cfg && cfg.items) || [];
+                // insert a placeholder so a user must explicitly choose —
+                // avoids accidental defaults and satisfies the "disable when not chosen" requirement.
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = 'Choose an option...';
+                placeholder.disabled = true;
+                placeholder.selected = true;
+                select.appendChild(placeholder);
+
+                items.forEach((it: any) => {
+                  const opt = document.createElement('option');
+                  opt.value = String(it.key);
+                  opt.textContent = `${it.emoji ? it.emoji + ' ' : ''}${it.label}`;
+                  select.appendChild(opt);
+                });
+                // ensure the select is enabled and required; tests choose options programmatically
+                try { select.removeAttribute('disabled'); } catch(e){}
+                try { select.setAttribute('required','required'); } catch(e){}
+                try { select.setAttribute('data-populated', '1'); } catch(e){}
+              }
+            } catch(e){}
+          }
+        }
+        return true;
+      } catch (err) { return false; }
+    }
+    try { if (modeSelect) modeSelect.addEventListener('change', updateConditionalFields); } catch(e){}
+    try { (window as any)._genFormUpdate = updateConditionalFields; } catch(e){}
+    try { (window as any).__GENFORM_READY = true; } catch(e){}
+    try { updateConditionalFields(); } catch(e){}
+  } catch (err) { try { (window as any).__GENFORM_ERROR = String(err); } catch(e){} }
 
   const _form = form;
   const _out = out;
@@ -178,6 +249,10 @@ export function initLucky() {
       } else if (mode === 'wheel') {
         const wheelType = fd.get('wheel_type');
         if (wheelType) payload.wheel_type = String(wheelType);
+      } else if (['zodiac','gemstone','star_sign','jyotish','chinese_zodiac','favorite_color'].includes(mode)) {
+        // include the selected mode key when a themed mode is active
+        const mk = fd.get('mode_key');
+        if (mk) payload.mode_key = String(mk);
       }
 
       const requests = Array.from({ length: sets }, () =>
@@ -228,8 +303,21 @@ export function initLucky() {
           return;
         }
 
-        const d: any = result.data;
+        const d: any = (result as any).data;
         const modeDisplay = String(mode).replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+        // render an optional badge for themed selections
+        let modeBadgeHtml = '';
+        try {
+          const actualMode = (d && d.mode) || mode;
+          const key = (d && d.mode_key) || (fd.get('mode_key') ? String(fd.get('mode_key')) : null);
+          if (key && actualMode) {
+            const cfg = (MODE_CONFIG as any)[actualMode];
+            if (cfg && cfg.items) {
+              const found = cfg.items.find((it: any) => String(it.key) === String(key));
+              if (found) modeBadgeHtml = `<div class=\"text-xs mt-1\">Mode: <span class=\"font-semibold\">${found.emoji ? found.emoji+' ' : ''}${found.label}</span></div>`;
+            }
+          }
+        } catch (e) {}
 
         const numbersHtml = Array.isArray(d.numbers)
           ? d.numbers.map((n: any) => `<span class="text-emerald-400 font-semibold">${n}</span>`).join(', ')
@@ -262,6 +350,10 @@ export function initLucky() {
             : '—');
         const singlePct = Number(d.probability_percent || 0).toFixed(6);
 
+        // Build odds link to education page
+        const gameCode = game || d.game || '';
+        const oddsLinkHref = `/lottery-odds${gameCode ? `?game=${encodeURIComponent(gameCode)}` : ''}`;
+
         let combinedSetsHtml = '';
         if (d.combined_sets_odds) {
           const combinedOddsNum = Number(d.combined_sets_odds);
@@ -272,11 +364,15 @@ export function initLucky() {
           combinedSetsHtml = `<div class="text-xs mt-1" style="color: var(--text-muted)">${sets} sets combined: <span class="font-semibold odds-number">${combinedOddsDisplay}</span> (${combinedPct}% chance)</div>`;
         }
 
-        _out.innerHTML += `
+          _out.innerHTML += `
             <div class="result-card">
               <div class="text-sm" style="color: var(--text-secondary)">Set ${idx + 1} • ${modeDisplay}</div>
+            ${modeBadgeHtml}
               <div class="text-xl mt-1" style="color: var(--text-primary)">Numbers: <b>${numbersHtml}</b>${d.bonus ? ` | Bonus: <b>${bonusHtml}</b>` : ''}</div>
-              <div class="text-xs mt-2" style="color: var(--text-muted)">Single draw: <span class="font-semibold odds-number">${singleOddsDisplay}</span> (${singlePct}% chance)</div>
+              <div class="text-xs mt-2" style="color: var(--text-muted)">
+                Odds: <span class="font-semibold odds-number">${singleOddsDisplay}</span> (${singlePct}% chance)
+              </div>
+              <a href="${oddsLinkHref}" class="odds-link">View full odds &amp; math →</a>
               ${combinedSetsHtml}
               ${lastInfoHtml}
             </div>`;
@@ -344,3 +440,45 @@ fixMonochromeButton();
 
 const mo = new MutationObserver(fixMonochromeButton);
 mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+// --- test & instrumentation bootstrapping ---
+// Ensure a single global tracking delegation exists so elements with
+// data-track-event / data-track-props will be recorded consistently.
+try {
+  // lazy-import tracking so tests don't break if module isn't present during SSR
+  // (esbuild bundles this file into public/scripts/lucky.js during build).
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  import('./tracking').then(({ track }) => {
+    if (typeof window !== 'undefined') {
+      try {
+        (window as any).__LUCKY_EVENTS = (window as any).__LUCKY_EVENTS || [];
+        // expose a safe window.track for inline scripts/tests
+        (window as any).track = (window as any).track || track;
+
+        document.addEventListener('click', (ev) => {
+          try {
+            let tgt: any = ev.target;
+            if (!(tgt instanceof Element)) tgt = (tgt && tgt.parentElement) || null;
+            if (!tgt) return;
+            const el = tgt.closest && tgt.closest('[data-track-event]');
+            if (!el) return;
+            const eventName = el.dataset.trackEvent || 'link_click';
+            let props: Record<string, any> = {};
+            if (el.dataset.trackProps) {
+              try { props = JSON.parse(el.dataset.trackProps); } catch (e) { props = {}; }
+            }
+            if (typeof (window as any).track === 'function') {
+              try { (window as any).track(eventName, { href: el.getAttribute && el.getAttribute('href'), ...props }); } catch (e) { /* swallow */ }
+            }
+          } catch (err) {
+            // swallow
+          }
+        }, false);
+      } catch (err) {
+        // ignore
+      }
+    }
+  }).catch(() => {});
+} catch (err) {
+  // ignore import failures during SSR
+}

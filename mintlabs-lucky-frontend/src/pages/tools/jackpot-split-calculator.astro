@@ -1,0 +1,605 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Lottery Jackpot Split Calculator | Multi-Winner Split Calculator";
+const description = "Calculate how lottery jackpots are split when multiple winners share the prize. Find out what each winner gets when 2, 3, or more people win the same jackpot.";
+const keywords = "lottery jackpot split calculator, multi winner calculator, shared jackpot, lottery prize split, jackpot division calculator";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Lottery Jackpot Split Calculator",
+  "description": description,
+  "applicationCategory": "CalculatorApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<InfoLayout
+  title="Jackpot Split Calculator"
+  subtitle="What happens when multiple people win?"
+  pageTitle={pageTitle}
+  description={description}
+  keywords={keywords}
+  jsonLd={jsonLd}
+>
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Ever wonder what happens when multiple people win the same lottery jackpot? This calculator shows
+      exactly how prizes are divided among winners. <strong>Sharing can dramatically reduce your take-home amount!</strong>
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="calculator-container">
+      <div class="input-section">
+        <h3>Jackpot Split Calculator</h3>
+
+        <div class="input-group">
+          <label for="jackpotAmount">Total Jackpot Amount ($):</label>
+          <input type="number" id="jackpotAmount" min="1000000" step="1000000" value="100000000" placeholder="100000000">
+          <span class="help-text">The advertised jackpot before splitting</span>
+        </div>
+
+        <div class="input-group">
+          <label for="numWinners">Number of Winners:</label>
+          <input type="number" id="numWinners" min="1" max="100" value="1" placeholder="1">
+          <span class="help-text">How many people share this jackpot?</span>
+        </div>
+
+        <div class="input-group">
+          <label for="taxRate">Federal Tax Rate (%):</label>
+          <input type="number" id="taxRate" min="0" max="50" step="0.1" value="37" placeholder="37">
+          <span class="help-text">Top federal tax bracket (37% for 2024)</span>
+        </div>
+
+        <div class="input-group">
+          <label for="stateTaxRate">State Tax Rate (%):</label>
+          <input type="number" id="stateTaxRate" min="0" max="15" step="0.1" value="5" placeholder="5">
+          <span class="help-text">Your state lottery tax rate</span>
+        </div>
+
+        <button id="calculateBtn" class="calculate-btn">Calculate Split</button>
+      </div>
+
+      <div class="results-section">
+        <h3>Split Results</h3>
+
+        <div id="results" class="results-display" style="display: none;">
+          <div class="main-result">
+            <div class="result-card">
+              <div class="result-label">Each Winner Gets</div>
+              <div id="eachWinnerAmount" class="result-value">--</div>
+              <div class="result-subtitle">After taxes and splitting</div>
+            </div>
+          </div>
+
+          <div class="breakdown-grid">
+            <div class="breakdown-item">
+              <span class="breakdown-label">Gross Jackpot:</span>
+              <span id="grossJackpot" class="breakdown-value">--</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Split Among:</span>
+              <span id="numWinnersDisplay" class="breakdown-value">-- winners</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Pre-Tax Share:</span>
+              <span id="preTaxShare" class="breakdown-value">--</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Federal Tax:</span>
+              <span id="federalTax" class="breakdown-value">--</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">State Tax:</span>
+              <span id="stateTax" class="breakdown-value">--</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Net Take-Home:</span>
+              <span id="netAmount" class="breakdown-value">--</span>
+            </div>
+          </div>
+
+          <div class="comparison">
+            <h4>Impact of Multiple Winners</h4>
+            <div id="comparisonText" class="comparison-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="historical-examples">
+      <h3>Famous Multi-Winner Jackpots</h3>
+
+      <div class="examples-grid">
+        <div class="example-item">
+          <h4>2016 Powerball ($1.586 Billion)</h4>
+          <p><strong>3 winners</strong> split the jackpot</p>
+          <p><strong>Each got:</strong> ~$528 million before taxes</p>
+          <p><strong>After taxes:</strong> ~$188 million each</p>
+        </div>
+
+        <div class="example-item">
+          <h4>2018 Mega Millions ($1.537 Billion)</h4>
+          <p><strong>3 winners</strong> split the jackpot</p>
+          <p><strong>Each got:</strong> ~$512 million before taxes</p>
+          <p><strong>After taxes:</strong> ~$180 million each</p>
+        </div>
+
+        <div class="example-item">
+          <h4>2022 Powerball ($2.04 Billion)</h4>
+          <p><strong>2 winners</strong> split the jackpot</p>
+          <p><strong>Each got:</strong> ~$1.02 billion before taxes</p>
+          <p><strong>After taxes:</strong> ~$380 million each</p>
+        </div>
+
+        <div class="example-item">
+          <h4>2012 Mega Millions ($656 Million)</h4>
+          <p><strong>3 winners</strong> split the jackpot</p>
+          <p><strong>Each got:</strong> ~$218 million before taxes</p>
+          <p><strong>After taxes:</strong> ~$77 million each</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="educational-content">
+      <h3>How Lottery Jackpots Are Split</h3>
+
+      <div class="split-explanation">
+        <h4>The Splitting Process</h4>
+        <ol>
+          <li><strong>Equal Division:</strong> The jackpot is divided equally among all winners</li>
+          <li><strong>Before Taxes:</strong> Winners receive their share pre-tax</li>
+          <li><strong>Tax Withholding:</strong> Federal and state taxes are withheld</li>
+          <li><strong>Cash vs Annuity:</strong> Winners choose lump sum or 30-year annuity</li>
+          <li><strong>Final Amount:</strong> Net take-home after all deductions</li>
+        </ol>
+      </div>
+
+      <div class="tax-considerations">
+        <h4>Tax Considerations</h4>
+        <ul>
+          <li><strong>Federal Tax:</strong> Lottery winnings are taxed as ordinary income (up to 37%)</li>
+          <li><strong>State Tax:</strong> Varies by state (0% to 15%)</li>
+          <li><strong>Withholding:</strong> 25% federal tax is automatically withheld</li>
+          <li><strong>Tax Planning:</strong> Winners can choose installment payments to manage tax brackets</li>
+          <li><strong>Local Taxes:</strong> Some cities add additional taxes</li>
+        </ul>
+      </div>
+
+      <div class="strategy-insights">
+        <h4>Strategic Considerations</h4>
+
+        <div class="insights-grid">
+          <div class="insight-item">
+            <h5>🎯 Impact of Sharing</h5>
+            <p>2 winners = 50% less each<br>
+               3 winners = 67% less each<br>
+               4 winners = 75% less each</p>
+          </div>
+
+          <div class="insight-item">
+            <h5>💰 Tax Efficiency</h5>
+            <p>Higher tax brackets mean more withheld. Consider spreading payments over multiple years.</p>
+          </div>
+
+          <div class="insight-item">
+            <h5>📅 Cash vs Annuity</h5>
+            <p>Cash option reduces jackpot by ~30-40%. Annuity spreads payments (and taxes) over 30 years.</p>
+          </div>
+
+          <div class="insight-item">
+            <h5>🎲 Odds of Sharing</h5>
+            <p>Powerball sharing probability: ~1 in 11 million<br>
+               Mega Millions sharing probability: ~1 in 12 million</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</InfoLayout>
+
+<style>
+  .calculator-container {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .input-section, .results-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .input-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border-primary);
+    border-radius: 8px;
+    font-size: 1.1rem;
+    transition: border-color 0.2s;
+    background: var(--input-bg);
+    color: var(--text-primary);
+  }
+
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+  }
+
+  .help-text {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  .calculate-btn {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+    color: var(--bg-primary);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .calculate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .results-display {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-primary);
+  }
+
+  .main-result {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .result-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 2px solid var(--accent-success);
+    display: inline-block;
+    min-width: 250px;
+    color: var(--text-primary);
+  }
+
+  .result-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .result-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .result-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .breakdown-item {
+    background: var(--bg-card);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+  }
+
+  .breakdown-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .breakdown-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .comparison {
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-success);
+  }
+
+  .comparison h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+  }
+
+  .comparison-text {
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+
+  .historical-examples {
+    margin-bottom: 3rem;
+  }
+
+  .examples-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .example-item {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 2px solid var(--border-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .example-item h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+  }
+
+  .example-item p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+  }
+
+  .educational-content {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-primary);
+  }
+
+  .split-explanation, .tax-considerations {
+    margin-bottom: 2rem;
+  }
+
+  .split-explanation h4, .tax-considerations h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+  }
+
+  .split-explanation ol, .tax-considerations ul {
+    margin: 0;
+    padding-left: 1.5rem;
+  }
+
+  .split-explanation li, .tax-considerations li {
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  .strategy-insights {
+    margin-top: 2rem;
+  }
+
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .insight-item {
+    background: var(--bg-card);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+  }
+
+  .insight-item h5 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+  }
+
+  .insight-item p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 768px) {
+    .calculator-container {
+      grid-template-columns: 1fr;
+    }
+
+    .breakdown-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .examples-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .insights-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  // Calculate jackpot split
+  function calculateJackpotSplit(
+    jackpotAmount: number,
+    numWinners: number,
+    federalTaxRate: number,
+    stateTaxRate: number
+  ): {
+    grossJackpot: number;
+    preTaxShare: number;
+    federalTax: number;
+    stateTax: number;
+    netAmount: number;
+  } {
+    const grossJackpot = jackpotAmount;
+    const preTaxShare = grossJackpot / numWinners;
+    const federalTax = preTaxShare * (federalTaxRate / 100);
+    const stateTax = preTaxShare * (stateTaxRate / 100);
+    const netAmount = preTaxShare - federalTax - stateTax;
+
+    return {
+      grossJackpot,
+      preTaxShare,
+      federalTax,
+      stateTax,
+      netAmount
+    };
+  }
+
+  // Format currency
+  function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  }
+
+  // Generate comparison text
+  function generateComparisonText(
+    numWinners: number,
+    netAmount: number,
+    jackpotAmount: number
+  ): string {
+    if (numWinners === 1) {
+      return `With only one winner, you get the full jackpot! After taxes, you'd take home ${formatCurrency(netAmount)}.`;
+    }
+
+    const reduction = ((jackpotAmount - (netAmount * numWinners)) / jackpotAmount) * 100;
+    const individualReduction = (1 - (netAmount / jackpotAmount)) * 100;
+
+    let comparison = `With ${numWinners} winners splitting the jackpot, each person gets ${formatCurrency(netAmount)} after taxes. `;
+
+    if (numWinners === 2) {
+      comparison += `That's 50% less than if you were the sole winner!`;
+    } else if (numWinners === 3) {
+      comparison += `That's 67% less than if you were the sole winner!`;
+    } else if (numWinners === 4) {
+      comparison += `That's 75% less than if you were the sole winner!`;
+    } else {
+      comparison += `That's ${individualReduction.toFixed(0)}% less than if you were the sole winner!`;
+    }
+
+    return comparison;
+  }
+
+  // Main calculation function
+  function calculate(): void {
+    const jackpotAmountInput = document.getElementById('jackpotAmount') as HTMLInputElement;
+    const numWinnersInput = document.getElementById('numWinners') as HTMLInputElement;
+    const taxRateInput = document.getElementById('taxRate') as HTMLInputElement;
+    const stateTaxRateInput = document.getElementById('stateTaxRate') as HTMLInputElement;
+
+    if (!jackpotAmountInput || !numWinnersInput || !taxRateInput || !stateTaxRateInput) return;
+
+    const jackpotAmount = parseFloat(jackpotAmountInput.value);
+    const numWinners = parseInt(numWinnersInput.value);
+    const federalTaxRate = parseFloat(taxRateInput.value);
+    const stateTaxRate = parseFloat(stateTaxRateInput.value);
+
+    if (isNaN(jackpotAmount) || isNaN(numWinners) || isNaN(federalTaxRate) || isNaN(stateTaxRate) ||
+        jackpotAmount <= 0 || numWinners < 1 || federalTaxRate < 0 || stateTaxRate < 0) {
+      alert('Please enter valid positive numbers for all fields.');
+      return;
+    }
+
+    const result = calculateJackpotSplit(jackpotAmount, numWinners, federalTaxRate, stateTaxRate);
+
+    // Update UI
+    const resultsEl = document.getElementById('results');
+    const eachWinnerAmountEl = document.getElementById('eachWinnerAmount');
+    const grossJackpotEl = document.getElementById('grossJackpot');
+    const numWinnersDisplayEl = document.getElementById('numWinnersDisplay');
+    const preTaxShareEl = document.getElementById('preTaxShare');
+    const federalTaxEl = document.getElementById('federalTax');
+    const stateTaxEl = document.getElementById('stateTax');
+    const netAmountEl = document.getElementById('netAmount');
+    const comparisonTextEl = document.getElementById('comparisonText');
+
+    if (resultsEl) resultsEl.style.display = 'block';
+    if (eachWinnerAmountEl) eachWinnerAmountEl.textContent = formatCurrency(result.netAmount);
+    if (grossJackpotEl) grossJackpotEl.textContent = formatCurrency(result.grossJackpot);
+    if (numWinnersDisplayEl) numWinnersDisplayEl.textContent = `${numWinners} winner${numWinners > 1 ? 's' : ''}`;
+    if (preTaxShareEl) preTaxShareEl.textContent = formatCurrency(result.preTaxShare);
+    if (federalTaxEl) federalTaxEl.textContent = formatCurrency(result.federalTax);
+    if (stateTaxEl) stateTaxEl.textContent = formatCurrency(result.stateTax);
+    if (netAmountEl) netAmountEl.textContent = formatCurrency(result.netAmount);
+
+    if (comparisonTextEl) {
+      comparisonTextEl.textContent = generateComparisonText(numWinners, result.netAmount, jackpotAmount);
+    }
+  }
+
+  // Set up event listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    const calculateBtn = document.getElementById('calculateBtn');
+    if (calculateBtn) {
+      calculateBtn.addEventListener('click', calculate);
+    }
+
+    // Auto-calculate on input change (with debounce)
+    let timeout: number | undefined;
+
+    const inputs = ['jackpotAmount', 'numWinners', 'taxRate', 'stateTaxRate'];
+    inputs.forEach(id => {
+      const input = document.getElementById(id) as HTMLInputElement;
+      if (input) {
+        input.addEventListener('input', function() {
+          clearTimeout(timeout);
+          timeout = window.setTimeout(calculate, 500);
+        });
+      }
+    });
+  });
+</script>

@@ -1,0 +1,605 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import BackToGenerator from "../../components/BackToGenerator.astro";
+
+const title = "Lottery Number Trend Graph | Number Frequency Over Time";
+const description =
+  "View historical frequency trends for lottery numbers over time. See which numbers are trending up or down with visual trend lines and frequency data.";
+const keywords =
+  "lottery number trends, number frequency chart, lottery trend graph, number frequency over time, lottery statistics, trending lottery numbers";
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Lottery Number Trend Graph",
+  description,
+  url: "https://lucky.mintloop.dev/tools/number-trend-graph",
+  applicationCategory: "EducationalApplication",
+  operatingSystem: "Any",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+};
+---
+
+<InfoLayout {title} {description} {keywords} {jsonLd}>
+  <BackToGenerator />
+
+  <div class="max-w-6xl mx-auto space-y-6">
+    {/* Header */}
+    <div class="text-center space-y-2">
+      <h1 class="text-3xl md:text-4xl font-bold">
+        📈 Lottery Number Trend Graph
+      </h1>
+      <p class="text-lg theme-text-secondary max-w-2xl mx-auto">
+        Track frequency trends for individual lottery numbers over the last 100 draws
+      </p>
+    </div>
+
+    {/* Game Selector */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <div class="flex flex-col sm:flex-row gap-4 items-center">
+        <label for="game-select" class="font-medium whitespace-nowrap">
+          Select Game:
+        </label>
+        <select
+          id="game-select"
+          class="flex-1 px-4 py-2 rounded-lg border theme-border-primary theme-bg-input theme-text-primary"
+        >
+          <option value="powerball">Powerball (1-69)</option>
+          <option value="megamillions">Mega Millions (1-70)</option>
+        </select>
+      </div>
+    </div>
+
+    {/* Number Selector */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">Select Numbers to Track</h2>
+      <p class="text-sm theme-text-secondary">
+        Choose up to 6 numbers to see their frequency trends. Click numbers to toggle selection.
+      </p>
+      
+      <div id="number-grid" class="grid grid-cols-7 sm:grid-cols-10 md:grid-cols-14 gap-2">
+        {/* Will be populated by JavaScript */}
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          id="select-random-btn"
+          class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold transition-colors"
+        >
+          Select Random 6
+        </button>
+        <button
+          id="clear-selection-btn"
+          class="px-4 py-2 rounded-lg border theme-border-primary hover:bg-slate-800/50 transition-colors"
+        >
+          Clear Selection
+        </button>
+      </div>
+    </div>
+
+    {/* Trend Graph */}
+    <div id="trend-section" class="theme-bg-card p-6 rounded-xl space-y-6 hidden">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-semibold">Frequency Trends (Last 100 Draws)</h2>
+        <div class="text-sm theme-text-muted">
+          Rolling 10-draw windows
+        </div>
+      </div>
+
+      {/* SVG Chart */}
+      <div class="theme-bg-surface rounded-lg p-6 border theme-border-primary overflow-x-auto">
+        <svg id="trend-chart" width="800" height="400" class="w-full">
+          {/* Will be drawn by JavaScript */}
+        </svg>
+      </div>
+
+      {/* Legend */}
+      <div id="legend" class="flex flex-wrap gap-4">
+        {/* Will be populated by JavaScript */}
+      </div>
+
+      {/* Statistics Table */}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b theme-border-primary">
+              <th class="text-left py-2 px-3">Number</th>
+              <th class="text-center py-2 px-3">Current Frequency</th>
+              <th class="text-center py-2 px-3">Trend Direction</th>
+              <th class="text-center py-2 px-3">Peak Frequency</th>
+              <th class="text-center py-2 px-3">Low Frequency</th>
+            </tr>
+          </thead>
+          <tbody id="stats-table">
+            {/* Will be populated by JavaScript */}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {/* Educational Content */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">📚 Understanding Trend Graphs</h2>
+      <div class="space-y-3 theme-text-secondary">
+        <p>
+          This tool shows <strong>frequency trends</strong> for lottery numbers over time using a rolling window approach:
+        </p>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li>Each point represents frequency over a 10-draw window</li>
+          <li>Windows overlap (draws 1-10, 2-11, 3-12, etc.)</li>
+          <li>Upward trends show numbers appearing more frequently recently</li>
+          <li>Downward trends show numbers appearing less frequently</li>
+        </ul>
+        
+        <div class="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg mt-4">
+          <div class="flex gap-3">
+            <div class="text-2xl">⚠️</div>
+            <div class="flex-1">
+              <div class="font-semibold text-amber-400 mb-1">Important Note</div>
+              <p class="text-sm">
+                <strong>Trends do not predict future results.</strong> Every lottery draw is independent.
+                Past frequency does not influence future probability. This tool is for entertainment
+                and pattern observation only.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Why Trends Don't Matter */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">🎲 Why Trends Don't Predict Outcomes</h2>
+      <div class="space-y-3 theme-text-secondary">
+        <p>
+          Even if a number shows an upward or downward trend, this is caused by <strong>random clustering</strong>,
+          not any underlying pattern or "momentum."
+        </p>
+        <div class="grid md:grid-cols-2 gap-4 mt-4">
+          <div class="p-4 border theme-border-primary rounded-lg">
+            <div class="font-semibold text-rose-400 mb-2">❌ Myth</div>
+            <p class="text-sm">
+              "Number 17 is trending up — it's on a hot streak and will keep appearing!"
+            </p>
+          </div>
+          <div class="p-4 border theme-border-primary rounded-lg">
+            <div class="font-semibold text-emerald-400 mb-2">✓ Reality</div>
+            <p class="text-sm">
+              Number 17 has the exact same probability (5/69 ≈ 7.2%) as every other number, regardless of past trends.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Related Tools */}
+    <div class="theme-bg-card p-6 rounded-xl space-y-4">
+      <h2 class="text-xl font-semibold">🔗 Related Tools</h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <a
+          href="/tools/hot-cold-numbers"
+          class="p-4 border theme-border-primary rounded-lg hover:bg-slate-800/50 transition-colors"
+        >
+          <div class="font-semibold text-amber-400 mb-1">🔥 Hot & Cold Numbers</div>
+          <div class="text-sm theme-text-secondary">View overall frequency data</div>
+        </a>
+        <a
+          href="/tools/why-odds-dont-change"
+          class="p-4 border theme-border-primary rounded-lg hover:bg-slate-800/50 transition-colors"
+        >
+          <div class="font-semibold text-emerald-400 mb-1">🎲 Why Odds Don't Change</div>
+          <div class="text-sm theme-text-secondary">Learn about independence</div>
+        </a>
+        <a
+          href="/tools/heatmap"
+          class="p-4 border theme-border-primary rounded-lg hover:bg-slate-800/50 transition-colors"
+        >
+          <div class="font-semibold text-orange-400 mb-1">🗺️ Number Heatmap</div>
+          <div class="text-sm theme-text-secondary">Visual frequency distribution</div>
+        </a>
+      </div>
+    </div>
+
+    {/* Disclaimer */}
+    <div class="p-4 bg-slate-800/30 border border-slate-700 rounded-lg text-sm theme-text-muted">
+      <strong>Educational Tool:</strong> This tool uses simulated historical data to demonstrate
+      frequency trends. Real lottery data would show similar random clustering patterns.
+      Trends are not predictive of future outcomes.
+    </div>
+  </div>
+
+  <script>
+    // Types
+    interface DrawData {
+      drawNumber: number;
+      numbers: number[];
+    }
+
+    interface FrequencyPoint {
+      window: number;
+      frequency: number;
+    }
+
+    interface TrendData {
+      number: number;
+      frequencies: FrequencyPoint[];
+      current: number;
+      peak: number;
+      low: number;
+      trend: 'up' | 'down' | 'stable';
+    }
+
+    // Global state
+    let selectedNumbers: Set<number> = new Set();
+    let maxNumbers = 69;
+    let historicalDraws: DrawData[] = [];
+    const MAX_SELECTION = 6;
+
+    // Color palette for trend lines
+    const colors = [
+      '#10b981', // emerald
+      '#3b82f6', // blue
+      '#f59e0b', // amber
+      '#ef4444', // red
+      '#8b5cf6', // purple
+      '#ec4899', // pink
+    ];
+
+    // Initialize
+    function init() {
+      const gameSelect = document.getElementById('game-select') as HTMLSelectElement;
+      gameSelect?.addEventListener('change', handleGameChange);
+      
+      document.getElementById('select-random-btn')?.addEventListener('click', selectRandom);
+      document.getElementById('clear-selection-btn')?.addEventListener('click', clearSelection);
+      
+      handleGameChange();
+    }
+
+    function handleGameChange() {
+      const gameSelect = document.getElementById('game-select') as HTMLSelectElement;
+      const game = gameSelect?.value || 'powerball';
+      maxNumbers = game === 'powerball' ? 69 : 70;
+      
+      selectedNumbers.clear();
+      renderNumberGrid();
+      generateHistoricalData();
+      hideTrendSection();
+    }
+
+    function renderNumberGrid() {
+      const grid = document.getElementById('number-grid');
+      if (!grid) return;
+      
+      grid.innerHTML = '';
+      for (let i = 1; i <= maxNumbers; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all border-2 theme-border-primary hover:scale-110';
+        btn.textContent = i.toString();
+        btn.dataset.number = i.toString();
+        
+        if (selectedNumbers.has(i)) {
+          btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-400');
+        } else {
+          btn.classList.add('bg-slate-700', 'text-slate-200', 'hover:bg-slate-600');
+        }
+        
+        btn.addEventListener('click', () => toggleNumber(i));
+        grid.appendChild(btn);
+      }
+    }
+
+    function toggleNumber(num: number) {
+      if (selectedNumbers.has(num)) {
+        selectedNumbers.delete(num);
+      } else {
+        if (selectedNumbers.size >= MAX_SELECTION) {
+          alert(`You can select up to ${MAX_SELECTION} numbers`);
+          return;
+        }
+        selectedNumbers.add(num);
+      }
+      
+      renderNumberGrid();
+      
+      if (selectedNumbers.size > 0) {
+        updateTrendGraph();
+      } else {
+        hideTrendSection();
+      }
+    }
+
+    function selectRandom() {
+      selectedNumbers.clear();
+      const available = Array.from({ length: maxNumbers }, (_, i) => i + 1);
+      
+      for (let i = 0; i < MAX_SELECTION; i++) {
+        const idx = Math.floor(Math.random() * available.length);
+        selectedNumbers.add(available[idx]);
+        available.splice(idx, 1);
+      }
+      
+      renderNumberGrid();
+      updateTrendGraph();
+    }
+
+    function clearSelection() {
+      selectedNumbers.clear();
+      renderNumberGrid();
+      hideTrendSection();
+    }
+
+    // Generate simulated historical draw data
+    function generateHistoricalData() {
+      historicalDraws = [];
+      
+      for (let i = 1; i <= 100; i++) {
+        const numbers: number[] = [];
+        const available = Array.from({ length: maxNumbers }, (_, i) => i + 1);
+        
+        for (let j = 0; j < 5; j++) {
+          const idx = Math.floor(Math.random() * available.length);
+          numbers.push(available[idx]);
+          available.splice(idx, 1);
+        }
+        
+        historicalDraws.push({
+          drawNumber: i,
+          numbers: numbers.sort((a, b) => a - b)
+        });
+      }
+    }
+
+    // Calculate rolling window frequencies
+    function calculateTrendData(): TrendData[] {
+      const windowSize = 10;
+      const trends: TrendData[] = [];
+      
+      for (const num of selectedNumbers) {
+        const frequencies: FrequencyPoint[] = [];
+        
+        // Calculate frequency for each rolling window
+        for (let i = 0; i <= historicalDraws.length - windowSize; i++) {
+          const window = historicalDraws.slice(i, i + windowSize);
+          const count = window.filter(draw => draw.numbers.includes(num)).length;
+          const frequency = (count / windowSize) * 100;
+          
+          frequencies.push({
+            window: i + windowSize,
+            frequency
+          });
+        }
+        
+        // Calculate stats
+        const current = frequencies[frequencies.length - 1].frequency;
+        const peak = Math.max(...frequencies.map(f => f.frequency));
+        const low = Math.min(...frequencies.map(f => f.frequency));
+        
+        // Determine trend (compare last 20 windows to first 20 windows)
+        const recentAvg = frequencies.slice(-20).reduce((sum, f) => sum + f.frequency, 0) / 20;
+        const earlyAvg = frequencies.slice(0, 20).reduce((sum, f) => sum + f.frequency, 0) / 20;
+        const diff = recentAvg - earlyAvg;
+        
+        let trend: 'up' | 'down' | 'stable' = 'stable';
+        if (diff > 5) trend = 'up';
+        else if (diff < -5) trend = 'down';
+        
+        trends.push({
+          number: num,
+          frequencies,
+          current,
+          peak,
+          low,
+          trend
+        });
+      }
+      
+      return trends;
+    }
+
+    function updateTrendGraph() {
+      const trendData = calculateTrendData();
+      
+      if (trendData.length === 0) {
+        hideTrendSection();
+        return;
+      }
+      
+      // Show section
+      const section = document.getElementById('trend-section');
+      if (section) {
+        section.classList.remove('hidden');
+      }
+      
+      // Draw chart
+      drawChart(trendData);
+      
+      // Update legend
+      updateLegend(trendData);
+      
+      // Update stats table
+      updateStatsTable(trendData);
+    }
+
+    function drawChart(trendData: TrendData[]) {
+      const svg = document.getElementById('trend-chart') as SVGSVGElement;
+      if (!svg) return;
+      
+      // Clear existing content
+      svg.innerHTML = '';
+      
+      const width = 800;
+      const height = 400;
+      const padding = { top: 20, right: 20, bottom: 40, left: 60 };
+      const chartWidth = width - padding.left - padding.right;
+      const chartHeight = height - padding.top - padding.bottom;
+      
+      // Scales
+      const maxWindow = 100;
+      const minWindow = 10;
+      const xScale = (window: number) => padding.left + ((window - minWindow) / (maxWindow - minWindow)) * chartWidth;
+      const yScale = (freq: number) => padding.top + (1 - freq / 100) * chartHeight;
+      
+      // Draw axes
+      const axesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      
+      // X axis
+      const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      xAxis.setAttribute('x1', padding.left.toString());
+      xAxis.setAttribute('y1', (height - padding.bottom).toString());
+      xAxis.setAttribute('x2', (width - padding.right).toString());
+      xAxis.setAttribute('y2', (height - padding.bottom).toString());
+      xAxis.setAttribute('stroke', '#475569');
+      xAxis.setAttribute('stroke-width', '2');
+      axesGroup.appendChild(xAxis);
+      
+      // Y axis
+      const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      yAxis.setAttribute('x1', padding.left.toString());
+      yAxis.setAttribute('y1', padding.top.toString());
+      yAxis.setAttribute('x2', padding.left.toString());
+      yAxis.setAttribute('y2', (height - padding.bottom).toString());
+      yAxis.setAttribute('stroke', '#475569');
+      yAxis.setAttribute('stroke-width', '2');
+      axesGroup.appendChild(yAxis);
+      
+      // X axis labels
+      for (let i = 10; i <= 100; i += 10) {
+        const x = xScale(i);
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', x.toString());
+        label.setAttribute('y', (height - padding.bottom + 20).toString());
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('fill', '#94a3b8');
+        label.setAttribute('font-size', '12');
+        label.textContent = i.toString();
+        axesGroup.appendChild(label);
+      }
+      
+      // Y axis labels
+      for (let i = 0; i <= 100; i += 20) {
+        const y = yScale(i);
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', (padding.left - 10).toString());
+        label.setAttribute('y', (y + 4).toString());
+        label.setAttribute('text-anchor', 'end');
+        label.setAttribute('fill', '#94a3b8');
+        label.setAttribute('font-size', '12');
+        label.textContent = `${i}%`;
+        axesGroup.appendChild(label);
+      }
+      
+      svg.appendChild(axesGroup);
+      
+      // Draw trend lines
+      trendData.forEach((trend, idx) => {
+        const color = colors[idx % colors.length];
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        
+        const pathData = trend.frequencies.map((point, i) => {
+          const x = xScale(point.window);
+          const y = yScale(point.frequency);
+          return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+        }).join(' ');
+        
+        path.setAttribute('d', pathData);
+        path.setAttribute('stroke', color);
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-linejoin', 'round');
+        
+        svg.appendChild(path);
+        
+        // Add dots at data points (every 5th point to reduce clutter)
+        trend.frequencies.forEach((point, i) => {
+          if (i % 5 === 0 || i === trend.frequencies.length - 1) {
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', xScale(point.window).toString());
+            circle.setAttribute('cy', yScale(point.frequency).toString());
+            circle.setAttribute('r', '4');
+            circle.setAttribute('fill', color);
+            svg.appendChild(circle);
+          }
+        });
+      });
+    }
+
+    function updateLegend(trendData: TrendData[]) {
+      const legend = document.getElementById('legend');
+      if (!legend) return;
+      
+      legend.innerHTML = '';
+      
+      trendData.forEach((trend, idx) => {
+        const color = colors[idx % colors.length];
+        const item = document.createElement('div');
+        item.className = 'flex items-center gap-2';
+        
+        const colorBox = document.createElement('div');
+        colorBox.className = 'w-4 h-4 rounded';
+        colorBox.style.backgroundColor = color;
+        
+        const label = document.createElement('span');
+        label.className = 'font-semibold';
+        label.textContent = `Number ${trend.number}`;
+        
+        item.appendChild(colorBox);
+        item.appendChild(label);
+        legend.appendChild(item);
+      });
+    }
+
+    function updateStatsTable(trendData: TrendData[]) {
+      const tbody = document.getElementById('stats-table');
+      if (!tbody) return;
+      
+      tbody.innerHTML = '';
+      
+      trendData.forEach((trend, idx) => {
+        const color = colors[idx % colors.length];
+        const row = document.createElement('tr');
+        row.className = 'border-b theme-border-primary';
+        
+        const trendEmoji = trend.trend === 'up' ? '↗️' : trend.trend === 'down' ? '↘️' : '➡️';
+        const trendText = trend.trend === 'up' ? 'Trending Up' : trend.trend === 'down' ? 'Trending Down' : 'Stable';
+        
+        row.innerHTML = `
+          <td class="py-2 px-3">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded" style="background-color: ${color}"></div>
+              <span class="font-semibold">${trend.number}</span>
+            </div>
+          </td>
+          <td class="text-center py-2 px-3 font-semibold">${trend.current.toFixed(1)}%</td>
+          <td class="text-center py-2 px-3">
+            <span class="inline-flex items-center gap-1">
+              ${trendEmoji} ${trendText}
+            </span>
+          </td>
+          <td class="text-center py-2 px-3">${trend.peak.toFixed(1)}%</td>
+          <td class="text-center py-2 px-3">${trend.low.toFixed(1)}%</td>
+        `;
+        
+        tbody.appendChild(row);
+      });
+    }
+
+    function hideTrendSection() {
+      const section = document.getElementById('trend-section');
+      if (section) {
+        section.classList.add('hidden');
+      }
+    }
+
+    // Initialize on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</InfoLayout>

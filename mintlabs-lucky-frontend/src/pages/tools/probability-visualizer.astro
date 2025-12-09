@@ -1,0 +1,1208 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import AffiliateGrid from "../../components/AffiliateGrid.astro";
+
+// Lottery odds data
+const lotteries = [
+  { 
+    name: "Powerball Jackpot", 
+    odds: 292201338,
+    color: "#E53935",
+    ticketPrice: 2
+  },
+  { 
+    name: "Mega Millions Jackpot", 
+    odds: 302575350,
+    color: "#FFC107",
+    ticketPrice: 5
+  },
+  { 
+    name: "CA SuperLotto Plus Jackpot", 
+    odds: 41416353,
+    color: "#2196F3",
+    ticketPrice: 1
+  },
+  { 
+    name: "Powerball (Match 5, no PB)", 
+    odds: 11688054,
+    color: "#FF7043",
+    ticketPrice: 2
+  },
+  { 
+    name: "Mega Millions (Match 5, no MB)", 
+    odds: 12607306,
+    color: "#FFCA28",
+    ticketPrice: 5
+  },
+  { 
+    name: "Powerball ($50K - Match 4 + PB)", 
+    odds: 913129,
+    color: "#EF5350",
+    ticketPrice: 2
+  },
+  { 
+    name: "Any Lottery Scratch-off ($1M+)", 
+    odds: 2000000,
+    color: "#9C27B0",
+    ticketPrice: 1
+  }
+];
+
+// Real-life comparisons
+const comparisons = [
+  {
+    event: "Grains of sand on a beach",
+    count: 7500000000000000000, // 7.5 quintillion on Earth's beaches
+    beachGrains: 100000000000, // ~100 billion on one beach
+    icon: "🏖️",
+    description: "Finding one specific grain of sand on a large beach"
+  },
+  {
+    event: "Stars in the Milky Way",
+    count: 200000000000,
+    icon: "⭐",
+    description: "Picking one specific star in our galaxy"
+  },
+  {
+    event: "Seconds in a human lifetime",
+    count: 2500000000, // ~80 years
+    icon: "⏱️",
+    description: "One specific second in an 80-year life"
+  },
+  {
+    event: "People on Earth",
+    count: 8000000000,
+    icon: "🌍",
+    description: "Randomly selecting one specific person on Earth"
+  },
+  {
+    event: "Heartbeats in a lifetime",
+    count: 3000000000,
+    icon: "❤️",
+    description: "One specific heartbeat in your entire life"
+  },
+  {
+    event: "Drops of water in an Olympic pool",
+    count: 660000000,
+    icon: "🏊",
+    description: "Finding one specific drop in an Olympic swimming pool"
+  },
+  {
+    event: "Blades of grass on a football field",
+    count: 3000000,
+    icon: "🌱",
+    description: "Picking one specific blade of grass on a football field"
+  },
+  {
+    event: "Words in all books ever written",
+    count: 130000000000000,
+    icon: "📚",
+    description: "Finding one specific word among all books"
+  },
+  {
+    event: "Lightning strike (annual odds)",
+    count: 500000,
+    icon: "⚡",
+    description: "Chance of being struck by lightning this year"
+  },
+  {
+    event: "Plane crash fatality (per flight)",
+    count: 11000000,
+    icon: "✈️",
+    description: "Odds of dying in a plane crash per flight"
+  }
+];
+---
+
+<InfoLayout 
+  title="Probability Visualizer"
+  subtitle="See lottery odds compared to real-life events"
+  pageTitle="Lottery Odds Visualizer – See Your Real Chances | MintLabs"
+  description="Visualize lottery odds compared to real-life events. See why winning Powerball is like finding a specific grain of sand on a beach. Educational and shareable!"
+  keywords="lottery odds visualizer, probability comparison, powerball odds, mega millions odds, lottery chances explained"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">🧠 Mind-bending:</strong>
+    Lottery odds are hard to comprehend. Let's make them <em>real</em> by comparing to things you can actually imagine.
+  </div>
+
+  <section class="lottery-selector rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+    <label for="lottery-select">Choose a lottery to visualize:</label>
+    <select id="lottery-select">
+      {lotteries.map((lottery, index) => (
+        <option value={index} data-odds={lottery.odds} data-color={lottery.color}>
+          {lottery.name} (1 in {lottery.odds.toLocaleString()})
+        </option>
+      ))}
+    </select>
+  </div>
+
+  <div class="visualization-container">
+    <div class="main-stat" id="main-stat">
+      <div class="stat-lottery">Powerball Jackpot</div>
+      <div class="stat-odds">1 in <span id="odds-number">292,201,338</span></div>
+      <div class="stat-percent" id="stat-percent">0.00000034% chance</div>
+    </div>
+
+    <div class="comparison-grid" id="comparison-grid">
+      <!-- Filled by JavaScript -->
+    </div>
+  </div>
+
+  <div class="visual-demo" id="visual-demo">
+    <h2>🎯 Visual Scale: Find the Winner</h2>
+    <p class="demo-intro">
+      Below are <span id="dot-count">10,000</span> dots. <strong>ONE</strong> of them is the "winner" (highlighted).
+      This represents <span id="scale-ratio">1 in 10,000</span> odds.
+      <br><em>The actual lottery odds are <span id="times-harder">29,220×</span> harder than this!</em>
+    </p>
+    <div style="display:flex;justify-content:center;gap:1rem;margin-bottom:0.5rem;align-items:center;">
+      <label for="dot-density-select" style="font-weight:600;color:var(--text-secondary);">Density</label>
+      <select id="dot-density-select" aria-label="Dots density" style="padding:0.45rem 0.6rem;border-radius:8px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-primary)">
+        <option value="auto" selected>Auto (responsive)</option>
+        <option value="20">20</option>
+        <option value="100">100</option>
+        <option value="500">500</option>
+        <option value="2000">2,000</option>
+        <option value="10000">10,000</option>
+      </select>
+      <span style="color:var(--text-secondary);font-size:0.9rem">(fewer dots = clearer winner)</span>
+    </div>
+
+    <div id="dot-hint" aria-hidden="false" class="dot-hint">Tip: Click any dot to guess the winner — the winner will reveal instantly.</div>
+    <noscript>
+      <div class="dot-hint" style="margin-top:.6rem; background:rgba(255,255,255,0.03);">JavaScript is required for the interactive visualization — enable JavaScript to see the dots and make guesses.</div>
+    </noscript>
+    <div class="dot-container" id="dot-container">
+      <!-- Dots rendered by JS -->
+    </div>
+    <div style="display:flex;justify-content:center;gap:1rem;align-items:center;margin-top:0.75rem;flex-wrap:wrap;">
+      <button id="reveal-btn" class="reveal-button">🔍 Reveal the Winner</button>
+      <div id="attempts-info" aria-live="polite" class="attempts-info">Attempts: 0 ($0)</div>
+    </div>
+
+    <!-- Spotlight modal shown when a winner is revealed -->
+    <div id="winner-modal" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;">
+      <div class="winner-overlay"></div>
+      <div class="winner-card" id="winner-card">
+        <div class="winner-icon">🏆</div>
+        <div class="winner-title">Winner!</div>
+        <div class="winner-sub" id="winner-sub">Congratulations — you found the winner</div>
+        <button id="winner-close" class="reveal-button" style="margin-top:1rem;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="perspective-section">
+    <h2>📊 Putting It In Perspective</h2>
+    
+    <div class="perspective-cards">
+      <div class="perspective-card">
+        <div class="p-icon">🎰</div>
+        <div class="p-title">Play Every Day for 800,000 Years</div>
+        <div class="p-desc">
+          If you bought one Powerball ticket every day, you'd need to play for about 
+          <strong>800,000 years</strong> to have a 50/50 shot at winning once.
+        </div>
+      </div>
+
+      <div class="perspective-card">
+        <div class="p-icon">💰</div>
+        <div class="p-title">$584 Million in Tickets</div>
+        <div class="p-desc">
+          To buy enough tickets to cover every Powerball combination (guaranteeing a win), 
+          you'd spend <strong>$584,402,676</strong>. The jackpot is often less than that.
+        </div>
+      </div>
+
+      <div class="perspective-card">
+        <div class="p-icon">🌍</div>
+        <div class="p-title">36× Rarer Than Finding One Person</div>
+        <div class="p-desc">
+          Winning Powerball is <strong>36 times less likely</strong> than randomly 
+          picking one specific person out of everyone on Earth.
+        </div>
+      </div>
+
+      <div class="perspective-card">
+        <div class="p-icon">⚡</div>
+        <div class="p-title">584× Rarer Than Lightning</div>
+        <div class="p-desc">
+          You're <strong>584 times more likely</strong> to be struck by lightning 
+          this year than to win the Powerball jackpot.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="share-section">
+    <h3>📱 Share This Visualization</h3>
+    <p>Help others understand lottery odds!</p>
+    <div class="share-buttons">
+      <button id="share-twitter" class="share-btn twitter">Share on X</button>
+      <button id="share-copy" class="share-btn copy">Copy Link</button>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Remember:</strong> Every lottery drawing is independent. Past results don't affect future odds. 
+    The lottery is entertainment, not investment. If you play, set a strict budget and stick to it.
+    <br><br>
+    <a href="/lottery-math">Learn more about lottery mathematics →</a>
+  </div>
+
+  <AffiliateGrid placement="tools" />
+
+  <style>
+    .page-intro {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .lottery-selector {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .lottery-selector label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+    }
+
+    .lottery-selector select {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.1rem;
+      background: var(--surface-2);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+      min-width: 300px;
+    }
+
+    .visualization-container {
+      margin: 2rem 0;
+    }
+
+    .main-stat {
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(135deg, var(--surface-1), var(--surface-2));
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      margin-bottom: 2rem;
+    }
+
+    .stat-lottery {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-odds {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    #odds-number {
+      color: var(--accent);
+    }
+
+    .stat-percent {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .comparison-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .comparison-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .comparison-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .comparison-icon {
+      font-size: 2rem;
+    }
+
+    .comparison-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .comparison-analogy {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .comparison-analogy strong {
+      color: var(--accent);
+    }
+
+    .visual-demo {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 3rem 0;
+      text-align: center;
+    }
+
+    .visual-demo h2 {
+      margin-top: 0;
+    }
+
+    .demo-intro {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .dot-hint {
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      padding: 0.45rem 0.75rem;
+      border-radius: 8px;
+      display: inline-block;
+      border: 1px solid var(--border);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .dot-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px;
+      width: min(92%, 920px);
+      margin: 0 auto 1.5rem;
+      padding: 1rem;
+      background: var(--surface-2);
+      border-radius: 8px;
+      max-height: 36vh; /* scale with viewport so more responsive */
+      min-height: 120px;
+      overflow: auto; /* allow scrolling on small/tight layouts */
+      align-items: center;
+      box-sizing: border-box;
+    }
+
+    .dot {
+      cursor: pointer; /* make clickability obvious */
+      /* make the dot element a larger hit target while the visible dot is a smaller inner circle */
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative; /* allow pseudo or inner sights */
+      border-radius: 50%;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+      position: relative; /* allow winner pseudo element */
+      border-radius: 50%;
+      transition: all 0.3s;
+      /* give dots a faint border for crisp rendering on similar backgrounds */
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.05) inset;
+    }
+
+    /* the actual visible small dot inside the larger clickable target */
+    .dot .dot-vis {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(var(--accent-rgb), 0.95);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.15) inset, 0 1px 3px rgba(0,0,0,0.18);
+      /* added outline so that the tiny visible dot contrasts across themes */
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+      /* expand hit area without changing visible size so small dots are easier to click */
+    }
+
+    /* invisible hit-area to make small dots easier to click while preserving visual size */
+    .dot::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% + 16px);
+      height: calc(100% + 16px);
+      border-radius: 50%;
+      background: transparent;
+      pointer-events: none; /* clicks still register on the dot element */
+    }
+
+    .dot:hover {
+      transform: scale(1.12);
+    }
+
+    .dot:hover .dot-vis {
+      transform: scale(1.5);
+      box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.45), 0 0 4px rgba(0,0,0,0.15) inset;
+    }
+
+    /* Winner style — more pronounced with scale, glow, and pulse animation */
+    .dot.winner {
+      /* make the winner dramatically bigger and more contrasty */
+      /* make winner much bolder and add a halo */
+      width: 56px;
+      height: 56px;
+      background: var(--accent);
+      box-shadow: 0 0 28px rgba(var(--accent-rgb), 1), 0 0 64px rgba(var(--accent-rgb), 0.6), 0 6px 24px rgba(0,0,0,0.5);
+      transform: none; /* size set explicitly */
+      z-index: 9999;
+      border: 3px solid rgba(255,255,255,0.14);
+      animation: winner-pulse 1s ease-in-out infinite;
+      border-radius: 50%;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    /* make the inner visual element pop for winners */
+    .dot.winner .dot-vis {
+      width: 24px;
+      height: 24px;
+      background: white; /* visible contrast against accent halo */
+      box-shadow: 0 0 28px rgba(var(--accent-rgb), 1), 0 0 64px rgba(var(--accent-rgb), 0.6);
+      transform: none;
+    }
+
+    /* trophy / label above the winner */
+    .dot.winner::after {
+      content: '🏆 Winner';
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -170%);
+      top: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.95), rgba(255,255,255,0.06));
+      pointer-events: none;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      opacity: 1;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.45));
+    }
+
+    /* Dimming other dots when winner is revealed to emphasize the winner */
+    .dot.dimmed {
+      /* make other dots fade out more so the winner stands out */
+      opacity: 0.02;
+      filter: blur(0.4px);
+      transform: scale(0.9);
+      transition: opacity 0.25s ease, transform 0.25s ease, filter 0.25s ease;
+    }
+
+    /* selected (user clicked) */
+    .dot.selected {
+      outline: 2px solid rgba(255,0,0,0.95);
+      transform: scale(1.15);
+      box-shadow: 0 0 8px rgba(255,60,60,0.9);
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .dot.revealed {
+      opacity: 0.5;
+    }
+
+    /* wrong guess indicator (red X) — ensures visible feedback for small dots */
+    /* inline wrong-marker (more reliable than pseudo-element that could be clipped) */
+    .dot .dot-mark {
+      display: flex; /* show the initial purchase marker ($) until clicked */
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--accent); /* initial dollar shown in accent color */
+      font-weight: 900;
+      font-size: 14px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+      pointer-events: none;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      transition: transform 120ms ease, opacity 120ms ease;
+    }
+
+    /* wrong marker — show a red X in the same spot; X is red (stroke=currentColor) */
+    .dot.wrong .dot-mark { display: flex; background: transparent; color: #ff3b3b; transform: scale(1.08); }
+
+    .dot.wrong .dot-vis {
+      background: #ff3b3b !important; /* make red selection unambiguous */
+      transform: scale(1.2);
+      box-shadow: 0 0 6px rgba(255,59,59,0.5);
+    }
+
+    /* When the winner is revealed, show a distinct check icon on the dot-mark */
+    .dot.winner .dot-mark {
+      display: flex;
+      background: var(--accent);
+      color: white;
+      font-size: 15px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      transform: scale(1.08);
+      box-shadow: 0 4px 14px rgba(var(--accent-rgb), 0.35);
+    }
+
+    /* winner gets a green accent for the inner dot so it's visually clear */
+    .dot.winner .dot-vis {
+      background: var(--accent);
+      box-shadow: 0 0 28px rgba(var(--accent-rgb), 0.95), 0 0 56px rgba(var(--accent-rgb), 0.55);
+      transform: none;
+    }
+
+    /* visually emphasize the winner area by adding a faint radial overlay when revealed */
+    .container-winner::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 85%;
+      height: 80%;
+      border-radius: 30px;
+      pointer-events: none;
+      background: radial-gradient(circle at center, rgba(var(--accent-rgb), 0.08), rgba(0,0,0,0) 50%);
+      z-index: 1000;
+    }
+
+    /* subtle revealed state for non-winning dots when interacted */
+    .dot.revealed {
+      background: rgba(var(--accent-rgb), 0.28);
+      opacity: 0.35;
+    }
+
+    .reveal-button {
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .reveal-button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .attempts-info {
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      background: linear-gradient(90deg, rgba(0,0,0,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      font-weight: 700;
+      font-size: 0.95rem;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    .attempts-info.pulse {
+      animation: attempts-pulse 420ms ease-out both;
+    }
+
+    @keyframes attempts-pulse {
+      0% { transform: scale(.96); box-shadow: 0 0 0 rgba(0,0,0,0); }
+      50% { transform: scale(1.05); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+      100% { transform: scale(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
+    }
+
+    /* modal overlay + card */
+    #winner-modal { position: fixed; inset: 0; display: grid; place-items: center; z-index: 12000; }
+    #winner-modal[aria-hidden="true"] { display: none; }
+    .winner-overlay { position: absolute; inset: 0; background: rgba(3,7,18,0.6); backdrop-filter: blur(4px); }
+    .winner-card { position: relative; z-index: 12010; width: min(96%, 600px); padding: 2rem; text-align: center; border-radius: 14px; background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); box-shadow: 0 8px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.06); color: white; }
+    .winner-icon { font-size: 52px; margin-bottom: .5rem; }
+    .winner-title { font-size: 22px; font-weight: 800; margin-bottom: .25rem; color: var(--accent); }
+    .winner-sub { font-size: 16px; opacity: 0.95; color: var(--text-secondary); }
+
+    @keyframes winner-pulse {
+      0% { transform: scale(2.9); box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.75), 0 0 20px rgba(var(--accent-rgb), 0.4); }
+      50% { transform: scale(3.15); box-shadow: 0 0 18px rgba(var(--accent-rgb), 1), 0 0 32px rgba(var(--accent-rgb), 0.6); }
+      100% { transform: scale(2.9); box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.75), 0 0 20px rgba(var(--accent-rgb), 0.4); }
+    }
+
+    .perspective-section {
+      margin: 3rem 0;
+    }
+
+    .perspective-section h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .perspective-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .perspective-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .p-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .p-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .p-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .share-section {
+      text-align: center;
+      padding: 2rem;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin: 2rem 0;
+    }
+
+    .share-section h3 {
+      margin-top: 0;
+    }
+
+    .share-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .share-btn {
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .share-btn.twitter {
+      background: #1DA1F2;
+      color: white;
+    }
+
+    .share-btn.copy {
+      background: var(--surface-2);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .share-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.9;
+    }
+
+    .disclaimer {
+      background: rgba(var(--accent-rgb), 0.1);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .disclaimer a {
+      color: var(--accent);
+    }
+
+    @media (max-width: 900px) {
+      /* keep a comfortable hit target on medium screens */
+      .dot-container { gap: 6px; max-height: 36vh; }
+      .dot { width: 14px; height: 14px; }
+      .dot .dot-vis { width: 5px; height: 5px; }
+      .dot.winner { width: 46px; height: 46px; }
+      .dot.winner .dot-vis { width: 20px; height: 20px; }
+    }
+
+    @media (max-width: 640px) {
+      .stat-odds { font-size: 1.6rem; }
+      .lottery-selector select { min-width: auto; width: 100%; }
+      /* on phone-sized screens keep dots comfortable for touch */
+      .dot { width: 20px; height: 20px; }
+      .dot .dot-vis { width: 10px; height: 10px; }
+      .dot.winner { width: 48px; height: 48px; }
+      .dot.winner .dot-vis { width: 24px; height: 24px; }
+
+      /* make the density selector wrap on small screens */
+      #dot-density-select { width: 120px; }
+      .visual-demo { padding: 1rem; }
+    }
+  </style>
+
+  <script define:vars={{ lotteries, comparisons }}>
+    document.addEventListener('DOMContentLoaded', () => {
+      const select = document.getElementById('lottery-select');
+      const statLottery = document.querySelector('.stat-lottery');
+      const oddsNumber = document.getElementById('odds-number');
+      const statPercent = document.getElementById('stat-percent');
+      const comparisonGrid = document.getElementById('comparison-grid');
+      const dotContainer = document.getElementById('dot-container');
+      const dotCount = document.getElementById('dot-count');
+      const scaleRatio = document.getElementById('scale-ratio');
+      const timesHarder = document.getElementById('times-harder');
+      const revealBtn = document.getElementById('reveal-btn');
+      const attemptsInfo = document.getElementById('attempts-info');
+      // ticketPrice will be set per-lottery in updateVisualization (default $2)
+      let TICKET_PRICE = 2;
+      // track currently selected lottery index so reveal flow can use it
+      let currentLotteryIndex = 0;
+      let attempts = 0;
+      // prevent counting multiple fast guesses while a reveal is pending
+      let guessInFlight = false;
+
+      // allow user changeable density — default to 'auto' (responsive)
+      let DOT_COUNT = pickAutoDensity();
+      let explicitDensity = 'auto';
+
+      // helper: pick a density based on viewport area when 'auto'
+      function pickAutoDensity() {
+        const area = window.innerWidth * window.innerHeight;
+        // heuristics tuned for readability in test/dev environments and real devices
+        if (area < 320 * 600) return 250; // tiny screens
+        if (area < 480 * 800) return 500; // small phones
+        if (area < 900 * 700) return 1200; // tablets / small desktop windows
+        if (area < 1400 * 900) return 2000; // normal desktops
+        return 2000; // cap large displays at 2000 for clarity (visibility-first)
+      }
+      let winnerIndex = Math.floor(Math.random() * DOT_COUNT);
+      let revealed = false;
+
+      function updateVisualization(lotteryIndex) {
+        const lottery = lotteries[lotteryIndex];
+        // remember which lottery is selected and update ticket price
+        currentLotteryIndex = lotteryIndex;
+        TICKET_PRICE = lottery.ticketPrice || 2;
+        const odds = lottery.odds;
+        const percent = (100 / odds).toFixed(8);
+
+        // Update main stat
+        statLottery.textContent = lottery.name;
+        oddsNumber.textContent = odds.toLocaleString();
+        statPercent.textContent = `${percent}% chance`;
+
+        // Generate comparisons
+        comparisonGrid.innerHTML = '';
+        
+        comparisons.forEach(comp => {
+          const ratio = odds / comp.count;
+          let analogy = '';
+          
+          if (ratio >= 1) {
+            analogy = `Winning is <strong>${Math.round(ratio).toLocaleString()}× harder</strong> than ${comp.description.toLowerCase()}.`;
+          } else if (ratio >= 0.01) {
+            analogy = `Winning is about as hard as ${comp.description.toLowerCase()} — if there were <strong>${Math.round(comp.count / odds).toLocaleString()}</strong> people doing it.`;
+          } else {
+            const equivalent = Math.round(comp.count / odds);
+            analogy = `It's like ${comp.description.toLowerCase()}, but <strong>${equivalent.toLocaleString()}× easier</strong>.`;
+          }
+
+          const card = document.createElement('div');
+          card.className = 'comparison-card';
+          card.innerHTML = `
+            <div class="comparison-header">
+              <span class="comparison-icon">${comp.icon}</span>
+              <span class="comparison-title">${comp.event}</span>
+            </div>
+            <div class="comparison-analogy">${analogy}</div>
+          `;
+          comparisonGrid.appendChild(card);
+        });
+
+        // Update dot visualization scale info
+        const hardness = Math.round(odds / DOT_COUNT);
+        timesHarder.textContent = `${hardness.toLocaleString()}×`;
+
+        // Reset dots
+        renderDots();
+        revealed = false;
+        revealBtn.textContent = '🔍 Reveal the Winner';
+      }
+
+      function renderDots() {
+        dotContainer.innerHTML = '';
+        winnerIndex = Math.floor(Math.random() * DOT_COUNT);
+        
+        for (let i = 0; i < DOT_COUNT; i++) {
+          const dot = document.createElement('div');
+            dot.className = 'dot';
+            // make each dot keyboard focusable so keyboard users can interact
+            dot.setAttribute('tabindex', '0');
+            dot.setAttribute('data-index', i);
+            // inner visible circle for clarity while keeping a larger hit target
+            const inner = document.createElement('span');
+            inner.className = 'dot-vis';
+            dot.appendChild(inner);
+            // inline wrong marker (✖) — using an inline element avoids clipping issues with ::after
+            const mark = document.createElement('span');
+            mark.className = 'dot-mark';
+            // default marker is a dollar icon — visible until clicked (purchase)
+            mark.innerHTML = `
+                <svg aria-hidden="true" data-icon="dollar" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 1v22M17.5 5.5c-1.3-1.3-3.3-2-5.5-2-3 0-5.5 1.6-5.5 4s2.5 4 5.5 4c3 0 5.5 1.6 5.5 4s-2.5 4-5.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              `;
+            // append the marker to the dot so it's present in the DOM
+            dot.appendChild(mark);
+            // make the container expose the winner index so tests / dev can inspect it
+            dotContainer.dataset.winner = winnerIndex;
+          if (i === winnerIndex && revealed) {
+            dot.classList.add('winner');
+          }
+          dotContainer.appendChild(dot);
+        }
+        // when rendering a fresh visualization, reset attempts and any transient state
+        attempts = 0;
+        guessInFlight = false;
+        if (attemptsInfo) {
+          attemptsInfo.textContent = `Attempts: ${attempts} ($${attempts * TICKET_PRICE})`;
+          attemptsInfo.classList.remove('pulse');
+        }
+      }
+
+        // interactive clicks: let users try selecting dots
+        dotContainer.addEventListener('click', (ev) => {
+          // allow clicks on inner elements (dot-vis) — find the closest .dot ancestor
+          const rawTarget = ev.target;
+          let target = (rawTarget instanceof Element) ? rawTarget.closest('.dot') : null;
+          // If the user clicked very near a dot but not directly on it (close-enough),
+          // map the click to the nearest dot within a small threshold so nearby clicks
+          // still register. This keeps the middle gap between two dots non-interactive
+          // while making the area around icons slightly forgiving.
+          if (!target) {
+            const dots = Array.from(dotContainer.querySelectorAll('.dot'));
+            if (dots.length && ev && typeof ev.clientX === 'number') {
+              const clickX = ev.clientX;
+              const clickY = ev.clientY;
+              let closest = null;
+              let minDist = Infinity;
+              for (const d of dots) {
+                const r = d.getBoundingClientRect();
+                const cx = r.left + r.width / 2;
+                const cy = r.top + r.height / 2;
+                const dist = Math.hypot(clickX - cx, clickY - cy);
+                if (dist < minDist) {
+                  minDist = dist;
+                  closest = d;
+                }
+              }
+              // threshold chosen to allow gentle near-misses to count (about half
+              // the dot plus padding). This is intentionally conservative to avoid
+              // picking dots when the click is in the middle gap between two dots.
+              if (closest && minDist <= 14) target = closest;
+            }
+          }
+          if (!target || !target.classList) return;
+          if (!target.classList.contains('dot')) return;
+          if (revealed) return; // ignore clicks after reveal
+
+          const idx = parseInt(target.getAttribute('data-index'), 10);
+          if (Number.isNaN(idx)) return;
+
+          // ignore clicks on dots already guessed (wrong or selected) — prevents
+          // users re-clicking a wrong dot and inflating the attempts counter
+          if (target.classList.contains('wrong') || target.classList.contains('selected')) return;
+
+          // ignore clicks on dots already guessed (wrong or selected) — prevents
+          // users re-clicking a wrong dot and inflating the attempts counter
+          if (target.classList.contains('wrong') || target.classList.contains('selected')) return;
+
+          // visual feedback for selection
+          target.classList.add('selected');
+
+          // if they clicked the winner, reveal immediately
+          if (idx === winnerIndex) {
+            // count the winning click as an attempt (user purchased that guess)
+            attempts += 1;
+            if (attemptsInfo) {
+              attemptsInfo.textContent = `Attempts: ${attempts} ($${attempts * TICKET_PRICE})`;
+              attemptsInfo.classList.add('pulse');
+              setTimeout(() => attemptsInfo.classList.remove('pulse'), 420);
+            }
+            // mark winner visually: replace the $ with a trophy and highlight
+            const markEl = target.querySelector('.dot-mark');
+            if (markEl) {
+              // replace the marker with a dollar icon and use the lottery accent
+              const lottery = lotteries[currentLotteryIndex] || { color: 'var(--accent)' };
+              markEl.innerHTML = `\n                <svg aria-hidden="true" data-icon="dollar" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n                  <path d="M12 1v22M17.5 5.5c-1.3-1.3-3.3-2-5.5-2-3 0-5.5 1.6-5.5 4s2.5 4 5.5 4c3 0 5.5 1.6 5.5 4s-2.5 4-5.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>\n                </svg>\n              `;
+              markEl.style.background = lottery.color;
+              markEl.style.color = 'white';
+              const innerVis = target.querySelector('.dot-vis');
+              if (innerVis) innerVis.style.background = lottery.color;
+              target.classList.add('winner');
+              target.classList.remove('wrong');
+            }
+            // show full reveal flow — this also opens the modal and keeps it visible until the user closes it
+            revealWinner();
+            return;
+          }
+
+          // wrong selection — mark with red X and count attempts, then reveal
+          if (idx !== winnerIndex) {
+            // ignore rapid duplicate guesses while a reveal is already queued
+            if (guessInFlight) return;
+            guessInFlight = true;
+            target.classList.add('wrong');
+            // update the inline marker to a red X
+            const markEl = target.querySelector('.dot-mark');
+            if (markEl) {
+              markEl.innerHTML = `\n                <svg aria-hidden="true" data-icon="x" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n                  <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>\n                </svg>\n              `;
+              // force the X to be red for visibility across themes
+              markEl.style.color = '#ff3b3b';
+              const innerVis = target.querySelector('.dot-vis');
+              if (innerVis) innerVis.style.background = '#ff3b3b';
+            }
+            attempts += 1;
+            if (attemptsInfo) {
+              attemptsInfo.textContent = `Attempts: ${attempts} ($${attempts * TICKET_PRICE})`;
+              attemptsInfo.classList.add('pulse');
+              setTimeout(() => attemptsInfo.classList.remove('pulse'), 420);
+            }
+            // keep selection visible briefly; don't auto-reveal — only the reveal button or clicking
+            // the correct (winning) dot reveals the winner. Reset the in-flight guard after a short pause
+            // so users cannot quickly double-guess the same dot.
+            setTimeout(() => { guessInFlight = false; }, 350);
+            return;
+          }
+        });
+
+        // keyboard activation (Enter / Space) — same behaviour as click
+        dotContainer.addEventListener('keydown', (ev) => {
+          if (ev.key !== 'Enter' && ev.key !== ' ') return;
+          const active = document.activeElement;
+          const target = (active instanceof Element && active.classList.contains('dot')) ? active : (active instanceof Element ? active.closest('.dot') : null);
+          if (!target) return;
+          // prevent page scroll on Space
+          ev.preventDefault();
+          // reuse the click flow — fake a click event on the dot
+          target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+        });
+
+      function revealWinner() {
+          if (revealed) {
+            // Reset
+            revealed = false;
+            dotContainer.classList.remove('container-winner');
+            renderDots();
+            revealBtn.textContent = '🔍 Reveal the Winner';
+            // clear in-flight guess marker
+            guessInFlight = false;
+          } else {
+            // Reveal
+            revealed = true;
+            const dots = Array.from(dotContainer.querySelectorAll('.dot'));
+
+            // add winner class + dim everyone else so the winner pops
+            dots.forEach((d, idx) => {
+              if (idx === winnerIndex) {
+                d.classList.add('winner');
+                d.classList.remove('dimmed');
+                // show a distinct check on the winner
+                const mark = d.querySelector('.dot-mark');
+                    if (mark) mark.innerHTML = `
+                      <svg aria-hidden="true" data-icon="dollar" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 1v22M17.5 5.5c-1.3-1.3-3.3-2-5.5-2-3 0-5.5 1.6-5.5 4s2.5 4 5.5 4c3 0 5.5 1.6 5.5 4s-2.5 4-5.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    `;
+              } else {
+                d.classList.add('dimmed');
+              }
+            });
+
+            // mark container so we can style an overlay/highlight
+            dotContainer.classList.add('container-winner');
+
+            // Scroll to winner (instant during tests, smooth visually otherwise)
+            dots[winnerIndex].scrollIntoView({ behavior: 'auto', block: 'center' });
+            // show spotlight modal and add an aria-live message for accessibility (screen readers) and a brief on-page text
+            const liveMsgId = 'visualizer-winner-msg';
+            let liveEl = document.getElementById(liveMsgId);
+            if (!liveEl) {
+              liveEl = document.createElement('div');
+              liveEl.id = liveMsgId;
+              liveEl.setAttribute('aria-live', 'polite');
+              liveEl.style.position = 'absolute';
+              liveEl.style.left = '-9999px';
+              liveEl.style.top = 'auto';
+              liveEl.style.width = '1px';
+              liveEl.style.height = '1px';
+              liveEl.style.overflow = 'hidden';
+              document.body.appendChild(liveEl);
+            }
+            liveEl.textContent = `Winner revealed at position ${winnerIndex + 1} of ${DOT_COUNT}`;
+
+            // show modal with details
+            const modal = document.getElementById('winner-modal');
+            const sub = document.getElementById('winner-sub');
+            if (modal && sub) {
+              const lottery = lotteries[currentLotteryIndex] || { name: 'Selected lottery', odds: 0 };
+              const hardness = Math.round(lottery.odds / DOT_COUNT);
+              const percentVis = (100 / DOT_COUNT).toFixed(6);
+              const percentLottery = (100 / lottery.odds).toFixed(8);
+              const spent = attempts * TICKET_PRICE;
+              sub.innerHTML = `Winner: Dot ${winnerIndex + 1} of ${DOT_COUNT} (${percentVis}% chance)<br>` +
+                `Actual lottery odds for ${lottery.name} is 1 out of ${lottery.odds.toLocaleString()} (${percentLottery}% chance).<br>` +
+                `<div style="margin-top:6px;font-weight:700;">You spent $${spent} on guesses</div>`;
+              modal.setAttribute('aria-hidden', 'false');
+              modal.style.display = 'grid';
+            }
+            revealBtn.textContent = '🔄 Reset & Try Again';
+
+            // The winner modal remains visible until the user explicitly
+            // closes it (either via the close button or clicking the overlay).
+            // Auto-reset is intentionally removed so users can inspect the result.
+          }
+
+          // when resetting, clear attempts and classes
+          if (!revealed) {
+            attempts = 0;
+            if (attemptsInfo) attemptsInfo.textContent = `Attempts: ${attempts} ($${attempts * TICKET_PRICE})`;
+          }
+      }
+
+      // Density selector
+      const densitySelect = document.getElementById('dot-density-select');
+      densitySelect.addEventListener('change', (e) => {
+        explicitDensity = e.target.value || 'auto';
+        if (explicitDensity === 'auto') {
+          DOT_COUNT = pickAutoDensity();
+        } else {
+          DOT_COUNT = parseInt(explicitDensity, 10) || 2000;
+        }
+        dotCount.textContent = DOT_COUNT.toLocaleString();
+        scaleRatio.textContent = `1 in ${DOT_COUNT.toLocaleString()}`;
+        renderDots();
+        // updating density affects the `times-harder` calculation — re-run the
+        // visualization update for the currently selected lottery so that the
+        // UI text remains accurate.
+        updateVisualization(parseInt(select.value, 10));
+      });
+
+      // recalc on resize for auto mode
+      window.addEventListener('resize', () => {
+        if (explicitDensity === 'auto') {
+          const next = pickAutoDensity();
+          if (next !== DOT_COUNT) {
+            DOT_COUNT = next;
+            dotCount.textContent = DOT_COUNT.toLocaleString();
+            scaleRatio.textContent = `1 in ${DOT_COUNT.toLocaleString()}`;
+            renderDots();
+          }
+        }
+      });
+
+      // Event listeners
+      select.addEventListener('change', (e) => {
+        updateVisualization(parseInt(e.target.value));
+      });
+
+      revealBtn.addEventListener('click', revealWinner);
+
+      // Share buttons
+      document.getElementById('share-twitter').addEventListener('click', () => {
+        const lottery = lotteries[parseInt(select.value)];
+        const text = `Did you know? Winning ${lottery.name} is a 1 in ${lottery.odds.toLocaleString()} chance. That's ${Math.round(lottery.odds / 500000)}× less likely than being struck by lightning! ⚡🎰`;
+        const url = window.location.href;
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+      });
+
+      document.getElementById('share-copy').addEventListener('click', () => {
+        navigator.clipboard.writeText(window.location.href);
+        const btn = document.getElementById('share-copy');
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => btn.textContent = 'Copy Link', 2000);
+      });
+
+      // Initialize
+      renderDots();
+      // modal close logic: persistent modal until an explicit close by the
+      // user (close button or clicking the overlay). Extracted into a helper
+      // so both handlers reuse the same reset logic.
+      function closeModal() {
+        const modal = document.getElementById('winner-modal');
+        if (modal) {
+          modal.setAttribute('aria-hidden', 'true');
+          modal.style.display = 'none';
+        }
+        // reset UI for another round
+        revealed = false;
+        dotContainer.classList.remove('container-winner');
+        renderDots();
+        revealBtn.textContent = '🔍 Reveal the Winner';
+        // reset attempts when modal closed
+        attempts = 0;
+        // clear any in-flight guess marker when user closes
+        guessInFlight = false;
+        if (attemptsInfo) attemptsInfo.textContent = `Attempts: ${attempts} ($${attempts * TICKET_PRICE})`;
+      }
+
+      const winnerClose = document.getElementById('winner-close');
+      if (winnerClose) winnerClose.addEventListener('click', closeModal);
+
+      // clicking the overlay or outside the card closes the modal too
+      const modalRoot = document.getElementById('winner-modal');
+      if (modalRoot) {
+        modalRoot.addEventListener('click', (ev) => {
+          // if the user clicked directly on the overlay / root element (outside the card)
+          if (ev.target === modalRoot || ev.target.classList.contains('winner-overlay')) closeModal();
+        });
+      }
+      dotCount.textContent = DOT_COUNT.toLocaleString();
+      scaleRatio.textContent = `1 in ${DOT_COUNT.toLocaleString()}`;
+      updateVisualization(0);
+    });
+  </script>
+</InfoLayout>

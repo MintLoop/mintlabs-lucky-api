@@ -1,0 +1,520 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Lucky Birthdate Number Mapper | Convert Birthdays to Lottery Numbers";
+const description = "Transform any birthday into lottery numbers using numerology-inspired methods. Convert dates to Pick-3, Pick-4, Powerball, and Mega Millions number sets.";
+const keywords = "birthday lottery numbers, birth date lucky numbers, numerology lottery, birthday to lottery converter, lucky birthday numbers";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Lucky Birthdate Number Mapper",
+  "description": description,
+  "applicationCategory": "Lottery Tool",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<InfoLayout
+  title="Lucky Birthdate Mapper"
+  subtitle="Turn any birthday into lottery number sets"
+  pageTitle={pageTitle}
+  description={description}
+  keywords={keywords}
+  jsonLd={jsonLd}
+>
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Convert birthdays into lottery numbers using multiple derivation methods.
+      <strong>Fun fact:</strong> Birthday-based numbers (1-31) are actually more commonly played,
+      which means if you win with them, you're more likely to share the jackpot!
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="input-section">
+      <div class="date-input-group">
+        <label for="birthdate">Enter a Birthday:</label>
+        <input type="date" id="birthdate" max="2099-12-31" />
+      </div>
+      
+      <button id="mapBtn" class="map-btn">
+        🎂 Map to Lucky Numbers
+      </button>
+    </div>
+
+    <div id="results" class="results-container"></div>
+  </section>
+
+  <section class="edu-section">
+    <h2>The Birthday Number Paradox</h2>
+    
+    <div class="paradox-card">
+      <div class="paradox-icon">🤔</div>
+      <div class="paradox-content">
+        <h3>Why Birthday Numbers Are Popular (But Not Lucky)</h3>
+        <p>
+          Studies show that <strong>80%+ of lottery players</strong> include at least one birthday 
+          in their numbers. This means numbers 1-31 are heavily overplayed.
+        </p>
+        <p>
+          <strong>The result:</strong> If those numbers hit, you'll share the jackpot with more people. 
+          A $100M jackpot split 10 ways = $10M each. The same jackpot with less popular numbers 
+          might only split 2 ways = $50M each.
+        </p>
+      </div>
+    </div>
+
+    <div class="methods-explainer">
+      <h3>Mapping Methods Explained</h3>
+      
+      <div class="method-grid">
+        <div class="method-card">
+          <h4>📅 Direct Digits</h4>
+          <p>Uses the raw digits from your date: month, day, year components.</p>
+          <p class="example">Example: 07/15/1990 → 7, 15, 19, 90</p>
+        </div>
+        
+        <div class="method-card">
+          <h4>🔢 Numerology Sum</h4>
+          <p>Adds all digits together, reducing to single digits or master numbers.</p>
+          <p class="example">07/15/1990 → 0+7+1+5+1+9+9+0 = 32 → 3+2 = 5</p>
+        </div>
+        
+        <div class="method-card">
+          <h4>🔄 Digit Shuffle</h4>
+          <p>Rearranges date digits using mathematical patterns.</p>
+          <p class="example">Uses modular arithmetic on date components</p>
+        </div>
+        
+        <div class="method-card">
+          <h4>✨ Life Path Number</h4>
+          <p>Classic numerology calculation used as a seed for generation.</p>
+          <p class="example">Creates variety by combining with other date elements</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="disclaimer-box">
+      <h3>⚠️ Important Reality Check</h3>
+      <p>
+        <strong>These numbers have no special power.</strong> Numerology is entertainment, not science. 
+        Every lottery combination has exactly the same mathematical probability of winning.
+        Birthday-derived numbers are no more or less "lucky" than any random set.
+      </p>
+      <p>
+        Using meaningful dates can make playing more fun—just know that the universe isn't 
+        keeping track of your birthday or reading your horoscope.
+      </p>
+    </div>
+  </section>
+</InfoLayout>
+
+<style>
+  .tool-section {
+    padding: 2rem;
+    background: var(--surface);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+  }
+
+  .input-section {
+    max-width: 400px;
+    margin: 0 auto 2rem;
+    text-align: center;
+  }
+
+  .date-input-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .date-input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .date-input-group input {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.25rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    text-align: center;
+  }
+
+  .date-input-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .map-btn {
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+  }
+
+  .map-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+  }
+
+  .map-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .results-container {
+    min-height: 100px;
+  }
+
+  .results-container:empty::before {
+    content: "Enter a birthday to see your lucky numbers";
+    display: block;
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem;
+    font-style: italic;
+  }
+
+  .result-game {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--bg);
+    border-radius: 12px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-game h4 {
+    margin-bottom: 1rem;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .number-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .number-ball {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-radius: 50%;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  }
+
+  .number-ball.bonus {
+    background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+  }
+
+  .method-tag {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+
+  .edu-section {
+    padding: 2rem;
+  }
+
+  .edu-section h2 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .paradox-card {
+    display: flex;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: var(--surface);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border-left: 4px solid #f59e0b;
+  }
+
+  .paradox-icon {
+    font-size: 3rem;
+    flex-shrink: 0;
+  }
+
+  .paradox-content h3 {
+    margin-bottom: 0.75rem;
+    color: #f59e0b;
+  }
+
+  .paradox-content p {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .paradox-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .methods-explainer {
+    margin-bottom: 2rem;
+  }
+
+  .methods-explainer h3 {
+    margin-bottom: 1rem;
+  }
+
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .method-card {
+    padding: 1.25rem;
+    background: var(--surface);
+    border-radius: 8px;
+  }
+
+  .method-card h4 {
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+  }
+
+  .method-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  .method-card .example {
+    font-family: monospace;
+    background: var(--bg);
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+
+  .disclaimer-box {
+    padding: 1.5rem;
+    background: var(--surface);
+    border-radius: 12px;
+    border-left: 4px solid #ef4444;
+  }
+
+  .disclaimer-box h3 {
+    margin-bottom: 0.75rem;
+    color: #ef4444;
+  }
+
+  .disclaimer-box p {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .disclaimer-box p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 600px) {
+    .paradox-card {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .number-ball {
+      width: 38px;
+      height: 38px;
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const birthdateInput = document.getElementById('birthdate') as HTMLInputElement;
+    const mapBtn = document.getElementById('mapBtn') as HTMLButtonElement;
+    const resultsContainer = document.getElementById('results') as HTMLDivElement;
+
+    // Set default to a sample date
+    const today = new Date();
+    birthdateInput.value = `${today.getFullYear() - 30}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    function reduceToDigit(num: number): number {
+      while (num > 9 && num !== 11 && num !== 22 && num !== 33) {
+        num = String(num).split('').reduce((a, b) => a + parseInt(b), 0);
+      }
+      return num;
+    }
+
+    function getLifePathNumber(month: number, day: number, year: number): number {
+      const m = reduceToDigit(month);
+      const d = reduceToDigit(day);
+      const y = reduceToDigit(year);
+      return reduceToDigit(m + d + y);
+    }
+
+    function seededRandom(seed: number): () => number {
+      return function() {
+        seed = (seed * 9301 + 49297) % 233280;
+        return seed / 233280;
+      };
+    }
+
+    function generatePowerball(month: number, day: number, year: number): { main: number[], bonus: number, method: string } {
+      const lifePath = getLifePathNumber(month, day, year);
+      const seed = month * 10000 + day * 100 + (year % 100) + lifePath;
+      const rng = seededRandom(seed);
+      
+      const main: number[] = [];
+      while (main.length < 5) {
+        const num = Math.floor(rng() * 69) + 1;
+        if (!main.includes(num)) main.push(num);
+      }
+      main.sort((a, b) => a - b);
+      
+      const bonus = Math.floor(rng() * 26) + 1;
+      
+      return { main, bonus, method: 'Life Path + Date Seed' };
+    }
+
+    function generateMegaMillions(month: number, day: number, year: number): { main: number[], bonus: number, method: string } {
+      const dateSum = month + day + (year % 100);
+      const seed = dateSum * 31 + day * month;
+      const rng = seededRandom(seed * 7);
+      
+      const main: number[] = [];
+      while (main.length < 5) {
+        const num = Math.floor(rng() * 70) + 1;
+        if (!main.includes(num)) main.push(num);
+      }
+      main.sort((a, b) => a - b);
+      
+      const bonus = Math.floor(rng() * 25) + 1;
+      
+      return { main, bonus, method: 'Date Sum Algorithm' };
+    }
+
+    function generatePick3(month: number, day: number, year: number): { numbers: number[], method: string } {
+      // Direct extraction
+      const d1 = day % 10;
+      const d2 = Math.floor(day / 10) || month % 10;
+      const d3 = (month + (year % 10)) % 10;
+      
+      return { numbers: [d1, d2, d3], method: 'Direct Digit Extraction' };
+    }
+
+    function generatePick4(month: number, day: number, year: number): { numbers: number[], method: string } {
+      const yearShort = year % 100;
+      const d1 = month % 10;
+      const d2 = Math.floor(month / 10) || day % 10;
+      const d3 = day % 10;
+      const d4 = Math.floor(yearShort / 10);
+      
+      return { numbers: [d1, d2, d3, d4], method: 'Date Component Split' };
+    }
+
+    function generateNumerologySet(month: number, day: number, year: number): { numbers: number[], method: string } {
+      const lifePath = getLifePathNumber(month, day, year);
+      const monthNum = reduceToDigit(month);
+      const dayNum = reduceToDigit(day);
+      const yearNum = reduceToDigit(year);
+      const destiny = reduceToDigit(month + day + year);
+      const personal = reduceToDigit(month + day);
+      
+      return { 
+        numbers: [lifePath, monthNum, dayNum, yearNum, destiny, personal].filter((v, i, a) => a.indexOf(v) === i).slice(0, 6),
+        method: 'Classic Numerology Derivation' 
+      };
+    }
+
+    function mapBirthdate() {
+      const dateValue = birthdateInput.value;
+      if (!dateValue) return;
+      
+      const [year, month, day] = dateValue.split('-').map(Number);
+      
+      const powerball = generatePowerball(month, day, year);
+      const megaMillions = generateMegaMillions(month, day, year);
+      const pick3 = generatePick3(month, day, year);
+      const pick4 = generatePick4(month, day, year);
+      const numerology = generateNumerologySet(month, day, year);
+      
+      resultsContainer.innerHTML = `
+        <div class="result-game" style="animation-delay: 0s">
+          <h4>🔴 Powerball Numbers</h4>
+          <div class="number-row">
+            ${powerball.main.map(n => `<div class="number-ball">${n}</div>`).join('')}
+            <div class="number-ball bonus">${powerball.bonus}</div>
+          </div>
+          <div class="method-tag">Method: ${powerball.method}</div>
+        </div>
+        
+        <div class="result-game" style="animation-delay: 0.1s">
+          <h4>🟡 Mega Millions Numbers</h4>
+          <div class="number-row">
+            ${megaMillions.main.map(n => `<div class="number-ball">${n}</div>`).join('')}
+            <div class="number-ball bonus">${megaMillions.bonus}</div>
+          </div>
+          <div class="method-tag">Method: ${megaMillions.method}</div>
+        </div>
+        
+        <div class="result-game" style="animation-delay: 0.2s">
+          <h4>3️⃣ Pick-3 Numbers</h4>
+          <div class="number-row">
+            ${pick3.numbers.map(n => `<div class="number-ball">${n}</div>`).join('')}
+          </div>
+          <div class="method-tag">Method: ${pick3.method}</div>
+        </div>
+        
+        <div class="result-game" style="animation-delay: 0.3s">
+          <h4>4️⃣ Pick-4 Numbers</h4>
+          <div class="number-row">
+            ${pick4.numbers.map(n => `<div class="number-ball">${n}</div>`).join('')}
+          </div>
+          <div class="method-tag">Method: ${pick4.method}</div>
+        </div>
+        
+        <div class="result-game" style="animation-delay: 0.4s">
+          <h4>✨ Numerology Lucky Numbers</h4>
+          <div class="number-row">
+            ${numerology.numbers.map(n => `<div class="number-ball">${n}</div>`).join('')}
+          </div>
+          <div class="method-tag">Method: ${numerology.method}</div>
+        </div>
+      `;
+    }
+
+    mapBtn.addEventListener('click', mapBirthdate);
+    birthdateInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') mapBirthdate();
+    });
+  });
+</script>

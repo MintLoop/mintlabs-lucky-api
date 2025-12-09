@@ -1,0 +1,204 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Ticket Variance Calculator — Lottery Outcome Range";
+const description = "Estimate the variance (range) of lottery outcomes across draws and tickets. Useful for understanding how variable 'rare events' can be even with repeated plays.";
+const keywords = "lottery variance, variance calculator, lottery outcome range, ticket variance";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Ticket Variance Calculator",
+  "description": description,
+  "applicationCategory": "CalculatorApplication",
+  "operatingSystem": "Any"
+};
+---
+
+<InfoLayout title="Ticket Variance Calculator" subtitle="Measure outcome range across draws and tickets" pageTitle={pageTitle} description={description} keywords={keywords} jsonLd={jsonLd}>
+
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Use this calculator to estimate the expected number of wins and the variance (spread) across many simulated runs of a lottery schedule. Great for visualizing why even "unlikely" events sometimes happen in the short term.
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="grid">
+      <div class="inputs">
+        <label>Preset odds</label>
+        <select id="preset">
+          <option value="custom">Custom</option>
+          <option value="powerball">Powerball — 1 in 292,201,338</option>
+          <option value="megamillions">Mega Millions — 1 in 302,575,350</option>
+          <option value="demo">Demo — 1 in 1,000</option>
+        </select>
+
+        <label>Odds (1 in X) — individual ticket</label>
+        <input id="odds" type="number" value="1000" min="1" />
+
+        <label>Tickets per draw</label>
+        <input id="ticketsPerDraw" type="number" value="5" min="1" />
+
+        <label>Draws</label>
+        <input id="draws" type="number" value="52" min="1" />
+
+        <label>Number of simulated trials</label>
+        <input id="trials" type="number" value="5000" min="10" />
+
+        <button id="compute" class="action-btn primary">Run Simulation</button>
+      </div>
+
+      <div class="results">
+        <h3>Results</h3>
+        <div class="result-row"><strong>Total tickets:</strong> <span id="totalTickets">—</span></div>
+        <div class="result-row"><strong>Theoretical mean (wins):</strong> <span id="mean">—</span></div>
+        <div class="result-row"><strong>Theoretical variance:</strong> <span id="variance">—</span></div>
+        <div class="result-row"><strong>Theoretical stddev:</strong> <span id="stddev">—</span></div>
+        <div class="result-row"><strong>Chance of ≥1 win:</strong> <span id="chanceOne">—</span></div>
+
+        <h4 class="mt-3">Simulation summary</h4>
+        <div class="result-row"><strong>Simulated mean:</strong> <span id="simMean">—</span></div>
+        <div class="result-row"><strong>Simulated variance:</strong> <span id="simVar">—</span></div>
+        <div class="result-row"><strong>Simulated pct with ≥1 win:</strong> <span id="simPctOne">—</span></div>
+
+        <div class="histogram" id="histogram"></div>
+
+        <p class="explain">Notes: For rare-event games (huge denominators like Powerball) the expected wins will be near zero — simulations then illustrate how variability can still produce occasional wins. Change the odds or increase tickets/draws to see different behavior.</p>
+      </div>
+    </div>
+  </section>
+
+</InfoLayout>
+
+<style>
+  .grid { display:grid; grid-template-columns: 320px 1fr; gap:1.25rem }
+  .inputs, .results { background:var(--bg-card); border:1px solid var(--border-primary); padding:1rem; border-radius:10px }
+  input, select { width:100%; padding:0.6rem; margin-bottom:0.75rem; border-radius:8px; border:1px solid var(--border-primary) }
+  .result-row { margin-bottom:0.5rem }
+  .explain { margin-top:0.75rem; color:var(--text-muted); font-size:0.95rem }
+
+  .histogram { display:flex; gap:3px; align-items:flex-end; height:160px; margin-top:0.75rem; border-top:1px dashed var(--border-primary); padding-top:0.75rem }
+  .histogram .bar { background:linear-gradient(180deg,var(--accent) 0%, rgba(255,255,255,0.05) 100%); height:10%; width:12px; border-radius:3px; }
+  .histogram .label { font-size:0.75rem; text-align:center; color:var(--text-secondary); margin-top:0.5rem }
+
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  // utility
+  function pct(v) { return `${(v*100).toFixed(2)}%`; }
+
+  // simple Poisson sampler for lambda (Knuth) — useful when p is small and n large
+  function randPoisson(lambda) {
+    const L = Math.exp(-lambda);
+    let k = 0;
+    let p = 1;
+    while (p > L) {
+      k++;
+      p *= Math.random();
+    }
+    return k - 1;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const preset = document.getElementById('preset');
+    const odds = document.getElementById('odds');
+    const ticketsPerDraw = document.getElementById('ticketsPerDraw');
+    const draws = document.getElementById('draws');
+    const trials = document.getElementById('trials');
+    const compute = document.getElementById('compute');
+
+    const totalTicketsEl = document.getElementById('totalTickets');
+    const meanEl = document.getElementById('mean');
+    const varianceEl = document.getElementById('variance');
+    const stddevEl = document.getElementById('stddev');
+    const chanceOneEl = document.getElementById('chanceOne');
+    const simMeanEl = document.getElementById('simMean');
+    const simVarEl = document.getElementById('simVar');
+    const simPctOneEl = document.getElementById('simPctOne');
+    const histogramEl = document.getElementById('histogram');
+
+    preset.addEventListener('change', () => {
+      const v = preset.value;
+      if (v === 'powerball') odds.value = '292201338';
+      else if (v === 'megamillions') odds.value = '302575350';
+      else if (v === 'demo') odds.value = '1000';
+      else odds.value = '1000';
+    });
+
+    function clearHistogram() { histogramEl.innerHTML = ''; }
+
+    function renderHistogram(counts) {
+      clearHistogram();
+      if (!counts || counts.length === 0) return;
+      const max = Math.max(...counts);
+      const totalBars = counts.length;
+      counts.forEach((c, i) => {
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        const height = max ? Math.round((c / max) * 100) : 2;
+        bar.style.height = height + '%';
+        bar.title = `${i}: ${c}`;
+        histogramEl.appendChild(bar);
+      });
+    }
+
+    compute.addEventListener('click', async () => {
+      const p = 1 / Math.max(1, Number(odds.value || 1));
+      const tpd = Math.max(1, Number(ticketsPerDraw.value || 1));
+      const nd = Math.max(1, Number(draws.value || 1));
+      const nTrials = Math.max(10, Number(trials.value || 1000));
+
+      const nTotal = tpd * nd;
+      totalTicketsEl.textContent = String(nTotal);
+
+      // Theoretical: Binomial(nTotal, p)
+      const mean = nTotal * p;
+      const variance = nTotal * p * (1 - p);
+      const stddev = Math.sqrt(variance);
+      const chanceOne = 1 - Math.pow(1 - p, nTotal);
+
+      meanEl.textContent = mean.toFixed(6);
+      varianceEl.textContent = variance.toExponential(6);
+      stddevEl.textContent = stddev.toFixed(6);
+      chanceOneEl.textContent = pct(chanceOne);
+
+      // simulation: sample from Poisson with lambda = nTotal * p in each trial
+      const lambda = nTotal * p;
+      const countsMap = new Map();
+      let simSum = 0;
+      let simSum2 = 0;
+      let countAtLeastOne = 0;
+      for (let i = 0; i < nTrials; i++) {
+        // choose sampler: if lambda small use Poisson, otherwise sample approx via gaussian or binomial
+        let val;
+        if (lambda < 200) {
+          val = randPoisson(lambda);
+        } else {
+          // gaussian approx
+          const approx = Math.round(Math.max(0, lambda + Math.sqrt(lambda) * (Math.random()*2-1)));
+          val = approx;
+        }
+        simSum += val;
+        simSum2 += val * val;
+        if (val >= 1) countAtLeastOne++;
+        countsMap.set(val, (countsMap.get(val) || 0) + 1);
+      }
+
+      const simMean = simSum / nTrials;
+      const simVar = (simSum2 / nTrials) - (simMean * simMean);
+
+      simMeanEl.textContent = simMean.toFixed(4);
+      simVarEl.textContent = simVar.toFixed(4);
+      simPctOneEl.textContent = pct(countAtLeastOne / nTrials);
+
+      // build histogram limited to a reasonable number of bins
+      const keys = Array.from(countsMap.keys()).sort((a, b) => a - b);
+      const maxKey = Math.min(15, keys.length ? keys[keys.length - 1] : 0);
+      const counts = [];
+      for (let k = 0; k <= maxKey; k++) counts.push(countsMap.get(k) || 0);
+      renderHistogram(counts);
+    });
+  });
+</script>

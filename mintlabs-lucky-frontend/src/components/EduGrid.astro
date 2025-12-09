@@ -1,26 +1,170 @@
-<section class="grid gap-3 md:grid-cols-3 mt-6" id="edu">
-  <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
-    <h3 class="font-semibold mb-1"><a href="/lottery-odds#independence" class="text-emerald-400 hover:text-emerald-300">Independence</a></h3>
-    <p class="text-sm theme-text-secondary">Each draw is independent. Past results don't change next odds.</p>
-  </article>
-  <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
-    <h3 class="font-semibold mb-1"><a href="/lottery-odds#gamblers-fallacy" class="text-emerald-400 hover:text-emerald-300">Gambler's fallacy</a></h3>
-    <p class="text-sm theme-text-secondary">"Due" numbers are a myth. Clusters happen in random data.</p>
-  </article>
-  <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
-    <h3 class="font-semibold mb-1"><a href="/lottery-odds#sum-range-filter" class="text-emerald-400 hover:text-emerald-300">Sum bands</a></h3>
-    <p class="text-sm theme-text-secondary">Sums cluster near the middle. Filters change patterns, not odds.</p>
-  </article>
-  <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
-    <h3 class="font-semibold mb-1"><a href="/lottery-odds#repeats-filter" class="text-emerald-400 hover:text-emerald-300">Repeats</a></h3>
-    <p class="text-sm theme-text-secondary">Numbers can repeat across draws. No statistical advantage to avoiding them.</p>
-  </article>
-  <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
-    <h3 class="font-semibold mb-1"><a href="/lottery-odds#consecutive-filter" class="text-emerald-400 hover:text-emerald-300">Consecutive</a></h3>
-    <p class="text-sm theme-text-secondary">Sequences like 14-15-16 occur randomly. They're equally likely as any other combination.</p>
-  </article>
-  <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
-    <h3 class="font-semibold mb-1"><a href="/lottery-odds?utm_source=generator&utm_medium=internal&utm_campaign=edu" class="text-emerald-400 hover:text-emerald-300">Learn More</a></h3>
-    <p class="text-sm theme-text-secondary">Complete guide to lottery odds and probability</p>
-  </article>
+---
+import TrackLink from "./TrackLink.astro";
+---
+
+<section class="mt-6" id="edu">
+  {/* Education teasers */}
+  <h3 class="text-sm font-semibold theme-text-secondary mb-3 flex items-center gap-2">
+    <span>📚</span> Learn About Lottery
+  </h3>
+  <div class="grid gap-3 md:grid-cols-3">
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><a href="/lottery-odds#independence" class="text-emerald-400 hover:text-emerald-300">Independence</a></h4>
+      <p class="text-sm theme-text-secondary">Each draw is independent — past results don't alter odds.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><a href="/lottery-odds#gamblers-fallacy" class="text-emerald-400 hover:text-emerald-300">Gambler's fallacy</a></h4>
+      <p class="text-sm theme-text-secondary">No "due" numbers — clusters can appear in truly random data.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><a href="/lottery-math" class="text-emerald-400 hover:text-emerald-300">The Math</a></h4>
+      <p class="text-sm theme-text-secondary">Combinations, expected value, and probability formulas explained simply.</p>
+    </article>
+  </div>
+
+  {/* Core Tools */}
+  <h3 class="text-sm font-semibold theme-text-secondary mb-3 mt-6 flex items-center gap-2">
+    <span>🔧</span> Core Tools
+  </h3>
+  <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/payout-calculator" class="text-blue-400 hover:text-blue-300" event="tool_card_click" props={{ tool: 'payout-calculator' }}>💰 Payout Calculator</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Estimate your take-home payout after taxes and deductions.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/lottery-budget" class="text-blue-400 hover:text-blue-300" event="tool_card_click" props={{ tool: 'lottery-budget' }}>📅 Budget Planner</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Estimate the long-term cost of regular lottery spending.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/odds-comparison" class="text-emerald-400 hover:text-emerald-300" event="tool_card_click" props={{ tool: 'odds-comparison' }}>📊 Odds Comparison</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Quickly compare odds across popular lottery games.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/expected-value-calculator" class="text-purple-400 hover:text-purple-300" event="tool_card_click" props={{ tool: 'expected-value-calculator' }}>🧮 Expected Value Calc</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Compute expected value per ticket using prize and odds inputs.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/jackpot-split-calculator" class="text-green-400 hover:text-green-300" event="tool_card_click" props={{ tool: 'jackpot-split-calculator' }}>💰 Jackpot Split Calc</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Estimate how jackpot splits affect each winner's payout.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/break-even" class="text-rose-400 hover:text-rose-300" event="tool_card_click" props={{ tool: 'break-even' }}>🧮 Break-Even Calc</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Find when ticket purchases reach break-even expected value.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/combination-calculator" class="text-indigo-400 hover:text-indigo-300" event="tool_card_click" props={{ tool: 'combination-calculator' }}>🔢 Combination Calc</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Compute combinations C(n,k) for any lottery game quickly.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/quick-draw-simulator" class="text-teal-400 hover:text-teal-300" event="tool_card_click" props={{ tool: 'quick-draw-simulator' }}>🎲 Quick Draw Simulator</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Run quick random draw simulations for practice and insight.</p>
+    </article>
+  </div>
+
+    <!-- moved: helper/calculator cards are included in the category grids below -->
+
+  {/* Analysis Tools */}
+  <h3 class="text-sm font-semibold theme-text-secondary mb-3 mt-6 flex items-center gap-2">
+    <span>🔍</span> Number Analysis
+  </h3>
+  <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/pattern-analyzer" class="text-purple-400 hover:text-purple-300" event="tool_card_click" props={{ tool: 'pattern-analyzer' }}>🔢 Pattern Analyzer</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Examine statistical properties of your chosen numbers.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/ticket-variance" class="text-sky-400 hover:text-sky-300" event="tool_card_click" props={{ tool: 'ticket-variance' }}>📈 Ticket Variance Calculator</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Visualize expected variance across many tickets and draw outcomes.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/hot-cold-numbers" class="text-amber-400 hover:text-amber-300" event="tool_card_click" props={{ tool: 'hot-cold-numbers' }}>🔥 Hot & Cold Numbers</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">View historical frequency — hot and cold numbers over time.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/common-combo-checker" class="text-red-400 hover:text-red-300" event="tool_card_click" props={{ tool: 'common-combo-checker' }}>📊 Common Combo Checker</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Check whether your combination is commonly selected by players.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/repeat-checker" class="text-cyan-400 hover:text-cyan-300" event="tool_card_click" props={{ tool: 'repeat-checker' }}>🔄 Repeat Checker</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Check historical repeats of your numbers across past draws.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/heatmap" class="text-orange-400 hover:text-orange-300" event="tool_card_click" props={{ tool: 'heatmap' }}>🗺️ Number Heatmap</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Heatmap showing frequency distribution of all numbers.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/why-odds-dont-change" class="text-emerald-400 hover:text-emerald-300" event="tool_card_click" props={{ tool: 'why-odds-dont-change' }}>🎲 Why Odds Don't Change</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Interactive demo proving past results don't affect future odds.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/number-trend-graph" class="text-indigo-400 hover:text-indigo-300" event="tool_card_click" props={{ tool: 'number-trend-graph' }}>📈 Number Trend Graph</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Track frequency trends for lottery numbers over time.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/most-drawn-numbers" class="text-orange-400 hover:text-orange-300" event="tool_card_click" props={{ tool: 'most-drawn-numbers' }}>🔥 Most Drawn Numbers</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Top 10 most frequently appearing lottery numbers.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/least-drawn-numbers" class="text-sky-400 hover:text-sky-300" event="tool_card_click" props={{ tool: 'least-drawn-numbers' }}>❄️ Least Drawn Numbers</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Top 10 least frequently appearing lottery numbers.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/expected-loss-over-years" class="text-blue-400 hover:text-blue-300" event="tool_card_click" props={{ tool: 'expected-loss-over-years' }}>📉 Expected Loss (Years)</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Estimate expected monetary loss over years of regular play.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/annuity-breakdown" class="text-blue-400 hover:text-blue-300" event="tool_card_click" props={{ tool: 'annuity-breakdown' }}>📆 Annuity Visualizer</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Visualize annuity payouts, taxes, and present value over time.</p>
+    </article>
+  </div>
+
+  {/* Fun Tools */}
+  <h3 class="text-sm font-semibold theme-text-secondary mb-3 mt-6 flex items-center gap-2">
+    <span>🎮</span> Fun & Games
+  </h3>
+  <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/number-wheel" class="text-amber-400 hover:text-amber-300" event="tool_card_click" props={{ tool: 'number-wheel' }}>🎡 Number Wheel</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Spin to generate random number picks instantly.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/birthdate-mapper" class="text-pink-400 hover:text-pink-300" event="tool_card_click" props={{ tool: 'birthdate-mapper' }}>🎂 Birthdate Mapper</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Map birthdays into lottery-friendly number selections.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/ticket-beautifier" class="text-violet-400 hover:text-violet-300" event="tool_card_click" props={{ tool: 'ticket-beautifier' }}>✨ Ticket Beautifier</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Create and export shareable ticket graphics.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/winning-chance" class="text-green-400 hover:text-green-300" event="tool_card_click" props={{ tool: 'winning-chance' }}>🎰 Win Simulator</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Simulate annual win chance when playing weekly for a year.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/lottery-math-quiz" class="text-fuchsia-400 hover:text-fuchsia-300" event="tool_card_click" props={{ tool: 'lottery-math-quiz' }}>🧠 Lottery Math Quiz</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Test your lottery knowledge with interactive flash cards.</p>
+    </article>
+  </div>
+
+  {/* Quick Generators */}
+  <h3 class="text-sm font-semibold theme-text-secondary mb-3 mt-6 flex items-center gap-2">
+    <span>🎲</span> Quick Generators
+  </h3>
+  <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/pick-generator" class="text-teal-400 hover:text-teal-300" event="tool_card_click" props={{ tool: 'pick-generator' }}>3️⃣ Pick-3/Pick-4</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Generate quick picks for daily number games.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/probability-visualizer" class="text-rose-400 hover:text-rose-300" event="tool_card_click" props={{ tool: 'probability-visualizer' }}>📉 Probability Viz</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Compare lottery odds to real-world analogies and events.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><TrackLink href="/tools/how-rare-is-this" class="text-purple-400 hover:text-purple-300" event="tool_card_click" props={{ tool: 'how-rare-is-this' }}>🔎 How Rare Is This?</TrackLink></h4>
+      <p class="text-sm theme-text-secondary">Convert odds into percent, per-million, and relatable analogies.</p>
+    </article>
+    <article class="theme-bg-card p-4 rounded-xl hover:bg-slate-800/80 transition-colors">
+      <h4 class="font-semibold mb-1"><a href="/faq" class="text-purple-400 hover:text-purple-300">❓ FAQ</a></h4>
+      <p class="text-sm theme-text-secondary">Clear answers to common questions about lottery odds.</p>
+    </article>
+  </div>
 </section>

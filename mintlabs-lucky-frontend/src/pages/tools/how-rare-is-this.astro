@@ -1,0 +1,177 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "How Rare Is This? — Probability Converter & Analogy";
+const description = "Convert odds into plain English: percent, per-million, and comparisons to common real-world events and lotteries like Powerball or Mega Millions.";
+const keywords = "how rare is this, odds converter, probability converter, lottery comparisons, powerball, mega millions";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "How Rare Is This? — Probability Converter",
+  "description": description,
+  "applicationCategory": "Tool",
+  "operatingSystem": "Any"
+};
+---
+
+<InfoLayout title="How Rare Is This?" subtitle="Odds → plain language, % → comparisons" pageTitle={pageTitle} description={description} keywords={keywords} jsonLd={jsonLd}>
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Ever wonder what "1 in 1,000,000" actually means? This tool converts odds into percentages, frequency per million, and compares them to lotteries and everyday events so you can understand scale.
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="converter">
+      <div class="controls">
+        <label for="presets">Pick a real-world event</label>
+        <select id="presets">
+          <option value="custom">— Enter your own odds —</option>
+          <option value="lightning">Struck by lightning (per year, approx 1 in 1,222,000)</option>
+          <option value="shark">Shark attack (death, approx 1 in 3,748,067)</option>
+          <option value="royal">Royal flush (poker hand, 1 in 649,740)</option>
+          <option value="powerball">Win Powerball jackpot (1 in 292,201,338)</option>
+          <option value="mega">Win Mega Millions jackpot (1 in 302,575,350)</option>
+        </select>
+
+        <div class="or">OR</div>
+
+        <label for="oddsInput">Enter odds (format: 1 in X)</label>
+        <input id="oddsInput" placeholder="1 in 1000000" value="1 in 1000000" />
+
+        <label for="percentInput">Or enter probability (%)</label>
+        <input id="percentInput" placeholder="0.0001" />
+
+        <button id="convertBtn" class="action-btn primary">Convert</button>
+      </div>
+
+      <div class="results">
+        <h3>Converted</h3>
+        <div class="result-row"><strong>Odds:</strong> <span id="oddsOut">—</span></div>
+        <div class="result-row"><strong>Percent:</strong> <span id="pctOut">—</span></div>
+        <div class="result-row"><strong>Per million:</strong> <span id="perMOut">—</span></div>
+        <h4>Contextual comparisons</h4>
+        <div id="comparisons"></div>
+      </div>
+    </div>
+
+    <div class="educational">
+      <h4>How to use</h4>
+      <p>
+        Pick a real-world event or enter your own odds. This tool shows multiple representations and compares the event to lotteries and other common chances so you get an intuitive sense of scale.
+      </p>
+    </div>
+  </section>
+</InfoLayout>
+
+<style>
+  .converter { display:flex; gap:2rem; align-items:flex-start; }
+  .controls { flex: 1; background:var(--bg-card); border:1px solid var(--border-primary); padding:1.25rem; border-radius:10px }
+  .results { flex: 1; background:var(--bg-card); border:1px solid var(--border-primary); padding:1.25rem; border-radius:10px }
+  .or { text-align:center; color:var(--text-muted); margin:0.75rem 0 }
+  input, select { width:100%; padding:0.6rem; border-radius:8px; border:1px solid var(--border-primary); margin-bottom:0.75rem }
+  .result-row { margin-bottom:0.5rem }
+  .educational { margin-top:1.5rem; background:var(--bg-card); padding:1rem; border-radius:8px; border:1px solid var(--border-primary) }
+</style>
+
+<script>
+  // small helper conversions
+  function parseOddsString(s) {
+    // accept "1 in X" or just X
+    const m = String(s).trim().toLowerCase().match(/1\s*in\s*([0-9,\.]+)/);
+    if (m) return Number(String(m[1]).replace(/,/g, '')) || null;
+    // try number alone
+    const n = Number(String(s).replace(/,/g, ''));
+    return isFinite(n) && n > 0 ? n : null;
+  }
+
+  function oddsToPct(oneInX) {
+    if (!oneInX || oneInX <= 0) return 0;
+    return (1 / oneInX) * 100;
+  }
+
+  function pctToOdds(pct) {
+    if (!pct || pct <= 0) return null;
+    return 1 / (pct / 100);
+  }
+
+  const presets = {
+    lightning: 1222000,
+    shark: 3748067,
+    royal: 649740,
+    powerball: 292201338,
+    mega: 302575350
+  };
+
+  function renderComparisons(oneInX) {
+    const el = document.getElementById('comparisons');
+    el.innerHTML = '';
+
+    const pk = [{ id: 'powerball', label: 'Powerball jackpot', odds: presets.powerball }, { id: 'mega', label: 'Mega Millions jackpot', odds: presets.mega }];
+    pk.forEach(p => {
+      const ratio = (p.odds / oneInX);
+      const times = ratio >= 1 ? `${Math.round(ratio)}× more likely` : `${(1/ratio).toFixed(2)}× less likely`;
+      const row = document.createElement('div');
+      row.innerHTML = `<strong>${p.label} (${formatOdds(p.odds)})</strong>: ${times}`;
+      el.appendChild(row);
+    });
+
+    // a few interesting comparators
+    const others = [
+      { name: 'Royal flush (poker)', odds: presets.royal },
+      { name: 'Struck by lightning (per year)', odds: presets.lightning },
+      { name: 'Shark attack (fatal)', odds: presets.shark },
+    ];
+    others.forEach(o => {
+      const ratio = (o.odds / oneInX);
+      const times = ratio >= 1 ? `${Math.round(ratio)}× more likely` : `${(1/ratio).toFixed(2)}× less likely`;
+      const row = document.createElement('div');
+      row.innerHTML = `<em>${o.name}</em> (${formatOdds(o.odds)}) — ${times}`;
+      el.appendChild(row);
+    });
+  }
+
+  function formatOdds(n) { return `1 in ${Number(n).toLocaleString()}`; }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const presetsSelect = document.getElementById('presets');
+    const oddsInput = document.getElementById('oddsInput');
+    const pctInput = document.getElementById('percentInput');
+    const convertBtn = document.getElementById('convertBtn');
+
+    presetsSelect.addEventListener('change', (e) => {
+      const v = presetsSelect.value;
+      if (v === 'custom') return;
+      const val = presets[v];
+      oddsInput.value = `1 in ${val.toLocaleString()}`;
+      pctInput.value = '';
+      // auto-convert
+      convert();
+    });
+
+    function convert() {
+      let inputOdds = parseOddsString(oddsInput.value);
+      let pct = parseFloat((pctInput.value || '').toString());
+
+      if (!inputOdds && pct) {
+        inputOdds = pctToOdds(pct);
+      }
+
+      if (!inputOdds || !isFinite(inputOdds)) {
+        alert('Please enter valid odds like "1 in 1000000" or a percent');
+        return;
+      }
+
+      const pctVal = oddsToPct(inputOdds);
+      const perMillion = (1 / inputOdds) * 1e6;
+
+      document.getElementById('oddsOut').textContent = formatOdds(inputOdds);
+      document.getElementById('pctOut').textContent = `${pctVal.toPrecision(pctVal >= 1 ? 4 : 4)}%`;
+      document.getElementById('perMOut').textContent = `${Number(perMillion).toLocaleString(undefined, { maximumFractionDigits: 2 })} per million`;
+      renderComparisons(inputOdds);
+    }
+
+    convertBtn.addEventListener('click', convert);
+  });
+</script>

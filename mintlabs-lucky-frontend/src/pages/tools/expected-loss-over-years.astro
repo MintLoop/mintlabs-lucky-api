@@ -1,0 +1,114 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Expected Loss Over X Years | Lottery Cost vs Return";
+const description = "Estimate the expected loss over a period of time when playing the lottery regularly. Includes tickets-per-draw, draws-per-week, jackpot odds and expected value math.";
+const keywords = "expected loss lottery, long-term lottery cost, expected value, lottery EV, how much losing lottery";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Expected Loss Over X Years",
+  "description": description,
+  "applicationCategory": "CalculatorApplication",
+  "operatingSystem": "Any"
+};
+---
+
+<InfoLayout title="Expected Loss Over X Years" subtitle="How much will you expect to lose if you play regularly?" pageTitle={pageTitle} description={description} keywords={keywords} jsonLd={jsonLd}>
+
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Use this calculator to estimate the expected loss (negative expected value) across a number of years if you purchase lottery tickets on a schedule. Includes a simple explanation and examples for Powerball / Mega Millions.
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="grid">
+      <div class="inputs">
+        <label>Ticket price (each)</label>
+        <input id="ticketPrice" type="number" value="2" min="0" step="0.01" />
+
+        <label>Tickets per draw</label>
+        <input id="ticketsPerDraw" type="number" value="1" min="1" />
+
+        <label>Draws per week</label>
+        <input id="drawsPerWeek" type="number" value="2" min="0" />
+
+        <label>Years</label>
+        <input id="years" type="number" value="1" min="0" />
+
+        <label>Odds (1 in X) — jackpot</label>
+        <input id="odds" type="number" value="292201338" min="1" />
+
+        <label>Expected jackpot payout (approx; after taxes)</label>
+        <input id="jackpotPayout" type="number" value="500000000" min="0" />
+
+        <button id="calculate" class="action-btn primary">Calculate Expected Loss</button>
+      </div>
+
+      <div class="results">
+        <h3>Results</h3>
+        <div class="result-row"><strong>Total tickets bought:</strong> <span id="ticketsBought">—</span></div>
+        <div class="result-row"><strong>Total cost:</strong> <span id="totalCost">—</span></div>
+        <div class="result-row"><strong>Expected jackpot wins:</strong> <span id="expectedWins">—</span></div>
+        <div class="result-row"><strong>Expected jackpot return:</strong> <span id="expectedReturn">—</span></div>
+        <div class="result-row"><strong>Expected loss (net)</strong> <span id="expectedLoss">—</span></div>
+        <div class="explain">Expected values are averages — most players will lose the full cost and rarely win. Use this to understand long-term cost vs rare big jackpots.</div>
+      </div>
+    </div>
+  </section>
+
+</InfoLayout>
+
+<style>
+  .grid { display:grid; grid-template-columns: 320px 1fr; gap:1.25rem }
+  .inputs, .results { background:var(--bg-card); border:1px solid var(--border-primary); padding:1rem; border-radius:10px }
+  input { width:100%; padding:0.6rem; margin-bottom:0.75rem; border-radius:8px; border:1px solid var(--border-primary) }
+  .result-row { margin-bottom:0.5rem }
+  .explain { margin-top:0.75rem; color:var(--text-muted); font-size:0.95rem }
+</style>
+
+<script>
+  function currency(n) {
+    const v = typeof n === 'string' ? Number(n) : Number(n || 0);
+    return `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const ticketPrice = document.getElementById('ticketPrice') as HTMLInputElement;
+    const ticketsPerDraw = document.getElementById('ticketsPerDraw') as HTMLInputElement;
+    const drawsPerWeek = document.getElementById('drawsPerWeek') as HTMLInputElement;
+    const yearsEl = document.getElementById('years') as HTMLInputElement;
+    const oddsEl = document.getElementById('odds') as HTMLInputElement;
+    const payoutEl = document.getElementById('jackpotPayout') as HTMLInputElement;
+    const calc = document.getElementById('calculate') as HTMLButtonElement;
+
+    function calculate() {
+      const price = Number(ticketPrice.value || 0);
+      const perDraw = Number(ticketsPerDraw.value || 0);
+      const drawsWeek = Number(drawsPerWeek.value || 0);
+      const years = Number(yearsEl.value || 0);
+      const odds = Number(oddsEl.value || 1);
+      const payout = Number(payoutEl.value || 0);
+
+      const weeks = years * 52;
+      const totalTickets = Math.round(perDraw * drawsWeek * weeks);
+      const totalCost = price * totalTickets;
+
+      // Expected wins = totalTickets / odds
+      const expectedWins = totalTickets / odds;
+      const expectedReturn = expectedWins * payout;
+
+      const expectedLoss = totalCost - expectedReturn;
+
+      (document.getElementById('ticketsBought') as HTMLElement).textContent = String(totalTickets);
+      (document.getElementById('totalCost') as HTMLElement).textContent = currency(totalCost);
+      (document.getElementById('expectedWins') as HTMLElement).textContent = expectedWins.toFixed(6);
+      (document.getElementById('expectedReturn') as HTMLElement).textContent = currency(expectedReturn.toFixed(2));
+      (document.getElementById('expectedLoss') as HTMLElement).textContent = currency(expectedLoss.toFixed(2));
+    }
+
+    calc.addEventListener('click', calculate);
+  });
+</script>

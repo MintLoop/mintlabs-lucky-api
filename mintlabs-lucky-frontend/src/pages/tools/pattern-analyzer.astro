@@ -1,0 +1,377 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import AffiliateGrid from "../../components/AffiliateGrid.astro";
+---
+
+<InfoLayout 
+  title="Number Pattern Analyzer"
+  subtitle="Analyze your lottery numbers for patterns, spreads, and statistics"
+  pageTitle="Lottery Number Pattern Analyzer - Check Your Picks | MintLabs"
+  description="Analyze your lottery number picks for patterns, even/odd ratios, high/low distribution, spreads, and more. Free pattern analysis tool for Powerball, Mega Millions."
+  keywords="lottery pattern analyzer, number pattern checker, lottery number analysis, even odd ratio lottery, number spread analyzer"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">🔍 Analyze Your Picks:</strong>
+    Check your chosen numbers for patterns, symmetry, spreads, and statistical properties. 
+    <em>Remember: patterns don't predict wins, but they're fun to explore!</em>
+  </div>
+
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+    <h2 class="text-xl font-semibold text-emerald-300 mb-4">Enter Your Numbers</h2>
+    
+    <div class="space-y-4">
+      <div>
+        <label for="game-select" class="block text-sm font-medium text-gray-300 mb-2">Select Game:</label>
+        <select id="game-select" class="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-gray-100 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+          <option value="powerball">Powerball (5 from 1-69 + 1 from 1-26)</option>
+          <option value="megamillions">Mega Millions (5 from 1-70 + 1 from 1-25)</option>
+          <option value="superlotto">CA SuperLotto Plus (5 from 1-47 + 1 from 1-27)</option>
+          <option value="custom">Custom Numbers</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="numbers-input" class="block text-sm font-medium text-gray-300 mb-2">
+          Your Numbers (comma or space separated):
+        </label>
+        <input 
+          type="text" 
+          id="numbers-input" 
+          placeholder="e.g., 7, 14, 21, 35, 42, 15"
+          class="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-gray-100 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+        />
+        <p class="mt-1 text-xs text-gray-400">Enter main numbers + bonus ball (if applicable)</p>
+      </div>
+
+      <button 
+        id="analyze-btn"
+        class="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg hover:from-emerald-400 hover:to-blue-400 transition-all"
+      >
+        🔍 Analyze Numbers
+      </button>
+    </div>
+  </section>
+
+  <section id="results" class="hidden space-y-6">
+    <!-- Summary Card -->
+    <div class="rounded-2xl border border-slate-700 bg-gradient-to-r from-emerald-900/30 to-blue-900/30 p-6 shadow-xl">
+      <h2 class="text-2xl font-bold text-emerald-300 mb-4">📊 Analysis Results</h2>
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-xl bg-slate-800/80 p-4 text-center">
+          <div class="text-3xl font-bold text-emerald-400" id="stat-sum">—</div>
+          <div class="text-sm text-gray-400">Total Sum</div>
+        </div>
+        <div class="rounded-xl bg-slate-800/80 p-4 text-center">
+          <div class="text-3xl font-bold text-blue-400" id="stat-range">—</div>
+          <div class="text-sm text-gray-400">Range (Spread)</div>
+        </div>
+        <div class="rounded-xl bg-slate-800/80 p-4 text-center">
+          <div class="text-3xl font-bold text-purple-400" id="stat-mean">—</div>
+          <div class="text-sm text-gray-400">Average</div>
+        </div>
+        <div class="rounded-xl bg-slate-800/80 p-4 text-center">
+          <div class="text-3xl font-bold text-amber-400" id="stat-stddev">—</div>
+          <div class="text-sm text-gray-400">Std Deviation</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Even/Odd Analysis -->
+    <div class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+      <h3 class="text-xl font-semibold text-emerald-300 mb-4">⚖️ Even/Odd Distribution</h3>
+      <div class="flex items-center gap-4 mb-4">
+        <div class="flex-1">
+          <div class="h-8 rounded-full overflow-hidden bg-slate-700 flex">
+            <div id="even-bar" class="bg-emerald-500 h-full transition-all duration-500" style="width: 50%"></div>
+            <div id="odd-bar" class="bg-blue-500 h-full transition-all duration-500" style="width: 50%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-emerald-400"><span id="even-count">0</span> Even</span>
+        <span class="text-blue-400"><span id="odd-count">0</span> Odd</span>
+      </div>
+      <p id="even-odd-verdict" class="mt-3 text-sm text-gray-300"></p>
+    </div>
+
+    <!-- High/Low Analysis -->
+    <div class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+      <h3 class="text-xl font-semibold text-emerald-300 mb-4">📈 High/Low Distribution</h3>
+      <div class="flex items-center gap-4 mb-4">
+        <div class="flex-1">
+          <div class="h-8 rounded-full overflow-hidden bg-slate-700 flex">
+            <div id="low-bar" class="bg-purple-500 h-full transition-all duration-500" style="width: 50%"></div>
+            <div id="high-bar" class="bg-amber-500 h-full transition-all duration-500" style="width: 50%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-purple-400"><span id="low-count">0</span> Low</span>
+        <span class="text-amber-400"><span id="high-count">0</span> High</span>
+      </div>
+      <p id="high-low-verdict" class="mt-3 text-sm text-gray-300"></p>
+    </div>
+
+    <!-- Pattern Detection -->
+    <div class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+      <h3 class="text-xl font-semibold text-emerald-300 mb-4">🎯 Pattern Detection</h3>
+      <div id="patterns-list" class="space-y-3">
+        <!-- Patterns will be inserted here -->
+      </div>
+    </div>
+
+    <!-- Number Visualization -->
+    <div class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+      <h3 class="text-xl font-semibold text-emerald-300 mb-4">🎨 Number Spread Visualization</h3>
+      <div id="number-viz" class="flex flex-wrap gap-1">
+        <!-- Number grid will be inserted here -->
+      </div>
+      <p class="mt-4 text-xs text-gray-400">Your selected numbers are highlighted. Spread across the range shows distribution.</p>
+    </div>
+
+    <!-- Gaps Analysis -->
+    <div class="rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-xl">
+      <h3 class="text-xl font-semibold text-emerald-300 mb-4">📏 Gap Analysis</h3>
+      <div id="gaps-analysis" class="space-y-2">
+        <!-- Gap info will be inserted here -->
+      </div>
+    </div>
+
+    <!-- Educational Note -->
+    <div class="rounded-xl border border-amber-700/50 bg-amber-900/20 p-4 text-sm text-amber-200/90">
+      <strong>⚠️ Important:</strong> Pattern analysis is for entertainment only. 
+      Every number combination has exactly the same probability of winning. 
+      Past patterns do not predict future draws. 
+      <a href="/lottery-odds" class="underline hover:text-amber-100">Learn more about lottery odds →</a>
+    </div>
+  </section>
+
+  <!-- Cross-links -->
+  <section class="rounded-2xl border border-slate-700 bg-slate-900/40 p-6">
+    <h3 class="mb-4 text-xl font-semibold text-gray-200">Related Tools</h3>
+    <div class="flex flex-wrap gap-3">
+      <a href="/tools/winning-chance-simulator" class="rounded-full border border-emerald-600 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors">
+        Winning Chance Simulator →
+      </a>
+      <a href="/tools/odds-comparison" class="rounded-full border border-blue-600 px-4 py-2 text-sm text-blue-400 hover:bg-blue-600 hover:text-white transition-colors">
+        Odds Comparison →
+      </a>
+      <a href="/lottery-math" class="rounded-full border border-purple-600 px-4 py-2 text-sm text-purple-400 hover:bg-purple-600 hover:text-white transition-colors">
+        Lottery Math →
+      </a>
+    </div>
+  </section>
+
+  <AffiliateGrid placement="tools" />
+</InfoLayout>
+
+<script>
+  const gameConfigs: Record<string, { mainMax: number; mainCount: number; bonusMax: number; name: string }> = {
+    powerball: { mainMax: 69, mainCount: 5, bonusMax: 26, name: 'Powerball' },
+    megamillions: { mainMax: 70, mainCount: 5, bonusMax: 25, name: 'Mega Millions' },
+    superlotto: { mainMax: 47, mainCount: 5, bonusMax: 27, name: 'SuperLotto Plus' },
+    custom: { mainMax: 70, mainCount: 6, bonusMax: 0, name: 'Custom' }
+  };
+
+  function parseNumbers(input: string): number[] {
+    return input
+      .split(/[,\s]+/)
+      .map(n => parseInt(n.trim(), 10))
+      .filter(n => !isNaN(n) && n > 0);
+  }
+
+  function analyze() {
+    const gameSelect = document.getElementById('game-select') as HTMLSelectElement;
+    const numbersInput = document.getElementById('numbers-input') as HTMLInputElement;
+    const resultsSection = document.getElementById('results')!;
+    
+    const game = gameConfigs[gameSelect.value];
+    const numbers = parseNumbers(numbersInput.value);
+    
+    if (numbers.length < 2) {
+      alert('Please enter at least 2 numbers to analyze');
+      return;
+    }
+
+    // Sort for analysis
+    const sorted = [...numbers].sort((a, b) => a - b);
+    const mainNumbers = sorted.slice(0, game.mainCount);
+    
+    // Basic stats
+    const sum = numbers.reduce((a, b) => a + b, 0);
+    const min = Math.min(...numbers);
+    const max = Math.max(...numbers);
+    const range = max - min;
+    const mean = sum / numbers.length;
+    const variance = numbers.reduce((acc, n) => acc + Math.pow(n - mean, 2), 0) / numbers.length;
+    const stddev = Math.sqrt(variance);
+
+    // Update stats
+    document.getElementById('stat-sum')!.textContent = sum.toString();
+    document.getElementById('stat-range')!.textContent = range.toString();
+    document.getElementById('stat-mean')!.textContent = mean.toFixed(1);
+    document.getElementById('stat-stddev')!.textContent = stddev.toFixed(1);
+
+    // Even/Odd analysis
+    const evenCount = numbers.filter(n => n % 2 === 0).length;
+    const oddCount = numbers.length - evenCount;
+    const evenPct = (evenCount / numbers.length) * 100;
+    
+    document.getElementById('even-count')!.textContent = evenCount.toString();
+    document.getElementById('odd-count')!.textContent = oddCount.toString();
+    (document.getElementById('even-bar') as HTMLElement).style.width = `${evenPct}%`;
+    (document.getElementById('odd-bar') as HTMLElement).style.width = `${100 - evenPct}%`;
+    
+    let evenOddVerdict = '';
+    if (evenCount === oddCount || Math.abs(evenCount - oddCount) === 1) {
+      evenOddVerdict = '✅ Well balanced even/odd ratio - this is the most common pattern in winning draws.';
+    } else if (evenCount === 0 || oddCount === 0) {
+      evenOddVerdict = '⚠️ All numbers are ' + (evenCount === 0 ? 'odd' : 'even') + ' - this is rare but equally likely to win.';
+    } else {
+      evenOddVerdict = '📊 Slightly unbalanced, but every combination has equal odds.';
+    }
+    document.getElementById('even-odd-verdict')!.textContent = evenOddVerdict;
+
+    // High/Low analysis
+    const midpoint = game.mainMax / 2;
+    const lowCount = mainNumbers.filter(n => n <= midpoint).length;
+    const highCount = mainNumbers.length - lowCount;
+    const lowPct = (lowCount / mainNumbers.length) * 100;
+    
+    document.getElementById('low-count')!.textContent = lowCount.toString();
+    document.getElementById('high-count')!.textContent = highCount.toString();
+    (document.getElementById('low-bar') as HTMLElement).style.width = `${lowPct}%`;
+    (document.getElementById('high-bar') as HTMLElement).style.width = `${100 - lowPct}%`;
+    
+    let highLowVerdict = '';
+    if (lowCount === highCount || Math.abs(lowCount - highCount) === 1) {
+      highLowVerdict = '✅ Well distributed across high and low numbers.';
+    } else {
+      highLowVerdict = `📊 Leans toward ${lowCount > highCount ? 'lower' : 'higher'} numbers - still equally likely to win!`;
+    }
+    document.getElementById('high-low-verdict')!.textContent = highLowVerdict;
+
+    // Pattern detection
+    const patterns: string[] = [];
+    
+    // Check for consecutive numbers
+    let consecutiveCount = 1;
+    let maxConsecutive = 1;
+    for (let i = 1; i < sorted.length; i++) {
+      if (sorted[i] === sorted[i-1] + 1) {
+        consecutiveCount++;
+        maxConsecutive = Math.max(maxConsecutive, consecutiveCount);
+      } else {
+        consecutiveCount = 1;
+      }
+    }
+    if (maxConsecutive >= 2) {
+      patterns.push(`🔢 Contains ${maxConsecutive} consecutive numbers`);
+    }
+
+    // Check for duplicates
+    const uniqueCount = new Set(numbers).size;
+    if (uniqueCount < numbers.length) {
+      patterns.push(`⚠️ Contains ${numbers.length - uniqueCount} duplicate number(s)`);
+    }
+
+    // Check for multiples
+    for (const mult of [5, 7, 10, 11]) {
+      const multCount = numbers.filter(n => n % mult === 0).length;
+      if (multCount >= 3) {
+        patterns.push(`✖️ ${multCount} numbers are multiples of ${mult}`);
+      }
+    }
+
+    // Check for arithmetic sequence
+    if (sorted.length >= 3) {
+      const diff = sorted[1] - sorted[0];
+      let isArithmetic = true;
+      for (let i = 2; i < sorted.length; i++) {
+        if (sorted[i] - sorted[i-1] !== diff) {
+          isArithmetic = false;
+          break;
+        }
+      }
+      if (isArithmetic) {
+        patterns.push(`📐 Forms an arithmetic sequence (difference of ${diff})`);
+      }
+    }
+
+    // Check for decades spread
+    const decades = new Set(numbers.map(n => Math.floor(n / 10)));
+    patterns.push(`📊 Spans ${decades.size} decade group(s): ${[...decades].sort((a,b) => a-b).map(d => `${d}0s`).join(', ')}`);
+
+    // Check sum range (typical winning sums for 5-number games are 100-200)
+    if (mainNumbers.length === 5) {
+      const mainSum = mainNumbers.reduce((a, b) => a + b, 0);
+      if (mainSum >= 100 && mainSum <= 200) {
+        patterns.push(`✅ Sum (${mainSum}) is in typical winning range (100-200)`);
+      } else if (mainSum < 100) {
+        patterns.push(`📉 Sum (${mainSum}) is below typical winning range`);
+      } else {
+        patterns.push(`📈 Sum (${mainSum}) is above typical winning range`);
+      }
+    }
+
+    // Render patterns
+    const patternsContainer = document.getElementById('patterns-list')!;
+    if (patterns.length === 0) {
+      patternsContainer.innerHTML = '<p class="text-gray-400">No notable patterns detected.</p>';
+    } else {
+      patternsContainer.innerHTML = patterns.map(p => 
+        `<div class="flex items-center gap-2 p-3 rounded-lg bg-slate-900/50 text-gray-300">${p}</div>`
+      ).join('');
+    }
+
+    // Number visualization grid
+    const vizContainer = document.getElementById('number-viz')!;
+    const gridMax = Math.max(game.mainMax, ...numbers);
+    let gridHtml = '';
+    for (let i = 1; i <= gridMax; i++) {
+      const isSelected = numbers.includes(i);
+      const bgClass = isSelected ? 'bg-emerald-500 text-white font-bold' : 'bg-slate-700 text-slate-400';
+      gridHtml += `<div class="w-8 h-8 rounded flex items-center justify-center text-xs ${bgClass}">${i}</div>`;
+    }
+    vizContainer.innerHTML = gridHtml;
+
+    // Gap analysis
+    const gaps: number[] = [];
+    for (let i = 1; i < sorted.length; i++) {
+      gaps.push(sorted[i] - sorted[i-1]);
+    }
+    const avgGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+    const maxGap = Math.max(...gaps);
+    const minGap = Math.min(...gaps);
+
+    const gapsContainer = document.getElementById('gaps-analysis')!;
+    gapsContainer.innerHTML = `
+      <div class="grid grid-cols-3 gap-4 text-center">
+        <div class="p-3 rounded-lg bg-slate-900/50">
+          <div class="text-lg font-bold text-emerald-400">${minGap}</div>
+          <div class="text-xs text-gray-400">Smallest Gap</div>
+        </div>
+        <div class="p-3 rounded-lg bg-slate-900/50">
+          <div class="text-lg font-bold text-blue-400">${avgGap.toFixed(1)}</div>
+          <div class="text-xs text-gray-400">Average Gap</div>
+        </div>
+        <div class="p-3 rounded-lg bg-slate-900/50">
+          <div class="text-lg font-bold text-purple-400">${maxGap}</div>
+          <div class="text-xs text-gray-400">Largest Gap</div>
+        </div>
+      </div>
+      <p class="mt-3 text-sm text-gray-300">
+        Gaps between consecutive numbers: ${gaps.join(', ')}
+      </p>
+    `;
+
+    // Show results
+    resultsSection.classList.remove('hidden');
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  document.getElementById('analyze-btn')?.addEventListener('click', analyze);
+  document.getElementById('numbers-input')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') analyze();
+  });
+</script>

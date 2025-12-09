@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage - Lottery Number Generator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Education: Lottery Odds -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/lottery-odds</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Education: Lottery Math -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/lottery-math</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Education: FAQ -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/faq</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Tools: Payout Calculator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/payout-calculator</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Tools: Lottery Budget Planner -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/lottery-budget</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Number Wheel -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/number-wheel</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Probability Visualizer -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/probability-visualizer</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Pattern Analyzer -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/pattern-analyzer</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Winning Chance Simulator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/winning-chance</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Odds Comparison -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/odds-comparison</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Tools: Expected Value Calculator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/expected-value-calculator</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Jackpot Split Calculator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/jackpot-split-calculator</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Hot & Cold Numbers -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/hot-cold-numbers</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Common Combo Checker -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/common-combo-checker</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Pick-3/Pick-4 Generator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/pick-generator</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Birthdate Mapper -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/birthdate-mapper</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Repeat Number Checker -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/repeat-checker</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Number Heatmap -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/heatmap</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Ticket Beautifier -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/ticket-beautifier</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Tools: Break-Even Calculator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/break-even</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Combination Calculator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/combination-calculator</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools: Quick Draw Simulator -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/tools/quick-draw-simulator</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Archive: Past Draws -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/archive</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Legal: Terms -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/terms</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  
+  <!-- Legal: Privacy -->
+  <url>
+    <loc>https://lucky.mintlabs.dev/privacy</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>

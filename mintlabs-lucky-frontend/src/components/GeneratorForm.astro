@@ -30,6 +30,12 @@ const { games = [] } = Astro.props;
       <optgroup label="Personal">
         <option value="birthday">Birthday</option>
         <option value="lucky">Lucky Numbers</option>
+        <option value="zodiac">Zodiac Sign</option>
+        <option value="gemstone">Gemstone</option>
+        <option value="star_sign">Star Sign</option>
+        <option value="jyotish">Jyotish</option>
+        <option value="chinese_zodiac">Chinese Zodiac</option>
+        <option value="favorite_color">Favorite Color</option>
       </optgroup>
       <optgroup label="Systematic">
         <option value="wheel">Wheel System</option>
@@ -61,6 +67,19 @@ const { games = [] } = Astro.props;
       <input type="text" name="lucky_numbers" placeholder="e.g., 7,13,21,42"
              class="mt-1 w-full theme-input-bg rounded-lg p-2 theme-text-primary" />
       <span class="text-xs theme-text-muted">Comma-separated numbers</span>
+    </label>
+  </div>
+
+  <!-- The new API uses a bounded mode_key selector for themed modes. The
+       UI will swap in a secondary dropdown when a themed mode is selected.
+       This prevents free-form seeds and keeps UX clearer. -->
+  <div id="modeKeyContainer" class="hidden">
+    <label class="block">
+      <span class="text-sm theme-text-secondary">Theme / Option</span>
+      <select id="modeKeySelect" name="mode_key" class="mt-1 w-full theme-input-bg rounded-lg p-2 theme-text-primary">
+        <!-- options populated by /scripts/lucky.ts using src/data/modeConfig -->
+      </select>
+      <span class="text-xs theme-text-muted">Themes are for fun — they do not change your odds.</span>
     </label>
   </div>
 
@@ -112,62 +131,4 @@ const { games = [] } = Astro.props;
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
     </svg>
   </button>
-</form>
-
-<script is:inline>
-  const modeSelect = document.getElementById('modeSelect');
-  const map = {
-    sum_target: document.getElementById('sumTargetField'),
-    birthday:   document.getElementById('birthdayField'),
-    lucky:      document.getElementById('luckyField'),
-    wheel:      document.getElementById('wheelField'),
-  };
-  function update(){
-    Object.values(map).forEach(el=>el?.classList.add('hidden'));
-    const key = modeSelect?.value;
-    if (key && map[key]) map[key].classList.remove('hidden');
-
-    // Toggle required for target sum input only when sum_target is selected
-    const target = document.getElementById('targetSumInput');
-    if (target) {
-      if (key === 'sum_target') target.setAttribute('required', 'required');
-      else target.removeAttribute('required');
-    }
-  }
-  update();
-  modeSelect?.addEventListener('change', update);
-
-  // Ensure form submit triggers when clicking Generate and that script-based handler can intercept
-  const form = document.getElementById('genForm');
-  const genBtn = document.getElementById('generateBtn');
-  if (form && !form.getAttribute('data-initialized')) {
-    form.setAttribute('data-initialized', '1');
-    // Allow the existing /src/scripts/lucky.ts to attach its handler; if that fails, add a minimal fallback
-    form.addEventListener('submit', async (e) => {
-      // If the external initLucky is present it will handle the submit; this fallback only fires when nothing else does
-      // Prevent double-handling
-      const alreadyHandled = form.__handledByLucky;
-      if (alreadyHandled) return;
-      e.preventDefault();
-      // Basic fallback: call backend directly
-      const fd = new FormData(form);
-      const payload = {
-        game_code: String(fd.get('game') || ''),
-        mode: String(fd.get('mode') || 'uniform'),
-        sets: Number(fd.get('sets') || 1)
-      };
-      if (payload.mode === 'sum_target') payload.target_sum = Number(fd.get('target_sum')) || undefined;
-      if (payload.mode === 'birthday') payload.birth_date = String(fd.get('birth_date') || '');
-      try {
-        const API = import.meta.env.PUBLIC_API_BASE || '';
-        const genUrl = API ? `${API.replace(/\/$/, '')}/generate` : '/generate';
-        const res = await fetch(genUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        const json = await res.json();
-        const out = document.getElementById('results');
-        if (out) out.innerHTML = `<div class="p-4 bg-slate-900/60 rounded">Numbers: ${json.numbers?.join(', ') || '—'}</div>`;
-      } catch (err) {
-        console.error('Fallback generate failed', err);
-      }
-    });
-  }
-</script>
+  </form>

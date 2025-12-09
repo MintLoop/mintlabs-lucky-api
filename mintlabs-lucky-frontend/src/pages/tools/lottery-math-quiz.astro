@@ -1,0 +1,868 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const pageTitle = "Lottery Math Quiz | Test Your Probability Knowledge";
+const description = "Interactive flash cards to test and improve your understanding of lottery probability, common misconceptions, and mathematical concepts.";
+const keywords = "lottery math quiz, probability basics, lottery quiz, math flash cards, lottery education, probability quiz";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Lottery Math Quiz",
+  "description": description,
+  "applicationCategory": "Educational Tool",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<InfoLayout
+  title="Lottery Math Quiz"
+  subtitle="Test your probability knowledge"
+  pageTitle={pageTitle}
+  description={description}
+  keywords={keywords}
+  jsonLd={jsonLd}
+>
+  <div slot="teaser" class="teaser-content">
+    <p>
+      Challenge yourself with these <strong>interactive flash cards</strong> covering 
+      common lottery misconceptions, probability basics, and mathematical concepts. 
+      Perfect for learning the truth behind lottery myths!
+    </p>
+  </div>
+
+  <section class="tool-section">
+    <div class="quiz-controls">
+      <div class="score-display">
+        <div class="score-item">
+          <span class="score-label">Score:</span>
+          <span class="score-value" id="score">0/0</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">Streak:</span>
+          <span class="score-value streak" id="streak">0</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">Card:</span>
+          <span class="score-value" id="cardNumber">1/20</span>
+        </div>
+      </div>
+
+      <div class="filter-controls">
+        <label for="categoryFilter">Category:</label>
+        <select id="categoryFilter">
+          <option value="all">All Topics</option>
+          <option value="misconceptions">Common Misconceptions</option>
+          <option value="probability">Probability Basics</option>
+          <option value="strategy">Strategy & Odds</option>
+          <option value="math">Mathematical Concepts</option>
+        </select>
+        <button id="resetBtn" class="reset-button">Reset Quiz</button>
+      </div>
+    </div>
+
+    <div class="flashcard-container">
+      <div class="flashcard" id="flashcard">
+        <div class="card-content">
+          <div class="card-category" id="cardCategory">Loading...</div>
+          <div class="card-question" id="cardQuestion">Loading question...</div>
+          
+          <div class="card-options" id="cardOptions">
+            <!-- Options will be inserted here -->
+          </div>
+
+          <div class="card-feedback" id="cardFeedback" style="display: none;">
+            <!-- Feedback will be shown here -->
+          </div>
+
+          <div class="card-explanation" id="cardExplanation" style="display: none;">
+            <!-- Explanation will be shown here -->
+          </div>
+        </div>
+      </div>
+
+      <div class="navigation-buttons">
+        <button id="prevBtn" class="nav-button" disabled>← Previous</button>
+        <button id="nextBtn" class="nav-button">Next →</button>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+
+    <div class="educational-section">
+      <h3>Why This Quiz Matters</h3>
+      
+      <div class="info-grid">
+        <div class="info-card">
+          <h4>🧠 Bust Common Myths</h4>
+          <p>
+            Learn why "hot numbers," "due numbers," and other popular strategies 
+            are mathematically unfounded.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <h4>📊 Understand Probability</h4>
+          <p>
+            Master the basics of independent events, expected value, and 
+            why lottery odds are so challenging.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <h4>💰 Make Better Decisions</h4>
+          <p>
+            Armed with knowledge, you can make informed choices about 
+            lottery participation and spending.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <h4>🎓 Learn Through Practice</h4>
+          <p>
+            Interactive questions with detailed explanations help 
+            reinforce mathematical concepts.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</InfoLayout>
+
+<style>
+  .tool-section {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .quiz-controls {
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .score-display {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .score-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .score-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .score-value {
+    font-size: 1.75rem;
+    color: var(--accent-primary);
+    font-weight: 700;
+  }
+
+  .score-value.streak {
+    color: var(--accent-success);
+  }
+
+  .filter-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-controls label {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .filter-controls select {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-primary);
+    border-radius: 4px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 1rem;
+  }
+
+  .reset-button {
+    padding: 0.5rem 1rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-primary);
+    border-radius: 4px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .reset-button:hover {
+    background: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+  }
+
+  .flashcard-container {
+    margin-bottom: 1rem;
+  }
+
+  .flashcard {
+    background: var(--bg-card);
+    border: 2px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 2rem;
+    min-height: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .flashcard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-category {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: var(--accent-primary);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-question {
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+  }
+
+  .card-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .option-button {
+    padding: 1rem 1.5rem;
+    background: var(--bg-surface);
+    border: 2px solid var(--border-primary);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .option-button:hover {
+    background: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+    transform: translateX(4px);
+  }
+
+  .option-button.correct {
+    background: var(--accent-success);
+    color: white;
+    border-color: var(--accent-success);
+  }
+
+  .option-button.incorrect {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+  }
+
+  .option-button.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .card-feedback {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .card-feedback.correct {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--accent-success);
+    border: 2px solid var(--accent-success);
+  }
+
+  .card-feedback.incorrect {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 2px solid #ef4444;
+  }
+
+  .card-explanation {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--bg-surface);
+    border-left: 4px solid var(--accent-primary);
+    border-radius: 4px;
+  }
+
+  .card-explanation h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+  }
+
+  .card-explanation p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .nav-button {
+    flex: 1;
+    padding: 1rem;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav-button:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .nav-button:disabled {
+    background: var(--bg-surface);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .progress-bar {
+    height: 8px;
+    background: var(--bg-surface);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-success));
+    transition: width 0.3s ease;
+  }
+
+  .educational-section {
+    margin-top: 3rem;
+  }
+
+  .educational-section h3 {
+    color: var(--text-primary);
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+
+  .info-card h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+  }
+
+  .info-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 768px) {
+    .score-display {
+      gap: 1.5rem;
+    }
+
+    .card-question {
+      font-size: 1.1rem;
+    }
+
+    .flashcard {
+      padding: 1.5rem;
+      min-height: 350px;
+    }
+
+    .navigation-buttons {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  // Flash card questions database
+  const questions = [
+    // Common Misconceptions
+    {
+      category: 'misconceptions',
+      question: 'If a number hasn\'t been drawn in a while, is it "due" to appear soon?',
+      options: [
+        'Yes, it\'s more likely to be drawn',
+        'No, each draw is independent',
+        'Only if it hasn\'t appeared in 50+ draws',
+        'Yes, based on mathematical regression'
+      ],
+      correct: 1,
+      explanation: 'This is the <strong>Gambler\'s Fallacy</strong>. Each lottery draw is completely independent. Past results have zero influence on future draws. A number that hasn\'t appeared in 100 draws has the exact same probability as one that appeared yesterday.'
+    },
+    {
+      category: 'misconceptions',
+      question: 'Are "hot numbers" (frequently drawn recently) better picks?',
+      options: [
+        'Yes, they\'re on a winning streak',
+        'No, all numbers have equal probability',
+        'Only in the short term',
+        'Yes, but only for Powerball'
+      ],
+      correct: 1,
+      explanation: 'No! All numbers have exactly the same probability of being drawn in any given draw. "Hot" numbers are just statistical noise from small sample sizes. The lottery machine has no memory of past draws.'
+    },
+    {
+      category: 'misconceptions',
+      question: 'Is the sequence 1, 2, 3, 4, 5 less likely to win than random-looking numbers?',
+      options: [
+        'Yes, sequential numbers rarely win',
+        'No, all combinations are equally likely',
+        'It depends on the game',
+        'Yes, mathematically proven'
+      ],
+      correct: 1,
+      explanation: 'Every possible combination of numbers has the <strong>exact same probability</strong>. 1-2-3-4-5 is just as likely as any "random" looking combination. Our brains perceive patterns, but the math doesn\'t care!'
+    },
+    {
+      category: 'misconceptions',
+      question: 'Does buying more tickets guarantee you\'ll eventually win?',
+      options: [
+        'Yes, with enough tickets you\'ll definitely win',
+        'No, you could play forever and never win',
+        'Yes, but only for smaller prizes',
+        'It depends on the jackpot size'
+      ],
+      correct: 1,
+      explanation: 'No guarantee at all! With odds like 1 in 292 million for Powerball, you could buy millions of tickets over a lifetime and still never win the jackpot. Probability doesn\'t guarantee outcomes—it only describes long-term averages.'
+    },
+    {
+      category: 'misconceptions',
+      question: 'If you play the same numbers every draw, does it increase your chances?',
+      options: [
+        'Yes, consistency improves odds over time',
+        'No, each draw is independent',
+        'Only if you play for 10+ years',
+        'Yes, but only slightly'
+      ],
+      correct: 1,
+      explanation: 'Each draw is completely independent. Playing 1-2-3-4-5 every week for 20 years gives you the same odds as playing random numbers each time. The lottery doesn\'t "remember" your previous tickets.'
+    },
+
+    // Probability Basics
+    {
+      category: 'probability',
+      question: 'What does "1 in 292 million" really mean for Powerball jackpot odds?',
+      options: [
+        'You\'ll win once every 292 million tickets',
+        'If you buy 292 million tickets, you\'re guaranteed to win',
+        'Each ticket has a 0.00000034% chance of winning',
+        'All of the above are misconceptions'
+      ],
+      correct: 2,
+      explanation: 'Correct! It means each individual ticket has about a 0.00000034% chance. It does NOT mean you\'ll win if you buy 292 million tickets—you could have duplicate numbers. And it doesn\'t mean "one win per 292 million tickets" in practice.'
+    },
+    {
+      category: 'probability',
+      question: 'What happens to your odds if you buy 2 tickets instead of 1?',
+      options: [
+        'They double (2x better)',
+        'They improve, but not by much',
+        'They stay exactly the same',
+        'They triple'
+      ],
+      correct: 1,
+      explanation: 'Your odds improve from 1/292,201,338 to 2/292,201,338—technically double, but still effectively zero (0.00000068%). Buying 100 tickets only gets you to 0.000034% chance. The improvement is mathematically real but practically meaningless.'
+    },
+    {
+      category: 'probability',
+      question: 'Are two events "independent" if past results don\'t affect future results?',
+      options: [
+        'Yes, that\'s what independent means',
+        'No, they\'re correlated',
+        'Only if they\'re more than 24 hours apart',
+        'It depends on the sample size'
+      ],
+      correct: 0,
+      explanation: 'Correct! Independence means the outcome of one event has zero influence on another. Lottery draws are independent—each draw is fresh with no memory of past results. This is why "due numbers" and "hot streaks" are myths.'
+    },
+    {
+      category: 'probability',
+      question: 'If you flip a fair coin 10 times and get 10 heads, what are the odds of tails on flip 11?',
+      options: [
+        'Very high, it\'s "due" for tails',
+        'Still 50/50',
+        'Lower than 50%, heads are hot',
+        'Depends on the coin'
+      ],
+      correct: 1,
+      explanation: 'Still 50/50! The coin has no memory. Each flip is independent. This is the Gambler\'s Fallacy in action—our brains expect "balance" but probability doesn\'t work that way in small samples.'
+    },
+    {
+      category: 'probability',
+      question: 'What\'s "expected value" in the context of lottery?',
+      options: [
+        'The amount you expect to win',
+        'The average outcome over many trials',
+        'The jackpot divided by the odds',
+        'Your total spending minus winnings'
+      ],
+      correct: 1,
+      explanation: 'Expected value is the average outcome if you played the same game infinite times. For lottery, EV is almost always negative (you lose money on average). A $2 Powerball ticket has an EV around -$1.50 to -$1.90 depending on jackpot.'
+    },
+
+    // Strategy & Odds
+    {
+      category: 'strategy',
+      question: 'Which strategy gives you better odds of winning?',
+      options: [
+        'Picking birthdays and anniversaries',
+        'Using "lucky" numbers',
+        'Quick picks (computer-generated)',
+        'All strategies have identical odds'
+      ],
+      correct: 3,
+      explanation: 'All strategies have <strong>identical odds of winning</strong>. However, birthdays (1-31) may lead to splitting jackpots more often since many people use them. Quick picks might have a slight edge in avoiding shared combinations.'
+    },
+    {
+      category: 'strategy',
+      question: 'Is there any mathematical way to improve your lottery odds beyond buying more tickets?',
+      options: [
+        'Yes, by analyzing past patterns',
+        'Yes, by avoiding common number combinations',
+        'No, every ticket has the same probability',
+        'Yes, by playing at certain times'
+      ],
+      correct: 2,
+      explanation: 'No! Every ticket has exactly the same odds. You can\'t "beat" randomness with patterns or timing. The only way to improve odds is buying more tickets—but even that has diminishing returns and negative expected value.'
+    },
+    {
+      category: 'strategy',
+      question: 'Does the size of the jackpot affect your odds of winning?',
+      options: [
+        'Yes, bigger jackpots have worse odds',
+        'No, odds stay the same regardless',
+        'Yes, bigger jackpots attract more winners',
+        'Only for Mega Millions'
+      ],
+      correct: 1,
+      explanation: 'Your odds of winning never change—they\'re fixed by the game rules. However, larger jackpots do attract more players, which increases the chance of splitting the prize if you win. But your probability of winning stays constant.'
+    },
+    {
+      category: 'strategy',
+      question: 'What\'s the best "strategy" for playing the lottery?',
+      options: [
+        'Play consistently with the same numbers',
+        'Only play when jackpots are huge',
+        'Play for entertainment, not profit',
+        'Avoid it entirely'
+      ],
+      correct: 2,
+      explanation: 'The mathematically honest answer is "play for entertainment only" or avoid it. Lottery has negative expected value—you lose money on average. If you play, set a fixed entertainment budget and never expect to win. Treating it as an investment is financial self-harm.'
+    },
+
+    // Mathematical Concepts
+    {
+      category: 'math',
+      question: 'What\'s a "combination" in lottery terms?',
+      options: [
+        'Any sequence of numbers',
+        'A set of numbers where order doesn\'t matter',
+        'A winning pattern',
+        'Numbers that appear together often'
+      ],
+      correct: 1,
+      explanation: 'In lottery math, a combination is a selection of numbers where order doesn\'t matter. 1-2-3-4-5 is the same combination as 5-4-3-2-1. This is why lottery odds use the combination formula C(n,k) = n! / (k!(n-k)!).'
+    },
+    {
+      category: 'math',
+      question: 'Why are Powerball odds 1 in 292,201,338?',
+      options: [
+        'Random number chosen by officials',
+        'C(69,5) × 26 possible combinations',
+        'Average of historical results',
+        'Based on ticket sales'
+      ],
+      correct: 1,
+      explanation: 'It\'s calculated mathematically! There are C(69,5) = 11,238,513 ways to pick 5 white balls from 69, multiplied by 26 possible Powerballs. 11,238,513 × 26 = 292,201,338 total combinations.'
+    },
+    {
+      category: 'math',
+      question: 'What does "variance" tell us about lottery outcomes?',
+      options: [
+        'How often you\'ll win',
+        'How spread out outcomes are from the average',
+        'Your expected profit',
+        'The range of jackpot sizes'
+      ],
+      correct: 1,
+      explanation: 'Variance measures how spread out results are from the expected average. High variance (like lottery) means extremely unpredictable outcomes—you could play 1000 times and see wildly different results each time.'
+    },
+    {
+      category: 'math',
+      question: 'What\'s the probability of losing the lottery jackpot on a single ticket?',
+      options: [
+        '50%',
+        '99.9%',
+        'About 99.9999997%',
+        '100%'
+      ],
+      correct: 2,
+      explanation: 'For Powerball: 292,201,337 / 292,201,338 ≈ 99.9999997%. You\'re essentially guaranteed to lose! This is why lottery is called a "tax on people who are bad at math."'
+    },
+    {
+      category: 'math',
+      question: 'If you play 52 tickets per year for 30 years, what are your chances of winning the jackpot?',
+      options: [
+        'Pretty good, about 5%',
+        'Essentially zero, about 0.00053%',
+        'About 10%',
+        'Guaranteed after 30 years'
+      ],
+      correct: 1,
+      explanation: 'With 1,560 total tickets (52 × 30), your probability is still only about 0.00053%—essentially zero. That\'s 1,560 / 292,201,338. You\'d need to play for thousands of lifetimes to have even a 1% chance!'
+    },
+    {
+      category: 'math',
+      question: 'What\'s "regression to the mean" in lottery context?',
+      options: [
+        'Hot numbers will cool down',
+        'Results tend toward average over time',
+        'Past results predict future results',
+        'Lottery machines get "reset"'
+      ],
+      correct: 1,
+      explanation: 'Regression to the mean says that extreme results (like a number being "hot") will trend toward the average over time—not because numbers are "due," but because each new draw is independent and random. It\'s a statistical observation, not a prediction tool.'
+    }
+  ];
+
+  // Quiz state
+  let currentIndex = 0;
+  let score = 0;
+  let totalAnswered = 0;
+  let streak = 0;
+  let answered = false;
+  let filteredQuestions = [...questions];
+
+  function shuffleArray(array: any[]) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
+  function initQuiz() {
+    filteredQuestions = shuffleArray(questions);
+    currentIndex = 0;
+    score = 0;
+    totalAnswered = 0;
+    streak = 0;
+    answered = false;
+    updateScore();
+    loadQuestion();
+  }
+
+  function filterQuestions() {
+    const filter = (document.getElementById('categoryFilter') as HTMLSelectElement).value;
+    
+    if (filter === 'all') {
+      filteredQuestions = shuffleArray(questions);
+    } else {
+      filteredQuestions = shuffleArray(questions.filter(q => q.category === filter));
+    }
+    
+    currentIndex = 0;
+    score = 0;
+    totalAnswered = 0;
+    streak = 0;
+    answered = false;
+    updateScore();
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    if (filteredQuestions.length === 0) {
+      document.getElementById('cardQuestion')!.textContent = 'No questions available for this category.';
+      return;
+    }
+
+    answered = false;
+    const question = filteredQuestions[currentIndex];
+    
+    // Update category badge
+    const categoryMap: any = {
+      'misconceptions': 'Common Misconceptions',
+      'probability': 'Probability Basics',
+      'strategy': 'Strategy & Odds',
+      'math': 'Mathematical Concepts'
+    };
+    document.getElementById('cardCategory')!.textContent = categoryMap[question.category];
+    
+    // Update question
+    document.getElementById('cardQuestion')!.textContent = question.question;
+    
+    // Clear and rebuild options
+    const optionsContainer = document.getElementById('cardOptions')!;
+    optionsContainer.innerHTML = '';
+    
+    question.options.forEach((option: string, index: number) => {
+      const button = document.createElement('button');
+      button.className = 'option-button';
+      button.textContent = option;
+      button.onclick = () => checkAnswer(index);
+      optionsContainer.appendChild(button);
+    });
+    
+    // Hide feedback and explanation
+    document.getElementById('cardFeedback')!.style.display = 'none';
+    document.getElementById('cardExplanation')!.style.display = 'none';
+    
+    // Update navigation
+    updateNavigation();
+    updateProgress();
+  }
+
+  function checkAnswer(selectedIndex: number) {
+    if (answered) return;
+    
+    answered = true;
+    const question = filteredQuestions[currentIndex];
+    const isCorrect = selectedIndex === question.correct;
+    
+    // Update score
+    totalAnswered++;
+    if (isCorrect) {
+      score++;
+      streak++;
+    } else {
+      streak = 0;
+    }
+    updateScore();
+    
+    // Update button states
+    const buttons = document.querySelectorAll('.option-button');
+    buttons.forEach((btn, idx) => {
+      btn.classList.add('disabled');
+      if (idx === question.correct) {
+        btn.classList.add('correct');
+      } else if (idx === selectedIndex && !isCorrect) {
+        btn.classList.add('incorrect');
+      }
+    });
+    
+    // Show feedback
+    const feedback = document.getElementById('cardFeedback')!;
+    feedback.textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
+    feedback.className = `card-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    feedback.style.display = 'block';
+    
+    // Show explanation
+    const explanation = document.getElementById('cardExplanation')!;
+    explanation.innerHTML = `<h4>Explanation:</h4><p>${question.explanation}</p>`;
+    explanation.style.display = 'block';
+  }
+
+  function updateScore() {
+    document.getElementById('score')!.textContent = `${score}/${totalAnswered}`;
+    document.getElementById('streak')!.textContent = streak.toString();
+    document.getElementById('cardNumber')!.textContent = `${currentIndex + 1}/${filteredQuestions.length}`;
+  }
+
+  function updateNavigation() {
+    const prevBtn = document.getElementById('prevBtn') as HTMLButtonElement;
+    const nextBtn = document.getElementById('nextBtn') as HTMLButtonElement;
+    
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex === filteredQuestions.length - 1;
+  }
+
+  function updateProgress() {
+    const progress = ((currentIndex + 1) / filteredQuestions.length) * 100;
+    document.getElementById('progressFill')!.style.width = `${progress}%`;
+  }
+
+  function nextQuestion() {
+    if (currentIndex < filteredQuestions.length - 1) {
+      currentIndex++;
+      loadQuestion();
+    }
+  }
+
+  function prevQuestion() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      loadQuestion();
+    }
+  }
+
+  // Event listeners
+  document.getElementById('nextBtn')?.addEventListener('click', nextQuestion);
+  document.getElementById('prevBtn')?.addEventListener('click', prevQuestion);
+  document.getElementById('resetBtn')?.addEventListener('click', initQuiz);
+  document.getElementById('categoryFilter')?.addEventListener('change', filterQuestions);
+
+  // Initialize quiz on load
+  initQuiz();
+</script>

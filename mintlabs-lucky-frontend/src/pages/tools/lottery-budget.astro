@@ -1,0 +1,286 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import AffiliateGrid from "../../components/AffiliateGrid.astro";
+
+// JSON-LD for the budget planner tool
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Lottery Budget Planner",
+  "description": "Calculate the true cost of lottery playing over time. See what your lottery spending could buy if invested elsewhere.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "provider": {
+    "@type": "Organization",
+    "name": "MintLabs"
+  }
+};
+---
+
+<InfoLayout 
+  title="Lottery Budget Planner" 
+  subtitle="Understand the true cost of lottery playing over time."
+  pageTitle="Lottery Budget Planner - True Cost Calculator"
+  description="Free lottery budget calculator. See the real cost of lottery spending over 1-30 years. Compare to investing the same amount. Responsible gambling resource."
+  keywords="lottery budget planner, lottery spending calculator, cost of lottery, responsible gambling, lottery vs investing, lottery true cost"
+  jsonLd={jsonLd}
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">Financial reality:</strong>
+    See what your lottery spending really costs—and what else it could buy.
+  </div>
+
+  <section class="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl">
+    <h2 class="mb-6 text-2xl font-semibold text-emerald-300">Your Lottery Budget</h2>
+    
+    <form id="budgetForm" class="space-y-6">
+      <div>
+        <label for="weeklySpend" class="block text-sm font-medium text-gray-300 mb-2">
+          Weekly Lottery Spending ($)
+        </label>
+        <input 
+          type="number" 
+          id="weeklySpend" 
+          name="weeklySpend" 
+          min="1" 
+          step="1" 
+          value="10"
+          class="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-gray-100 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+          placeholder="10"
+        />
+        <p class="mt-1 text-xs text-gray-400">How much do you spend on lottery tickets per week?</p>
+      </div>
+
+      <div>
+        <label for="ticketCost" class="block text-sm font-medium text-gray-300 mb-2">
+          Cost Per Ticket ($)
+        </label>
+        <input 
+          type="number" 
+          id="ticketCost" 
+          name="ticketCost" 
+          min="1" 
+          step="1" 
+          value="2"
+          class="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-gray-100 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+          placeholder="2"
+        />
+      </div>
+
+      <div>
+        <label for="years" class="block text-sm font-medium text-gray-300 mb-2">
+          Years of Playing
+        </label>
+        <input 
+          type="range" 
+          id="years" 
+          name="years" 
+          min="1" 
+          max="40" 
+          value="10"
+          class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+        />
+        <p class="text-center text-lg font-semibold text-emerald-400 mt-2">
+          <span id="yearsDisplay">10</span> years
+        </p>
+      </div>
+
+      <button 
+        type="submit"
+        class="w-full rounded-lg bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-500 transition-colors"
+      >
+        Calculate Impact
+      </button>
+    </form>
+  </section>
+
+  <section id="results" class="hidden space-y-6">
+    <div class="rounded-2xl border border-red-600/50 bg-gradient-to-r from-red-900/30 to-amber-900/30 p-8 shadow-xl">
+      <h2 class="mb-6 text-2xl font-semibold text-red-300">💸 The True Cost</h2>
+      
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center">
+          <p class="text-sm text-gray-400">Monthly Spend</p>
+          <p id="resultMonthly" class="text-2xl font-bold text-gray-100">$0</p>
+        </div>
+        <div class="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center">
+          <p class="text-sm text-gray-400">Yearly Spend</p>
+          <p id="resultYearly" class="text-2xl font-bold text-amber-300">$0</p>
+        </div>
+        <div class="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center">
+          <p class="text-sm text-gray-400">Total Over <span id="resultYearsLabel">10</span> Years</p>
+          <p id="resultTotal" class="text-2xl font-bold text-red-400">$0</p>
+        </div>
+      </div>
+
+      <div class="mt-6 rounded-lg border border-red-600/30 bg-red-900/20 p-4">
+        <p class="text-sm text-gray-300">
+          <strong class="text-red-300">Expected loss:</strong> Lotteries return about 50¢ per dollar played. 
+          Your expected loss over <span id="expectedYears">10</span> years is approximately 
+          <span id="expectedLoss" class="font-bold text-red-400">$0</span>.
+        </p>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-emerald-600/50 bg-gradient-to-r from-emerald-900/30 to-blue-900/30 p-8 shadow-xl">
+      <h2 class="mb-6 text-2xl font-semibold text-emerald-300">💡 What Else Could You Buy?</h2>
+      
+      <div class="grid gap-4 md:grid-cols-2">
+        <div id="alternatives" class="space-y-3">
+          <!-- Filled by JavaScript -->
+        </div>
+        <div class="rounded-xl border border-slate-700 bg-slate-800 p-4">
+          <h3 class="text-lg font-semibold text-blue-300 mb-3">If Invested Instead</h3>
+          <p class="text-sm text-gray-400 mb-2">At 7% annual return:</p>
+          <p id="investedValue" class="text-3xl font-bold text-emerald-400">$0</p>
+          <p class="text-xs text-gray-400 mt-2">This is the power of compound interest over time.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-blue-600/50 bg-blue-900/20 p-8 shadow-xl">
+      <h2 class="mb-4 text-xl font-semibold text-blue-300">🎰 Tickets & Odds</h2>
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center">
+          <p class="text-sm text-gray-400">Total Tickets Purchased</p>
+          <p id="totalTickets" class="text-2xl font-bold text-gray-100">0</p>
+        </div>
+        <div class="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center">
+          <p class="text-sm text-gray-400">Jackpot Odds (Powerball)</p>
+          <p class="text-lg font-bold text-gray-400">1 in 292,201,338</p>
+          <p id="oddsComparison" class="text-xs text-gray-500 mt-1">Still essentially zero chance</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Responsible gambling note */}
+  <section class="rounded-2xl border border-amber-600/50 bg-amber-900/20 p-6">
+    <h3 class="mb-2 text-lg font-semibold text-amber-300">🛡️ Play Responsibly</h3>
+    <p class="text-sm text-gray-300 leading-relaxed">
+      Lottery tickets can be entertaining, but they're not an investment strategy. Set a strict entertainment budget 
+      you can afford to lose. If gambling is affecting your finances, relationships, or mental health, please reach out to 
+      <a href="https://www.ncpgambling.org/" target="_blank" rel="noopener" class="text-amber-400 hover:underline">ncpgambling.org</a> 
+      or call 1-800-522-4700.
+    </p>
+  </section>
+
+  {/* Cross-links */}
+  <section class="rounded-2xl border border-slate-700 bg-slate-900/40 p-6">
+    <h3 class="mb-4 text-xl font-semibold text-gray-200">More tools</h3>
+    <div class="flex flex-wrap gap-3">
+      <a href="/tools/payout-calculator" class="rounded-full border border-emerald-600 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors">
+        Payout Calculator →
+      </a>
+      <a href="/lottery-odds" class="rounded-full border border-blue-600 px-4 py-2 text-sm text-blue-400 hover:bg-blue-600 hover:text-white transition-colors">
+        Lottery Odds →
+      </a>
+      <a href="/faq" class="rounded-full border border-purple-600 px-4 py-2 text-sm text-purple-400 hover:bg-purple-600 hover:text-white transition-colors">
+        FAQ →
+      </a>
+    </div>
+  </section>
+
+  {/* Affiliate resources */}
+  <AffiliateGrid placement="tools" />
+</InfoLayout>
+
+<script>
+  function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  }
+
+  function calculateInvestmentValue(monthlyContribution: number, years: number, annualReturn: number = 0.07): number {
+    // Future value of a series of payments
+    const monthlyRate = annualReturn / 12;
+    const months = years * 12;
+    if (monthlyRate === 0) return monthlyContribution * months;
+    return monthlyContribution * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+  }
+
+  function getAlternatives(totalAmount: number): string[] {
+    const alternatives: { threshold: number; text: string }[] = [
+      { threshold: 100, text: "🍕 A nice dinner out" },
+      { threshold: 500, text: "📱 A new smartphone" },
+      { threshold: 1000, text: "✈️ A weekend getaway" },
+      { threshold: 2500, text: "💻 A quality laptop" },
+      { threshold: 5000, text: "🏖️ An international vacation" },
+      { threshold: 10000, text: "🚗 A down payment on a car" },
+      { threshold: 25000, text: "🎓 A year of college tuition" },
+      { threshold: 50000, text: "🏠 A down payment on a house" },
+      { threshold: 100000, text: "💰 A significant retirement boost" },
+    ];
+
+    return alternatives
+      .filter(alt => totalAmount >= alt.threshold)
+      .slice(-4)
+      .map(alt => `<div class="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-gray-300">${alt.text}</div>`);
+  }
+
+  function calculate() {
+    const form = document.getElementById('budgetForm') as HTMLFormElement;
+    const resultsSection = document.getElementById('results');
+    
+    const weeklySpend = parseFloat((form.querySelector('#weeklySpend') as HTMLInputElement).value) || 0;
+    const ticketCost = parseFloat((form.querySelector('#ticketCost') as HTMLInputElement).value) || 2;
+    const years = parseInt((form.querySelector('#years') as HTMLInputElement).value) || 10;
+    
+    const monthlySpend = weeklySpend * 4.33;
+    const yearlySpend = weeklySpend * 52;
+    const totalSpend = yearlySpend * years;
+    const expectedLoss = totalSpend * 0.5; // 50% return rate
+    const ticketsPerWeek = Math.floor(weeklySpend / ticketCost);
+    const totalTickets = ticketsPerWeek * 52 * years;
+    const investedValue = calculateInvestmentValue(monthlySpend, years);
+    
+    // Update UI
+    document.getElementById('resultMonthly')!.textContent = formatCurrency(monthlySpend);
+    document.getElementById('resultYearly')!.textContent = formatCurrency(yearlySpend);
+    document.getElementById('resultTotal')!.textContent = formatCurrency(totalSpend);
+    document.getElementById('resultYearsLabel')!.textContent = years.toString();
+    document.getElementById('expectedYears')!.textContent = years.toString();
+    document.getElementById('expectedLoss')!.textContent = formatCurrency(expectedLoss);
+    document.getElementById('totalTickets')!.textContent = totalTickets.toLocaleString();
+    document.getElementById('investedValue')!.textContent = formatCurrency(investedValue);
+    
+    // Odds comparison
+    const oddsImprovement = totalTickets / 292201338;
+    const oddsText = oddsImprovement < 0.0001 
+      ? "Still essentially zero chance"
+      : `Improved to ~1 in ${Math.round(292201338 / totalTickets).toLocaleString()}`;
+    document.getElementById('oddsComparison')!.textContent = oddsText;
+    
+    // Alternatives
+    const alternativesHtml = getAlternatives(totalSpend).join('');
+    document.getElementById('alternatives')!.innerHTML = alternativesHtml || '<p class="text-gray-400 text-sm">Enter a larger amount to see alternatives</p>';
+    
+    // Show results
+    resultsSection?.classList.remove('hidden');
+  }
+
+  // Update years display in real-time
+  document.getElementById('years')?.addEventListener('input', (e) => {
+    const value = (e.target as HTMLInputElement).value;
+    document.getElementById('yearsDisplay')!.textContent = value;
+  });
+
+  document.getElementById('budgetForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    calculate();
+  });
+  
+  // Calculate on any input change
+  document.getElementById('budgetForm')?.addEventListener('input', calculate);
+  
+  // Initial calculation
+  document.addEventListener('DOMContentLoaded', calculate);
+</script>

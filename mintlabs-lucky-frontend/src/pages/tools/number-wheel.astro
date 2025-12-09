@@ -1,0 +1,493 @@
+---
+import InfoLayout from "../../components/InfoLayout.astro";
+import AffiliateGrid from "../../components/AffiliateGrid.astro";
+---
+
+<InfoLayout 
+  title="Lucky Number Wheel"
+  subtitle="Spin to pick a random number, name, or option"
+  pageTitle="Lucky Number Wheel – Free Random Spinner | MintLabs"
+  description="Spin the wheel to pick random numbers, names, or anything else. Perfect for lottery picks, party games, team selection, and more. Free and fun!"
+  keywords="random wheel spinner, lottery number picker, random name picker, wheel of fortune, random selector"
+>
+  <div slot="teaser">
+    <strong class="text-emerald-400">🎡 Fun & Free:</strong>
+    Spin to randomly pick a number, name, or option. Great for lottery picks, party games, or any random decision!
+  </div>
+
+  <section class="wheel-container rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-xl">
+    <div class="wheel-wrapper">
+      <div class="wheel-pointer">▼</div>
+      <canvas id="wheel-canvas" width="400" height="400"></canvas>
+    </div>
+    
+    <div class="wheel-result" id="wheel-result">
+      <span class="result-label">Result:</span>
+      <span class="result-value" id="result-value">—</span>
+    </div>
+
+    <button id="spin-btn" class="spin-button">
+      🎡 Spin the Wheel!
+    </button>
+  </div>
+
+  <div class="wheel-config">
+    <h2>Customize Your Wheel</h2>
+    
+    <div class="config-section">
+      <label for="wheel-mode">Wheel Mode:</label>
+      <select id="wheel-mode">
+        <option value="numbers">Numbers (1-10)</option>
+        <option value="custom-numbers">Custom Number Range</option>
+        <option value="names">Custom Names/Options</option>
+      </select>
+    </div>
+
+    <div class="config-section" id="number-range-config">
+      <label for="num-min">From:</label>
+      <input type="number" id="num-min" value="1" min="0" max="999">
+      <label for="num-max">To:</label>
+      <input type="number" id="num-max" value="10" min="1" max="999">
+      <button id="apply-range" class="apply-btn">Apply</button>
+    </div>
+
+    <div class="config-section hidden" id="names-config">
+      <label for="names-input">Enter options (one per line):</label>
+      <textarea id="names-input" rows="6" placeholder="Alice
+Bob
+Charlie
+Diana
+..."></textarea>
+      <button id="apply-names" class="apply-btn">Apply Names</button>
+    </div>
+
+    <div class="config-section">
+      <label for="slice-count">Number of Slices: <span id="slice-count-display">10</span></label>
+      <input type="range" id="slice-count" min="2" max="20" value="10">
+    </div>
+  </div>
+
+  <div class="wheel-tips">
+    <h3>💡 Ideas for Using the Wheel</h3>
+    <ul>
+      <li><strong>Lottery Numbers:</strong> Set range to 1-69 for Powerball main numbers</li>
+      <li><strong>Team Picker:</strong> Enter team member names and spin to assign tasks</li>
+      <li><strong>Party Games:</strong> Add dares, questions, or challenges</li>
+      <li><strong>Decision Maker:</strong> Can't decide where to eat? Add restaurant names!</li>
+      <li><strong>Classroom:</strong> Teachers can randomly call on students</li>
+    </ul>
+  </div>
+
+  <AffiliateGrid placement="tools" />
+
+  <style>
+    .page-intro {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      color: var(--text-secondary);
+    }
+
+    .wheel-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .wheel-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .wheel-pointer {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      color: var(--accent);
+      z-index: 10;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    #wheel-canvas {
+      border-radius: 50%;
+      box-shadow: 
+        0 0 0 8px var(--surface-2),
+        0 0 0 12px var(--accent),
+        0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .wheel-result {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      background: var(--surface-2);
+      border-radius: 12px;
+      font-size: 1.25rem;
+    }
+
+    .result-label {
+      color: var(--text-secondary);
+    }
+
+    .result-value {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--accent);
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .spin-button {
+      padding: 1rem 3rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.4);
+    }
+
+    .spin-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.5);
+    }
+
+    .spin-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .wheel-config {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .wheel-config h2 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-size: 1.25rem;
+    }
+
+    .config-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .config-section label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .config-section select,
+    .config-section input[type="number"],
+    .config-section textarea {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+
+    .config-section input[type="number"] {
+      width: calc(50% - 3rem);
+      display: inline-block;
+    }
+
+    .config-section input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .apply-btn {
+      margin-top: 0.75rem;
+      padding: 0.5rem 1.5rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .apply-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .wheel-tips {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .wheel-tips h3 {
+      margin-top: 0;
+    }
+
+    .wheel-tips ul {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+
+    .wheel-tips li {
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+    }
+
+    .wheel-tips li strong {
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 480px) {
+      #wheel-canvas {
+        width: 300px;
+        height: 300px;
+      }
+
+      .spin-button {
+        padding: 0.875rem 2rem;
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+
+  <script>
+    // Wheel colors - alternating vibrant palette
+    const COLORS = [
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', 
+      '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F',
+      '#BB8FCE', '#85C1E9', '#F8B500', '#00CED1'
+    ];
+
+    class LuckyWheel {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.items = this.generateNumbers(1, 10);
+        this.rotation = 0;
+        this.isSpinning = false;
+        this.draw();
+      }
+
+      generateNumbers(min, max) {
+        const nums = [];
+        for (let i = min; i <= max; i++) {
+          nums.push(String(i));
+        }
+        return nums;
+      }
+
+      setItems(items) {
+        this.items = items.slice(0, 20); // Max 20 slices
+        this.draw();
+      }
+
+      draw() {
+        const ctx = this.ctx;
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = Math.min(centerX, centerY) - 5;
+        const sliceAngle = (2 * Math.PI) / this.items.length;
+
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw slices
+        this.items.forEach((item, i) => {
+          const startAngle = this.rotation + i * sliceAngle;
+          const endAngle = startAngle + sliceAngle;
+
+          // Slice
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+          ctx.closePath();
+          ctx.fillStyle = COLORS[i % COLORS.length];
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // Text
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.rotate(startAngle + sliceAngle / 2);
+          ctx.textAlign = 'right';
+          ctx.fillStyle = '#fff';
+          ctx.font = `bold ${Math.max(12, 20 - this.items.length)}px system-ui, sans-serif`;
+          ctx.shadowColor = 'rgba(0,0,0,0.5)';
+          ctx.shadowBlur = 3;
+          
+          // Truncate long text
+          let displayText = item.length > 10 ? item.slice(0, 9) + '…' : item;
+          ctx.fillText(displayText, radius - 15, 5);
+          ctx.restore();
+        });
+
+        // Center circle
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 25, 0, 2 * Math.PI);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+
+      spin(callback) {
+        if (this.isSpinning) return;
+        this.isSpinning = true;
+
+        const spinDuration = 4000 + Math.random() * 2000; // 4-6 seconds
+        const totalRotation = (5 + Math.random() * 5) * 2 * Math.PI; // 5-10 full rotations
+        const startRotation = this.rotation;
+        const startTime = performance.now();
+
+        const animate = (currentTime) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / spinDuration, 1);
+          
+          // Easing: decelerate
+          const easeOut = 1 - Math.pow(1 - progress, 3);
+          
+          this.rotation = startRotation + totalRotation * easeOut;
+          this.draw();
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            this.isSpinning = false;
+            const winner = this.getWinner();
+            callback(winner);
+          }
+        };
+
+        requestAnimationFrame(animate);
+      }
+
+      getWinner() {
+        // The pointer is at the top (12 o'clock = -π/2)
+        // Normalize rotation to 0-2π
+        const normalizedRotation = (((-this.rotation - Math.PI / 2) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+        const sliceAngle = (2 * Math.PI) / this.items.length;
+        const winnerIndex = Math.floor(normalizedRotation / sliceAngle);
+        return this.items[winnerIndex];
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('wheel-canvas') as HTMLCanvasElement;
+      const wheel = new LuckyWheel(canvas);
+      
+      const spinBtn = document.getElementById('spin-btn') as HTMLButtonElement;
+      const resultValue = document.getElementById('result-value');
+      const modeSelect = document.getElementById('wheel-mode') as HTMLSelectElement;
+      const numberRangeConfig = document.getElementById('number-range-config');
+      const namesConfig = document.getElementById('names-config');
+      const numMin = document.getElementById('num-min') as HTMLInputElement;
+      const numMax = document.getElementById('num-max') as HTMLInputElement;
+      const applyRange = document.getElementById('apply-range');
+      const namesInput = document.getElementById('names-input') as HTMLTextAreaElement;
+      const applyNames = document.getElementById('apply-names');
+      const sliceCount = document.getElementById('slice-count') as HTMLInputElement;
+      const sliceCountDisplay = document.getElementById('slice-count-display');
+
+      // Spin button
+      spinBtn.addEventListener('click', () => {
+        spinBtn.disabled = true;
+        resultValue.textContent = '...';
+        resultValue.style.animation = 'none';
+        
+        wheel.spin((winner) => {
+          resultValue.textContent = winner;
+          resultValue.style.animation = 'pulse 0.5s ease';
+          spinBtn.disabled = false;
+        });
+      });
+
+      // Mode switching
+      modeSelect.addEventListener('change', () => {
+        const mode = modeSelect.value;
+        
+        if (mode === 'numbers') {
+          numberRangeConfig.classList.remove('hidden');
+          namesConfig.classList.add('hidden');
+          wheel.setItems(wheel.generateNumbers(1, 10));
+          sliceCount.value = '10';
+          sliceCountDisplay.textContent = '10';
+        } else if (mode === 'custom-numbers') {
+          numberRangeConfig.classList.remove('hidden');
+          namesConfig.classList.add('hidden');
+        } else if (mode === 'names') {
+          numberRangeConfig.classList.add('hidden');
+          namesConfig.classList.remove('hidden');
+        }
+      });
+
+      // Apply number range
+      applyRange.addEventListener('click', () => {
+        let min = parseInt(numMin.value) || 1;
+        let max = parseInt(numMax.value) || 10;
+        if (min > max) [min, max] = [max, min];
+        
+        const count = Math.min(max - min + 1, 20);
+        const items = wheel.generateNumbers(min, min + count - 1);
+        wheel.setItems(items);
+        sliceCount.value = String(items.length);
+        sliceCountDisplay.textContent = String(items.length);
+      });
+
+      // Apply names
+      applyNames.addEventListener('click', () => {
+        const names = namesInput.value
+          .split('\n')
+          .map(n => n.trim())
+          .filter(n => n.length > 0);
+        
+        if (names.length >= 2) {
+          wheel.setItems(names);
+          sliceCount.value = String(names.length);
+          sliceCountDisplay.textContent = String(names.length);
+        } else {
+          alert('Please enter at least 2 options');
+        }
+      });
+
+      // Slice count slider (only for numbers mode)
+      sliceCount.addEventListener('input', () => {
+        const count = parseInt(sliceCount.value);
+        sliceCountDisplay.textContent = String(count);
+        
+        if (modeSelect.value !== 'names') {
+          const min = parseInt(numMin.value) || 1;
+          wheel.setItems(wheel.generateNumbers(min, min + count - 1));
+        }
+      });
+    });
+  </script>
+</InfoLayout>
