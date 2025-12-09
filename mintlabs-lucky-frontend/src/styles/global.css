@@ -380,3 +380,8 @@ html[data-theme="bw-light"] #generateBtn {
   background-color: #ef4444;
   color: #fff;
 }
+
+/* Small-screen tweaks for carousel tool cards to reduce crowding */
+@media (max-width: 420px) {
+  .tool-card { padding: .5rem .75rem !important; font-size: .95rem !important; }
+}
