@@ -313,40 +313,84 @@ const description = "Practice blackjack strategy with our fictional casino simul
     return total;
   }
 
-  // Render a single card
+  // Asset resolver - ensures JPEG fallback (matches CardView.astro)
+  function resolveAsset(src: string | undefined): string | null {
+    if (!src) return null;
+    return src
+      .replace('.webp', '.jpeg')
+      .replace('.jpg', '.jpeg')
+      .replace('.svg', '.jpeg');
+  }
+
+  // Render a single card with Phase 4.4 visual polish (matches CardView.astro)
   function renderCard(card: Card, faceDown = false): string {
     const theme = getDeckTheme(currentThemeId);
     const suitSet = getSuitSet(theme.suitSetId);
     const suitIcon = suitSet.icons[card.suit];
     const isEmoji = !suitIcon.startsWith('/');
     const cardColor = (card.suit === 'hearts' || card.suit === 'diamonds') ? 'text-red-600' : 'text-slate-900';
-    const ariaLabel = formatCard(card);
+    const ariaLabel = faceDown ? 'Face down card' : formatCard(card);
 
-    if (faceDown) {
-      return `
-        <div class="relative aspect-[3/4] w-24 ${theme.cardFrameClass}" role="img" aria-label="Face down card">
-          <div class="absolute inset-0 ${theme.backPattern || 'bg-emerald-700'} flex items-center justify-center">
-            <div class="text-white text-2xl opacity-20">🎴</div>
+    // Resolve image paths
+    const frontSrc = resolveAsset((theme as any).frontBySuit?.[card.suit] ?? (theme as any).frontImage);
+    const backSrc = resolveAsset((theme as any).backImage);
+    const cardImageSrc = faceDown ? backSrc : frontSrc;
+
+    // Build inner mask with image/pattern
+    let innerContent = '';
+    if (cardImageSrc) {
+      innerContent = `
+        <div class="absolute inset-0 p-[2%]">
+          <div class="w-full h-full bg-cover bg-center" style="background-image: url('${cardImageSrc}')"></div>
+        </div>
+      `;
+    } else if (theme.background && !faceDown) {
+      innerContent = `<div class="absolute inset-0 ${theme.background}"></div>`;
+    } else if (faceDown) {
+      innerContent = `
+        <div class="absolute inset-0 ${theme.backPattern || 'bg-emerald-700'} flex items-center justify-center">
+          <div class="text-white text-2xl opacity-20">🎴</div>
+        </div>
+      `;
+    } else {
+      innerContent = `<div class="absolute inset-0 bg-white"></div>`;
+    }
+
+    // Build rank/suit overlay (face-up only)
+    let overlayContent = '';
+    if (!faceDown) {
+      overlayContent = `
+        <div class="absolute inset-0 pointer-events-none">
+          <!-- Top-left -->
+          <div class="absolute top-[6%] left-[7%]">
+            <div class="flex flex-col items-center justify-center leading-none text-[0.7rem] sm:text-[0.8rem] drop-shadow-[0_0_3px_rgba(0,0,0,0.5)] ${cardColor}">
+              <span class="${theme.rankFontClass}">${card.rank}</span>
+              <span>${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-3 h-3 sm:w-4 sm:h-4"/>`}</span>
+            </div>
+          </div>
+          <!-- Center -->
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <span class="text-[1.8rem] sm:text-[2rem] opacity-80 drop-shadow-[0_0_4px_rgba(0,0,0,0.6)] ${cardColor}">
+              ${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-10 h-10 sm:w-12 sm:h-12 opacity-80" style="filter: drop-shadow(0 0 4px rgba(0,0,0,0.6));"/>`}
+            </span>
+          </div>
+          <!-- Bottom-right -->
+          <div class="absolute bottom-[6%] right-[7%] rotate-180">
+            <div class="flex flex-col items-center justify-center leading-none text-[0.7rem] sm:text-[0.8rem] drop-shadow-[0_0_3px_rgba(0,0,0,0.5)] ${cardColor}">
+              <span class="${theme.rankFontClass}">${card.rank}</span>
+              <span>${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-3 h-3 sm:w-4 sm:h-4"/>`}</span>
+            </div>
           </div>
         </div>
       `;
     }
 
     return `
-      <div class="relative aspect-[3/4] w-24 ${theme.cardFrameClass}" role="img" aria-label="${ariaLabel}">
-        <div class="absolute inset-0 ${theme.background || 'bg-white'} flex flex-col justify-between p-2">
-          <div class="flex flex-col items-start leading-none ${cardColor}">
-            <span class="${theme.rankFontClass} text-xl">${card.rank}</span>
-            <span class="text-sm">${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-4 h-4"/>`}</span>
-          </div>
-          <div class="flex justify-center items-center ${cardColor}">
-            <span class="text-4xl">${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-12 h-12"/>`}</span>
-          </div>
-          <div class="flex flex-col items-end leading-none rotate-180 ${cardColor}">
-            <span class="${theme.rankFontClass} text-xl">${card.rank}</span>
-            <span class="text-sm">${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-4 h-4"/>`}</span>
-          </div>
+      <div class="relative w-[80px] sm:w-[90px] aspect-[3/4] ${theme.cardFrameClass} transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg" role="img" aria-label="${ariaLabel}">
+        <div class="absolute inset-0 rounded-xl overflow-hidden">
+          ${innerContent}
         </div>
+        ${overlayContent}
       </div>
     `;
   }
@@ -406,9 +450,14 @@ const description = "Practice blackjack strategy with our fictional casino simul
     }
   }
 
-  // Check for blackjack
-  function hasBlackjack(hand: Card[]): boolean {
+  // Check for natural blackjack (ONLY on initial 2 cards)
+  function hasNaturalBlackjack(hand: Card[]): boolean {
     return hand.length === 2 && calculateTotal(hand) === 21;
+  }
+
+  // Check if hand is busted
+  function isBusted(hand: Card[]): boolean {
+    return calculateTotal(hand) > 21;
   }
 
   // Dealer play
@@ -433,53 +482,63 @@ const description = "Practice blackjack strategy with our fictional casino simul
     hitDealer();
   }
 
-  // Check winner
+  // Settlement - Centralized payout logic
   function checkWinner() {
     const playerTotal = calculateTotal(playerHand);
     const dealerTotal = calculateTotal(dealerHand);
-    const playerNatural = hasBlackjack(playerHand);
-    const dealerNatural = hasBlackjack(dealerHand);
+    const playerNatural = hasNaturalBlackjack(playerHand);
+    const dealerNatural = hasNaturalBlackjack(dealerHand);
     
-    // Calculate payout multiplier (1x for normal win, 1.5x for natural blackjack, 2x for doubled down)
-    let winMultiplier = isDoubledDown ? 2 : 1;
-    let winAmount = baseBet * 2 * winMultiplier; // Return bet + win
-    let lossAmount = baseBet * (isDoubledDown ? 2 : 1);
-    let pushAmount = baseBet * (isDoubledDown ? 2 : 1); // Return bet
+    // Current bet (may be doubled)
+    const currentBet = baseBet * (isDoubledDown ? 2 : 1);
+    
+    // Settlement outcomes:
+    // - Player bust: lose bet
+    // - Dealer bust: win 1:1 (return bet + winnings)
+    // - Natural BJ vs non-BJ: win 3:2 (return bet + 1.5x winnings)
+    // - Both natural BJ: push (return bet)
+    // - Compare totals: win 1:1, lose bet, or push
 
     if (playerTotal > 21) {
+      // Player busted - lose bet
       showStatus('Bust! 💥', `You went over 21 with ${playerTotal}.`, 'lose');
-      subtractCatnip(lossAmount, isDoubledDown ? 'Blackjack doubled down bust' : 'Blackjack bust');
-      showCatnipChange(-lossAmount, 'Bust');
+      showCatnipChange(-currentBet, 'Bust');
     } else if (dealerTotal > 21) {
+      // Dealer busted - win 1:1
+      const payout = currentBet * 2; // Return bet + winnings
       showStatus('You Win! 🎉', `Dealer busted with ${dealerTotal}.`, 'win');
-      addCatnip(winAmount, isDoubledDown ? 'Blackjack doubled down win' : 'Blackjack win');
-      showCatnipChange(+winAmount, isDoubledDown ? 'Doubled Win!' : 'Win');
+      addCatnip(payout, isDoubledDown ? 'Blackjack doubled down win' : 'Blackjack win');
+      showCatnipChange(+payout, isDoubledDown ? 'Doubled Win!' : 'Win');
     } else if (playerNatural && !dealerNatural) {
-      // Natural blackjack pays 3:2 (1.5x the bet)
-      const naturalPayout = Math.floor(baseBet * 2.5); // Bet + 1.5x win
+      // Natural blackjack pays 3:2 (only on base bet, not doubled)
+      const payout = Math.floor(baseBet * 2.5); // Bet + 1.5x winnings
       showStatus('Blackjack! 🎰', 'Natural 21 pays 3:2!', 'win');
-      addCatnip(naturalPayout, 'Blackjack natural 21');
-      showCatnipChange(+naturalPayout, 'Blackjack!');
+      addCatnip(payout, 'Blackjack natural 21');
+      showCatnipChange(+payout, 'Blackjack!');
     } else if (dealerNatural && !playerNatural) {
+      // Dealer has natural BJ - lose bet
       showStatus('Dealer Blackjack 🎩', 'Dealer has natural 21.', 'lose');
-      subtractCatnip(lossAmount, 'Blackjack loss');
-      showCatnipChange(-lossAmount, 'Loss');
+      showCatnipChange(-currentBet, 'Loss');
     } else if (playerNatural && dealerNatural) {
+      // Both have natural BJ - push
       showStatus('Push 🤝', 'Both have Blackjack!', 'push');
-      addCatnip(baseBet, 'Blackjack push');
-      showCatnipChange(+baseBet, 'Push');
+      addCatnip(currentBet, 'Blackjack push');
+      showCatnipChange(0, 'Push');
     } else if (playerTotal > dealerTotal) {
+      // Player wins - 1:1 payout
+      const payout = currentBet * 2; // Return bet + winnings
       showStatus('You Win! 🎉', `${playerTotal} beats ${dealerTotal}.`, 'win');
-      addCatnip(winAmount, isDoubledDown ? 'Blackjack doubled down win' : 'Blackjack win');
-      showCatnipChange(+winAmount, isDoubledDown ? 'Doubled Win!' : 'Win');
+      addCatnip(payout, isDoubledDown ? 'Blackjack doubled down win' : 'Blackjack win');
+      showCatnipChange(+payout, isDoubledDown ? 'Doubled Win!' : 'Win');
     } else if (dealerTotal > playerTotal) {
+      // Dealer wins - lose bet
       showStatus('Dealer Wins 🎩', `${dealerTotal} beats ${playerTotal}.`, 'lose');
-      subtractCatnip(lossAmount, 'Blackjack loss');
-      showCatnipChange(-lossAmount, 'Loss');
+      showCatnipChange(-currentBet, 'Loss');
     } else {
+      // Tie - push (return bet)
       showStatus('Push 🤝', `Both have ${playerTotal}. It's a tie!`, 'push');
-      addCatnip(pushAmount, 'Blackjack push');
-      showCatnipChange(+pushAmount, 'Push');
+      addCatnip(currentBet, 'Blackjack push');
+      showCatnipChange(0, 'Push');
     }
 
     updateButtons(false, false, false, true);
@@ -514,13 +573,17 @@ const description = "Practice blackjack strategy with our fictional casino simul
     hideStatus();
     gameOver = false;
     isDoubledDown = false;
+    
+    // Deduct bet at deal time
+    subtractCatnip(baseBet, 'Blackjack bet');
+    
     deck = shuffleDeck(generateStandardDeck());
     playerHand = [deck.pop()!, deck.pop()!];
     dealerHand = [deck.pop()!, deck.pop()!];
     renderHands();
 
-    // Check for immediate blackjacks
-    if (hasBlackjack(playerHand) || hasBlackjack(dealerHand)) {
+    // Check for immediate natural blackjacks
+    if (hasNaturalBlackjack(playerHand) || hasNaturalBlackjack(dealerHand)) {
       gameOver = true;
       renderHands();
       checkWinner();
@@ -557,9 +620,12 @@ const description = "Practice blackjack strategy with our fictional casino simul
   // Double Down
   function doubleDown() {
     // Only allowed on first decision with 2 cards
-    if (playerHand.length !== 2 || isDoubledDown) {
+    if (playerHand.length !== 2 || isDoubledDown || gameOver) {
       return;
     }
+
+    // Deduct additional bet amount
+    subtractCatnip(baseBet, 'Blackjack double down');
 
     // Mark as doubled down
     isDoubledDown = true;

@@ -32,15 +32,31 @@ Implemented a reusable, deck-agnostic **Card Template System** for Lucky.mintloo
 
 ### 2. Deck Configuration (`src/config/decks.ts`)
 
-**4 Built-in Themes:**
+**7 Built-in Themes:**
+
+**CSS-Based Themes (4):**
 1. **Emoji Default** – Lightweight, emoji-only suits (♠️♥️♦️♣️)
 2. **Classic Green Table** – Traditional casino look with text suits (♠♥♦♣)
 3. **Dark Mode** – High contrast for dark environments
 4. **Royal Purple** – Elegant purple-themed deck
 
+**Image-Backed Themes (3):** *(Phase 4.3.y+z)*
+5. **Emerald Velvet** – Rich green textured background with JPEG front/back
+6. **Linen Ivory** – Vintage paper texture with JPEG front/back
+7. **Mist Blue** – Calm blue aesthetic with JPEG front/back
+
+**Image Theme Structure:**
+- All image themes use **JPEG format** (`.jpeg` extension)
+- Assets stored in: `public/cards/themes/<theme>/`
+  - `front.jpeg` – Card face background
+  - `back.jpeg` – Card back pattern
+- Optional per-suit fronts: `frontBySuit: { hearts, diamonds, clubs, spades }`
+- Asset resolver ensures `.svg`/`.webp` fallback to `.jpeg`
+
 **Extensibility:**
-- Easy to add new themes: just add 4 suit icons + 1 background + CSS classes
-- Future themes planned: Kawaii, MintLoop branded, Pixel art, Seasonal
+- CSS themes: just add 4 suit icons + CSS classes
+- Image themes: add 2 JPEGs (front/back) + theme config
+- Future formats: WebP support ready (resolver handles conversion)
 
 **Helper Functions:**
 - `getSuitSet(id)`: Get suit set with fallback to emoji
