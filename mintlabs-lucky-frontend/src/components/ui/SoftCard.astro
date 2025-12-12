@@ -1,0 +1,158 @@
+---
+// SoftCard.astro - Lucky v2 Design System
+// Soft shadow card with blur background and optional gradient glow
+
+export interface Props {
+  variant?: 'default' | 'elevated' | 'glow' | 'flat';
+  padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  radius?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+  gradient?: 'none' | 'subtle' | 'accent' | 'hero';
+  hasAnimation?: boolean;
+  className?: string;
+  as?: 'div' | 'article' | 'section';
+}
+
+const {
+  variant = 'default',
+  padding = 'md',
+  radius = '2xl',
+  gradient = 'none',
+  hasAnimation = false,
+  className = '',
+  as: Tag = 'div',
+  ...rest
+} = Astro.props;
+
+const paddingClasses = {
+  none: '',
+  sm: 'p-3 sm:p-4',
+  md: 'p-4 sm:p-6',
+  lg: 'p-6 sm:p-8',
+  xl: 'p-8 sm:p-10',
+};
+
+const radiusClasses = {
+  sm: 'rounded-lg',
+  md: 'rounded-xl',
+  lg: 'rounded-2xl',
+  xl: 'rounded-3xl',
+  '2xl': 'rounded-3xl',
+  '3xl': 'rounded-[2rem]',
+};
+
+const variantStyles = {
+  default: 'bg-white/80 backdrop-blur-sm shadow-soft-md',
+  elevated: 'bg-white/90 backdrop-blur-md shadow-soft-lg',
+  glow: 'bg-white/80 backdrop-blur-sm shadow-glow',
+  flat: 'bg-white/70 shadow-soft-xs',
+};
+
+const gradientClasses = {
+  none: '',
+  subtle: 'soft-card-gradient-subtle',
+  accent: 'soft-card-gradient-accent',
+  hero: 'soft-card-gradient-hero',
+};
+
+const animationClass = hasAnimation ? 'soft-card-hover-glow' : '';
+
+const classes = [
+  'soft-card',
+  paddingClasses[padding as keyof typeof paddingClasses],
+  radiusClasses[radius as keyof typeof radiusClasses],
+  variantStyles[variant as keyof typeof variantStyles],
+  gradientClasses[gradient as keyof typeof gradientClasses],
+  animationClass,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<Tag {...rest} class={classes}>
+  <slot />
+</Tag>
+
+<style>
+  .soft-card {
+    position: relative;
+    overflow: hidden;
+    transition:
+      transform var(--duration-normal) var(--ease-out),
+      box-shadow var(--duration-normal) var(--ease-out);
+  }
+
+  .soft-card-gradient-subtle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-card-glow);
+    opacity: 0.4;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .soft-card-gradient-accent::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-theme-accent);
+    opacity: 0.1;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .soft-card-gradient-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-hero);
+    opacity: 0.08;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .soft-card > :global(*) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .soft-card-hover-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .soft-card,
+    .soft-card-hover-glow:hover {
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* Shadow utility classes */
+  .shadow-soft-xs {
+    box-shadow: var(--shadow-soft-xs);
+  }
+
+  .shadow-soft-sm {
+    box-shadow: var(--shadow-soft-sm);
+  }
+
+  .shadow-soft-md {
+    box-shadow: var(--shadow-soft-md);
+  }
+
+  .shadow-soft-lg {
+    box-shadow: var(--shadow-soft-lg);
+  }
+
+  .shadow-soft-xl {
+    box-shadow: var(--shadow-soft-xl);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+</style>

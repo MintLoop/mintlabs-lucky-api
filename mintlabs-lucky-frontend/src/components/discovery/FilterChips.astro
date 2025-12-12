@@ -1,0 +1,122 @@
+---
+// FilterChips.astro - Lucky v2 Design System
+// Pill-style filter chips for category selection
+
+export interface Props {
+  filters: { id: string; label: string; icon?: string }[];
+  className?: string;
+}
+
+const {
+  filters = [],
+  className = '',
+} = Astro.props;
+---
+
+<div class={`filter-chips flex flex-wrap gap-2 ${className}`} data-filter-container>
+  <button
+    type="button"
+    class="filter-chip filter-chip-active px-4 py-2 rounded-full text-sm font-medium transition-all"
+    data-filter="all"
+    data-filter-chip
+  >
+    <span>✨ All</span>
+  </button>
+  {filters.map(filter => (
+    <button
+      type="button"
+      class="filter-chip px-4 py-2 rounded-full text-sm font-medium transition-all"
+      data-filter={filter.id}
+      data-filter-chip
+    >
+      <span>
+        {filter.icon && `${filter.icon} `}
+        {filter.label}
+      </span>
+    </button>
+  ))}
+</div>
+
+<style>
+  .filter-chip {
+    border: 2px solid var(--border-primary);
+    background: white;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .filter-chip:hover {
+    background: var(--bg-surface-1);
+    border-color: var(--accent-primary);
+    transform: translateY(-1px);
+  }
+
+  .filter-chip-active {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+    font-weight: 600;
+  }
+
+  .filter-chip-active:hover {
+    background: var(--accent-primary);
+    transform: none;
+  }
+
+  .filter-chip:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .filter-chip,
+    .filter-chip:hover {
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  function initFilterChips() {
+    const filterChips = document.querySelectorAll('[data-filter-chip]');
+    
+    if (!filterChips.length) return;
+
+    function handleFilterClick(event: Event) {
+      const target = event.currentTarget as HTMLButtonElement;
+      const filterId = target.getAttribute('data-filter');
+
+      // Update active state
+      filterChips.forEach(chip => {
+        chip.classList.remove('filter-chip-active');
+      });
+      target.classList.add('filter-chip-active');
+
+      // Dispatch filter change event
+      window.dispatchEvent(
+        new CustomEvent('filterChange', {
+          detail: { filterId },
+        })
+      );
+    }
+
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', handleFilterClick);
+    });
+  }
+
+  // Initialize on load and page transitions
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFilterChips);
+  } else {
+    initFilterChips();
+  }
+
+  document.addEventListener('astro:page-load', initFilterChips);
+</script>

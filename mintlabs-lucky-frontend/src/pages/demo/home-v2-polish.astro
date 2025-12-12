@@ -1,0 +1,239 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DemoHeader from '../../components/demo/DemoHeader.astro';
+import DemoGeneratorContainer from '../../components/demo/DemoGeneratorContainer.astro';
+import DemoFeatureCard from '../../components/demo/DemoFeatureCard.astro';
+import DemoEduGrid from '../../components/demo/DemoEduGrid.astro';
+import DemoCarousel from '../../components/demo/DemoCarousel.astro';
+import DemoThemeToolbar from '../../components/demo/DemoThemeToolbar.astro';
+import SearchBar from '../../components/discovery/SearchBar.astro';
+import InfoBlurb from '../../components/ui/InfoBlurb.astro';
+import TermsModal from '../../components/TermsModal.astro';
+import PrivacyModal from '../../components/PrivacyModal.astro';
+
+const API = import.meta.env.PUBLIC_API_BASE || 'http://localhost:8000';
+const gamesEndpoint = API ? `${String(API).replace(/\/$/, '')}/games` : '/games';
+const games = await fetch(gamesEndpoint).then(r => r.json()).catch(() => []);
+const jsonGames = Array.isArray(games) ? JSON.stringify(games).replaceAll('`', '\\`') : '[]';
+const current = Array.isArray(games) && games.length > 0 ? games[0] : null;
+const ADS = import.meta.env.PUBLIC_ADSENSE_CLIENT;
+const IS_PROD = import.meta.env.PROD;
+const apiBase = API ? String(API).replace(/\/$/, '') : '';
+---
+
+<Layout title="MintLabs Lucky Numbers — Demo Home" description="Demo layout with Lucky v2 polished UX" keywords="demo, lucky v2, design system" demo>
+  {jsonGames && jsonGames !== '[]' && (
+    <script type="application/json" id="initial-games" set:html={jsonGames} />
+  )}
+
+  <main class="demo-page-shell">
+    <div class="demo-container">
+      <DemoHeader />
+    </div>
+
+    <div class="demo-shell">
+      <div class="demo-container">
+        <section class="demo-controls" aria-label="Theme and search">
+          <div class="control-theme">
+            <DemoThemeToolbar />
+          </div>
+          <div class="control-search">
+            <SearchBar placeholder="Search tools & features" className="compact-search" />
+          </div>
+        </section>
+      </div>
+
+      <div class="demo-container">
+        <section class="demo-column" aria-label="Generator and results">
+          <DemoGeneratorContainer games={games} />
+
+          <div id="results" class="demo-results"></div>
+          <div id="facts" class="demo-facts">
+            {current && (
+              <div class="demo-fact-card demo-card">
+                <div class="text-sm font-semibold mb-1" style="color:var(--text-strong);">Game Facts & Odds</div>
+                <div class="text-sm" style="color:var(--text-body)">{current.name} • {current.code}</div>
+              </div>
+            )}
+          </div>
+
+          <section class="demo-carousel-section">
+            <h3 class="section-title">Explore Tools</h3>
+            <DemoCarousel />
+          </section>
+
+          <div class="demo-info-grid">
+            <InfoBlurb variant="educational" title="What's New" className="demo-card">
+              Polished design system demo showing token-driven theming and accessible components.
+            </InfoBlurb>
+            <InfoBlurb variant="tip" title="Performance First" className="demo-card">
+              WebP images, reduced-motion, and SSR-safe storage. Demo uses token-based CSS for consistent theme parity.
+            </InfoBlurb>
+          </div>
+        </section>
+      </div>
+
+      <div class="demo-container">
+        <section class="demo-column demo-feature-section" aria-label="Feature cards">
+          <div class="section-header">
+            <h3 class="section-title">Featured experiences</h3>
+            <p class="section-subtitle">Quick paths to the most popular tools.</p>
+          </div>
+          <div class="features-grid">
+            <DemoFeatureCard icon="✨" title="Lucky Profile Generator" description="Discover your personalized lucky numbers based on birthstone, Indian zodiac (Rashi), and color psychology." href="/lucky-profile" badge="New" variant="accent" />
+
+            <DemoFeatureCard icon="🎰" title="Casino-Lite Simulators" description="Learn probability & strategy via fictional simulators such as Blackjack and Wheel Spinner." href="/casino-lite" badge="Featured" variant="elevated" />
+
+            {IS_PROD && ADS && (
+              <>
+                <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS}`} crossorigin="anonymous"></script>
+                <ins class="adsbygoogle block h-[90px]" data-ad-client={ADS} data-ad-slot="0000000001" data-full-width-responsive="true"></ins>
+                <script is:inline>try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){console.warn('AdSense failed:',e);}</script>
+              </>
+            )}
+          </div>
+        </section>
+      </div>
+
+      <div class="demo-container">
+        <section class="demo-column demo-edu-section" aria-label="Education and guides">
+          <div class="section-header">
+            <h3 class="section-title">Learn & Explore</h3>
+            <p class="section-subtitle">Guides, math, and probability basics.</p>
+          </div>
+          <div class="demo-edu-shell">
+            <DemoEduGrid />
+          </div>
+          <div class="demo-edu-link">
+            <a class="demo-link" href="/lottery-odds">View all guides →</a>
+          </div>
+        </section>
+      </div>
+
+      <div class="demo-container">
+        <footer class="demo-footer">
+          <div class="demo-footer-grid">
+            <div>
+              <h4 class="font-semibold" style="color: var(--text-secondary);">Education</h4>
+              <ul class="space-y-1.5" style="color: var(--text-muted);">
+                <li><a href="/lottery-odds" class="hover:underline demo-link">Lottery Odds</a></li>
+                <li><a href="/lottery-math" class="hover:underline demo-link">The Math</a></li>
+                <li><a href="/faq" class="hover:underline demo-link">FAQ</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold" style="color: var(--text-secondary);">Tools</h4>
+              <ul class="space-y-1.5" style="color: var(--text-muted);">
+                <li><a href="/tools/payout-calculator" class="hover:underline demo-link">Payout Calculator</a></li>
+                <li><a href="/tools/lottery-budget" class="hover:underline demo-link">Budget Planner</a></li>
+                <li><a href="/archive" class="hover:underline demo-link">Past Results</a></li>
+              </ul>
+            </div>
+            <div class="col-span-2 md:col-span-1">
+              <h4 class="font-semibold" style="color: var(--text-secondary);">Legal</h4>
+              <ul class="space-y-1.5" style="color: var(--text-muted);">
+                <li><a href="/terms" class="hover:underline demo-link">Terms & Conditions</a></li>
+                <li><a href="/privacy" class="hover:underline demo-link">Privacy Policy</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="demo-footer-meta">
+            <p>© 2025 MintLabs. All rights reserved.</p>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <TermsModal />
+    <PrivacyModal />
+
+    <script is:inline define:vars={{ apiBase }}>
+      window.__LUCKY_API_BASE = apiBase;
+    </script>
+    <script type="module" src="/scripts/entry.js"></script>
+  </main>
+</Layout>
+
+<style>
+  .demo-page-shell { background: var(--surface-page); min-height: 100vh; padding: var(--space-xl) var(--space-sm) var(--space-2xl); }
+  .demo-shell { width: 100%; max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-lg); }
+  .demo-container { width: 100%; max-width: 960px; margin: 0 auto; padding: 0 var(--space-md); }
+  .demo-column { width: 100%; display: flex; flex-direction: column; gap: var(--space-lg); }
+  .demo-main-column { width: 100%; max-width: 960px; margin: 0 auto; }
+
+  .demo-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    justify-content: space-between;
+    background: var(--surface-generator-outer);
+    border: 1px solid var(--border-generator, var(--border-subtle));
+    border-radius: var(--radius-xl);
+    padding: var(--space-sm);
+    box-shadow: var(--shadow-soft-md);
+  }
+  .control-theme { flex: 0 1 240px; min-width: 210px; }
+  .control-search { flex: 2 1 560px; min-width: 260px; }
+  .compact-search .search-input { padding: 0.6rem 0.9rem 0.6rem 2.75rem; min-height: 44px; background: var(--surface-generator-inner); border: 1px solid var(--border-generator); }
+
+  .demo-results { display: flex; flex-direction: column; gap: 0.75rem; }
+  .demo-facts { margin-top: var(--space-xs); }
+  .demo-fact-card { background: color-mix(in srgb, var(--surface-results) 70%, var(--surface-generator-inner) 30%); border: 1px solid var(--border-results); border-radius: var(--radius-xl); padding: var(--space-md); box-shadow: var(--shadow-soft-sm); }
+
+  .section-header { display: flex; flex-direction: column; gap: 0.25rem; }
+  .section-title { font-size: 1.1rem; font-weight: 700; color: var(--text-strong); }
+  .section-subtitle { color: var(--text-muted); font-size: 0.95rem; }
+
+  .demo-info-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-md); }
+  @media (min-width: 640px) { .demo-info-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+
+  .features-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-md); }
+  @media(min-width: 768px) { .features-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .features-grid .demo-card { padding: 1rem; }
+  .features-grid .adsbygoogle { width: 100%; border-radius: var(--radius-xl); background: var(--surface-card-soft); }
+  .demo-feature-section {
+    background: var(--surface-generator-outer);
+    border: 1px solid color-mix(in srgb, var(--border-subtle) 50%, transparent 50%);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-soft-md);
+    gap: var(--space-md);
+  }
+
+  .demo-edu-shell {
+    background: var(--surface-generator-outer);
+    border: 1px solid color-mix(in srgb, var(--border-subtle) 50%, transparent 50%);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-soft-md);
+    padding: var(--space-md);
+  }
+  .demo-edu-shell .demo-edu-grid { margin-top: 0; }
+  .demo-edu-link { text-align: right; margin-top: var(--space-sm); }
+  @media (max-width: 640px) {
+    .demo-controls { padding: var(--space-sm); }
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .control-theme, .control-search { width: 100%; max-width: none; }
+  }
+
+  .demo-footer { width: 100%; max-width: 960px; margin: 2rem auto 0; padding-top: var(--space-lg); border-top: 1px solid var(--border-primary); }
+  .demo-footer-grid { display: grid; gap: var(--space-md); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media(min-width: 768px) { .demo-footer-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .demo-footer-meta { text-align: center; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid var(--border-primary); padding-top: var(--space-md); margin-top: var(--space-md); }
+
+  .demo-card {
+    background: var(--surface-card);
+    background-image: var(--surface-card-soft);
+    background-blend-mode: soft-light;
+    border: 1px solid color-mix(in srgb, var(--border-subtle) 50%, transparent 50%);
+    box-shadow: var(--shadow-soft-lg);
+    border-radius: var(--radius-xl);
+    color: var(--text-body);
+    transition: box-shadow var(--duration-normal), transform var(--duration-normal);
+  }
+  .demo-card .soft-card { border-radius: var(--radius-xl); }
+  .demo-card:hover { box-shadow: var(--shadow-soft-lg); transform: translateY(-2px); }
+
+  .demo-link { color: var(--text-link); transition: color .15s ease; }
+  .demo-link:hover { color: var(--accent-primary); text-decoration: underline; }
+</style>

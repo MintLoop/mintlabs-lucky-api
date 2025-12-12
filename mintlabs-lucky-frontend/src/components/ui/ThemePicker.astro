@@ -1,0 +1,208 @@
+---
+// ThemePicker.astro - Lucky v2 Design System
+// Theme selector with SSR-safe persistence and live preview
+
+import { THEMES } from '../../themes';
+
+export interface Props {
+  variant?: 'compact' | 'full' | 'dropdown';
+  showLabels?: boolean;
+  className?: string;
+}
+
+const {
+  variant = 'full',
+  showLabels = true,
+  className = '',
+} = Astro.props;
+
+const containerClasses = {
+  compact: 'flex flex-wrap gap-2',
+  full: 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4',
+  dropdown: 'relative',
+};
+---
+
+<div class={`theme-picker ${containerClasses[variant as keyof typeof containerClasses]} ${className}`} data-variant={variant}>
+  {variant === 'dropdown' ? (
+    <div class="theme-picker-dropdown">
+      <button
+        type="button"
+        class="theme-picker-button w-full px-4 py-2 rounded-xl bg-white/80 backdrop-blur-sm shadow-soft-md hover:shadow-soft-lg transition-shadow"
+        aria-label="Select theme"
+      >
+        <span class="theme-picker-current-name font-medium">Select Theme</span>
+        <svg class="w-5 h-5 inline-block ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+      <div class="theme-picker-menu hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-soft-lg p-2 z-50">
+        {THEMES.map(theme => (
+          <button
+            type="button"
+            class="theme-option w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+            data-theme-id={theme.id}
+            data-theme-name={theme.displayName}
+          >
+            <div class="flex items-center gap-2">
+              <div class="theme-preview-swatch w-6 h-6 rounded-md" style={`background: ${theme.colors.accent};`}></div>
+              <span class="font-medium">{theme.displayName}</span>
+              {theme.category && (
+                <span class="ml-auto text-xs text-gray-500 capitalize">{theme.category}</span>
+              )}
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  ) : (
+    THEMES.map(theme => (
+      <button
+        type="button"
+        class="theme-option group"
+        data-theme-id={theme.id}
+        data-theme-name={theme.displayName}
+        aria-label={`Switch to ${theme.displayName} theme`}
+      >
+        <div class="theme-card rounded-xl sm:rounded-2xl overflow-hidden shadow-soft-sm hover:shadow-soft-md transition-all transform hover:scale-105 group-hover:ring-2 ring-offset-2"
+             style={`background: linear-gradient(135deg, ${theme.colors.accent} 0%, ${theme.colors.accentSecondary} 100%); --ring-color: ${theme.colors.accent};`}>
+          <div class="aspect-video sm:aspect-square flex items-center justify-center p-3 sm:p-4">
+            <div class="text-white text-center">
+              {theme.hasAnimation && (
+                <div class="text-xl sm:text-2xl mb-1">✨</div>
+              )}
+              {showLabels && variant === 'full' && (
+                <div class="text-xs sm:text-sm font-semibold">{theme.displayName}</div>
+              )}
+            </div>
+          </div>
+        </div>
+        {showLabels && variant === 'compact' && (
+          <div class="text-xs text-center mt-1 font-medium text-gray-700">{theme.displayName}</div>
+        )}
+      </button>
+    ))
+  )}
+</div>
+
+<style>
+  .theme-picker {
+    /* Container styles handled via classes */
+  }
+
+  .theme-option {
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+    transition:
+      transform var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-normal) var(--ease-out);
+  }
+
+  .theme-card {
+    transition: all var(--duration-normal) var(--ease-out);
+  }
+
+  .group:hover .theme-card {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .group:focus-visible .theme-card {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  .theme-picker-dropdown button:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-option,
+    .theme-card {
+      transform: none !important;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { safeGetItem, safeSetItem } from '../../utils/ssr';
+  import { getThemeById, getThemeCSSVars } from '../../themes';
+
+  const STORAGE_KEY = 'lucky-v2-theme';
+  const DEFAULT_THEME = 'kawaii-mochi';
+
+  function applyTheme(themeId: string) {
+    const theme = getThemeById(themeId);
+    if (!theme) return;
+
+    const cssVars = getThemeCSSVars(theme);
+    const root = document.documentElement;
+
+    Object.entries(cssVars).forEach(([key, value]) => {
+      root.style.setProperty(key, value);
+    });
+
+    // Update dropdown label if present
+    const currentNameEl = document.querySelector('.theme-picker-current-name');
+    if (currentNameEl) {
+      currentNameEl.textContent = theme.displayName;
+    }
+
+    // Save to localStorage
+    safeSetItem(STORAGE_KEY, themeId);
+
+    // Dispatch custom event for other components
+    window.dispatchEvent(new CustomEvent('themeChanged', { detail: { themeId, theme } }));
+  }
+
+  function initThemePicker() {
+    // Load saved theme or default
+    const savedTheme = safeGetItem(STORAGE_KEY) || DEFAULT_THEME;
+    applyTheme(savedTheme);
+
+    // Attach click handlers
+    document.querySelectorAll('.theme-option').forEach(button => {
+      button.addEventListener('click', () => {
+        const themeId = button.getAttribute('data-theme-id');
+        if (themeId) {
+          applyTheme(themeId);
+          
+          // Close dropdown if open
+          const dropdown = button.closest('.theme-picker-dropdown');
+          if (dropdown) {
+            const menu = dropdown.querySelector('.theme-picker-menu');
+            menu?.classList.add('hidden');
+          }
+        }
+      });
+    });
+
+    // Dropdown toggle
+    const dropdownButton = document.querySelector('.theme-picker-button');
+    const dropdownMenu = document.querySelector('.theme-picker-menu');
+    
+    if (dropdownButton && dropdownMenu) {
+      dropdownButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('hidden');
+      });
+
+      // Close on outside click
+      document.addEventListener('click', () => {
+        dropdownMenu.classList.add('hidden');
+      });
+    }
+  }
+
+  // Initialize on load and on Astro page transitions
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemePicker);
+  } else {
+    initThemePicker();
+  }
+
+  document.addEventListener('astro:page-load', initThemePicker);
+</script>

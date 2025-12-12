@@ -1,0 +1,119 @@
+---
+// SearchBar.astro - Lucky v2 Design System
+// Search input with debounced filtering
+
+export interface Props {
+  placeholder?: string;
+  className?: string;
+  autofocus?: boolean;
+}
+
+const {
+  placeholder = 'Search...',
+  className = '',
+  autofocus = false,
+} = Astro.props;
+---
+
+<div class={`search-bar relative ${className}`}>
+  <div class="relative">
+    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+    </div>
+    <input
+      type="search"
+      class="search-input w-full pl-12 pr-4 py-3 rounded-xl bg-white/80 backdrop-blur-sm shadow-soft-md focus:shadow-soft-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all"
+      placeholder={placeholder}
+      autocomplete="off"
+      spellcheck="false"
+      autofocus={autofocus}
+      data-search-input
+    />
+    <button
+      type="button"
+      class="search-clear-btn hidden absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+      aria-label="Clear search"
+      data-clear-search
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style>
+  .search-input {
+    font-size: 1rem;
+    border: 2px solid transparent;
+    transition:
+      box-shadow var(--duration-normal) var(--ease-out),
+      border-color var(--duration-normal) var(--ease-out);
+  }
+
+  .search-input:focus {
+    border-color: var(--accent-primary);
+    ring-color: var(--accent-primary);
+  }
+
+  .search-input::placeholder {
+    color: var(--text-muted);
+  }
+</style>
+
+<script>
+  function initSearchBar() {
+    const searchInput = document.querySelector('[data-search-input]') as HTMLInputElement;
+    const clearBtn = document.querySelector('[data-clear-search]') as HTMLButtonElement;
+    
+    if (!searchInput) return;
+
+    let debounceTimer: number;
+
+    function handleInput() {
+      const value = searchInput.value.trim();
+      
+      // Show/hide clear button
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', value === '');
+      }
+
+      // Debounced search event
+      clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent('searchChange', {
+            detail: { query: value.toLowerCase() },
+          })
+        );
+      }, 300);
+    }
+
+    function handleClear() {
+      searchInput.value = '';
+      searchInput.focus();
+      if (clearBtn) {
+        clearBtn.classList.add('hidden');
+      }
+      window.dispatchEvent(
+        new CustomEvent('searchChange', {
+          detail: { query: '' },
+        })
+      );
+    }
+
+    searchInput.addEventListener('input', handleInput);
+    clearBtn?.addEventListener('click', handleClear);
+  }
+
+  // Initialize on load and page transitions
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSearchBar);
+  } else {
+    initSearchBar();
+  }
+
+  document.addEventListener('astro:page-load', initSearchBar);
+</script>

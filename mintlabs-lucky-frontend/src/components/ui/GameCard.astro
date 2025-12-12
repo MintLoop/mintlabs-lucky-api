@@ -1,0 +1,101 @@
+---
+// GameCard.astro - Lucky v2 Design System
+// Card for casino-lite games with featured styling
+
+import SoftCard from './SoftCard.astro';
+
+export interface Props {
+  title: string;
+  description: string;
+  icon?: string;
+  href: string;
+  difficulty?: 'Easy' | 'Medium' | 'Advanced';
+  featured?: boolean;
+  className?: string;
+}
+
+const {
+  title,
+  description,
+  icon = '🎰',
+  href,
+  difficulty,
+  featured = false,
+  className = '',
+} = Astro.props;
+
+const difficultyColors = {
+  Easy: 'bg-green-100 text-green-700',
+  Medium: 'bg-yellow-100 text-yellow-700',
+  Advanced: 'bg-red-100 text-red-700',
+};
+---
+
+<a href={href} class={`game-card-link block ${className}`}>
+  <SoftCard 
+    variant={featured ? 'glow' : 'default'}
+    padding="lg" 
+    radius="2xl" 
+    gradient={featured ? 'accent' : 'subtle'}
+    hasAnimation={featured}
+  >
+    <div class="text-center">
+      <div class="game-icon text-5xl sm:text-6xl mb-3" aria-hidden="true">
+        {icon}
+      </div>
+      <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+        {title}
+      </h3>
+      <p class="text-sm sm:text-base text-gray-600 mb-3">
+        {description}
+      </p>
+      <div class="flex items-center justify-center gap-2 flex-wrap">
+        {difficulty && (
+          <span class={`text-xs font-medium px-3 py-1 rounded-full ${difficultyColors[difficulty as keyof typeof difficultyColors]}`}>
+            {difficulty}
+          </span>
+        )}
+        {featured && (
+          <span class="text-xs font-medium px-3 py-1 rounded-full bg-purple-100 text-purple-700">
+            ⭐ Featured
+          </span>
+        )}
+      </div>
+    </div>
+  </SoftCard>
+</a>
+
+<style>
+  .game-card-link {
+    text-decoration: none;
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .game-card-link:hover {
+    transform: translateY(-4px);
+  }
+
+  .game-card-link:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 4px;
+    border-radius: var(--radius-2xl);
+  }
+
+  .game-icon {
+    transition: transform var(--duration-normal) var(--ease-bounce);
+  }
+
+  .game-card-link:hover .game-icon {
+    transform: scale(1.15) rotate(-5deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .game-card-link,
+    .game-card-link:hover,
+    .game-icon,
+    .game-card-link:hover .game-icon {
+      transform: none;
+      transition: none;
+    }
+  }
+</style>

@@ -1,0 +1,56 @@
+---
+import TrackLink from "../TrackLink.astro";
+import SoftCard from "../ui/SoftCard.astro";
+---
+
+<SoftCard padding="md" variant="default" radius="2xl" className="demo-card demo-carousel-card w-full">
+  <div class="demo-carousel tools-carousel" aria-label="Featured tools carousel">
+    <div class="carousel-track" role="list" id="demo-carousel-track">
+      <TrackLink class="demo-tool-card" href="/tools/probability-visualizer" event="carousel_click" props={{ tool: 'probability-visualizer' }}>📉 Probability Visualizer</TrackLink>
+      <TrackLink class="demo-tool-card" href="/tools/ticket-beautifier" event="carousel_click" props={{ tool: 'ticket-beautifier' }}>✨ Ticket Beautifier</TrackLink>
+      <TrackLink class="demo-tool-card" href="/tools/quick-draw-simulator" event="carousel_click" props={{ tool: 'quick-draw-simulator' }}>🎲 Quick Draw Simulator</TrackLink>
+      <TrackLink class="demo-tool-card" href="/tools/combination-calculator" event="carousel_click" props={{ tool: 'combination-calculator' }}>🔢 Combination Calculator</TrackLink>
+      <div id="demo-random-slot-1" class="demo-tool-card tool-placeholder" role="listitem" aria-hidden="true">🔄 Loading…</div>
+      <div id="demo-random-slot-2" class="demo-tool-card tool-placeholder" role="listitem" aria-hidden="true">🔄 Loading…</div>
+    </div>
+  </div>
+</SoftCard>
+
+<style>
+.demo-carousel { overflow:hidden; padding:0.25rem; }
+.carousel-track { display:flex; gap:0.75rem; padding:0.5rem; align-items:center; animation: demo-scroll-left 18s linear infinite; }
+.demo-tool-card { display:inline-block; padding:0.5rem 0.9rem; border-radius: var(--radius-md); background: var(--surface-card); color: var(--text-body); font-weight:600; border: 1px solid color-mix(in srgb, var(--border-subtle) 60%, transparent 40%); box-shadow: var(--shadow-soft-sm); }
+.demo-tool-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft-md); border-color: color-mix(in srgb, var(--border-subtle) 70%, var(--text-link) 10%); color: var(--text-link); }
+@keyframes demo-scroll-left { 0%{ transform: translateX(0);} 100%{ transform: translateX(-50%);} }
+@media (prefers-reduced-motion: reduce){ .carousel-track{ animation:none; } }
+.demo-tool-card { white-space:nowrap; }
+.demo-tool-card svg { transform:none; opacity:0.9; margin-right: 0.25rem; }
+</style>
+
+<script is:inline>
+  (function(){
+    try{
+      const pool = [
+        {href:'/tools/expected-value-calculator', label:'🧮 Expected Value Calculator'},
+        {href:'/tools/most-drawn-numbers', label:'🔥 Most Drawn'},
+        {href:'/tools/least-drawn-numbers', label:'❄️ Least Drawn'},
+        {href:'/tools/number-trend-graph', label:'📈 Number Trend'},
+        {href:'/tools/lottery-math-quiz', label:'🧠 Math Quiz'},
+        {href:'/tools/pattern-analyzer', label:'🔍 Pattern Analyzer'},
+        {href:'/tools/ticket-variance', label:'📊 Ticket Variance'},
+      ];
+      const key = 'demo_carousel_secondary';
+      const getSessionPick = (k, count) => {
+        const existing = sessionStorage.getItem(k); if(existing) return JSON.parse(existing);
+        const cp = [...pool]; let picks=[]; for(let i=0;i<count;i++){ if(!cp.length) break; const idx=Math.floor(Math.random()*cp.length); picks.push(cp.splice(idx,1)[0]); }
+        sessionStorage.setItem(k, JSON.stringify(picks)); return picks;
+      };
+      const picks = getSessionPick(key,2);
+      const s1 = document.getElementById('demo-random-slot-1');
+      const s2 = document.getElementById('demo-random-slot-2');
+      const make = (o)=>{ const a=document.createElement('a'); a.className='demo-tool-card'; a.href=o.href; a.textContent=o.label; a.setAttribute('role','listitem'); return a; };
+      if(s1 && picks[0]) s1.replaceWith(make(picks[0]));
+      if(s2 && picks[1]) s2.replaceWith(make(picks[1]));
+    }catch(e){console.warn('demo carousel picks failed',e)}
+  })();
+</script>

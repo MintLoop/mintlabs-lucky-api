@@ -1,0 +1,17 @@
+---
+import ThemeToolBar from "../ThemeToolBar.astro";
+---
+
+<div class="demo-theme-toolbar w-full">
+  <div class="flex items-center justify-end sm:justify-end gap-2">
+    <ThemeToolBar />
+  </div>
+</div>
+
+<style>
+.demo-theme-toolbar { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+@media (max-width: 640px) {
+  .demo-theme-toolbar { display: block; }
+  .demo-theme-toolbar .flex { justify-content: flex-start !important; }
+}
+</style>

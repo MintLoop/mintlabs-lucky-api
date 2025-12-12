@@ -1,0 +1,67 @@
+---
+// High Card - Casino-Lite Card Game (Phase 4.6 Stub)
+// Simple card comparison game - highest card wins
+
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const title = "High Card (Coming Soon)";
+const description = "Compare cards with the dealer. Highest card wins. Simple, quick, and great for learning card values.";
+---
+
+<InfoLayout title={title} description={description}>
+  <main class="mx-auto max-w-4xl p-6 space-y-8">
+    <header class="text-center space-y-4">
+      <h1 class="text-4xl font-bold" style="color: var(--text-primary);">
+        🎴 High Card
+      </h1>
+      <p class="text-lg" style="color: var(--text-secondary);">
+        Coming in Phase 4.6
+      </p>
+    </header>
+
+    <div class="p-8 rounded-xl text-center space-y-4" style="background: var(--surface-elevated);">
+      <div class="text-6xl mb-4">🚧</div>
+      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">Under Construction</h2>
+      <p style="color: var(--text-secondary);">
+        High Card is a simple card game where you and the dealer each draw one card. Highest card wins!
+      </p>
+      
+      <div class="mt-8 space-y-3 text-left max-w-md mx-auto">
+        <h3 class="font-bold" style="color: var(--text-primary);">Planned Features:</h3>
+        <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
+          <li>• Quick single-card draws</li>
+          <li>• Tie breaker on suits (Spades > Hearts > Diamonds > Clubs)</li>
+          <li>• CatnipCoin betting system</li>
+          <li>• Card theme support</li>
+          <li>• Educational probability info</li>
+        </ul>
+      </div>
+      
+      <div class="pt-6">
+        <a
+          href="/casino-lite"
+          class="inline-block px-6 py-3 rounded-lg font-semibold"
+          style="background: var(--accent-primary); color: var(--text-on-accent);"
+        >
+          ← Back to Casino-Lite
+        </a>
+      </div>
+    </div>
+  </main>
+</InfoLayout>
+
+<script>
+  // TODO Phase 4.6: High Card implementation
+  // 
+  // Game logic:
+  // 1. Player and dealer each draw one card from shuffled deck
+  // 2. Compare card values (A=14, K=13, Q=12, J=11, 10-2=face value)
+  // 3. If tie on value, compare suits (♠ > ♥ > ♦ > ♣)
+  // 4. Winner gets 2x bet, tie returns bet
+  //
+  // Features to add:
+  // - Card animation (flip reveal)
+  // - Bet selector (1, 5, 10, 25 CC)
+  // - Win streak counter
+  // - Educational: "Probability of drawing higher card" indicator
+</script>

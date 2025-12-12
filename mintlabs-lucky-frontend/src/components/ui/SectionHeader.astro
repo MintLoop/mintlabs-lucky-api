@@ -1,0 +1,95 @@
+---
+// SectionHeader.astro - Lucky v2 Design System
+// Section heading with optional subtitle and action button
+
+export interface Props {
+  title: string;
+  subtitle?: string;
+  actionText?: string;
+  actionHref?: string;
+  align?: 'left' | 'center';
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+const {
+  title,
+  subtitle,
+  actionText,
+  actionHref,
+  align = 'left',
+  size = 'md',
+  className = '',
+} = Astro.props;
+
+const alignClasses = {
+  left: 'text-left',
+  center: 'text-center',
+};
+
+const sizeClasses = {
+  sm: {
+    title: 'text-xl sm:text-2xl',
+    subtitle: 'text-sm sm:text-base',
+  },
+  md: {
+    title: 'text-2xl sm:text-3xl',
+    subtitle: 'text-base sm:text-lg',
+  },
+  lg: {
+    title: 'text-3xl sm:text-4xl',
+    subtitle: 'text-lg sm:text-xl',
+  },
+};
+
+const containerClasses = [
+  'section-header mb-6 sm:mb-8',
+  align === 'left' && actionHref ? 'flex items-start justify-between gap-4' : '',
+  className,
+].filter(Boolean).join(' ');
+
+const titleClasses = [
+  'font-bold tracking-tight text-gray-900',
+  sizeClasses[size as keyof typeof sizeClasses].title,
+  alignClasses[align as keyof typeof alignClasses],
+].join(' ');
+
+const subtitleClasses = [
+  'mt-2 text-gray-600',
+  sizeClasses[size as keyof typeof sizeClasses].subtitle,
+  alignClasses[align as keyof typeof alignClasses],
+].join(' ');
+---
+
+<div class={containerClasses}>
+  <div class={align === 'left' && actionHref ? 'flex-1' : ''}>
+    <h2 class={titleClasses}>{title}</h2>
+    {subtitle && <p class={subtitleClasses}>{subtitle}</p>}
+  </div>
+  {actionText && actionHref && (
+    <a
+      href={actionHref}
+      class="section-header-action inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 backdrop-blur-sm shadow-soft-sm hover:shadow-soft-md transition-shadow text-sm font-medium text-gray-700 hover:text-gray-900 flex-shrink-0"
+    >
+      {actionText}
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+      </svg>
+    </a>
+  )}
+</div>
+
+<style>
+  .section-header {
+    /* Handled via classes */
+  }
+
+  .section-header-action {
+    transition: all var(--duration-normal) var(--ease-out);
+  }
+
+  .section-header-action:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+</style>

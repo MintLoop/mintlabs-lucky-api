@@ -1,0 +1,91 @@
+---
+import TrackLink from "../TrackLink.astro";
+import SoftCard from "../ui/SoftCard.astro";
+---
+
+<section class="demo-edu-grid mt-6">
+  <div class="demo-edu-grid-cards">
+    <SoftCard padding="md" variant="default" radius="2xl" className="demo-card" data-demo-query="odds probability independence combinations analysis math">
+      <h4 class="font-semibold mb-2" style="color:var(--text-strong, var(--text-primary));">🧮 Lottery Odds 101</h4>
+      <p class="demo-edu-desc">How independence and combinations shape every draw — no number is ever “due.”</p>
+      <ul class="demo-edu-list">
+        <li><a href="/lottery-odds#independence" class="demo-link">Independence explained</a></li>
+        <li><a href="/lottery-math" class="demo-link">Combinations vs permutations</a></li>
+      </ul>
+    </SoftCard>
+
+    <SoftCard padding="md" variant="default" radius="2xl" className="demo-card" data-demo-query="expected value ev averages risk bankroll">
+      <h4 class="font-semibold mb-2" style="color:var(--text-strong, var(--text-primary));">💰 Expected Value Basics</h4>
+      <p class="demo-edu-desc">Read EV before chasing jackpots; it’s the long-run average, not a promise.</p>
+      <ul class="demo-edu-list">
+        <li><a href="/lottery-math#expected-value" class="demo-link">EV in plain language</a></li>
+        <li><a href="/tools/expected-value-calculator" class="demo-link">Compare tickets quickly</a></li>
+      </ul>
+    </SoftCard>
+
+    <SoftCard padding="md" variant="default" radius="2xl" className="demo-card" data-demo-query="randomness fairness entropy rng unbiased draws">
+      <h4 class="font-semibold mb-2" style="color:var(--text-strong, var(--text-primary));">🎲 Randomness & Fairness</h4>
+      <p class="demo-edu-desc">Why past draws cannot steer the next one and how unbiased RNG keeps odds consistent.</p>
+      <ul class="demo-edu-list">
+        <li><a href="/lottery-odds#randomness" class="demo-link">Why odds don’t trend</a></li>
+        <li><a href="/faq" class="demo-link">Fair RNG basics</a></li>
+      </ul>
+    </SoftCard>
+
+    <SoftCard padding="md" variant="default" radius="2xl" className="demo-card" data-demo-query="budgeting limits spending plan safe play">
+      <h4 class="font-semibold mb-2" style="color:var(--text-strong, var(--text-primary));">💳 Budgeting & Limits</h4>
+      <p class="demo-edu-desc">Keep play recreational with hard caps and pre-set loss limits.</p>
+      <ul class="demo-edu-list">
+        <li><a href="/faq#responsible-play" class="demo-link">Responsible play checklist</a></li>
+        <li><TrackLink href="/tools/lottery-budget" class="demo-link">Set a monthly cap</TrackLink></li>
+      </ul>
+    </SoftCard>
+
+    <SoftCard padding="md" variant="default" radius="2xl" className="demo-card" data-demo-query="myths fallacy jackpot reality hot cold due analysis">
+      <h4 class="font-semibold mb-2" style="color:var(--text-strong, var(--text-primary));">🧊 Jackpot Myths vs Reality</h4>
+      <p class="demo-edu-desc">Debunk “due” numbers, streak chasing, and other gambler’s fallacies.</p>
+      <ul class="demo-edu-list">
+        <li><a href="/lottery-odds#gamblers-fallacy" class="demo-link">Gambler's fallacy</a></li>
+        <li><a href="/faq" class="demo-link">Myths vs reality FAQ</a></li>
+      </ul>
+    </SoftCard>
+  </div>
+</section>
+
+<style>
+  .demo-edu-grid { width: 100%; }
+  .demo-edu-grid-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+  @media (min-width: 720px) {
+    .demo-edu-grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .demo-edu-grid .demo-card { text-align: left; height: 100%; padding: var(--space-md); }
+  .demo-edu-grid h4 { color: var(--text-strong); }
+  .demo-edu-desc { color: var(--text-body); margin-bottom: var(--space-sm); line-height: 1.45; }
+  .demo-edu-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+  .demo-edu-list a { font-weight: 600; }
+  .demo-edu-grid .demo-card { transition: transform var(--duration-normal), box-shadow var(--duration-normal); }
+  .demo-edu-grid .demo-card:focus-within, .demo-edu-grid .demo-card:focus, .demo-edu-grid .demo-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: var(--shadow-glow); }
+  .demo-edu-grid .demo-card:focus-within { outline: 2px solid var(--accent-primary); outline-offset: 3px; }
+</style>
+
+<script is:inline>
+  (function(){
+    function filterEduGrid(query){
+      const cards = document.querySelectorAll('.demo-edu-grid .demo-card');
+      cards.forEach((c)=>{
+        const q = (c.getAttribute('data-demo-query')||'').toLowerCase();
+        if(!query) { c.style.display=''; return; }
+        c.style.display = q.indexOf(query) >= 0 ? '' : 'none';
+      });
+    }
+
+    window.addEventListener('searchChange', function(e){
+      const q = (e.detail && e.detail.query) ? e.detail.query.toLowerCase() : '';
+      filterEduGrid(q);
+    });
+  })();
+</script>

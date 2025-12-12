@@ -1,0 +1,123 @@
+---
+// PageHero.astro - Lucky v2 Design System
+// Dynamic gradient hero section with theme support
+
+export interface Props {
+  title: string;
+  subtitle?: string;
+  variant?: 'default' | 'gradient' | 'minimal';
+  align?: 'left' | 'center';
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+const {
+  title,
+  subtitle,
+  variant = 'gradient',
+  align = 'center',
+  size = 'md',
+  className = '',
+} = Astro.props;
+
+const alignClasses = {
+  left: 'text-left',
+  center: 'text-center',
+};
+
+const sizeClasses = {
+  sm: {
+    title: 'text-2xl sm:text-3xl',
+    subtitle: 'text-base sm:text-lg',
+    spacing: 'mb-8',
+  },
+  md: {
+    title: 'text-3xl sm:text-4xl md:text-5xl',
+    subtitle: 'text-lg sm:text-xl',
+    spacing: 'mb-12',
+  },
+  lg: {
+    title: 'text-4xl sm:text-5xl md:text-6xl',
+    subtitle: 'text-xl sm:text-2xl',
+    spacing: 'mb-16',
+  },
+};
+
+const variantClasses = {
+  default: 'bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-sm',
+  gradient: 'page-hero-gradient',
+  minimal: 'bg-transparent',
+};
+
+const containerClasses = [
+  'page-hero',
+  variantClasses[variant as keyof typeof variantClasses],
+  sizeClasses[size as keyof typeof sizeClasses].spacing,
+  'py-8 sm:py-12 px-4 sm:px-6 rounded-3xl',
+  className,
+].filter(Boolean).join(' ');
+
+const titleClasses = [
+  'font-bold tracking-tight',
+  sizeClasses[size as keyof typeof sizeClasses].title,
+  alignClasses[align as keyof typeof alignClasses],
+  variant === 'gradient' ? 'text-gradient' : 'text-gray-900',
+].join(' ');
+
+const subtitleClasses = [
+  'mt-3 sm:mt-4',
+  sizeClasses[size as keyof typeof sizeClasses].subtitle,
+  alignClasses[align as keyof typeof alignClasses],
+  'text-gray-600 max-w-2xl',
+  align === 'center' ? 'mx-auto' : '',
+].filter(Boolean).join(' ');
+---
+
+<div class={containerClasses}>
+  <h1 class={titleClasses}>{title}</h1>
+  {subtitle && <p class={subtitleClasses}>{subtitle}</p>}
+  <slot />
+</div>
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-hero-gradient {
+    background: var(--gradient-hero);
+    background-size: 200% 200%;
+    animation: gradient-shift 15s ease infinite;
+  }
+
+  .text-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--accent-primary) 0%,
+      var(--accent-secondary) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-hero-gradient {
+      animation: none;
+      background-size: 100% 100%;
+    }
+  }
+</style>

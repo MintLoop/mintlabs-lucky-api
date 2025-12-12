@@ -1,0 +1,91 @@
+---
+// InfoBlurb.astro - Lucky v2 Design System
+// Educational info box with icon and optional link
+
+export interface Props {
+  icon?: string;
+  title?: string;
+  variant?: 'info' | 'tip' | 'warning' | 'educational';
+  className?: string;
+}
+
+const {
+  icon,
+  title,
+  variant = 'info',
+  className = '',
+} = Astro.props;
+
+const variantConfig = {
+  info: {
+    icon: icon || 'ℹ️',
+    accent: 'var(--accent-primary)',
+  },
+  tip: {
+    icon: icon || '💡',
+    accent: 'var(--accent-secondary, var(--accent-primary))',
+  },
+  warning: {
+    icon: icon || '⚠️',
+    accent: 'var(--accent-warning, var(--accent-primary))',
+  },
+  educational: {
+    icon: icon || '📚',
+    accent: 'var(--accent-primary)',
+  },
+};
+
+const config = variantConfig[variant as keyof typeof variantConfig];
+
+const containerClasses = [
+  'info-blurb',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<div class={containerClasses} style={{ '--info-accent': config.accent }}>
+  <div class="flex items-start gap-3">
+    {config.icon && (
+      <div class="text-2xl flex-shrink-0 info-icon" aria-hidden="true">
+        {config.icon}
+      </div>
+    )}
+    <div class="flex-1 min-w-0">
+      {title && (
+        <h4 class="info-title font-semibold mb-1">
+          {title}
+        </h4>
+      )}
+      <div class="info-body text-sm leading-relaxed">
+        <slot />
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .info-blurb {
+    background: var(--surface-card);
+    background-image: var(--surface-card-soft);
+    background-blend-mode: soft-light;
+    border: 1px solid color-mix(in srgb, var(--border-subtle) 60%, transparent 40%);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-soft-md);
+    padding: var(--space-md);
+    color: var(--text-body);
+    transition: border-color var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal);
+  }
+
+  .info-blurb:hover {
+    border-color: color-mix(in srgb, var(--border-subtle) 70%, var(--info-accent, var(--accent-primary)) 30%);
+    box-shadow: var(--shadow-soft-lg);
+  }
+
+  .info-title { color: var(--text-strong); }
+  .info-body { color: var(--text-body); }
+  .info-icon { color: var(--info-accent, var(--accent-primary)); }
+
+  @media (max-width: 640px) {
+    .info-blurb { padding: var(--space-sm); }
+  }
+</style>

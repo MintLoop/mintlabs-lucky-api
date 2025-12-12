@@ -1,0 +1,72 @@
+---
+// War - Casino-Lite Card Game (Phase 4.6 Stub)
+// Classic card game - battle the dealer, go to war on ties
+
+import InfoLayout from "../../components/InfoLayout.astro";
+
+const title = "War (Coming Soon)";
+const description = "Play the classic card game War. Battle the dealer, double down on ties, and watch the drama unfold.";
+---
+
+<InfoLayout title={title} description={description}>
+  <main class="mx-auto max-w-4xl p-6 space-y-8">
+    <header class="text-center space-y-4">
+      <h1 class="text-4xl font-bold" style="color: var(--text-primary);">
+        ⚔️ War
+      </h1>
+      <p class="text-lg" style="color: var(--text-secondary);">
+        Coming in Phase 4.6
+      </p>
+    </header>
+
+    <div class="p-8 rounded-xl text-center space-y-4" style="background: var(--surface-elevated);">
+      <div class="text-6xl mb-4">🚧</div>
+      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">Under Construction</h2>
+      <p style="color: var(--text-secondary);">
+        War is a classic card game where ties lead to dramatic "war" showdowns with higher stakes!
+      </p>
+      
+      <div class="mt-8 space-y-3 text-left max-w-md mx-auto">
+        <h3 class="font-bold" style="color: var(--text-primary);">Planned Features:</h3>
+        <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
+          <li>• Classic War gameplay: highest card wins</li>
+          <li>• "War" on ties: burn 3 cards, flip 4th to decide</li>
+          <li>• Escalating bets during war (double stakes)</li>
+          <li>• CatnipCoin wagering system</li>
+          <li>• Animated card reveals</li>
+          <li>• Win/loss statistics</li>
+        </ul>
+      </div>
+      
+      <div class="pt-6">
+        <a
+          href="/casino-lite"
+          class="inline-block px-6 py-3 rounded-lg font-semibold"
+          style="background: var(--accent-primary); color: var(--text-on-accent);"
+        >
+          ← Back to Casino-Lite
+        </a>
+      </div>
+    </div>
+  </main>
+</InfoLayout>
+
+<script>
+  // TODO Phase 4.6: War implementation
+  // 
+  // Game logic:
+  // 1. Player and dealer each flip top card
+  // 2. Higher card wins the round (2x bet)
+  // 3. On tie:
+  //    a. Player chooses: Surrender (lose half bet) or War (double bet)
+  //    b. If War: burn 3 cards, flip 4th card
+  //    c. Higher 4th card wins all stakes (4x original bet)
+  //    d. If tie again: repeat war or allow surrender
+  //
+  // Features to add:
+  // - Deck depletion handling (reshuffle when < 10 cards)
+  // - War animation (card burn sequence)
+  // - Bet amount selector
+  // - Educational: "Probability of war" indicator (~7.7%)
+  // - Sound effects (optional, with mute toggle)
+</script>

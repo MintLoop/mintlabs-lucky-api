@@ -1,0 +1,328 @@
+/* Lucky v2 Design System Tokens */
+/* Phase 4.5+ - Modern theming with seasonal and animated variants */
+
+:root {
+  /* ─────────────────────────────────────────────────
+     BASE COLOR SYSTEM
+     ───────────────────────────────────────────────── */
+  
+  /* Neutrals */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  
+  /* Brand Colors */
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  
+  /* Semantic Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+  
+  /* ─────────────────────────────────────────────────
+     THEME TOKENS (overridden by theme registry)
+     ───────────────────────────────────────────────── */
+  
+  /* Backgrounds */
+  --bg-base: #ffffff;
+  --bg-surface-1: #f9fafb;
+  --bg-surface-2: #f3f4f6;
+  --bg-surface-elevated: #ffffff;
+  --bg-blur: rgba(255, 255, 255, 0.8);
+  
+  /* Text */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --text-on-accent: #ffffff;
+  
+  /* Borders */
+  --border-primary: #e5e7eb;
+  --border-secondary: #f3f4f6;
+  --border-accent: #10b981;
+  
+  /* Accents */
+  --accent-primary: #10b981;
+  --accent-secondary: #34d399;
+  --accent-warning: #f59e0b;
+  --accent-success: #10b981;
+  --accent-error: #ef4444;
+  
+  /* ─────────────────────────────────────────────────
+     GRADIENTS
+     ───────────────────────────────────────────────── */
+  
+  --gradient-hero: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --gradient-card-glow: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
+  --gradient-theme-accent: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  --gradient-soft-shadow: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.04) 100%);
+  
+  /* ─────────────────────────────────────────────────
+     SHADOWS
+     ───────────────────────────────────────────────── */
+  
+  --shadow-soft-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-soft-sm: 0 2px 4px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-soft-md: 0 4px 8px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-soft-lg: 0 8px 16px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
+  --shadow-soft-xl: 0 16px 32px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.06);
+  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.3);
+  
+  /* ─────────────────────────────────────────────────
+     BORDER RADIUS
+     ───────────────────────────────────────────────── */
+  
+  --radius-sm: 0.375rem;  /* 6px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-3xl: 2rem;     /* 32px */
+  --radius-full: 9999px;
+  
+  /* ─────────────────────────────────────────────────
+     SPACING (cluster layout system)
+     ───────────────────────────────────────────────── */
+  
+  --space-xs: 0.5rem;   /* 8px */
+  --space-sm: 0.75rem;  /* 12px */
+  --space-md: 1rem;     /* 16px */
+  --space-lg: 1.5rem;   /* 24px */
+  --space-xl: 2rem;     /* 32px */
+  --space-2xl: 3rem;    /* 48px */
+  --space-3xl: 4rem;    /* 64px */
+  
+  --cluster-gap-4: 1rem;
+  --cluster-gap-6: 1.5rem;
+  --cluster-gap-8: 2rem;
+  --cluster-gap-12: 3rem;
+  
+  /* ─────────────────────────────────────────────────
+     TYPOGRAPHY
+     ───────────────────────────────────────────────── */
+  
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.875rem;     /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.25rem;      /* 20px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 1.875rem;    /* 30px */
+  --text-4xl: 2.25rem;     /* 36px */
+  --text-5xl: 3rem;        /* 48px */
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* ─────────────────────────────────────────────────
+     ANIMATIONS
+     ───────────────────────────────────────────────── */
+  
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* ─────────────────────────────────────────────────
+     BLUR
+     ───────────────────────────────────────────────── */
+  
+  --blur-sm: 4px;
+  --blur-md: 8px;
+  --blur-lg: 16px;
+  --blur-xl: 24px;
+
+  /* ─────────────────────────────────────────────────
+     DEMO-SCOPED TOKENS (used by demo components to avoid theme breakage)
+     These provide stable contrasts for generator/results/cards in the demo only
+     The production site can ignore or override these safely.
+     They are scoped for demo pages only via the [data-demo] attribute on <html>
+     ───────────────────────────────────────────────── */
+
+}
+
+/* Demo-scoped tokens are applied only when the root <html> element has data-demo="true"
+   or when a `.demo-root` wrapper is used. This prevents these values from leaking into
+   production pages while allowing the demo to preview v2 design tokens safely. */
+
+:root[data-demo], .demo-root {
+  --surface-generator-outer: var(--bg-surface-1);
+  --surface-generator-inner: var(--bg-surface-elevated);
+  --text-generator-primary: var(--text-primary);
+  --text-generator-muted: var(--text-muted);
+  --border-generator: var(--border-primary);
+
+  --surface-card: var(--bg-surface-elevated);
+  --surface-card-soft: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.006));
+  --border-subtle: rgba(0,0,0,0.06);
+
+  --surface-results: var(--bg-surface-2);
+  --text-results-primary: var(--text-primary);
+  --text-results-muted: var(--text-muted);
+  --border-results: var(--border-primary);
+
+  /* Role-based demo tokens (DEMO ONLY) */
+  --surface-page: var(--bg-surface-elevated);
+  --text-strong: var(--text-primary);
+  --text-body: var(--text-primary);
+  --text-muted: var(--text-muted);
+  --text-link: var(--accent-primary);
+  --accent-primary-rgb: 16,185,129; /* 16,185,129 => #10b981 - used as optional rgb helper for fallbacks */
+   --border-subtle: rgba(0,0,0,0.06);
+}
+
+/* Demo visual overrides for core components - limited to demo scope */
+:root[data-demo] .soft-card,
+:root[data-demo] .demo-card {
+   background: var(--surface-card) !important;
+   color: var(--text-body) !important;
+   border: 1px solid var(--border-subtle) !important;
+   box-shadow: var(--shadow-soft-md) !important;
+}
+
+:root[data-demo] .filter-chip {
+   background: var(--surface-card-soft) !important;
+   color: var(--text-body) !important;
+   border-color: var(--border-subtle) !important;
+}
+
+:root[data-demo] .filter-chip-active {
+   background: var(--accent-primary) !important;
+   color: var(--text-on-accent) !important;
+   border-color: var(--accent-primary) !important;
+}
+
+
+:root[data-demo] .soft-card .soft-card-gradient-subtle::before,
+:root[data-demo] .soft-card .soft-card-gradient-accent::before,
+:root[data-demo] .soft-card .soft-card-gradient-hero::before {
+   /* Keep gradients but reduce intensity where demo tokens prefer subtlety */
+   opacity: 0.12;
+}
+
+:root[data-demo] .search-input {
+   background: var(--surface-card-soft) !important;
+   color: var(--text-body) !important;
+   border: 1px solid var(--border-generator) !important;
+}
+
+:root[data-demo] .theme-picker-button,
+:root[data-demo] .theme-picker-menu {
+   background: var(--surface-card) !important;
+   border: 1px solid var(--border-subtle) !important;
+   color: var(--text-body) !important;
+}
+
+:root[data-demo] .demo-pill,
+:root[data-demo] .demo-feature-badge {
+   background: rgba(var(--accent-primary-rgb), 0.12);
+   border: 1px solid var(--accent-primary);
+   color: var(--accent-primary);
+   font-weight: 600;
+}
+
+:root[data-demo] .demo-feature-cta {
+   background: var(--accent-primary) !important;
+   color: var(--text-on-accent) !important;
+}
+
+:root[data-demo] .demo-page {
+   background: var(--surface-page) !important;
+}
+
+:root[data-demo] .demo-generator-container {
+   /* ensure the SoftCard wrapper uses the themed outer surface */
+   background: var(--surface-generator-outer) !important;
+   border: 1px solid var(--border-generator) !important;
+}
+
+:root[data-demo] .demo-generator-body {
+   background: color-mix(in srgb, var(--surface-generator-inner) 92%, var(--surface-generator-outer) 8%) !important;
+   color: var(--text-strong) !important;
+}
+
+/* Demo card general hover/focus enhancements */
+:root[data-demo] .demo-card {
+   transition: transform var(--duration-normal), box-shadow var(--duration-normal);
+}
+:root[data-demo] .demo-card:hover,
+:root[data-demo] .demo-card:focus-within {
+   transform: translateY(-4px) scale(1.01);
+   box-shadow: var(--shadow-glow);
+}
+
+:root[data-demo][data-theme$="-dark"],
+:root[data-demo][data-theme="dark"] {
+  /* Rebase core surfaces to dark theme values */
+  --bg-base: var(--bg-primary);
+  --bg-surface-1: var(--bg-secondary);
+  --bg-surface-2: var(--bg-secondary);
+  --bg-surface-elevated: var(--bg-card);
+
+  /* Demo-scoped surface tokens for dark palettes */
+  --surface-page: var(--bg-primary);
+  --surface-card: var(--bg-card);
+  --surface-card-soft: color-mix(in srgb, var(--bg-card) 80%, var(--bg-secondary) 20%);
+  --surface-generator-outer: var(--bg-card);
+  --surface-generator-inner: color-mix(in srgb, var(--bg-card) 70%, var(--bg-secondary) 30%);
+  --surface-results: var(--bg-card);
+  --text-strong: var(--text-primary);
+  --text-body: var(--text-primary);
+  --text-muted: var(--text-muted);
+  --text-link: var(--accent-primary);
+  --border-subtle: color-mix(in srgb, var(--border-primary) 85%, transparent 15%);
+  --border-generator: var(--border-primary);
+  --border-results: var(--border-primary);
+}
+
+/* Avoid excessive motion for those who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+   :root[data-demo] .demo-card { transform: none !important; transition: none !important; }
+}
+
+
+
+/* ─────────────────────────────────────────────────
+   DARK MODE OVERRIDES (future)
+   ───────────────────────────────────────────────── */
+
+/* TODO Phase 5: Implement dark mode variants */
+
+/* ─────────────────────────────────────────────────
+   REDUCED MOTION
+   ───────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

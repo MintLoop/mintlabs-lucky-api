@@ -1,0 +1,43 @@
+---
+import SoftCard from "../ui/SoftCard.astro";
+export interface Props {
+  icon?: string;
+  title: string;
+  description: string;
+  href: string;
+  badge?: string;
+  variant?: 'accent' | 'elevated' | 'glow';
+}
+
+const { icon = '✨', title, description, href, badge, variant = 'accent' } = Astro.props;
+---
+
+<SoftCard variant="default" padding="md" radius="xl" className="demo-card demo-feature-card">
+  <div class="flex items-start gap-4">
+    <div class="text-4xl sm:text-5xl flex-shrink-0 demo-feature-icon">{icon}</div>
+    <div class="flex-1 flex flex-col">
+      <h3 class="text-lg sm:text-xl font-bold mb-1" style="color:var(--text-strong);">{title}</h3>
+      <p class="text-sm mb-3 clamp-2" style="color:var(--text-body);">{description}</p>
+      <div class="mt-auto flex items-center gap-3">
+        <a href={href} class="demo-feature-cta inline-flex items-center gap-2 px-4 py-2 rounded-md font-semibold" style="background:var(--accent-primary); color:var(--text-on-accent)">
+          Explore
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+        {badge && <span class="demo-feature-badge text-xs px-3 py-1.5 rounded-full demo-pill">{badge}</span>}
+      </div>
+    </div>
+  </div>
+</SoftCard>
+<style>
+.demo-card { background: var(--surface-card); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-soft-md); }
+.demo-card .soft-card { border-radius: var(--radius-xl); }
+.demo-feature-icon { transform-origin: center; transition: transform var(--duration-normal); }
+.demo-feature-cta { transition: box-shadow var(--duration-normal), transform var(--duration-normal); }
+.demo-feature-cta:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+.demo-feature-badge { font-weight: 600; }
+.demo-pill { background:var(--surface-card-soft); border:1px solid var(--border-subtle); color:var(--text-body); }
+.demo-feature-card { min-height: 12rem; display:flex; flex-direction:column; }
+@media (prefers-reduced-motion: reduce) { .demo-feature-icon, .demo-feature-cta { transform: none; transition: none; } }
+</style>
