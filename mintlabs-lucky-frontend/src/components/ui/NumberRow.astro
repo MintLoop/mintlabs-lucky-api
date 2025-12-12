@@ -1,0 +1,297 @@
+---
+/**
+ * NumberRow.astro
+ * Reusable component for displaying lottery number results.
+ * 
+ * Architecture: Phase 4.5 mobile-first UX
+ * Spec: docs/LUCKY/WORKFLOWS/mobile-ux.md
+ * 
+ * Requirements:
+ * - Consistent pill sizing across viewports
+ * - Bonus ball distinction (gold/amber styling)
+ * - Theme-aware contrast (uses CSS custom properties)
+ * - Accessible with proper ARIA attributes
+ * - Responsive: wraps gracefully on mobile
+ */
+
+export interface Props {
+  /** Main lottery numbers */
+  numbers: number[];
+  /** Optional bonus/powerball number */
+  bonus?: number | null;
+  /** Size variant */
+  size?: 'sm' | 'md' | 'lg';
+  /** Show animation on render */
+  animate?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+  /** Game name for context (e.g., "Powerball", "Mega Millions") */
+  game?: string;
+  /** Mode label to display (e.g., "Hot Numbers", "Birthday") */
+  mode?: string;
+}
+
+const { 
+  numbers, 
+  bonus = null, 
+  size = 'md', 
+  animate = false,
+  class: className = '',
+  game,
+  mode
+} = Astro.props;
+
+// Size mappings for consistent sizing
+const sizeClasses = {
+  sm: 'number-row--sm',
+  md: 'number-row--md',
+  lg: 'number-row--lg',
+};
+---
+
+<div 
+  class:list={[
+    'number-row',
+    sizeClasses[size],
+    { 'number-row--animate': animate },
+    className
+  ]}
+  role="group"
+  aria-label={game ? `${game} numbers` : 'Lottery numbers'}
+>
+  {/* Optional header with game/mode info */}
+  {(game || mode) && (
+    <div class="number-row__header">
+      {game && <span class="number-row__game">{game}</span>}
+      {mode && <span class="number-row__mode">{mode}</span>}
+    </div>
+  )}
+  
+  {/* Numbers container */}
+  <div class="number-row__numbers">
+    {/* Main numbers */}
+    {numbers.map((num, index) => (
+      <span 
+        class="number-ball"
+        style={animate ? `--delay: ${index * 0.05}s` : undefined}
+        aria-label={`Number ${num}`}
+      >
+        {num}
+      </span>
+    ))}
+    
+    {/* Bonus number with visual distinction */}
+    {bonus !== null && bonus !== undefined && (
+      <>
+        <span class="number-row__separator" aria-hidden="true">+</span>
+        <span 
+          class="number-ball number-ball--bonus"
+          style={animate ? `--delay: ${numbers.length * 0.05}s` : undefined}
+          aria-label={`Bonus number ${bonus}`}
+        >
+          {bonus}
+        </span>
+      </>
+    )}
+  </div>
+</div>
+
+<style>
+  /* Number Row Container */
+  .number-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .number-row__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+  }
+  
+  .number-row__game {
+    color: var(--color-text-secondary, #6b7280);
+    font-weight: 500;
+  }
+  
+  .number-row__mode {
+    color: var(--color-primary, #6366f1);
+    font-weight: 600;
+    padding: 2px 8px;
+    background: var(--color-primary-alpha, rgba(99, 102, 241, 0.1));
+    border-radius: 9999px;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .number-row__numbers {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+  }
+  
+  .number-row__separator {
+    color: var(--color-text-muted, #9ca3af);
+    font-weight: 300;
+    font-size: 1.25em;
+    margin: 0 4px;
+  }
+  
+  /* Number Ball Base Styles */
+  .number-ball {
+    /* Sizing - using CSS custom properties for easy theming */
+    --ball-size: 44px;
+    width: var(--ball-size);
+    height: var(--ball-size);
+    
+    /* Layout */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Typography */
+    font-size: calc(var(--ball-size) * 0.38);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    
+    /* Visual */
+    background: linear-gradient(
+      135deg,
+      var(--color-primary, #6366f1) 0%,
+      var(--color-primary-dark, #4f46e5) 100%
+    );
+    color: white;
+    border-radius: 50%;
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.1),
+      0 4px 8px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    
+    /* Subtle 3D effect */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    
+    /* Ensure minimum tap target */
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Bonus ball styling - gold/amber for visual distinction */
+  .number-ball--bonus {
+    background: linear-gradient(
+      135deg,
+      var(--color-bonus-start, #f59e0b) 0%,
+      var(--color-bonus-end, #ef4444) 100%
+    );
+    box-shadow: 
+      0 2px 4px rgba(245, 158, 11, 0.3),
+      0 4px 8px rgba(239, 68, 68, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Size variants */
+  .number-row--sm .number-ball {
+    --ball-size: 36px;
+    font-size: 14px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+  
+  .number-row--sm .number-row__numbers {
+    gap: 6px;
+  }
+  
+  .number-row--lg .number-ball {
+    --ball-size: 56px;
+    font-size: 22px;
+    min-width: 56px;
+    min-height: 56px;
+  }
+  
+  .number-row--lg .number-row__numbers {
+    gap: 12px;
+  }
+  
+  /* Animation variant */
+  .number-row--animate .number-ball {
+    animation: ballPop 0.4s ease-out backwards;
+    animation-delay: var(--delay, 0s);
+  }
+  
+  @keyframes ballPop {
+    0% {
+      opacity: 0;
+      transform: scale(0) rotate(-180deg);
+    }
+    60% {
+      transform: scale(1.1) rotate(10deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+  }
+  
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .number-row--animate .number-ball {
+      animation: ballFadeIn 0.3s ease-out backwards;
+    }
+    
+    @keyframes ballFadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  }
+  
+  /* Mobile responsive */
+  @media (max-width: 400px) {
+    .number-row--md .number-ball {
+      --ball-size: 40px;
+      font-size: 15px;
+    }
+    
+    .number-row--lg .number-ball {
+      --ball-size: 48px;
+      font-size: 18px;
+    }
+    
+    .number-row__numbers {
+      gap: 6px;
+    }
+  }
+  
+  /* Dark mode / theme support */
+  :global([data-theme="dark"]) .number-ball {
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      0 4px 8px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  :global([data-theme="dark"]) .number-ball--bonus {
+    box-shadow: 
+      0 2px 4px rgba(245, 158, 11, 0.4),
+      0 4px 8px rgba(239, 68, 68, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .number-ball {
+      border: 2px solid white;
+    }
+    
+    .number-ball--bonus {
+      border: 2px solid #fcd34d;
+    }
+  }
+</style>

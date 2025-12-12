@@ -1,0 +1,285 @@
+---
+/**
+ * Budget Hub - Coming Soon
+ * Phase 4.5 stub page for future Budget features
+ * 
+ * Planned features:
+ * - Spending tracker
+ * - Play frequency suggestions
+ * - Responsible gaming resources
+ * - Budget alerts
+ */
+import Layout from '../layouts/Layout.astro';
+import BottomNav from '../components/mobile/BottomNav.astro';
+---
+
+<Layout 
+  title="Budget | Lucky Numbers" 
+  description="Track your lottery spending and play responsibly with Lucky Numbers budget tools."
+>
+  <main class="budget-page">
+    <div class="budget-container">
+      {/* Coming Soon Hero */}
+      <section class="coming-soon-hero">
+        <div class="icon-wrapper">
+          <span class="hero-icon" aria-hidden="true">💰</span>
+        </div>
+        <h1 class="hero-title">Budget Tools</h1>
+        <p class="hero-subtitle">Coming Soon</p>
+        <p class="hero-description">
+          Smart spending tools to help you play responsibly and stay within your limits.
+        </p>
+      </section>
+
+      {/* Planned Features */}
+      <section class="planned-features">
+        <h2 class="section-title">Planned Features</h2>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-icon" aria-hidden="true">📊</span>
+            <div class="feature-content">
+              <h3>Spending Tracker</h3>
+              <p>Log your plays and see spending patterns over time</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon" aria-hidden="true">⏰</span>
+            <div class="feature-content">
+              <h3>Play Frequency</h3>
+              <p>Get suggestions based on your budget and goals</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon" aria-hidden="true">🔔</span>
+            <div class="feature-content">
+              <h3>Budget Alerts</h3>
+              <p>Set limits and receive notifications</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon" aria-hidden="true">📚</span>
+            <div class="feature-content">
+              <h3>Responsible Gaming</h3>
+              <p>Resources and education for healthy play habits</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      {/* CTA to Numbers */}
+      <section class="cta-section">
+        <a href="/" class="cta-button">
+          <span class="cta-icon" aria-hidden="true">🎲</span>
+          Generate Numbers
+        </a>
+        <p class="cta-note">While you wait, try our number generator!</p>
+      </section>
+
+      {/* Responsible Gaming Notice */}
+      <section class="responsible-notice">
+        <h3>Play Responsibly</h3>
+        <p>
+          The lottery should be entertainment, not an investment strategy. 
+          Never spend more than you can afford to lose.
+        </p>
+        <a href="https://www.ncpgambling.org/" target="_blank" rel="noopener noreferrer" class="help-link">
+          Need help? National Council on Problem Gambling →
+        </a>
+      </section>
+    </div>
+  </main>
+
+  {/* Mobile Bottom Navigation */}
+  <BottomNav activeTab="budget" />
+</Layout>
+
+<style>
+  .budget-page {
+    min-height: 100vh;
+    background: var(--bg-base, #ffffff);
+    padding-bottom: var(--page-padding-bottom, 80px);
+  }
+
+  .budget-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--space-lg, 1.5rem);
+  }
+
+  /* Coming Soon Hero */
+  .coming-soon-hero {
+    text-align: center;
+    padding: var(--space-2xl, 3rem) 0;
+  }
+
+  .icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: var(--gradient-card-glow);
+    border-radius: var(--radius-full, 9999px);
+    margin-bottom: var(--space-md, 1rem);
+  }
+
+  .hero-icon {
+    font-size: 40px;
+  }
+
+  .hero-title {
+    font-size: var(--text-3xl, 1.875rem);
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--text-primary, #111827);
+    margin: 0 0 var(--space-xs, 0.5rem);
+  }
+
+  .hero-subtitle {
+    font-size: var(--text-lg, 1.125rem);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--accent-primary, #10b981);
+    margin: 0 0 var(--space-md, 1rem);
+  }
+
+  .hero-description {
+    font-size: var(--text-base, 1rem);
+    color: var(--text-secondary, #4b5563);
+    line-height: var(--line-height-relaxed, 1.75);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Planned Features */
+  .planned-features {
+    margin-top: var(--space-xl, 2rem);
+  }
+
+  .section-title {
+    font-size: var(--text-sm, 0.875rem);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-muted, #9ca3af);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 var(--space-md, 1rem);
+  }
+
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm, 0.75rem);
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md, 1rem);
+    padding: var(--space-md, 1rem);
+    background: var(--bg-surface-1, #f9fafb);
+    border-radius: var(--radius-lg, 0.75rem);
+    border: 1px solid var(--border-primary, #e5e7eb);
+  }
+
+  .feature-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .feature-content h3 {
+    font-size: var(--text-base, 1rem);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary, #111827);
+    margin: 0 0 4px;
+  }
+
+  .feature-content p {
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--text-secondary, #4b5563);
+    margin: 0;
+    line-height: var(--line-height-normal, 1.5);
+  }
+
+  /* CTA Section */
+  .cta-section {
+    margin-top: var(--space-2xl, 3rem);
+    text-align: center;
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs, 0.5rem);
+    padding: var(--space-md, 1rem) var(--space-xl, 2rem);
+    background: var(--accent-primary, #10b981);
+    color: var(--text-on-accent, #ffffff);
+    font-size: var(--text-lg, 1.125rem);
+    font-weight: var(--font-weight-semibold, 600);
+    text-decoration: none;
+    border-radius: var(--radius-xl, 1rem);
+    box-shadow: var(--shadow-soft-md);
+    transition: transform var(--duration-fast), box-shadow var(--duration-fast);
+    min-height: var(--tap-target-min, 44px);
+  }
+
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft-lg);
+  }
+
+  .cta-button:active {
+    transform: translateY(0);
+  }
+
+  .cta-icon {
+    font-size: 24px;
+  }
+
+  .cta-note {
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--text-muted, #9ca3af);
+    margin: var(--space-sm, 0.75rem) 0 0;
+  }
+
+  /* Responsible Gaming Notice */
+  .responsible-notice {
+    margin-top: var(--space-2xl, 3rem);
+    padding: var(--space-lg, 1.5rem);
+    background: var(--bg-surface-2, #f3f4f6);
+    border-radius: var(--radius-lg, 0.75rem);
+    text-align: center;
+  }
+
+  .responsible-notice h3 {
+    font-size: var(--text-base, 1rem);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary, #111827);
+    margin: 0 0 var(--space-xs, 0.5rem);
+  }
+
+  .responsible-notice p {
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--text-secondary, #4b5563);
+    line-height: var(--line-height-relaxed, 1.75);
+    margin: 0 0 var(--space-md, 1rem);
+  }
+
+  .help-link {
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--accent-primary, #10b981);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium, 500);
+  }
+
+  .help-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Desktop: hide bottom nav padding adjustment */
+  @media (min-width: 768px) {
+    .budget-page {
+      padding-bottom: var(--space-2xl, 3rem);
+    }
+  }
+</style>

@@ -1,0 +1,148 @@
+---
+/**
+ * GeneratorFormPolished.astro
+ * Phase 4.x UX Polish - Batch 1: Generator Dominance & Container Cleanup
+ *
+ * Changes from production GeneratorForm.astro:
+ * - Removed: theme-bg-card p-4 rounded-2xl wrapper
+ * - Added: shadow-xl rounded-2xl p-6 bg-[var(--bg-secondary)] border-l-4 border-[var(--accent-primary)]
+ *
+ * Production reference: src/components/GeneratorForm.astro (DO NOT EDIT)
+ */
+const { games = [] } = Astro.props;
+---
+
+<form id="genForm" class="space-y-4 shadow-xl rounded-2xl p-6 bg-[var(--bg-secondary)] border-l-4 border-[var(--accent-primary)]">
+  <label class="block">
+    <span class="text-sm theme-text-secondary">Game</span>
+    <select name="game" class="mt-1 w-full theme-input-bg rounded-lg p-2 theme-text-primary">
+      {games.map((g:any)=><option value={g.code}>{g.name}</option>)}
+    </select>
+  </label>
+
+  <label class="block">
+    <span class="text-sm theme-text-secondary">Mode</span>
+    <select name="mode" id="modeSelect" class="mt-1 w-full theme-input-bg rounded-lg p-2 theme-text-primary">
+      <optgroup label="Basic">
+        <option value="uniform">Uniform Random</option>
+        <option value="spaced">Spaced Distribution</option>
+        <option value="balanced">Balanced</option>
+      </optgroup>
+      <optgroup label="Strategic">
+        <option value="odd_even_mix">Odd-Even Mix</option>
+        <option value="sum_target">Sum Target</option>
+        <option value="pattern_avoid">Pattern Avoid</option>
+      </optgroup>
+      <optgroup label="Statistical">
+        <option value="hot">Hot Numbers</option>
+        <option value="cold">Cold Numbers</option>
+      </optgroup>
+      <optgroup label="Personal">
+        <option value="birthday">Birthday</option>
+        <option value="lucky">Lucky Numbers</option>
+        <option value="zodiac">Zodiac Sign</option>
+        <option value="gemstone">Gemstone</option>
+        <option value="star_sign">Star Sign</option>
+        <option value="jyotish">Jyotish</option>
+        <option value="chinese_zodiac">Chinese Zodiac</option>
+        <option value="favorite_color">Favorite Color</option>
+      </optgroup>
+      <optgroup label="Systematic">
+        <option value="wheel">Wheel System</option>
+      </optgroup>
+    </select>
+  </label>
+
+  <!-- Conditional fields -->
+  <div id="sumTargetField" class="hidden">
+    <label class="block">
+      <span class="text-sm theme-text-secondary">Target Sum</span>
+      <input id="targetSumInput" type="number" name="target_sum" placeholder="e.g., 150"
+             class="mt-1 w-full theme-input-bg rounded-lg p-2 theme-text-primary" />
+    </label>
+  </div>
+
+  <div id="birthdayField" class="hidden">
+    <label class="block">
+      <span class="text-sm theme-text-secondary">Birth Date</span>
+      <input type="date" name="birth_date"
+             class="mt-1 w-full theme-input-bg rounded-lg p-2 theme-text-primary" />
+      <span class="text-xs theme-text-muted">Format: YYYY-MM-DD</span>
+    </label>
+  </div>
+
+  <div id="luckyField" class="hidden">
+    <label class="block">
+      <span class="text-sm theme-text-secondary">Lucky Numbers</span>
+      <input type="text" name="lucky_numbers" placeholder="e.g., 7,13,21,42"
+             class="mt-1 w-full theme-input-bg rounded-lg p-2 theme-text-primary" />
+      <span class="text-xs theme-text-muted">Comma-separated numbers</span>
+    </label>
+  </div>
+
+  <div id="modeKeyContainer" class="hidden">
+    <label class="block">
+      <span class="text-sm theme-text-secondary">Theme / Option</span>
+      <select id="modeKeySelect" name="mode_key" class="mt-1 w-full theme-input-bg rounded-lg p-2 theme-text-primary">
+        <!-- options populated by /scripts/lucky.ts using src/data/modeConfig -->
+      </select>
+      <div class="mt-2 p-2 rounded-lg bg-blue-500/10 border border-blue-500/30">
+        <p class="text-xs text-blue-300">
+          <strong>Theme Disclaimer:</strong> Themes are cosmetic only and do not affect probability. All RNG outputs have identical odds regardless of theme selection.
+        </p>
+      </div>
+      <div id="themeEducation" class="hidden mt-2 p-2 rounded-lg bg-slate-800/50 border border-slate-700">
+        <p class="text-xs theme-text-secondary" id="themeEducationText"></p>
+      </div>
+    </label>
+  </div>
+
+  <div id="wheelField" class="hidden">
+    <label class="block">
+      <span class="text-sm theme-text-secondary">Wheel Type</span>
+      <select name="wheel_type" class="mt-1 w-full theme-input-bg rounded-lg p-2 theme-text-primary">
+        <option value="key">Key Number</option>
+        <option value="abbreviated">Abbreviated</option>
+        <option value="full">Full Wheel</option>
+      </select>
+    </label>
+  </div>
+
+  <label class="block">
+    <span class="text-sm theme-text-secondary">How many sets?</span>
+    <input type="number" name="sets" min="1" max="10" value="5"
+           class="mt-1 w-full theme-input-bg rounded-lg p-2 theme-text-primary" />
+  </label>
+
+  <div class="space-y-2 theme-border-primary border-t pt-3">
+    <h3 class="text-xs font-semibold theme-text-muted uppercase tracking-wide">Additional Filters</h3>
+
+    <label class="flex items-center gap-2">
+      <input type="checkbox" name="allow_repeats" value="true"
+             class="w-3 h-3 theme-input-bg theme-border-primary rounded focus:ring-emerald-500 focus:ring-1" />
+      <div>
+        <span class="text-xs font-medium theme-text-primary">Allow Repeats</span>
+        <p class="text-xs theme-text-secondary">Include numbers from recent draws</p>
+      </div>
+    </label>
+
+    <label class="flex items-center gap-2">
+      <input type="checkbox" name="allow_consecutive" value="true"
+             class="w-3 h-3 theme-input-bg theme-border-primary rounded focus:ring-emerald-500 focus:ring-1" />
+      <div>
+        <span class="text-xs font-medium theme-text-primary">Allow Consecutive</span>
+        <p class="text-xs theme-text-secondary">Include sequences like 14-15-16</p>
+      </div>
+    </label>
+  </div>
+
+  <button id="generateBtn" type="submit" class="w-full theme-accent-primary hover:theme-accent-hover theme-text-primary font-semibold rounded-xl py-2 flex items-center justify-center gap-2">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+    </svg>
+    Generate Numbers
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+    </svg>
+  </button>
+</form>

@@ -1,0 +1,322 @@
+---
+/**
+ * Phase 4.x UX Polish Demo Page
+ *
+ * This page demonstrates ALL batches from docs/LUCKY/PHASE_4X_UX_POLISH.md
+ * Production files are NOT modified - this is the demo staging surface.
+ *
+ * Batches implemented:
+ * - Batch 1: Generator Dominance & Container Cleanup
+ * - Batch 2: Width & Alignment Normalization
+ * - Batch 3: Mobile Optimization
+ * - Batch 4: Education Section Demotion
+ * - Batch 5: Contextual Tool Discovery
+ */
+import Layout from '../../layouts/Layout.astro';
+import GeneratorFormPolished from '../../components/demo/GeneratorFormPolished.astro';
+import GameFacts from '../../components/GameFacts.astro';
+import TrackLink from '../../components/TrackLink.astro';
+import TermsModal from '../../components/TermsModal.astro';
+import PrivacyModal from '../../components/PrivacyModal.astro';
+
+const API = import.meta.env.PUBLIC_API_BASE || 'http://localhost:8000';
+const gamesEndpoint = API ? `${String(API).replace(/\/$/, '')}/games` : '/games';
+const games = await fetch(gamesEndpoint).then(r => r.json()).catch(() => []);
+const jsonGames = Array.isArray(games) ? JSON.stringify(games).replaceAll('`', '\\`') : '[]';
+const current = Array.isArray(games) && games.length > 0 ? games[0] : null;
+const apiBase = API ? String(API).replace(/\/$/, '') : '';
+---
+
+<Layout title="Phase 4.x UX Polish Demo" description="Demo staging for UX polish changes" demo>
+  {jsonGames && jsonGames !== '[]' && (
+    <script type="application/json" id="initial-games" set:html={jsonGames} />
+  )}
+
+  <body class="min-h-screen theme-bg-primary theme-text-primary">
+    <!--
+      BATCH 2: Width & Alignment Normalization
+      - Changed max-w-xl sm:max-w-2xl to max-w-[var(--content-max-width)]
+      - Standardized to px-4 sm:px-6
+    -->
+    <main class="mx-auto max-w-[var(--content-max-width)] px-4 sm:px-6 space-y-6">
+
+      <!--
+        BATCH 3: Mobile Optimization - SiteHeader
+        - Added hidden sm:block to tagline <p>
+      -->
+      <header class="pt-3">
+        <div class="flex items-center justify-center gap-3 md:gap-4">
+          <a href="/" class="flex items-center gap-3 md:gap-4 hover:opacity-90 transition-opacity">
+            <img src="/clover.png" alt="Lucky Clover" class="w-12 h-12 md:w-14 md:h-14 shrink-0" />
+            <h1 class="text-3xl md:text-4xl font-bold leading-tight whitespace-nowrap">
+              MintLabs Lucky Numbers
+            </h1>
+          </a>
+        </div>
+        <!-- BATCH 3: Hide tagline on mobile -->
+        <p class="hidden sm:block mt-1 text-center theme-text-secondary text-sm">
+          For education and entertainment only. Play responsibly.
+        </p>
+
+        <nav class="mt-4 flex flex-wrap justify-center gap-2 md:gap-4">
+          <a href="/lottery-odds" class="px-3 py-1.5 text-sm rounded-full border border-slate-700 bg-slate-800/50 text-gray-300 hover:border-emerald-500 hover:text-emerald-400 transition-colors">Odds</a>
+          <a href="/lottery-math" class="px-3 py-1.5 text-sm rounded-full border border-slate-700 bg-slate-800/50 text-gray-300 hover:border-emerald-500 hover:text-emerald-400 transition-colors">Math</a>
+          <a href="/faq" class="px-3 py-1.5 text-sm rounded-full border border-slate-700 bg-slate-800/50 text-gray-300 hover:border-emerald-500 hover:text-emerald-400 transition-colors">FAQ</a>
+          <a href="/tools/payout-calculator" class="px-3 py-1.5 text-sm rounded-full border border-slate-700 bg-slate-800/50 text-gray-300 hover:border-emerald-500 hover:text-emerald-400 transition-colors">Tools</a>
+        </nav>
+      </header>
+
+      <!--
+        BATCH 2 & 3: ThemeToolBar
+        - Removed sm:justify-end, use justify-center
+        - Wrapped in hidden sm:flex for mobile
+      -->
+      <div class="hidden sm:flex flex-col sm:flex-row sm:items-center justify-center gap-2 mt-2 mb-2">
+        <label for="themeSelectPolished" class="sr-only">Theme</label>
+        <select id="themeSelectPolished"
+          class="w-full sm:w-auto shrink-0 theme-bg-card theme-text-primary theme-border-primary border
+                 rounded-lg h-9 px-3 pr-8 bg-clip-padding backdrop-blur-sm text-sm focus:outline-none
+                 focus:ring-2 focus:ring-[var(--accent-primary)]">
+          <option value="green-dark">Classic</option>
+          <option value="blue-dark">Alpine</option>
+          <option value="purple-dark">Perilla</option>
+          <option value="amber-dark">Eau de Cologne</option>
+          <option value="red-dark">Red</option>
+          <option value="teal-dark">Teal</option>
+          <option value="bw-dark">Monochrome</option>
+          <option value="green-light">Classic Light</option>
+          <option value="blue-light">Alpine Light</option>
+          <option value="purple-light">Perilla Light</option>
+          <option value="amber-light">Eau de Cologne Light</option>
+          <option value="red-light">Red Light</option>
+          <option value="teal-light">Teal Light</option>
+          <option value="bw-light">Monochrome Light</option>
+        </select>
+      </div>
+
+      <!--
+        BATCH 1: Generator Dominance
+        - Increased form margin my-8
+        - Form itself has: shadow-xl rounded-2xl p-6 bg-[var(--bg-secondary)] border-l-4 border-[var(--accent-primary)]
+      -->
+      <div class="my-8">
+        <GeneratorFormPolished games={Array.isArray(games) ? games : []} />
+      </div>
+
+      <!-- Results section -->
+      <section id="results" class="space-y-3"></section>
+
+      <!--
+        BATCH 5: Contextual Tool Discovery
+        - Link injected after generation (see script below)
+        - Format: "Why these odds?" styled link
+      -->
+      <div id="contextual-discovery" class="hidden">
+        <a href="/lottery-odds" class="text-sm underline theme-text-muted hover:theme-text-secondary transition-colors">
+          Why these odds? &rarr;
+        </a>
+      </div>
+
+      <!--
+        BATCH 3: GameFacts moved AFTER results section
+      -->
+      <div id="facts" class="mt-3">
+        {current && <GameFacts game={current} />}
+      </div>
+
+      <!--
+        BATCH 3 & 4: EduGrid wrapped in details/summary for mobile
+        - Collapsed by default, shown after generation or scroll
+        - Education section demoted with simplified styling
+      -->
+      <details id="edu-section" class="mt-6">
+        <summary class="cursor-pointer text-xs uppercase tracking-wide theme-text-muted font-semibold mb-3 list-none flex items-center gap-2">
+          <span class="transform transition-transform duration-200 edu-chevron">&#9654;</span>
+          Learn More
+        </summary>
+
+        <!-- BATCH 4: Horizontal rule above education -->
+        <hr class="border-[var(--border-primary)] my-4" />
+
+        <!--
+          BATCH 4: Education Section Demotion
+          - Changed to grid-cols-1 sm:grid-cols-2 (removed 3-col)
+          - Reduced to 3 items max
+          - Removed theme-bg-card, rounded-xl from articles
+          - Use text-sm theme-text-muted for descriptions
+        -->
+        <section class="space-y-4" id="edu">
+          <div class="grid gap-3 grid-cols-1 sm:grid-cols-2">
+            <article class="p-3 hover:bg-slate-800/30 transition-colors rounded-lg">
+              <h4 class="font-semibold mb-1">
+                <a href="/lottery-odds#independence" class="text-emerald-400 hover:text-emerald-300">Independence</a>
+              </h4>
+              <p class="text-sm theme-text-muted">Each draw is independent — past results don't alter odds.</p>
+            </article>
+            <article class="p-3 hover:bg-slate-800/30 transition-colors rounded-lg">
+              <h4 class="font-semibold mb-1">
+                <a href="/lottery-odds#gamblers-fallacy" class="text-emerald-400 hover:text-emerald-300">Gambler's fallacy</a>
+              </h4>
+              <p class="text-sm theme-text-muted">No "due" numbers — clusters can appear in truly random data.</p>
+            </article>
+            <article class="p-3 hover:bg-slate-800/30 transition-colors rounded-lg sm:col-span-2">
+              <h4 class="font-semibold mb-1">
+                <a href="/lottery-math" class="text-emerald-400 hover:text-emerald-300">The Math</a>
+              </h4>
+              <p class="text-sm theme-text-muted">Combinations, expected value, and probability formulas explained simply.</p>
+            </article>
+          </div>
+        </section>
+      </details>
+
+      <!-- Footer (simplified for demo) -->
+      <footer class="mt-12 pb-8 border-t border-slate-700/50 pt-8">
+        <div class="grid gap-6 grid-cols-2 md:grid-cols-3 mb-6 text-sm">
+          <div>
+            <h4 class="font-semibold theme-text-secondary mb-2">Education</h4>
+            <ul class="space-y-1.5 theme-text-muted">
+              <li><a href="/lottery-odds" class="hover:text-emerald-400 transition-colors">Lottery Odds</a></li>
+              <li><a href="/lottery-math" class="hover:text-emerald-400 transition-colors">The Math</a></li>
+              <li><a href="/faq" class="hover:text-emerald-400 transition-colors">FAQ</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold theme-text-secondary mb-2">Tools</h4>
+            <ul class="space-y-1.5 theme-text-muted">
+              <li><a href="/tools/payout-calculator" class="hover:text-emerald-400 transition-colors">Payout Calculator</a></li>
+              <li><a href="/tools/lottery-budget" class="hover:text-emerald-400 transition-colors">Budget Planner</a></li>
+              <li><a href="/archive" class="hover:text-emerald-400 transition-colors">Past Results</a></li>
+            </ul>
+          </div>
+          <div class="col-span-2 md:col-span-1">
+            <h4 class="font-semibold theme-text-secondary mb-2">Legal</h4>
+            <ul class="space-y-1.5 theme-text-muted">
+              <li><a href="/terms" class="hover:text-emerald-400 transition-colors">Terms & Conditions</a></li>
+              <li><a href="/privacy" class="hover:text-emerald-400 transition-colors">Privacy Policy</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Mobile theme selector in footer (BATCH 3) -->
+        <div class="sm:hidden mb-6">
+          <label for="themeSelectMobile" class="text-xs theme-text-muted mb-1 block">Theme</label>
+          <select id="themeSelectMobile"
+            class="w-full theme-bg-card theme-text-primary theme-border-primary border
+                   rounded-lg h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]">
+            <option value="green-dark">Classic</option>
+            <option value="blue-dark">Alpine</option>
+            <option value="purple-dark">Perilla</option>
+            <option value="green-light">Classic Light</option>
+            <option value="blue-light">Alpine Light</option>
+            <option value="purple-light">Perilla Light</option>
+          </select>
+        </div>
+
+        <div class="text-center text-sm theme-text-muted border-t border-slate-700/50 pt-4">
+          <p>&copy; 2025 MintLabs. All rights reserved.</p>
+          <p class="mt-2 text-xs theme-text-muted max-w-sm mx-auto">
+            For entertainment and education only. We do not predict lottery numbers. Play responsibly.
+          </p>
+        </div>
+      </footer>
+    </main>
+
+    <TermsModal />
+    <PrivacyModal />
+
+    <script is:inline define:vars={{ apiBase }}>
+      window.__LUCKY_API_BASE = apiBase;
+    </script>
+    <script type="module" src="/scripts/entry.js"></script>
+  </body>
+</Layout>
+
+<style>
+  /*
+   * BATCH 2: Content max-width token
+   * In production, add to global.css: :root { --content-max-width: 36rem; }
+   */
+  :root {
+    --content-max-width: 36rem;
+  }
+
+  /*
+   * BATCH 1: Solid hex equivalents for --bg-card
+   * Demo override - in production, update global.css
+   */
+  :root {
+    --bg-card-solid: #1e293b;
+  }
+  [data-theme="green-dark"] {
+    --bg-card-solid: #065f46;
+  }
+  [data-theme="blue-dark"] {
+    --bg-card-solid: #1e293b;
+  }
+  [data-theme="purple-dark"] {
+    --bg-card-solid: #3b2d7a;
+  }
+  [data-theme$="-light"] {
+    --bg-card-solid: #f1f5f9;
+  }
+
+  /* Education section chevron rotation when open */
+  details[open] .edu-chevron {
+    transform: rotate(90deg);
+  }
+
+  /* Ensure generator has highest visual weight */
+  #genForm {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Results styling for contextual discovery */
+  #contextual-discovery {
+    text-align: center;
+    padding: 0.5rem 0;
+  }
+</style>
+
+<script is:inline>
+  // Theme selector sync (both desktop and mobile)
+  (function() {
+    const selDesktop = document.getElementById('themeSelectPolished');
+    const selMobile = document.getElementById('themeSelectMobile');
+    const apply = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('selectedTheme', t);
+      if (selDesktop) selDesktop.value = t;
+      if (selMobile) selMobile.value = t;
+    };
+
+    const saved = document.documentElement.getAttribute('data-theme') || localStorage.getItem('selectedTheme') || 'green-dark';
+    apply(saved);
+
+    if (selDesktop) selDesktop.addEventListener('change', (e) => apply(e.target.value));
+    if (selMobile) selMobile.addEventListener('change', (e) => apply(e.target.value));
+  })();
+
+  // BATCH 5: Show contextual discovery link after successful generation
+  (function() {
+    const resultsEl = document.getElementById('results');
+    const discoveryEl = document.getElementById('contextual-discovery');
+    const eduSection = document.getElementById('edu-section');
+
+    if (!resultsEl || !discoveryEl) return;
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.addedNodes.length > 0) {
+          // Results were added - show contextual discovery
+          discoveryEl.classList.remove('hidden');
+          // Also open education section after first generation
+          if (eduSection) eduSection.setAttribute('open', '');
+          break;
+        }
+      }
+    });
+
+    observer.observe(resultsEl, { childList: true });
+  })();
+</script>
