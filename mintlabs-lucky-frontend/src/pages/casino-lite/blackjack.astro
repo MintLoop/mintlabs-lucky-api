@@ -106,6 +106,14 @@ const description = "Practice blackjack strategy with our fictional casino simul
           Stand
         </button>
         <button
+          id="split-btn"
+          class="px-8 py-3 rounded-lg font-bold text-lg transition-all hidden"
+          style="background: var(--accent-warning); color: var(--text-on-accent); border: 2px solid var(--accent-warning);"
+          disabled
+        >
+          ✂️ Split
+        </button>
+        <button
           id="double-btn"
           class="px-8 py-3 rounded-lg font-bold text-lg transition-all"
           style="background: var(--accent-secondary); color: var(--text-on-accent); border: 2px solid var(--accent-secondary);"
@@ -156,6 +164,7 @@ const description = "Practice blackjack strategy with our fictional casino simul
           <ul class="text-sm space-y-1" style="color: var(--text-secondary);">
             <li>• <strong>Hit:</strong> Take another card</li>
             <li>• <strong>Stand:</strong> Keep your current hand</li>
+            <li>• <strong>Split:</strong> Split a pair into two hands (requires additional bet)</li>
             <li>• <strong>Double Down:</strong> Double your bet, get exactly one card, then forced stand</li>
             <li>• <strong>Blackjack:</strong> Ace + 10-value card pays 3:2 (1.5× your bet)</li>
           </ul>
@@ -249,6 +258,13 @@ const description = "Practice blackjack strategy with our fictional casino simul
   let isDoubledDown = false;
   let baseBet = 5; // Base CatnipCoin bet
   let currentThemeId = 'emoji-default';
+  
+  // TODO Phase 4.6: Multi-hand state for splitting
+  // let hands: Card[][] = [];
+  // let activeHandIndex = 0;
+  // let bets: number[] = [];
+  // let handResults: ('win' | 'lose' | 'push' | null)[] = [];
+  // let isSplitHand = false;
 
   // Load saved theme
   const savedTheme = localStorage.getItem('casino-deck-theme');
@@ -459,6 +475,30 @@ const description = "Practice blackjack strategy with our fictional casino simul
   function isBusted(hand: Card[]): boolean {
     return calculateTotal(hand) > 21;
   }
+  
+  // Check if player can split (Phase 4.5 stub + 4.6 full implementation)
+  function canSplit(): boolean {
+    // Must have exactly 2 cards
+    if (playerHand.length !== 2) return false;
+    
+    // Must have matching values (rank for non-faces, value for faces)
+    const card1 = playerHand[0];
+    const card2 = playerHand[1];
+    
+    // Same rank (e.g., 7-7, A-A)
+    if (card1.rank === card2.rank) return true;
+    
+    // Both are 10-value cards (10, J, Q, K)
+    const tenValues = ['10', 'J', 'Q', 'K'];
+    if (tenValues.includes(card1.rank) && tenValues.includes(card2.rank)) return true;
+    
+    return false;
+  }
+  
+  // Check if player has enough balance to split
+  function canAffordSplit(): boolean {
+    return getCatnipBalance() >= baseBet;
+  }
 
   // Dealer play
   function dealerPlay() {
@@ -549,12 +589,20 @@ const description = "Practice blackjack strategy with our fictional casino simul
     const hitBtn = document.getElementById('hit-btn') as HTMLButtonElement;
     const standBtn = document.getElementById('stand-btn') as HTMLButtonElement;
     const doubleBtn = document.getElementById('double-btn') as HTMLButtonElement;
+    const splitBtn = document.getElementById('split-btn') as HTMLButtonElement;
     const dealBtn = document.getElementById('deal-btn') as HTMLButtonElement;
     const dealAgainBtn = document.getElementById('deal-again-btn') as HTMLButtonElement;
 
     if (hitBtn) hitBtn.disabled = !hit;
     if (standBtn) standBtn.disabled = !stand;
     if (doubleBtn) doubleBtn.disabled = !doubleDown;
+    
+    // Split button logic (Phase 4.5 - shown when eligible)
+    if (splitBtn) {
+      const canSplitNow = canSplit() && canAffordSplit() && !gameOver && playerHand.length === 2;
+      splitBtn.classList.toggle('hidden', !canSplitNow);
+      splitBtn.disabled = !canSplitNow;
+    }
     
     // Show Deal Again instead of Deal Cards when game is over
     if (dealBtn && dealAgainBtn) {
@@ -581,6 +629,13 @@ const description = "Practice blackjack strategy with our fictional casino simul
     playerHand = [deck.pop()!, deck.pop()!];
     dealerHand = [deck.pop()!, deck.pop()!];
     renderHands();
+
+    // TODO Phase 4.6: Insurance side bet
+    // If dealer shows Ace, offer insurance (half of original bet)
+    // Insurance pays 2:1 if dealer has blackjack
+    // if (dealerHand[0].rank === 'A') {
+    //   showInsurancePrompt();
+    // }
 
     // Check for immediate natural blackjacks
     if (hasNaturalBlackjack(playerHand) || hasNaturalBlackjack(dealerHand)) {
@@ -648,6 +703,50 @@ const description = "Practice blackjack strategy with our fictional casino simul
       dealerPlay();
     }
   }
+  
+  // Split (Phase 4.5 stub / Phase 4.6 full implementation)
+  function split() {
+    // TODO Phase 4.6: Full multi-hand implementation
+    // For now, show a message explaining the feature is coming soon
+    
+    if (!canSplit() || !canAffordSplit() || gameOver) {
+      return;
+    }
+    
+    alert('✂️ Split feature coming in Phase 4.6!\n\nSplitting will allow you to:\n• Split matching pairs into two hands\n• Play each hand independently\n• Double your bet automatically\n\nStay tuned!');
+    
+    /* Phase 4.6 implementation plan:
+    
+    // Deduct additional bet
+    subtractCatnip(baseBet, 'Blackjack split');
+    showCatnipChange(-baseBet, 'Split');
+    
+    // Split the hand
+    const secondCard = playerHand.pop()!;
+    hands = [playerHand, [secondCard]];
+    bets = [baseBet, baseBet];
+    activeHandIndex = 0;
+    handResults = [null, null];
+    isSplitHand = true;
+    
+    // Deal one card to each hand
+    hands[0].push(deck.pop()!);
+    hands[1].push(deck.pop()!);
+    
+    // Special case: Split aces
+    if (hands[0][0].rank === 'A') {
+      isSplitAces = true;
+      // Split aces get one card each, then auto-stand
+      gameOver = true;
+      dealerPlay();
+      return;
+    }
+    
+    // Render and enable play on first hand
+    renderHands();
+    updateButtons(true, true, false, false);
+    */
+  }
 
   // Initialize
   document.addEventListener('DOMContentLoaded', () => {
@@ -655,12 +754,14 @@ const description = "Practice blackjack strategy with our fictional casino simul
     const dealAgainBtn = document.getElementById('deal-again-btn');
     const hitBtn = document.getElementById('hit-btn');
     const standBtn = document.getElementById('stand-btn');
+    const splitBtn = document.getElementById('split-btn');
     const doubleBtn = document.getElementById('double-btn');
 
     if (dealBtn) dealBtn.addEventListener('click', deal);
     if (dealAgainBtn) dealAgainBtn.addEventListener('click', deal);
     if (hitBtn) hitBtn.addEventListener('click', hit);
     if (standBtn) standBtn.addEventListener('click', stand);
+    if (splitBtn) splitBtn.addEventListener('click', split);
     if (doubleBtn) doubleBtn.addEventListener('click', doubleDown);
 
     // Initialize balance display

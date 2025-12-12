@@ -338,9 +338,9 @@ export function initLucky() {
         } catch (e) {}
 
         const numbersHtml = Array.isArray(d.numbers)
-          ? d.numbers.map((n: any) => `<span class="text-emerald-400 font-semibold">${n}</span>`).join(', ')
+          ? d.numbers.map((n: any) => `<span class=\"result-chip text-emerald-400 font-semibold\">${n}</span>`).join(', ')
           : (d.numbers || '—');
-        const bonusHtml = d.bonus ? `<span class="text-emerald-400 font-semibold">${d.bonus}</span>` : '';
+        const bonusHtml = d.bonus ? `<span class=\"result-chip text-emerald-400 font-semibold\">${d.bonus}</span>` : '';
 
         let lastInfoHtml = '';
         if (d.last_number_info) {

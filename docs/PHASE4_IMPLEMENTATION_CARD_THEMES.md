@@ -453,3 +453,65 @@ All requirements from Phase 4.3.y+z TODO met:
 ---
 
 End of Phase 4.3.y+z Implementation Summary
+
+---
+
+## Phase 4.5 — WebP Migration + Loading States (December 10, 2025)
+
+**Status:** ✅ **COMPLETE**  
+**Branch:** `feature/card-themes-phase-4-3` (continued)
+
+### Overview
+
+Implemented WebP image compression, loading skeletons, and error fallbacks to improve performance and user experience.
+
+### Deliverables
+
+#### 1. WebP Image Generation
+
+All card themes now have WebP variants with significant file size reduction:
+
+- emerald-velvet: front.webp (67KB), back.webp (113KB)
+- linen-ivory: front.webp (83KB), back.webp (108KB)  
+- mist-blue: front.webp (101KB), back.webp (90KB)
+
+#### 2. CardView Enhancements
+
+**File:** `src/components/casino/CardView.astro`
+
+- Replaced `<img>` with `<picture>` element
+- Added WebP source with JPEG fallback
+- Added loading skeleton with pulse animation
+- Added error fallback UI for broken images
+- Added lazy loading
+
+#### 3. SSR-Safe Storage
+
+**File:** `src/utils/ssr.ts` (NEW)
+
+Created SSR-safe localStorage helpers to prevent build-time crashes and hydration warnings.
+
+#### 4. Performance Impact
+
+**Before (JPEG):** 1.0-1.5 MB per theme  
+**After (WebP):** 180-191 KB per theme (81-88% reduction)
+
+**Expected:** 500-1000ms LCP improvement on mobile
+
+### Files Modified
+
+**New (6):**
+- `src/utils/ssr.ts`
+- `scripts/convert-to-webp.js`
+- `scripts/optimize-webp.js`
+- `tests/playwright/cards/cardview-webp.spec.ts`
+- `tests/playwright/casino/blackjack-splitting.spec.ts`
+- `docs/BLACKJACK_SPLITTING.md`
+
+**Modified (4):**
+- `src/types/cards.ts` (added WebP fields)
+- `src/config/decks.ts` (added WebP paths)
+- `src/components/casino/CardView.astro` (picture element)
+- `src/utils/catnipCoin.ts` (SSR-safe storage)
+
+---

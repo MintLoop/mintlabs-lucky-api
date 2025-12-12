@@ -181,6 +181,15 @@ Expected:
 - All tests pass
 - Logs include `[test] intercepted /generate` confirming mocked calls work
 
+Visual snapshot notes:
+- Visual (screenshot) tests are stored alongside Playwright tests and use `expect(...).toMatchSnapshot(...)` to compare.
+- To run only visual tests or a specific suite:
+  - `npx playwright test tests/demo` (to run demo tests)
+  - `npx playwright test tests/demo/demo-visual.spec.ts` (specific tests)
+- To update snapshots when a visual change is intentional:
+  - `npx playwright test --update-snapshots` or `npm run test:e2e -- --update-snapshots`
+
+
 ---
 
 ## 5. Normal Development Workflow

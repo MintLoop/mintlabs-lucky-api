@@ -28,10 +28,13 @@ export interface DeckTheme {
   cardFrameClass?: string;   // Tailwind border/rounded/shadow utilities
   backPattern?: string;      // Card back design CSS (fallback for face-down cards)
   
-  // Image-backed themes (Phase 4.3.x)
-  frontImage?: string;                        // Default front face image (WebP/PNG)
-  backImage?: string;                         // Default back face image (WebP/PNG)
+  // Image-backed themes (Phase 4.3.x + 4.5 WebP)
+  frontImage?: string;                        // Default front face image (JPEG fallback)
+  backImage?: string;                         // Default back face image (JPEG fallback)
+  frontImageWebP?: string;                    // WebP variant (Phase 4.5)
+  backImageWebP?: string;                     // WebP variant (Phase 4.5)
   frontBySuit?: Partial<Record<Suit, string>>; // Optional suit-specific front images
+  frontBySuitWebP?: Partial<Record<Suit, string>>; // WebP variants for suit-specific
 }
 
 // Helper type for card values in game logic

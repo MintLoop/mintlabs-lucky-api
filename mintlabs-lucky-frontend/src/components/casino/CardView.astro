@@ -19,7 +19,7 @@ const { card, theme, suitSet, faceDown = false, size = 'md', class: className = 
 // Debug mode for alignment QA (set to true to see guides)
 const debug = false;
 
-// Asset resolver - ensures JPEG fallback (Phase 4.3.z)
+// Asset resolver - ensures JPEG fallback (Phase 4.3.z + 4.5)
 const resolveAsset = (src: string | undefined): string | null => {
   if (!src) return null;
   return src
@@ -42,12 +42,15 @@ const isEmoji = !suitIcon.startsWith('/');
 const cardColor = getCardColor(card.suit);
 const colorClass = cardColor === 'red' ? 'text-red-600' : 'text-slate-900';
 
-// Compute front/back image sources with resolver (Phase 4.3.z)
-const frontSrc = resolveAsset(theme.frontBySuit?.[card.suit] ?? theme.frontImage);
-const backSrc = resolveAsset(theme.backImage);
+// Compute front/back image sources with WebP + fallback (Phase 4.5)
+const frontSrcWebP = theme.frontBySuitWebP?.[card.suit] ?? theme.frontImageWebP;
+const frontSrcFallback = resolveAsset(theme.frontBySuit?.[card.suit] ?? theme.frontImage);
+const backSrcWebP = theme.backImageWebP;
+const backSrcFallback = resolveAsset(theme.backImage);
 
-// Select appropriate image source based on face direction
-const cardImageSrc = faceDown ? backSrc : frontSrc;
+// Select appropriate image sources based on face direction
+const cardImageWebP = faceDown ? backSrcWebP : frontSrcWebP;
+const cardImageFallback = faceDown ? backSrcFallback : frontSrcFallback;
 
 // Aria label for accessibility
 const ariaLabel = faceDown ? 'Face down card' : formatCard(card);
@@ -61,13 +64,25 @@ const ariaLabel = faceDown ? 'Face down card' : formatCard(card);
 >
   {/* Inner mask: clips image to card shape */}
   <div class="absolute inset-0 rounded-xl overflow-hidden">
+    {/* Loading skeleton (Phase 4.5) */}
+    <div class="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 animate-pulse card-skeleton"></div>
+    
     {/* Background image/pattern with padding for visible border */}
-    {cardImageSrc ? (
+    {cardImageWebP || cardImageFallback ? (
       <div class="absolute inset-0 p-[2%]">
-        <div
-          class="w-full h-full bg-cover bg-center"
-          style={`background-image: url('${cardImageSrc}')`}
-        />
+        <picture class="w-full h-full block">
+          {cardImageWebP && (
+            <source type="image/webp" srcset={cardImageWebP} />
+          )}
+          <img
+            src={cardImageFallback || ''}
+            alt={faceDown ? 'Card back' : `${card.rank} of ${card.suit}`}
+            class="w-full h-full object-cover card-image"
+            loading="lazy"
+            onerror="this.parentElement.parentElement.classList.add('card-error'); this.style.display='none';"
+            onload="this.parentElement.parentElement.previousElementSibling.style.display='none';"
+          />
+        </picture>
       </div>
     ) : theme.background && !faceDown ? (
       <div class={`absolute inset-0 ${theme.background}`} />
@@ -78,6 +93,14 @@ const ariaLabel = faceDown ? 'Face down card' : formatCard(card);
     ) : (
       <div class="absolute inset-0 bg-white" />
     )}
+    
+    {/* Error fallback (Phase 4.5) */}
+    <div class="card-error-fallback hidden absolute inset-0 bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center">
+      <div class="text-center text-slate-600 text-xs px-2">
+        <div class="text-2xl mb-1">⚠️</div>
+        <div>Image failed</div>
+      </div>
+    </div>
   </div>
 
   {/* Rank/Suit Overlay (face-up cards only) */}
@@ -145,6 +168,32 @@ const ariaLabel = faceDown ? 'Face down card' : formatCard(card);
 </div>
 
 <style>
+  /* Loading skeleton animation (Phase 4.5) */
+  .card-skeleton {
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes skeleton-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  /* Image loaded state - hide skeleton */
+  .card-image {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Error state - show fallback */
+  .card-error .card-error-fallback {
+    display: flex !important;
+    z-index: 2;
+  }
+  
   /* Optional: Add flip animation for card reveals */
   .card-flip {
     animation: flip 0.6s cubic-bezier(0.4, 0, 0.2, 1);

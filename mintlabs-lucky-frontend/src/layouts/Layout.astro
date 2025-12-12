@@ -9,6 +9,8 @@ interface Props {
 	canonicalUrl?: string;
 	noIndex?: boolean;
 	jsonLd?: object;
+	/* If set true, this will mark the page as a demo page and enable demo-scoped tokens */
+	demo?: boolean;
 	}
 
 	const { 
@@ -27,7 +29,7 @@ const fullCanonical = canonicalUrl || Astro.url.href;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-demo={Astro.props.demo ? 'true' : undefined}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -80,6 +82,7 @@ const fullCanonical = canonicalUrl || Astro.url.href;
 			}
 		</script>
 		
+		<link rel="stylesheet" href="/src/styles/tokens.css" />
 		<link rel="stylesheet" href="/src/styles/global.css" />
 		
 		<!-- Apply saved theme before paint -->

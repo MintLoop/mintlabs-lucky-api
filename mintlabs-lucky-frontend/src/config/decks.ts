@@ -65,13 +65,15 @@ export const DECK_THEMES: DeckTheme[] = [
     backPattern: 'bg-gradient-to-br from-purple-600 to-purple-800',
   },
   
-  // Image-backed themes (Phase 4.3.x)
+  // Image-backed themes (Phase 4.3.x + 4.5 WebP)
   {
     id: 'emerald-velvet',
     label: 'Emerald Velvet',
     suitSetId: 'classic',
     frontImage: '/cards/themes/emerald-velvet/front.jpeg',
     backImage: '/cards/themes/emerald-velvet/back.jpeg',
+    frontImageWebP: '/cards/themes/emerald-velvet/front.webp',
+    backImageWebP: '/cards/themes/emerald-velvet/back.webp',
     rankFontClass: 'font-semibold text-emerald-50 drop-shadow-md',
     cardFrameClass: 'rounded-xl border-[2px] border-emerald-700 shadow-[0_4px_10px_rgba(0,0,0,0.4)] bg-transparent',
   },
@@ -81,6 +83,8 @@ export const DECK_THEMES: DeckTheme[] = [
     suitSetId: 'classic',
     frontImage: '/cards/themes/linen-ivory/front.jpeg',
     backImage: '/cards/themes/linen-ivory/back.jpeg',
+    frontImageWebP: '/cards/themes/linen-ivory/front.webp',
+    backImageWebP: '/cards/themes/linen-ivory/back.webp',
     rankFontClass: 'font-semibold text-slate-800',
     cardFrameClass: 'rounded-xl border-[2px] border-amber-700 shadow-[0_4px_10px_rgba(0,0,0,0.4)] bg-transparent',
   },
@@ -90,6 +94,8 @@ export const DECK_THEMES: DeckTheme[] = [
     suitSetId: 'classic',
     frontImage: '/cards/themes/mist-blue/front.jpeg',
     backImage: '/cards/themes/mist-blue/back.jpeg',
+    frontImageWebP: '/cards/themes/mist-blue/front.webp',
+    backImageWebP: '/cards/themes/mist-blue/back.webp',
     rankFontClass: 'font-semibold text-slate-900',
     cardFrameClass: 'rounded-xl border-[2px] border-blue-700 shadow-[0_4px_10px_rgba(0,0,0,0.4)] bg-transparent',
   },

@@ -1,5 +1,8 @@
 // CatnipCoin - Fictional Currency System
 // Phase 4.3 - Casino-Lite Currency
+// Phase 4.5 - SSR-safe storage
+
+import { safeGetItem, safeSetItem, safeGetJSON, safeSetJSON, safeRemoveItem, isBrowser } from './ssr';
 
 export const CATNIP_INITIAL_BALANCE = 100;
 export const CATNIP_STORAGE_KEY = 'catnip-coin-balance';
@@ -14,34 +17,25 @@ export interface CatnipTransaction {
  * Get current CatnipCoin balance
  */
 export function getCatnipBalance(): number {
-  if (typeof window === 'undefined') return CATNIP_INITIAL_BALANCE;
+  if (!isBrowser()) return CATNIP_INITIAL_BALANCE;
   
-  try {
-    const stored = localStorage.getItem(CATNIP_STORAGE_KEY);
-    if (stored) {
-      const balance = parseInt(stored, 10);
-      return isNaN(balance) ? CATNIP_INITIAL_BALANCE : balance;
-    }
-    return CATNIP_INITIAL_BALANCE;
-  } catch (e) {
-    console.warn('Failed to read CatnipCoin balance:', e);
-    return CATNIP_INITIAL_BALANCE;
+  const stored = safeGetItem(CATNIP_STORAGE_KEY);
+  if (stored) {
+    const balance = parseInt(stored, 10);
+    return isNaN(balance) ? CATNIP_INITIAL_BALANCE : balance;
   }
+  return CATNIP_INITIAL_BALANCE;
 }
 
 /**
  * Set CatnipCoin balance
  */
 export function setCatnipBalance(amount: number): void {
-  if (typeof window === 'undefined') return;
+  if (!isBrowser()) return;
   
-  try {
-    localStorage.setItem(CATNIP_STORAGE_KEY, amount.toString());
-    // Dispatch event for UI updates
-    window.dispatchEvent(new CustomEvent('catnipBalanceChange', { detail: amount }));
-  } catch (e) {
-    console.warn('Failed to save CatnipCoin balance:', e);
-  }
+  safeSetItem(CATNIP_STORAGE_KEY, amount.toString());
+  // Dispatch event for UI updates
+  window.dispatchEvent(new CustomEvent('catnipBalanceChange', { detail: amount }));
 }
 
 /**
@@ -78,47 +72,31 @@ export function resetCatnipBalance(): void {
  * Log transaction (last 10 only)
  */
 function logTransaction(transaction: CatnipTransaction): void {
-  if (typeof window === 'undefined') return;
+  if (!isBrowser()) return;
   
-  try {
-    const historyKey = 'catnip-coin-history';
-    const stored = localStorage.getItem(historyKey);
-    const history: CatnipTransaction[] = stored ? JSON.parse(stored) : [];
-    
-    history.unshift(transaction);
-    if (history.length > 10) history.pop();
-    
-    localStorage.setItem(historyKey, JSON.stringify(history));
-  } catch (e) {
-    console.warn('Failed to log CatnipCoin transaction:', e);
-  }
+  const historyKey = 'catnip-coin-history';
+  const history: CatnipTransaction[] = safeGetJSON(historyKey, []);
+  
+  history.unshift(transaction);
+  if (history.length > 10) history.pop();
+  
+  safeSetJSON(historyKey, history);
 }
 
 /**
  * Get transaction history
  */
 export function getCatnipHistory(): CatnipTransaction[] {
-  if (typeof window === 'undefined') return [];
-  
-  try {
-    const stored = localStorage.getItem('catnip-coin-history');
-    return stored ? JSON.parse(stored) : [];
-  } catch (e) {
-    console.warn('Failed to read CatnipCoin history:', e);
-    return [];
-  }
+  if (!isBrowser()) return [];
+  return safeGetJSON('catnip-coin-history', []);
 }
 
 /**
  * Clear transaction history
  */
 function clearTransactionHistory(): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.removeItem('catnip-coin-history');
-  } catch (e) {
-    console.warn('Failed to clear CatnipCoin history:', e);
-  }
+  if (!isBrowser()) return;
+  safeRemoveItem('catnip-coin-history');
 }
 
 /**

@@ -489,3 +489,84 @@ Branch: feature/card-themes-phase-4-3"
 ---
 
 End of Phase 4.4 Sprint Documentation
+
+---
+
+## Phase 4.5 — Splitting Hooks (December 10, 2025)
+
+**Status:** ✅ **STUB COMPLETE** — Full implementation in Phase 4.6
+
+### Overview
+
+Added UI hooks and helper functions for blackjack pair splitting. Split button appears when eligible, but shows "coming soon" message when clicked. Full multi-hand logic planned for Phase 4.6.
+
+### Implementation
+
+#### 1. Split Button UI
+
+**File:** `src/pages/casino-lite/blackjack.astro`
+
+Added split button to game controls:
+```html
+<button
+  id="split-btn"
+  class="px-8 py-3 rounded-lg font-bold text-lg transition-all hidden"
+  style="background: var(--accent-warning); color: var(--text-on-accent);"
+  disabled
+>
+  ✂️ Split
+</button>
+```
+
+#### 2. Split Eligibility Check
+
+Added helper functions:
+- `canSplit()` — Checks if hand is a valid pair
+- `canAffordSplit()` — Checks CatnipCoin balance
+
+```typescript
+function canSplit(): boolean {
+  if (playerHand.length !== 2) return false;
+  
+  const card1 = playerHand[0];
+  const card2 = playerHand[1];
+  
+  // Same rank (7-7, A-A) or both 10-value (10-J, Q-K, etc.)
+  if (card1.rank === card2.rank) return true;
+  
+  const tenValues = ['10', 'J', 'Q', 'K'];
+  if (tenValues.includes(card1.rank) && tenValues.includes(card2.rank)) return true;
+  
+  return false;
+}
+```
+
+#### 3. Button Visibility Logic
+
+Updated `updateButtons()` to show split button when:
+- Exactly 2 cards in hand
+- Cards form a valid pair
+- Player has sufficient balance
+- Game is not over
+
+#### 4. Placeholder Implementation
+
+`split()` function shows alert explaining feature is coming in Phase 4.6, with commented-out implementation plan for next phase.
+
+### Documentation
+
+- Created `docs/BLACKJACK_SPLITTING.md` with full implementation spec
+- Added TODO comments for Phase 4.6 multi-hand state
+- Created test stub in `tests/playwright/casino/blackjack-splitting.spec.ts`
+
+### Phase 4.6 Roadmap
+
+Full splitting implementation will include:
+- Multi-hand state machine (hands[], bets[], activeHandIndex)
+- Sequential hand play
+- Independent settlement per hand
+- Split aces special case (one card only)
+- CatnipCoin deduction on split
+- Proper settlement accounting
+
+---

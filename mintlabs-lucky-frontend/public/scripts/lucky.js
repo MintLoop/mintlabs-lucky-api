@@ -714,8 +714,8 @@ function initLucky() {
           }
         } catch (e2) {
         }
-        const numbersHtml = Array.isArray(d.numbers) ? d.numbers.map((n) => `<span class="text-emerald-400 font-semibold">${n}</span>`).join(", ") : d.numbers || "\u2014";
-        const bonusHtml = d.bonus ? `<span class="text-emerald-400 font-semibold">${d.bonus}</span>` : "";
+        const numbersHtml = Array.isArray(d.numbers) ? d.numbers.map((n) => `<span class="result-chip text-emerald-400 font-semibold">${n}</span>`).join(", ") : d.numbers || "\u2014";
+        const bonusHtml = d.bonus ? `<span class="result-chip text-emerald-400 font-semibold">${d.bonus}</span>` : "";
         let lastInfoHtml = "";
         if (d.last_number_info) {
           let infoText = "";
