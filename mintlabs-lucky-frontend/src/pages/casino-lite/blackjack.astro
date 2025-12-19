@@ -355,6 +355,79 @@ const description = "Practice blackjack strategy with our fictional casino simul
       </p>
     </div>
 
+    <!-- Gameplay Settings Accordion -->
+    <details class="rounded-xl" style="background: var(--surface-elevated);">
+      <summary class="p-4 cursor-pointer font-semibold text-sm" style="color: var(--text-primary);">
+        ⚙️ Gameplay Settings
+      </summary>
+      <div class="p-4 pt-0 space-y-4">
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label for="deckModeSelect" class="block text-xs mb-1" style="color: var(--text-secondary);">Deck Mode</label>
+            <select
+              id="deckModeSelect"
+              class="w-full px-3 py-2 rounded-lg text-sm"
+              style="background: var(--surface); color: var(--text-primary); border: 1px solid var(--border-primary);"
+            >
+              <option value="shoe">Persistent Shoe</option>
+              <option value="fresh">Fresh Shuffle Each Round</option>
+              <option value="infinite">Infinite Deck (RNG)</option>
+            </select>
+            <p id="deckModeDesc" class="mt-1 text-xs" style="color: var(--text-muted);">Cards dealt from a multi-deck shoe without replacement.</p>
+          </div>
+          <div>
+            <label for="deckCountSelect" class="block text-xs mb-1" style="color: var(--text-secondary);">Number of Decks</label>
+            <select
+              id="deckCountSelect"
+              class="w-full px-3 py-2 rounded-lg text-sm"
+              style="background: var(--surface); color: var(--text-primary); border: 1px solid var(--border-primary);"
+            >
+              <option value="1">1 Deck</option>
+              <option value="2">2 Decks</option>
+              <option value="4">4 Decks</option>
+              <option value="6" selected>6 Decks</option>
+              <option value="8">8 Decks</option>
+            </select>
+          </div>
+        </div>
+        <div id="reshuffleOptions">
+          <label for="reshuffleSelect" class="block text-xs mb-1" style="color: var(--text-secondary);">Reshuffle Threshold (Shoe mode only)</label>
+          <select
+            id="reshuffleSelect"
+            class="w-full sm:w-auto px-3 py-2 rounded-lg text-sm"
+            style="background: var(--surface); color: var(--text-primary); border: 1px solid var(--border-primary);"
+          >
+            <option value="0.5">50% dealt</option>
+            <option value="0.75" selected>75% dealt</option>
+          </select>
+        </div>
+        <p class="text-xs" style="color: var(--text-muted);">
+          Changing settings will reset the current game.
+        </p>
+      </div>
+    </details>
+
+    <!-- Fairness & RNG Disclosure -->
+    <details class="rounded-xl" style="background: var(--surface-elevated);">
+      <summary class="p-4 cursor-pointer font-semibold text-sm" style="color: var(--text-primary);">
+        🎲 Fairness & RNG
+      </summary>
+      <div class="p-4 pt-0 space-y-2 text-xs" style="color: var(--text-secondary);">
+        <p>
+          <strong style="color: var(--text-primary);">Random Number Generation:</strong>
+          All shuffles use the Web Crypto API (<code style="background: var(--surface); padding: 2px 6px; border-radius: 4px;">crypto.getRandomValues()</code>),
+          providing cryptographically secure randomness.
+        </p>
+        <p id="currentModeDescription">
+          <strong style="color: var(--text-primary);">Current Mode:</strong>
+          <span id="currentModeLabel">Persistent Shoe</span> — Cards are dealt from a multi-deck shoe without replacement. Reshuffles when running low.
+        </p>
+        <p style="color: var(--text-muted);">
+          This is for entertainment and education only. No real money is involved. MintyCatnipCoin (MCC) is a fictional currency with no value.
+        </p>
+      </div>
+    </details>
+
 </CasinoLayout>
 
 <script>
@@ -389,6 +462,24 @@ const description = "Practice blackjack strategy with our fictional casino simul
   // Insurance state (Phase 4.6)
   let insuranceBet = 0; // Half of base bet
   let insuranceTaken = false; // Whether player took insurance
+
+  // Deck mode settings
+  type DeckMode = 'shoe' | 'fresh' | 'infinite';
+  let deckMode: DeckMode = 'shoe';
+  let deckCount = 6;
+  let reshuffleThreshold = 0.75;
+
+  const modeDescriptions: Record<DeckMode, string> = {
+    shoe: 'Cards dealt from a multi-deck shoe without replacement. Reshuffles when running low.',
+    fresh: 'A completely shuffled deck for each round. No card memory between hands.',
+    infinite: 'Each card drawn independently with replacement. Any card can appear multiple times.'
+  };
+
+  const modeLabels: Record<DeckMode, string> = {
+    shoe: 'Persistent Shoe',
+    fresh: 'Fresh Shuffle',
+    infinite: 'Infinite Deck'
+  };
   let insurancePromptActive = false; // Is the prompt showing
 
   // Backward compatibility alias
@@ -689,7 +780,7 @@ const description = "Practice blackjack strategy with our fictional casino simul
     const hitDealer = () => {
       if (calculateTotal(dealerHand) < 17) {
         setTimeout(() => {
-          dealerHand.push(deck.pop()!);
+          dealerHand.push(drawGameCard());
           renderHands();
           hitDealer();
         }, 600);
@@ -936,10 +1027,16 @@ const description = "Practice blackjack strategy with our fictional casino simul
     // Deduct bet at deal time
     subtractCatnip(baseBet, 'Blackjack bet');
 
-    deck = shuffleDeck(generateStandardDeck());
-    hands[0] = [deck.pop()!, deck.pop()!];
+    // Fresh mode: shuffle a new deck each round
+    if (deckMode === 'fresh') {
+      deck = shuffleDeck(generateStandardDeck());
+    } else if (deckMode === 'shoe' && (deck.length < 20 || needsReshuffle())) {
+      deck = buildShoe();
+    }
+
+    hands[0] = [drawGameCard(), drawGameCard()];
     playerHand = hands[0]; // Update alias
-    dealerHand = [deck.pop()!, deck.pop()!];
+    dealerHand = [drawGameCard(), drawGameCard()];
     renderHands();
 
     // Phase 4.6: Insurance side bet
@@ -1068,7 +1165,7 @@ const description = "Practice blackjack strategy with our fictional casino simul
   // Hit
   function hit() {
     // Add card to current active hand
-    hands[activeHandIndex].push(deck.pop()!);
+    hands[activeHandIndex].push(drawGameCard());
     playerHand = hands[activeHandIndex]; // Keep alias in sync
     renderHands();
 
@@ -1123,7 +1220,7 @@ const description = "Practice blackjack strategy with our fictional casino simul
     isDoubledDown = true;
 
     // Deal exactly one card
-    playerHand.push(deck.pop()!);
+    playerHand.push(drawGameCard());
     renderHands();
 
     // Disable all action buttons
@@ -1181,8 +1278,8 @@ const description = "Practice blackjack strategy with our fictional casino simul
     isSplitGame = true;
 
     // Deal one card to each of the two hands that were just split
-    hands[activeHandIndex].push(deck.pop()!);
-    hands[newHandIndex].push(deck.pop()!);
+    hands[activeHandIndex].push(drawGameCard());
+    hands[newHandIndex].push(drawGameCard());
 
     // Update playerHand alias
     playerHand = hands[activeHandIndex];
@@ -1255,6 +1352,70 @@ const description = "Practice blackjack strategy with our fictional casino simul
   }
 
   // Initialize
+  // Update mode description UI
+  function updateModeUI() {
+    const descEl = document.getElementById('deckModeDesc');
+    const labelEl = document.getElementById('currentModeLabel');
+    const deckCountSelect = document.getElementById('deckCountSelect') as HTMLSelectElement;
+    const reshuffleOptions = document.getElementById('reshuffleOptions');
+
+    if (descEl) descEl.textContent = modeDescriptions[deckMode];
+    if (labelEl) {
+      labelEl.textContent = modeLabels[deckMode];
+      const parentP = labelEl.parentElement;
+      if (parentP) {
+        parentP.innerHTML = `<strong style="color: var(--text-primary);">Current Mode:</strong> <span id="currentModeLabel">${modeLabels[deckMode]}</span> — ${modeDescriptions[deckMode]}`;
+      }
+    }
+
+    if (deckCountSelect) {
+      deckCountSelect.disabled = deckMode === 'infinite';
+      deckCountSelect.style.opacity = deckMode === 'infinite' ? '0.5' : '1';
+    }
+
+    if (reshuffleOptions) {
+      reshuffleOptions.style.display = deckMode === 'shoe' ? 'block' : 'none';
+    }
+  }
+
+  // Build the shoe based on current settings
+  function buildShoe(): Card[] {
+    const baseDecks: Card[] = [];
+    for (let i = 0; i < deckCount; i++) {
+      baseDecks.push(...generateStandardDeck());
+    }
+    return shuffleDeck(baseDecks);
+  }
+
+  // Check if shoe needs reshuffling
+  function needsReshuffle(): boolean {
+    if (deckMode !== 'shoe') return false;
+    const totalCards = deckCount * 52;
+    const cardsUsed = totalCards - deck.length;
+    return cardsUsed / totalCards >= reshuffleThreshold;
+  }
+
+  // Draw a card based on current deck mode
+  function drawGameCard(): Card {
+    if (deckMode === 'infinite') {
+      const freshDeck = generateStandardDeck();
+      return freshDeck[Math.floor(Math.random() * freshDeck.length)];
+    }
+
+    if (deckMode === 'fresh') {
+      if (deck.length === 0) {
+        deck = shuffleDeck(generateStandardDeck());
+      }
+      return deck.pop()!;
+    }
+
+    // Shoe mode
+    if (deck.length < 20 || needsReshuffle()) {
+      deck = buildShoe();
+    }
+    return deck.pop()!;
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     const dealBtn = document.getElementById('deal-btn');
     const dealAgainBtn = document.getElementById('deal-again-btn');
@@ -1275,6 +1436,36 @@ const description = "Practice blackjack strategy with our fictional casino simul
     const insuranceNoBtn = document.getElementById('insurance-no-btn');
     if (insuranceYesBtn) insuranceYesBtn.addEventListener('click', takeInsurance);
     if (insuranceNoBtn) insuranceNoBtn.addEventListener('click', declineInsurance);
+
+    // Deck mode settings event listeners
+    const deckModeSelect = document.getElementById('deckModeSelect') as HTMLSelectElement;
+    const deckCountSelect = document.getElementById('deckCountSelect') as HTMLSelectElement;
+    const reshuffleSelect = document.getElementById('reshuffleSelect') as HTMLSelectElement;
+
+    if (deckModeSelect) {
+      deckModeSelect.addEventListener('change', () => {
+        deckMode = deckModeSelect.value as DeckMode;
+        deck = buildShoe();
+        updateModeUI();
+        deal(); // Start fresh with new settings
+      });
+    }
+
+    if (deckCountSelect) {
+      deckCountSelect.addEventListener('change', () => {
+        deckCount = parseInt(deckCountSelect.value, 10);
+        deck = buildShoe();
+        deal();
+      });
+    }
+
+    if (reshuffleSelect) {
+      reshuffleSelect.addEventListener('change', () => {
+        reshuffleThreshold = parseFloat(reshuffleSelect.value);
+      });
+    }
+
+    updateModeUI();
 
     // Initialize balance display
     updateBalanceDisplay();

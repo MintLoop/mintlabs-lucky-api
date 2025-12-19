@@ -95,6 +95,58 @@
 
 - 2025-12-10 – **Phase 4.5 COMPLETE** (GitHub Copilot — Claude Sonnet 4.5): Implemented WebP migration, loading states, and blackjack splitting hooks. **WebP Migration:** Generated WebP variants for all 3 image-backed themes (67-113KB per file, 81-88% reduction from JPEGs), created conversion scripts (`scripts/convert-to-webp.js`, `scripts/optimize-webp.js`), updated `DeckTheme` type with `frontImageWebP`/`backImageWebP` fields, updated `src/config/decks.ts` with WebP paths. **CardView Enhancements:** Replaced `<img>` with `<picture>` element for WebP/JPEG fallback, added loading skeleton with pulse animation, added error fallback UI with "Image failed" message, added `loading="lazy"` and `onload`/`onerror` handlers. **SSR-Safe Storage:** Created `src/utils/ssr.ts` with `safeGetItem()`/`safeSetItem()`/`safeGetJSON()`/`safeSetJSON()`/`safeRemoveItem()` helpers, updated `src/utils/catnipCoin.ts` to use SSR-safe helpers (no crashes during build, no hydration warnings). **Blackjack Splitting Hooks:** Added split button UI (appears when eligible pairs dealt), implemented `canSplit()` eligibility check (same rank or both 10-value), implemented `canAffordSplit()` balance check, added split button visibility logic to `updateButtons()`, created stub `split()` function with "coming soon" alert and commented Phase 4.6 implementation plan. **Future Game Stubs:** Created `/casino-lite/high-card.astro` and `/casino-lite/war.astro` placeholder pages with Phase 4.6 roadmap. **Testing:** Created `tests/playwright/cards/cardview-webp.spec.ts` (WebP rendering tests), `tests/playwright/casino/blackjack-splitting.spec.ts` (splitting tests, stub). **Documentation:** Updated `docs/PHASE4_IMPLEMENTATION_CARD_THEMES.md` with Phase 4.5 section, updated `docs/PHASE4_BLACKJACK_FIXES.md` with splitting section, created `docs/BLACKJACK_SPLITTING.md` with full implementation spec. **Performance Impact:** Expected 500-1000ms LCP improvement on mobile networks. **Files Modified:** 4 modified (`src/types/cards.ts`, `src/config/decks.ts`, `src/components/casino/CardView.astro`, `src/utils/catnipCoin.ts`), 6 new (`src/utils/ssr.ts`, conversion scripts, test stubs, doc), 6 WebP images. Build: 55 pages (2.06s), zero TypeScript errors. Branch: `feature/card-themes-phase-4-3`. Ready for Phase 4.6 (full splitting implementation, insurance, high-card, war).
 
+- 2025-12-19 – **Phase 4.6 Session 4: Keno + Deck Modes + Fairness COMPLETE** (Claude Opus 4.5 — phase-4-home/hub-ia-rollout):
+
+  **Keno Game (New):**
+  - Created `src/scripts/rng/shuffle.ts` - Shared RNG utility with Web Crypto API
+    - `cryptoRandomInt()` for cryptographically secure random integers
+    - `shuffleInPlace()` Fisher-Yates shuffle
+    - `generateDeck()`, `buildShoe()`, `drawCard()` for card games
+    - `getModeDescription()`, `getModeLabel()` for deck mode UI
+  - Created `src/scripts/casino/keno.ts` - Keno game logic
+    - 80-number grid, 10 picks, 20 draws
+    - Hit classification: cold (0-2), warm (3-4), hot (5-6), jackpot (7+)
+    - `calculateHitProbability()` with binomial coefficient formula
+    - `getProbabilityTable()` for odds display
+  - Created `src/pages/casino-lite/keno.astro` - Full Keno game
+    - 8×10 number grid with CSS variables for theming
+    - Draw animation with 200ms delays
+    - Learn section with probability table and formula explanation
+    - Fairness & RNG disclosure accordion
+
+  **Deck Mode Settings (All Card Games):**
+  - Added 3 deck modes: Persistent Shoe, Fresh Shuffle, Infinite Deck (RNG)
+  - Deck count selector (1/2/4/6/8 decks)
+  - Reshuffle threshold (50%/75%) for shoe mode
+  - Updated all card drawing calls to use `drawGameCard()`:
+    - Blackjack: `deal()`, `hit()`, `stand()`, `doubleDown()`, `split()`, `dealerPlay()`
+    - War: `battle()`, `goToWar()`
+    - High Card: `play()`
+  - Gameplay Settings accordion in each game
+
+  **Fairness & RNG Disclosures:**
+  - Added Fairness & RNG accordion to all casino games
+  - Explains Web Crypto API (`crypto.getRandomValues()`)
+  - Shows current deck mode and description
+  - Entertainment-only disclaimer
+
+  **War Bug Fix:**
+  - Fixed "Play again" auto-dealing bug
+  - Now resets to idle state with card backs (not auto-deal)
+  - Changed event listener from `resetBattle(); battle();` to just `resetBattle()`
+
+  **Files Created:**
+  - `src/scripts/rng/shuffle.ts` (~120 lines)
+  - `src/scripts/casino/keno.ts` (~210 lines)
+  - `src/pages/casino-lite/keno.astro` (~450 lines)
+
+  **Files Modified:**
+  - `src/pages/casino-lite/blackjack.astro` - Deck modes + drawGameCard()
+  - `src/pages/casino-lite/war.astro` - Deck modes + play-again fix
+  - `src/pages/casino-lite/high-card.astro` - Deck modes
+
+  Build: Casino-lite pages verified. Branch: `phase-4-home/hub-ia-rollout`.
+
 - 2025-12-19 – **Phase 4.6 Session 3: Theme Consistency + Bug Fixes COMPLETE** (Claude Opus 4.5 — phase-4-home/hub-ia-rollout):
 
   **Blackjack Bug Fix:**
@@ -279,6 +331,32 @@
 - [x] Session stats (battles, wins, losses, wars, surrenders)
 - [x] Full CatnipCoin integration
 - [x] How to Play section with probability info
+
+**Priority 7 - Keno Game** ✅ DONE
+- [x] 80-number grid, pick 10, draw 20
+- [x] Hit classification (cold/warm/hot/jackpot)
+- [x] Draw animation with 200ms delays
+- [x] Probability table with exact odds
+- [x] Binomial coefficient formula explanation
+- [x] Fairness & RNG disclosure
+
+**Priority 8 - Deck Mode Settings** ✅ DONE
+- [x] 3 modes: Persistent Shoe, Fresh Shuffle, Infinite Deck (RNG)
+- [x] Deck count selector (1/2/4/6/8 decks)
+- [x] Reshuffle threshold for shoe mode (50%/75%)
+- [x] Shared RNG utility (`src/scripts/rng/shuffle.ts`)
+- [x] Updated Blackjack, War, High Card to use `drawGameCard()`
+- [x] Gameplay Settings accordion in each game
+
+**Priority 9 - Fairness & RNG Disclosures** ✅ DONE
+- [x] Fairness accordion in all casino games
+- [x] Web Crypto API explanation
+- [x] Current mode description
+- [x] Entertainment-only disclaimer
+
+**Bug Fixes:**
+- [x] War "Play again" now resets to idle (not auto-deal)
+- [x] Split hands properly clear on new Blackjack deal
 
 ### Phase 4.7 — Performance & Polish
 
