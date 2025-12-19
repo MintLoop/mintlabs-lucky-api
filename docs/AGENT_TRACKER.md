@@ -94,3 +94,211 @@
 - 2025-12-18 – **Phase 4.6 Demo UX Polish COMPLETE** (Claude Opus 4.5 — opus-architecture-reset): Fixed theme token responsiveness on `/demo/ux-polish-balls`. **Root Cause:** Circular CSS variable references (`--text-muted: var(--text-muted)`) in `tokens.css` with higher specificity than `global.css` theme definitions, causing variable invalidation. **Fixes:** (1) Removed nested `<body>` tag from `ux-polish-balls.astro` that broke Layout CSS inheritance, (2) Removed circular `--text-muted` assignments from `tokens.css` lines 193 and 296, (3) Removed `.result-card.ln-resultCard .odds-number { color: inherit }` override from `global.css` that blocked accent colors, (4) Changed `.odds-number` to use `var(--accent-primary)` for theme-responsive accent colors on odds numbers in all themes (dark and light), (5) Reduced odds/meta text size to 75% (`font-size: 0.56rem`) for compact card layout, (6) Tightened line spacing (`line-height: 1.3`, removed inter-line margins) while adding top cushion (`margin-top: 0.5rem`) for visual balance with CTA button. **Files Modified:** `src/pages/demo/ux-polish-balls.astro`, `src/styles/tokens.css`, `src/styles/global.css`, `src/scripts/lucky.demo-balls.ts`, `src/scripts/entry.demo-balls.js`. **Result:** Demo result cards now have theme-responsive text colors matching production, with accent-colored odds numbers and compact metadata display. Branch: `opus-architecture-reset`.
 
 - 2025-12-10 – **Phase 4.5 COMPLETE** (GitHub Copilot — Claude Sonnet 4.5): Implemented WebP migration, loading states, and blackjack splitting hooks. **WebP Migration:** Generated WebP variants for all 3 image-backed themes (67-113KB per file, 81-88% reduction from JPEGs), created conversion scripts (`scripts/convert-to-webp.js`, `scripts/optimize-webp.js`), updated `DeckTheme` type with `frontImageWebP`/`backImageWebP` fields, updated `src/config/decks.ts` with WebP paths. **CardView Enhancements:** Replaced `<img>` with `<picture>` element for WebP/JPEG fallback, added loading skeleton with pulse animation, added error fallback UI with "Image failed" message, added `loading="lazy"` and `onload`/`onerror` handlers. **SSR-Safe Storage:** Created `src/utils/ssr.ts` with `safeGetItem()`/`safeSetItem()`/`safeGetJSON()`/`safeSetJSON()`/`safeRemoveItem()` helpers, updated `src/utils/catnipCoin.ts` to use SSR-safe helpers (no crashes during build, no hydration warnings). **Blackjack Splitting Hooks:** Added split button UI (appears when eligible pairs dealt), implemented `canSplit()` eligibility check (same rank or both 10-value), implemented `canAffordSplit()` balance check, added split button visibility logic to `updateButtons()`, created stub `split()` function with "coming soon" alert and commented Phase 4.6 implementation plan. **Future Game Stubs:** Created `/casino-lite/high-card.astro` and `/casino-lite/war.astro` placeholder pages with Phase 4.6 roadmap. **Testing:** Created `tests/playwright/cards/cardview-webp.spec.ts` (WebP rendering tests), `tests/playwright/casino/blackjack-splitting.spec.ts` (splitting tests, stub). **Documentation:** Updated `docs/PHASE4_IMPLEMENTATION_CARD_THEMES.md` with Phase 4.5 section, updated `docs/PHASE4_BLACKJACK_FIXES.md` with splitting section, created `docs/BLACKJACK_SPLITTING.md` with full implementation spec. **Performance Impact:** Expected 500-1000ms LCP improvement on mobile networks. **Files Modified:** 4 modified (`src/types/cards.ts`, `src/config/decks.ts`, `src/components/casino/CardView.astro`, `src/utils/catnipCoin.ts`), 6 new (`src/utils/ssr.ts`, conversion scripts, test stubs, doc), 6 WebP images. Build: 55 pages (2.06s), zero TypeScript errors. Branch: `feature/card-themes-phase-4-3`. Ready for Phase 4.6 (full splitting implementation, insurance, high-card, war).
+
+- 2025-12-19 – **Phase 4.6 Session 3: Theme Consistency + Bug Fixes COMPLETE** (Claude Opus 4.5 — phase-4-home/hub-ia-rollout):
+
+  **Blackjack Bug Fix:**
+  - Fixed split hands not disappearing on new deal
+  - Added DOM cleanup loop in `deal()` to hide/reset hand containers 1-3
+  - Clears hand content, result badges, and active indicators
+  - Resets primary hand label to "You"
+
+  **InfoLayout Theme Consistency:**
+  - Updated footer to use CSS variables instead of hardcoded colors
+  - Replaced `text-slate-400` → `color: var(--text-muted)`
+  - Replaced `hover:text-emerald-400` → `hover:text-[var(--accent-primary)]`
+  - Updated header gradient to use `var(--gradient-hero)` with fallback
+  - Added responsible gaming notice with hotline to footer
+  - All 44 tool pages now inherit theme-consistent footer styling
+
+  **Files Modified:**
+  - `src/pages/casino-lite/blackjack.astro` - Split hand cleanup in deal()
+  - `src/components/InfoLayout.astro` - Theme-consistent colors + footer update
+
+  Build: 65 pages (2.42s), zero errors. Branch: `phase-4-home/hub-ia-rollout`.
+
+- 2025-12-19 – **Phase 4.6 Session 2: UX Consistency + Legal Footers COMPLETE** (Claude Opus 4.5 — phase-4-home/hub-ia-rollout):
+
+  **Card Back Display (War & High Card):**
+  - Added `renderCardBack()` function to both War and High Card games
+  - Initial state now shows themed card backs instead of emoji placeholder
+  - Card backs respect selected deck theme (Emerald Velvet, Linen Ivory, etc.)
+  - Reset functions updated to show card backs after game ends
+
+  **Blackjack Bet Selector:**
+  - Added dropdown bet selector matching War and High Card (5/10/25/50 CC)
+  - Bet selector disabled during active game, re-enabled on game end
+  - baseBet now reads from dropdown on each deal
+
+  **Hub Pages Legal Footer:**
+  - Added full legal footer to Casino-Lite hub (`/casino-lite/index.astro`)
+  - Added RNG Transparency notice explaining crypto.getRandomValues()
+  - Added 3-column footer (Education, Tools, Legal) with Terms/Privacy links
+  - Added MintLabs logo + branding
+  - Added responsible gaming disclaimer with hotline number
+  - Added matching footer to Tools hub (`/tools/index.astro`)
+
+  **Files Modified:**
+  - `src/pages/casino-lite/war.astro` - Added renderCardBack(), initial card backs
+  - `src/pages/casino-lite/high-card.astro` - Added renderCardBack(), initial card backs
+  - `src/pages/casino-lite/blackjack.astro` - Added bet selector dropdown
+  - `src/pages/casino-lite/index.astro` - Added full legal footer
+  - `src/pages/tools/index.astro` - Added legal footer
+
+  Build verified. Branch: `phase-4-home/hub-ia-rollout`.
+
+- 2025-12-19 – **Phase 4.6 Casino-Lite Major Expansion COMPLETE** (Claude Opus 4.5 — phase-4-home/hub-ia-rollout):
+
+  **Blackjack Re-Splitting (Full Casino Rules):**
+  - Implemented re-splitting up to 4 hands (MAX_HANDS = 4)
+  - Added `handFromAces[]` tracking to prevent re-splitting aces
+  - Split aces receive 1 card each and auto-stand (standard casino rule)
+  - Updated `canSplit()` to check active hand, max hands limit, and ace restriction
+  - Rewrote `split()` with proper array splicing for mid-game re-splits
+  - Updated `moveToNextHand()` to skip ace-split hands and check re-split eligibility
+  - Added HTML containers for hands 3-4 in DOM
+  - Updated strategy guide with re-split and ace rules
+
+  **CasinoLayout Component (New):**
+  - Created `src/components/CasinoLayout.astro` for casino-lite games
+  - Clean breadcrumb nav (Home / Casino-Lite / Page)
+  - Header balance display with live CatnipCoin sync (`catnipBalanceChange` event)
+  - RNG Transparency notice explaining `crypto.getRandomValues()` CSPRNG
+  - 3-column footer (Education, Tools, Legal) with MintLabs logo
+  - Entertainment/education disclaimers + responsible gaming hotline (1-800-522-4700)
+  - Links to Terms & Privacy pages
+
+  **Dice Roller Overhaul:**
+  - Rewrote with CasinoLayout (removed lottery elements)
+  - Fixed dice animation by adding `is:global` to styles (Astro scoping issue)
+  - 3D-styled dice with realistic pips and shadows
+  - Rolling animation with pip flash effect
+  - Compact history with highlighted most recent roll
+  - Quick D6 probability reference cards
+
+  **High Card Game (New):**
+  - Full implementation with deck theme support via DeckSelector
+  - Ace-high card values (A=14, K=13, Q=12, J=11, 10-2=face)
+  - Suit tiebreaker (♠ > ♥ > ♦ > ♣) - no draws possible
+  - Variable bet selector (5/10/25/50 CC)
+  - Session stats tracking (games, wins, losses, streak)
+  - Full CatnipCoin integration with balance checks
+  - How to Play educational section
+
+  **Files Created/Modified:**
+  - `src/components/CasinoLayout.astro` (NEW) - 130 lines
+  - `src/pages/casino-lite/blackjack.astro` - Re-splitting logic, CasinoLayout
+  - `src/pages/casino-lite/dice-roller.astro` - Complete rewrite
+  - `src/pages/casino-lite/high-card.astro` - Complete rewrite (was stub)
+
+  Build: 65 pages (2.48s), zero errors. Branch: `phase-4-home/hub-ia-rollout`.
+
+- 2025-12-18 – **Phase 4.6 Hub Architecture + MintyCatnipCoin Enhancements IN PROGRESS** (Claude Opus 4.5 — opus-architecture-reset):
+
+  **Hub Pages Standardization:**
+  - Created shared `src/styles/hub.css` for consistent hub page styling
+  - Unified `/tools` and `/casino-lite` hub pages with identical structure
+  - Both hubs now use: breadcrumb + theme selector → hero → search → featured section → grouped sections → cross-links → disclaimer
+  - Created reusable components: `HubSearch.astro` (page filtering + site-wide search with ⌘K shortcut), `ThemeSelector.astro` (compact dropdown)
+  - Search filters page cards in real-time AND shows site-wide dropdown results from all tools + games
+
+  **MintyCatnipCoin Improvements:**
+  - Increased starting balance from 100 → 1,000 MCC
+  - Added "Reset to 1,000" button on casino-lite hub
+  - Added "Set Custom Amount" button with modal dialog (1 - 999,999 range)
+  - Balance persists in localStorage across games
+  - Real-time balance display with event-driven updates (`catnipBalanceChange` event)
+
+  **Files Created/Modified:**
+  - `src/styles/hub.css` (NEW) - 100 lines of shared hub styles
+  - `src/components/HubSearch.astro` (NEW) - Search with page + site-wide filtering
+  - `src/components/ThemeSelector.astro` (NEW) - Compact theme dropdown
+  - `src/pages/tools/index.astro` - Uses shared styles, added search + theme
+  - `src/pages/casino-lite/index.astro` - Restructured to match tools hub, added MCC controls
+  - `src/utils/catnipCoin.ts` - Updated CATNIP_INITIAL_BALANCE to 1000
+
+  Build: 66 pages (2.45s), zero errors. Branch: `opus-architecture-reset`.
+
+---
+
+## Phase 4.6+ Roadmap
+
+### Phase 4.6 — Casino-Lite Expansion (CURRENT)
+
+**Priority 1 - MintyCatnipCoin System** ✅ DONE
+- [x] Increase starting balance to 1,000 MCC
+- [x] Add reset button to hub page
+- [x] Add custom balance input with modal
+- [x] Event-driven balance updates across games
+
+**Priority 2 - Blackjack Splitting** ✅ DONE
+- [x] Multi-hand state machine (`hands[]`, `bets[]`, `activeHandIndex`)
+- [x] Sequential hand play with active hand indicator
+- [x] Independent settlement per hand
+- [x] Split aces special case (one card only, auto-stand, no re-split)
+- [x] Re-splitting pairs (up to 4 hands MAX_HANDS)
+- [x] Full CatnipCoin accounting for split bets
+- [x] Updated strategy guide with re-split and ace rules
+
+**Priority 3 - CasinoLayout & UX Standardization** ✅ DONE
+- [x] Created `CasinoLayout.astro` - minimal layout for casino games (no lottery elements)
+- [x] Clean breadcrumb nav (Home / Casino-Lite / Page)
+- [x] Header balance display with live CatnipCoin sync
+- [x] RNG Transparency notice (crypto.getRandomValues() explanation)
+- [x] 3-column footer (Education, Tools, Legal) matching site standard
+- [x] MintLabs logo + powered by branding
+- [x] Entertainment/education disclaimers with responsible gaming hotline
+- [x] Updated Blackjack, Dice Roller, High Card to use CasinoLayout
+- [x] Fixed Dice Roller styles (is:global for dynamic content)
+
+**Priority 4 - High Card Game** ✅ DONE
+- [x] Single-card draw gameplay with deck theme support
+- [x] Card value comparison (A=14, K=13, Q=12, J=11)
+- [x] Suit tiebreaker (♠ > ♥ > ♦ > ♣)
+- [x] Bet selector (5, 10, 25, 50 CC)
+- [x] Session stats tracking (games, wins, losses, streak)
+- [x] Full CatnipCoin integration
+- [x] How to Play educational section
+
+**Priority 5 - Blackjack Insurance** ✅ DONE
+- [x] Dealer Ace detection prompt (shown after deal if dealer shows A)
+- [x] Insurance modal (half-bet side wager)
+- [x] 2:1 payout if dealer has blackjack
+- [x] Proper accounting with main hand settlement
+- [x] Insurance state reset on new deal
+- [x] Can't afford insurance handling
+- [x] Updated How to Play section
+
+**Priority 6 - War Game** ✅ DONE
+- [x] Classic War gameplay (highest card wins)
+- [x] "War" on ties: burn 3 cards, flip 4th
+- [x] Surrender option (lose half bet, return rest)
+- [x] War escalation (double stakes on war)
+- [x] Deck depletion handling (reshuffle at 10 cards)
+- [x] War zone UI with burned card counter
+- [x] Session stats (battles, wins, losses, wars, surrenders)
+- [x] Full CatnipCoin integration
+- [x] How to Play section with probability info
+
+### Phase 4.7 — Performance & Polish
+
+**Theme Consistency (Partial):**
+- [x] InfoLayout footer updated to use CSS variables (affects 44 tool pages)
+- [x] InfoLayout header gradient now uses `--gradient-hero` with fallback
+- [ ] Update individual tool page content sections (forms, results) to use theme variables
+- [ ] Full theme consistency audit across all 65 pages
+
+**Performance:**
+- [ ] Bundle size optimization (target < 200KB initial JS)
+- [ ] Lighthouse score ≥ 95 on all pages
+- [ ] Core Web Vitals (LCP < 2.5s, FID < 100ms, CLS < 0.1)
+- [ ] Mobile optimization pass
+- [ ] Accessibility audit (WCAG AA compliance)
+
+### Phase 5 — SEO Farming
+
+- [ ] Lucky-by-date pages (365 daily pages)
+- [ ] Zodiac/birthday number pages
+- [ ] Hot/cold number clusters
+- [ ] Content hubs with schema markup
+- [ ] Internal linking audit script
