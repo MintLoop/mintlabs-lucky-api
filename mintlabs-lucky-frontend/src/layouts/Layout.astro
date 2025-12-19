@@ -1,5 +1,8 @@
 ---
 import NewsletterModal from '../components/NewsletterModal.astro';
+import '../styles/tokens.css';
+import '../styles/global.css';
+
 interface Props {
 	title?: string;
 	description?: string;
@@ -81,9 +84,6 @@ const fullCanonical = canonicalUrl || Astro.url.href;
 				"sameAs": []
 			}
 		</script>
-		
-		<link rel="stylesheet" href="/src/styles/tokens.css" />
-		<link rel="stylesheet" href="/src/styles/global.css" />
 		
 		<!-- Apply saved theme before paint -->
 		<script is:inline>
