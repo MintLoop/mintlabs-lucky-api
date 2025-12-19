@@ -1,67 +1,429 @@
 ---
-// High Card - Casino-Lite Card Game (Phase 4.6 Stub)
-// Simple card comparison game - highest card wins
+// High Card - Casino-Lite Card Game
+// Phase 4.6 - Simple high card comparison game
 
-import InfoLayout from "../../components/InfoLayout.astro";
+import CasinoLayout from "../../components/CasinoLayout.astro";
+import DeckSelector from "../../components/casino/DeckSelector.astro";
+import { DECK_THEMES } from "../../config/decks";
 
-const title = "High Card (Coming Soon)";
-const description = "Compare cards with the dealer. Highest card wins. Simple, quick, and great for learning card values.";
+const title = "High Card";
+const description = "Simple high card game. Draw a card and beat the dealer. Highest card wins! Learn card values and probability.";
 ---
 
-<InfoLayout title={title} description={description}>
-  <main class="mx-auto max-w-4xl p-6 space-y-8">
-    <header class="text-center space-y-4">
-      <h1 class="text-4xl font-bold" style="color: var(--text-primary);">
-        🎴 High Card
-      </h1>
-      <p class="text-lg" style="color: var(--text-secondary);">
-        Coming in Phase 4.6
-      </p>
-    </header>
+<CasinoLayout title={title} description={description}>
+  <!-- Game Controls Row: Deck Selector + Bet -->
+  <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl" style="background: var(--surface-elevated);">
+    <DeckSelector themes={DECK_THEMES} selectedId="emoji-default" />
+    <div class="flex items-center gap-4">
+      <label for="betSelect" class="text-sm" style="color: var(--text-secondary);">Bet:</label>
+      <select
+        id="betSelect"
+        class="px-3 py-2 rounded-lg font-bold text-sm"
+        style="background: var(--surface); color: var(--accent-primary); border: 1px solid var(--border-primary);"
+      >
+        <option value="5">5 CC</option>
+        <option value="10">10 CC</option>
+        <option value="25">25 CC</option>
+        <option value="50">50 CC</option>
+      </select>
+    </div>
+  </div>
 
-    <div class="p-8 rounded-xl text-center space-y-4" style="background: var(--surface-elevated);">
-      <div class="text-6xl mb-4">🚧</div>
-      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">Under Construction</h2>
-      <p style="color: var(--text-secondary);">
-        High Card is a simple card game where you and the dealer each draw one card. Highest card wins!
-      </p>
-      
-      <div class="mt-8 space-y-3 text-left max-w-md mx-auto">
-        <h3 class="font-bold" style="color: var(--text-primary);">Planned Features:</h3>
-        <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
-          <li>• Quick single-card draws</li>
-          <li>• Tie breaker on suits (Spades > Hearts > Diamonds > Clubs)</li>
-          <li>• CatnipCoin betting system</li>
-          <li>• Card theme support</li>
-          <li>• Educational probability info</li>
-        </ul>
+  <!-- Game Area -->
+  <div class="space-y-4">
+    <!-- Cards Display -->
+    <div class="grid grid-cols-2 gap-4">
+      <!-- Dealer Card -->
+      <div class="p-6 rounded-xl text-center" style="background: var(--surface-elevated);">
+        <h2 class="text-lg font-bold mb-4" style="color: var(--text-primary);">🎩 Dealer</h2>
+        <div id="dealer-card" class="flex justify-center items-center min-h-[140px]">
+          <div id="dealer-placeholder"></div>
+        </div>
+        <div id="dealer-value" class="mt-3 text-lg font-bold hidden" style="color: var(--text-primary);">--</div>
       </div>
-      
-      <div class="pt-6">
-        <a
-          href="/casino-lite"
-          class="inline-block px-6 py-3 rounded-lg font-semibold"
-          style="background: var(--accent-primary); color: var(--text-on-accent);"
-        >
-          ← Back to Casino-Lite
-        </a>
+
+      <!-- Player Card -->
+      <div class="p-6 rounded-xl text-center" style="background: var(--surface-elevated); border: 2px solid var(--accent-primary);">
+        <h2 class="text-lg font-bold mb-4" style="color: var(--text-primary);">🎮 You</h2>
+        <div id="player-card" class="flex justify-center items-center min-h-[140px]">
+          <div id="player-placeholder"></div>
+        </div>
+        <div id="player-value" class="mt-3 text-lg font-bold hidden" style="color: var(--text-primary);">--</div>
       </div>
     </div>
-  </main>
-</InfoLayout>
+
+    <!-- Draw Button -->
+    <div class="flex justify-center">
+      <button
+        id="draw-btn"
+        class="px-8 py-3 rounded-lg font-bold text-lg transition-all hover:scale-105"
+        style="background: var(--accent-primary); color: var(--text-on-accent);"
+      >
+        🃏 Draw Cards
+      </button>
+      <button
+        id="play-again-btn"
+        class="px-8 py-3 rounded-lg font-bold text-lg transition-all hover:scale-105 hidden"
+        style="background: var(--accent-primary); color: var(--text-on-accent);"
+      >
+        🔄 Play Again
+      </button>
+    </div>
+
+    <!-- Result Display -->
+    <div id="result-panel" class="p-4 rounded-xl text-center hidden" style="background: var(--surface-elevated);">
+      <p id="result-message" class="text-2xl font-bold mb-2" style="color: var(--text-primary);"></p>
+      <p id="result-detail" class="text-sm" style="color: var(--text-secondary);"></p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="p-4 rounded-xl" style="background: var(--surface-elevated);">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-bold" style="color: var(--text-primary);">Session Stats</h3>
+      <button
+        id="reset-stats"
+        class="px-3 py-1 rounded text-xs font-semibold transition-all"
+        style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border-primary);"
+      >
+        Reset
+      </button>
+    </div>
+    <div class="grid grid-cols-4 gap-3 text-center text-xs">
+      <div class="p-2 rounded-lg" style="background: var(--surface);">
+        <div id="stat-games" class="text-lg font-bold" style="color: var(--accent-primary);">0</div>
+        <div style="color: var(--text-muted);">Games</div>
+      </div>
+      <div class="p-2 rounded-lg" style="background: var(--surface);">
+        <div id="stat-wins" class="text-lg font-bold" style="color: var(--accent-success, #22c55e);">0</div>
+        <div style="color: var(--text-muted);">Wins</div>
+      </div>
+      <div class="p-2 rounded-lg" style="background: var(--surface);">
+        <div id="stat-losses" class="text-lg font-bold" style="color: var(--accent-danger, #ef4444);">0</div>
+        <div style="color: var(--text-muted);">Losses</div>
+      </div>
+      <div class="p-2 rounded-lg" style="background: var(--surface);">
+        <div id="stat-streak" class="text-lg font-bold" style="color: var(--accent-warning, #f59e0b);">0</div>
+        <div style="color: var(--text-muted);">Streak</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How to Play -->
+  <div class="p-4 rounded-xl" style="background: var(--surface-elevated);">
+    <h3 class="text-sm font-bold mb-3" style="color: var(--text-primary);">🎯 How to Play</h3>
+    <div class="grid sm:grid-cols-2 gap-4 text-xs" style="color: var(--text-secondary);">
+      <div>
+        <strong style="color: var(--text-primary);">Card Values</strong>
+        <p class="mt-1">A=14 (high), K=13, Q=12, J=11, 10-2=face value</p>
+      </div>
+      <div>
+        <strong style="color: var(--text-primary);">Tie Breaker</strong>
+        <p class="mt-1">Suits: ♠ Spades > ♥ Hearts > ♦ Diamonds > ♣ Clubs</p>
+      </div>
+      <div>
+        <strong style="color: var(--text-primary);">Winning</strong>
+        <p class="mt-1">Draw a higher card than the dealer to win 2x your bet!</p>
+      </div>
+      <div>
+        <strong style="color: var(--text-primary);">Probability</strong>
+        <p class="mt-1">With suit tiebreaker, you have ~50% chance to win each draw.</p>
+      </div>
+    </div>
+  </div>
+</CasinoLayout>
 
 <script>
-  // TODO Phase 4.6: High Card implementation
-  // 
-  // Game logic:
-  // 1. Player and dealer each draw one card from shuffled deck
-  // 2. Compare card values (A=14, K=13, Q=12, J=11, 10-2=face value)
-  // 3. If tie on value, compare suits (♠ > ♥ > ♦ > ♣)
-  // 4. Winner gets 2x bet, tie returns bet
-  //
-  // Features to add:
-  // - Card animation (flip reveal)
-  // - Bet selector (1, 5, 10, 25 CC)
-  // - Win streak counter
-  // - Educational: "Probability of drawing higher card" indicator
+  import { generateStandardDeck, shuffleDeck, formatCard } from '../../utils/cardDeck';
+  import { getDeckTheme, getSuitSet } from '../../config/decks';
+  import type { Card } from '../../types/cards';
+  import {
+    getCatnipBalance,
+    addCatnip,
+    subtractCatnip,
+  } from '../../utils/catnipCoin';
+
+  // Game state
+  let deck: Card[] = [];
+  let currentThemeId = 'emoji-default';
+  let stats = { games: 0, wins: 0, losses: 0, streak: 0, maxStreak: 0 };
+
+  // Load saved theme
+  const savedTheme = localStorage.getItem('casino-deck-theme');
+  if (savedTheme) currentThemeId = savedTheme;
+
+  // Listen for theme changes
+  window.addEventListener('deckThemeChange', ((e: CustomEvent) => {
+    currentThemeId = e.detail;
+  }) as EventListener);
+
+  // Card value calculation (A=14 high)
+  function getCardValue(card: Card): number {
+    const values: Record<string, number> = {
+      'A': 14, 'K': 13, 'Q': 12, 'J': 11,
+      '10': 10, '9': 9, '8': 8, '7': 7,
+      '6': 6, '5': 5, '4': 4, '3': 3, '2': 2
+    };
+    return values[card.rank] || 0;
+  }
+
+  // Suit rank for tiebreaker (Spades > Hearts > Diamonds > Clubs)
+  function getSuitRank(card: Card): number {
+    const ranks: Record<string, number> = {
+      'spades': 4, 'hearts': 3, 'diamonds': 2, 'clubs': 1
+    };
+    return ranks[card.suit] || 0;
+  }
+
+  // Compare two cards: returns 1 if card1 wins, -1 if card2 wins
+  function compareCards(card1: Card, card2: Card): number {
+    const val1 = getCardValue(card1);
+    const val2 = getCardValue(card2);
+
+    if (val1 > val2) return 1;
+    if (val2 > val1) return -1;
+
+    // Tie on value - compare suits
+    const suit1 = getSuitRank(card1);
+    const suit2 = getSuitRank(card2);
+
+    return suit1 > suit2 ? 1 : -1;
+  }
+
+  // Asset resolver
+  function resolveAsset(src: string | undefined): string | null {
+    if (!src) return null;
+    return src.replace('.webp', '.jpeg').replace('.jpg', '.jpeg').replace('.svg', '.jpeg');
+  }
+
+  // Render a card
+  function renderCard(card: Card, faceDown = false): string {
+    const theme = getDeckTheme(currentThemeId);
+    const suitSet = getSuitSet(theme.suitSetId);
+    const suitIcon = suitSet.icons[card.suit];
+    const isEmoji = !suitIcon.startsWith('/');
+    const cardColor = (card.suit === 'hearts' || card.suit === 'diamonds') ? 'text-red-600' : 'text-slate-900';
+
+    const frontSrc = resolveAsset((theme as any).frontBySuit?.[card.suit] ?? (theme as any).frontImage);
+    const backSrc = resolveAsset((theme as any).backImage);
+    const cardImageSrc = faceDown ? backSrc : frontSrc;
+
+    let innerContent = '';
+    if (cardImageSrc) {
+      innerContent = `<div class="absolute inset-0 p-[2%]"><div class="w-full h-full bg-cover bg-center" style="background-image: url('${cardImageSrc}')"></div></div>`;
+    } else if (theme.background && !faceDown) {
+      innerContent = `<div class="absolute inset-0 ${theme.background}"></div>`;
+    } else if (faceDown) {
+      innerContent = `<div class="absolute inset-0 ${theme.backPattern || 'bg-emerald-700'} flex items-center justify-center"><div class="text-white text-2xl opacity-20">🎴</div></div>`;
+    } else {
+      innerContent = `<div class="absolute inset-0 bg-white"></div>`;
+    }
+
+    let overlayContent = '';
+    if (!faceDown) {
+      overlayContent = `
+        <div class="absolute inset-0 pointer-events-none">
+          <div class="absolute top-[6%] left-[7%]">
+            <div class="flex flex-col items-center justify-center leading-none text-[0.8rem] sm:text-[0.9rem] drop-shadow-[0_0_3px_rgba(0,0,0,0.5)] ${cardColor}">
+              <span class="${theme.rankFontClass}">${card.rank}</span>
+              <span>${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-4 h-4"/>`}</span>
+            </div>
+          </div>
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <span class="text-[2rem] sm:text-[2.5rem] opacity-80 drop-shadow-[0_0_4px_rgba(0,0,0,0.6)] ${cardColor}">
+              ${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-12 h-12 opacity-80"/>`}
+            </span>
+          </div>
+          <div class="absolute bottom-[6%] right-[7%] rotate-180">
+            <div class="flex flex-col items-center justify-center leading-none text-[0.8rem] sm:text-[0.9rem] drop-shadow-[0_0_3px_rgba(0,0,0,0.5)] ${cardColor}">
+              <span class="${theme.rankFontClass}">${card.rank}</span>
+              <span>${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-4 h-4"/>`}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="relative w-[90px] sm:w-[100px] aspect-[3/4] ${theme.cardFrameClass} transition-transform duration-200" role="img" aria-label="${faceDown ? 'Face down card' : formatCard(card)}">
+        <div class="absolute inset-0 rounded-xl overflow-hidden">
+          ${innerContent}
+        </div>
+        ${overlayContent}
+      </div>
+    `;
+  }
+
+  // Render a face-down card placeholder
+  function renderCardBack(): string {
+    const theme = getDeckTheme(currentThemeId);
+    const backSrc = resolveAsset((theme as any).backImage);
+
+    let innerContent = '';
+    if (backSrc) {
+      innerContent = `<div class="absolute inset-0 p-[2%]"><div class="w-full h-full bg-cover bg-center" style="background-image: url('${backSrc}')"></div></div>`;
+    } else {
+      innerContent = `<div class="absolute inset-0 ${theme.backPattern || 'bg-emerald-700'} flex items-center justify-center"><div class="text-white text-2xl opacity-20">🎴</div></div>`;
+    }
+
+    return `
+      <div class="relative w-[90px] sm:w-[100px] aspect-[3/4] ${theme.cardFrameClass} transition-transform duration-200" role="img" aria-label="Face down card">
+        <div class="absolute inset-0 rounded-xl overflow-hidden">
+          ${innerContent}
+        </div>
+      </div>
+    `;
+  }
+
+  // Format card value for display
+  function formatValue(card: Card): string {
+    const val = getCardValue(card);
+    const suitSymbols: Record<string, string> = {
+      'spades': '♠', 'hearts': '♥', 'diamonds': '♦', 'clubs': '♣'
+    };
+    return `${card.rank} ${suitSymbols[card.suit]} (${val})`;
+  }
+
+  // Update stats display
+  function updateStats() {
+    const gamesEl = document.getElementById('stat-games');
+    const winsEl = document.getElementById('stat-wins');
+    const lossesEl = document.getElementById('stat-losses');
+    const streakEl = document.getElementById('stat-streak');
+
+    if (gamesEl) gamesEl.textContent = stats.games.toString();
+    if (winsEl) winsEl.textContent = stats.wins.toString();
+    if (lossesEl) lossesEl.textContent = stats.losses.toString();
+    if (streakEl) streakEl.textContent = stats.streak.toString();
+  }
+
+  // Show result
+  function showResult(message: string, detail: string, isWin: boolean) {
+    const panel = document.getElementById('result-panel');
+    const msgEl = document.getElementById('result-message');
+    const detailEl = document.getElementById('result-detail');
+
+    if (panel && msgEl && detailEl) {
+      panel.classList.remove('hidden');
+      msgEl.textContent = message;
+      msgEl.style.color = isWin ? 'var(--accent-success, #22c55e)' : 'var(--accent-danger, #ef4444)';
+      detailEl.textContent = detail;
+    }
+  }
+
+  // Play the game
+  function play() {
+    const betSelect = document.getElementById('betSelect') as HTMLSelectElement;
+    const bet = parseInt(betSelect?.value || '5', 10);
+
+    // Check balance
+    if (getCatnipBalance() < bet) {
+      showResult('Insufficient Balance! 💸', 'Visit the Casino-Lite hub to reset your balance.', false);
+      return;
+    }
+
+    // Deduct bet
+    subtractCatnip(bet, 'High Card bet');
+
+    // Shuffle if deck is low
+    if (deck.length < 4) {
+      deck = shuffleDeck(generateStandardDeck());
+    }
+
+    // Draw cards
+    const playerCard = deck.pop()!;
+    const dealerCard = deck.pop()!;
+
+    // Display cards
+    const playerCardEl = document.getElementById('player-card');
+    const dealerCardEl = document.getElementById('dealer-card');
+    const playerValueEl = document.getElementById('player-value');
+    const dealerValueEl = document.getElementById('dealer-value');
+
+    if (playerCardEl) playerCardEl.innerHTML = renderCard(playerCard);
+    if (dealerCardEl) dealerCardEl.innerHTML = renderCard(dealerCard);
+    if (playerValueEl) {
+      playerValueEl.textContent = formatValue(playerCard);
+      playerValueEl.classList.remove('hidden');
+    }
+    if (dealerValueEl) {
+      dealerValueEl.textContent = formatValue(dealerCard);
+      dealerValueEl.classList.remove('hidden');
+    }
+
+    // Compare and settle
+    const result = compareCards(playerCard, dealerCard);
+    stats.games++;
+
+    if (result > 0) {
+      // Player wins
+      const winnings = bet * 2;
+      addCatnip(winnings, 'High Card win');
+      stats.wins++;
+      stats.streak = stats.streak > 0 ? stats.streak + 1 : 1;
+      showResult('You Win! 🎉', `${formatCard(playerCard)} beats ${formatCard(dealerCard)}. +${winnings} CC`, true);
+    } else {
+      // Dealer wins
+      stats.losses++;
+      stats.streak = stats.streak < 0 ? stats.streak - 1 : -1;
+      showResult('Dealer Wins 🎩', `${formatCard(dealerCard)} beats ${formatCard(playerCard)}. -${bet} CC`, false);
+    }
+
+    // Update UI
+    updateStats();
+
+    // Toggle buttons
+    const drawBtn = document.getElementById('draw-btn');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    if (drawBtn) drawBtn.classList.add('hidden');
+    if (playAgainBtn) playAgainBtn.classList.remove('hidden');
+  }
+
+  // Reset for new game
+  function resetGame() {
+    const playerCardEl = document.getElementById('player-card');
+    const dealerCardEl = document.getElementById('dealer-card');
+    const playerValueEl = document.getElementById('player-value');
+    const dealerValueEl = document.getElementById('dealer-value');
+    const resultPanel = document.getElementById('result-panel');
+
+    // Show card backs instead of emoji placeholder
+    if (playerCardEl) playerCardEl.innerHTML = renderCardBack();
+    if (dealerCardEl) dealerCardEl.innerHTML = renderCardBack();
+    if (playerValueEl) playerValueEl.classList.add('hidden');
+    if (dealerValueEl) dealerValueEl.classList.add('hidden');
+    if (resultPanel) resultPanel.classList.add('hidden');
+
+    const drawBtn = document.getElementById('draw-btn');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    if (drawBtn) drawBtn.classList.remove('hidden');
+    if (playAgainBtn) playAgainBtn.classList.add('hidden');
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    deck = shuffleDeck(generateStandardDeck());
+
+    // Render initial card backs
+    const playerCardEl = document.getElementById('player-card');
+    const dealerCardEl = document.getElementById('dealer-card');
+    if (playerCardEl) playerCardEl.innerHTML = renderCardBack();
+    if (dealerCardEl) dealerCardEl.innerHTML = renderCardBack();
+
+    const drawBtn = document.getElementById('draw-btn');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const resetStatsBtn = document.getElementById('reset-stats');
+
+    if (drawBtn) drawBtn.addEventListener('click', play);
+    if (playAgainBtn) playAgainBtn.addEventListener('click', () => {
+      resetGame();
+      play();
+    });
+    if (resetStatsBtn) resetStatsBtn.addEventListener('click', () => {
+      stats = { games: 0, wins: 0, losses: 0, streak: 0, maxStreak: 0 };
+      updateStats();
+    });
+
+    updateStats();
+  });
 </script>

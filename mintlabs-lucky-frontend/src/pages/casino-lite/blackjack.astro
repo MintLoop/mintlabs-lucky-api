@@ -2,49 +2,31 @@
 // Blackjack - Casino-Lite Card Game
 // Phase 4 - Casino-Lite Visual System + CatnipCoin Integration
 
-import InfoLayout from "../../components/InfoLayout.astro";
-import TrackLink from "../../components/TrackLink.astro";
-import CardView from "../../components/casino/CardView.astro";
+import CasinoLayout from "../../components/CasinoLayout.astro";
 import DeckSelector from "../../components/casino/DeckSelector.astro";
-import { DECK_THEMES, getDeckTheme, getSuitSet } from "../../config/decks";
+import { DECK_THEMES } from "../../config/decks";
 
-const title = "Blackjack Simulator";
+const title = "Blackjack";
 const description = "Practice blackjack strategy with our fictional casino simulator. Learn basic strategy, card counting concepts, and probability—all with zero risk and zero real money.";
 ---
 
-<InfoLayout title={title} description={description}>
-  <main class="mx-auto max-w-5xl p-6 space-y-8">
-    <!-- Header -->
-    <header class="text-center space-y-4">
-      <h1 class="text-4xl font-bold" style="color: var(--text-primary);">
-        🎰 Blackjack Simulator
-      </h1>
-      <p class="text-lg max-w-2xl mx-auto" style="color: var(--text-secondary);">
-        Practice blackjack strategy in a risk-free environment. This is a fictional simulation for entertainment and education only—no real money, no real gambling.
-      </p>
-    </header>
-
-    <!-- Casino-Lite Disclaimer -->
-    <div class="p-6 rounded-xl" style="background: var(--surface-elevated); border-left: 4px solid var(--accent-warning);">
-      <h2 class="text-lg font-bold mb-2" style="color: var(--text-primary);">⚠️ Fictional Simulation Only</h2>
-      <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
-        <li>• <strong>No real money:</strong> This tool does not involve real wagering, payouts, or gambling.</li>
-        <li>• <strong>No prediction:</strong> Nothing here predicts real casino outcomes or improves your odds.</li>
-        <li>• <strong>Educational only:</strong> Use this to learn basic strategy, not to develop "winning systems."</li>
-        <li>• <strong>Responsible gaming:</strong> If you have a gambling problem, visit <a href="https://www.ncpgambling.org" class="underline" style="color: var(--accent-primary);" target="_blank" rel="noopener">ncpgambling.org</a> or call 1-800-522-4700.</li>
-      </ul>
-    </div>
-
-    <!-- Deck Selector & CatnipCoin Balance -->
-    <div class="grid md:grid-cols-2 gap-6">
-      <div class="p-6 rounded-xl" style="background: var(--surface-elevated);">
-        <DeckSelector themes={DECK_THEMES} selectedId="emoji-default" />
-      </div>
-      <div class="p-6 rounded-xl flex flex-col justify-center items-center gap-2" style="background: var(--surface-elevated); border: 2px solid var(--accent-secondary);">
-        <div class="text-sm font-semibold" style="color: var(--text-secondary);">Your CatnipCoin Balance</div>
-        <div id="catnip-balance" class="text-4xl font-bold" style="color: var(--accent-primary);">🪙 100 CC</div>
-        <div class="text-xs" style="color: var(--text-muted);">Fictional currency • No monetary value</div>
-        <div id="catnip-change" class="text-sm font-bold mt-2 hidden"></div>
+<CasinoLayout title={title} description={description}>
+    <!-- Game Controls Row: Deck Selector + Bet Selector -->
+    <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl" style="background: var(--surface-elevated);">
+      <DeckSelector themes={DECK_THEMES} selectedId="emoji-default" />
+      <div class="flex items-center gap-4">
+        <label for="betSelect" class="text-sm" style="color: var(--text-secondary);">Bet:</label>
+        <select
+          id="betSelect"
+          class="px-3 py-2 rounded-lg font-bold text-sm"
+          style="background: var(--surface); color: var(--accent-primary); border: 1px solid var(--border-primary);"
+        >
+          <option value="5">5 CC</option>
+          <option value="10">10 CC</option>
+          <option value="25">25 CC</option>
+          <option value="50">50 CC</option>
+        </select>
+        <div id="catnip-change" class="text-sm font-bold hidden"></div>
       </div>
     </div>
 
@@ -65,18 +47,74 @@ const description = "Practice blackjack strategy with our fictional casino simul
         </div>
       </div>
 
-      <!-- Player Section -->
-      <div class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated); border: 2px solid var(--accent-primary);">
-        <div class="flex items-center justify-between">
-          <h2 class="text-xl font-bold" style="color: var(--text-primary);">
-            🎮 You
-          </h2>
-          <div class="text-lg font-mono" style="color: var(--text-secondary);">
-            Total: <span id="player-total" class="font-bold" style="color: var(--text-primary);">0</span>
+      <!-- Player Section (supports multiple hands for splitting) -->
+      <div id="player-section" class="space-y-4">
+        <!-- Primary Hand -->
+        <div id="player-hand-0-container" class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated); border: 2px solid var(--accent-primary);">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold" style="color: var(--text-primary);">
+              🎮 <span id="player-hand-0-label">You</span>
+              <span id="player-hand-0-active" class="text-sm ml-2 px-2 py-0.5 rounded-full hidden" style="background: var(--accent-primary); color: var(--text-on-accent);">Active</span>
+            </h2>
+            <div class="text-lg font-mono" style="color: var(--text-secondary);">
+              Total: <span id="player-total" class="font-bold" style="color: var(--text-primary);">0</span>
+              <span id="player-hand-0-result" class="text-sm ml-2 hidden"></span>
+            </div>
+          </div>
+          <div id="player-hand" class="flex gap-4 flex-wrap justify-center min-h-[120px] items-center">
+            <!-- Cards rendered here -->
           </div>
         </div>
-        <div id="player-hand" class="flex gap-4 flex-wrap justify-center min-h-[120px] items-center">
-          <!-- Cards rendered here -->
+
+        <!-- Split Hand 2 (hidden until split occurs) -->
+        <div id="player-hand-1-container" class="p-6 rounded-xl space-y-4 hidden" style="background: var(--surface-elevated); border: 2px solid var(--border-primary);">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold" style="color: var(--text-primary);">
+              🎮 <span id="player-hand-1-label">Hand 2</span>
+              <span id="player-hand-1-active" class="text-sm ml-2 px-2 py-0.5 rounded-full hidden" style="background: var(--accent-primary); color: var(--text-on-accent);">Active</span>
+            </h2>
+            <div class="text-lg font-mono" style="color: var(--text-secondary);">
+              Total: <span id="player-total-1" class="font-bold" style="color: var(--text-primary);">0</span>
+              <span id="player-hand-1-result" class="text-sm ml-2 hidden"></span>
+            </div>
+          </div>
+          <div id="player-hand-1" class="flex gap-4 flex-wrap justify-center min-h-[120px] items-center">
+            <!-- Cards rendered here -->
+          </div>
+        </div>
+
+        <!-- Split Hand 3 (hidden until re-split) -->
+        <div id="player-hand-2-container" class="p-6 rounded-xl space-y-4 hidden" style="background: var(--surface-elevated); border: 2px solid var(--border-primary);">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold" style="color: var(--text-primary);">
+              🎮 <span id="player-hand-2-label">Hand 3</span>
+              <span id="player-hand-2-active" class="text-sm ml-2 px-2 py-0.5 rounded-full hidden" style="background: var(--accent-primary); color: var(--text-on-accent);">Active</span>
+            </h2>
+            <div class="text-lg font-mono" style="color: var(--text-secondary);">
+              Total: <span id="player-total-2" class="font-bold" style="color: var(--text-primary);">0</span>
+              <span id="player-hand-2-result" class="text-sm ml-2 hidden"></span>
+            </div>
+          </div>
+          <div id="player-hand-2" class="flex gap-4 flex-wrap justify-center min-h-[120px] items-center">
+            <!-- Cards rendered here -->
+          </div>
+        </div>
+
+        <!-- Split Hand 4 (hidden until re-split) -->
+        <div id="player-hand-3-container" class="p-6 rounded-xl space-y-4 hidden" style="background: var(--surface-elevated); border: 2px solid var(--border-primary);">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold" style="color: var(--text-primary);">
+              🎮 <span id="player-hand-3-label">Hand 4</span>
+              <span id="player-hand-3-active" class="text-sm ml-2 px-2 py-0.5 rounded-full hidden" style="background: var(--accent-primary); color: var(--text-on-accent);">Active</span>
+            </h2>
+            <div class="text-lg font-mono" style="color: var(--text-secondary);">
+              Total: <span id="player-total-3" class="font-bold" style="color: var(--text-primary);">0</span>
+              <span id="player-hand-3-result" class="text-sm ml-2 hidden"></span>
+            </div>
+          </div>
+          <div id="player-hand-3" class="flex gap-4 flex-wrap justify-center min-h-[120px] items-center">
+            <!-- Cards rendered here -->
+          </div>
         </div>
       </div>
 
@@ -139,6 +177,39 @@ const description = "Practice blackjack strategy with our fictional casino simul
         <p id="status-message" class="text-2xl font-bold mb-2" style="color: var(--text-primary);"></p>
         <p id="status-detail" class="text-sm" style="color: var(--text-secondary);"></p>
       </div>
+
+      <!-- Insurance Prompt (shows when dealer has Ace) -->
+      <div
+        id="insurance-prompt"
+        class="p-6 rounded-xl text-center hidden"
+        style="background: var(--surface-elevated); border: 2px solid var(--accent-warning);"
+      >
+        <div class="flex items-center justify-center gap-2 mb-3">
+          <span class="text-2xl">🛡️</span>
+          <p class="text-xl font-bold" style="color: var(--text-primary);">Insurance?</p>
+        </div>
+        <p class="text-sm mb-4" style="color: var(--text-secondary);">
+          Dealer shows an Ace. Take insurance for <span id="insurance-cost" class="font-bold" style="color: var(--accent-warning);">2.5 CC</span>?
+          <br/>
+          <span class="text-xs">Pays 2:1 if dealer has Blackjack.</span>
+        </p>
+        <div class="flex gap-3 justify-center">
+          <button
+            id="insurance-yes-btn"
+            class="px-6 py-2 rounded-lg font-bold text-sm transition-all hover:scale-105"
+            style="background: var(--accent-warning); color: var(--text-on-accent);"
+          >
+            Yes, Take Insurance
+          </button>
+          <button
+            id="insurance-no-btn"
+            class="px-6 py-2 rounded-lg font-bold text-sm transition-all hover:scale-105"
+            style="background: var(--surface); color: var(--text-primary); border: 2px solid var(--border-primary);"
+          >
+            No Thanks
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- How to Play -->
@@ -164,7 +235,8 @@ const description = "Practice blackjack strategy with our fictional casino simul
           <ul class="text-sm space-y-1" style="color: var(--text-secondary);">
             <li>• <strong>Hit:</strong> Take another card</li>
             <li>• <strong>Stand:</strong> Keep your current hand</li>
-            <li>• <strong>Split:</strong> Split a pair into two hands (requires additional bet)</li>
+            <li>• <strong>Split:</strong> Split a pair into two hands (requires additional bet). Can re-split up to 4 hands total. Split aces get 1 card each and cannot be re-split.</li>
+            <li>• <strong>Insurance:</strong> When dealer shows an Ace, you can take insurance (half your bet). Pays 2:1 if dealer has Blackjack.</li>
             <li>• <strong>Double Down:</strong> Double your bet, get exactly one card, then forced stand</li>
             <li>• <strong>Blackjack:</strong> Ace + 10-value card pays 3:2 (1.5× your bet)</li>
           </ul>
@@ -178,66 +250,112 @@ const description = "Practice blackjack strategy with our fictional casino simul
       </div>
     </div>
 
-    <!-- Educational Content -->
+    <!-- Basic Strategy Quick Reference -->
     <div class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated);">
-      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">📚 Learn Blackjack Strategy</h2>
-      <div class="space-y-3 text-sm" style="color: var(--text-secondary);">
-        <p>
-          <strong style="color: var(--text-primary);">Basic Strategy:</strong> Mathematically optimal plays exist for every situation. Generally, hit on 11 or less, stand on 17 or more, and the middle range depends on the dealer's up-card.
-        </p>
-        <p>
-          <strong style="color: var(--text-primary);">House Edge:</strong> With perfect basic strategy, blackjack has one of the lowest house edges in casinos (~0.5%). Without strategy, the house edge increases significantly.
-        </p>
-        <p>
-          <strong style="color: var(--text-primary);">Card Counting Myth:</strong> While card counting can give a small edge, it requires extensive practice, is difficult to apply, and is banned in most casinos. This simulator does NOT teach or endorse card counting systems.
-        </p>
-        <p>
-          <strong style="color: var(--text-primary);">Variance Warning:</strong> Even with perfect play, you can lose many hands in a row due to variance. No strategy guarantees wins.
-        </p>
+      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">📊 Basic Strategy Quick Reference</h2>
+      <p class="text-sm" style="color: var(--text-secondary);">
+        These simplified guidelines cover the most common decisions. Real basic strategy charts are more nuanced but this covers ~90% of situations.
+      </p>
+      <div class="grid md:grid-cols-2 gap-6 mt-4">
+        <div class="space-y-3">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">When to Hit</h3>
+          <ul class="text-sm space-y-1" style="color: var(--text-secondary);">
+            <li>• Always hit on 8 or less</li>
+            <li>• Hit on 12 if dealer shows 2 or 3</li>
+            <li>• Hit on 12-16 if dealer shows 7 or higher</li>
+            <li>• Hit on soft 17 (A+6) against dealer 9, 10, A</li>
+          </ul>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">When to Stand</h3>
+          <ul class="text-sm space-y-1" style="color: var(--text-secondary);">
+            <li>• Always stand on 17 or higher (hard total)</li>
+            <li>• Stand on 12-16 if dealer shows 2-6 (dealer likely to bust)</li>
+            <li>• Stand on soft 19 (A+8) or higher</li>
+          </ul>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-warning);">When to Split</h3>
+          <ul class="text-sm space-y-1" style="color: var(--text-secondary);">
+            <li>• <strong>Always split:</strong> Aces and 8s</li>
+            <li>• <strong>Never split:</strong> 10s and 5s</li>
+            <li>• Split 2s, 3s, 6s, 7s against dealer 2-7</li>
+            <li>• Split 9s against 2-6, 8-9 (not 7, 10, A)</li>
+            <li>• Split 4s only against dealer 5-6</li>
+            <li>• <strong>Re-split:</strong> You can split again (up to 4 hands) if dealt another pair</li>
+            <li>• <strong>Aces rule:</strong> Split aces get only 1 card each and cannot be re-split</li>
+          </ul>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-secondary);">When to Double Down</h3>
+          <ul class="text-sm space-y-1" style="color: var(--text-secondary);">
+            <li>• Double on 11 against any dealer card except A</li>
+            <li>• Double on 10 against dealer 2-9</li>
+            <li>• Double on 9 against dealer 3-6</li>
+            <li>• Double on soft 16-18 against dealer 4-6</li>
+          </ul>
+        </div>
       </div>
     </div>
 
-    <!-- Navigation -->
-    <div class="flex gap-4 flex-wrap justify-center pt-4">
-      <TrackLink
-        href="/casino-lite"
-        label="Back to Casino-Lite Hub"
-        trackName="blackjack-to-casino-hub"
-        class="px-6 py-3 rounded-lg font-semibold transition-all"
-        style="background: var(--accent-primary); color: var(--text-on-accent);"
-      >
-        🎰 Casino-Lite Hub
-      </TrackLink>
-      <TrackLink
-        href="/tools/wheel-spinner"
-        label="Try Wheel Spinner"
-        trackName="blackjack-to-wheel"
-        class="px-6 py-3 rounded-lg font-semibold transition-all"
-        style="background: var(--surface-elevated); color: var(--text-primary); border: 2px solid var(--border-primary);"
-      >
-        🎡 Wheel Spinner
-      </TrackLink>
-      <TrackLink
-        href="/tools/raffle-picker"
-        label="Try Raffle Picker"
-        trackName="blackjack-to-raffle"
-        class="px-6 py-3 rounded-lg font-semibold transition-all"
-        style="background: var(--surface-elevated); color: var(--text-primary); border: 2px solid var(--border-primary);"
-      >
-        🎫 Raffle Picker
-      </TrackLink>
-      <TrackLink
-        href="/"
-        label="Back to Home"
-        trackName="blackjack-to-home"
-        class="px-6 py-3 rounded-lg font-semibold transition-all"
-        style="background: var(--surface-elevated); color: var(--text-primary); border: 2px solid var(--border-primary);"
-      >
-        🏠 Home
-      </TrackLink>
+    <!-- Educational Content -->
+    <div class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated);">
+      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">📚 Understanding Blackjack</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-3">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">Why Basic Strategy Works</h3>
+          <p class="text-sm" style="color: var(--text-secondary);">
+            Basic strategy is derived from computer simulations of millions of hands. For every combination of your cards and the dealer's up-card, mathematicians calculated the expected value of each action (hit, stand, double, split). The strategy tells you which action has the best expected outcome over time.
+          </p>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">The House Edge Explained</h3>
+          <p class="text-sm" style="color: var(--text-secondary);">
+            With perfect basic strategy, blackjack has one of the lowest house edges in casinos (~0.5%). This means for every $100 wagered, you expect to lose about $0.50 on average. Without strategy, the house edge increases to 2-4%. The house edge comes from the player acting first and busting before the dealer plays.
+          </p>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">Card Counting Reality</h3>
+          <p class="text-sm" style="color: var(--text-secondary);">
+            While card counting can give a small edge (0.5-1.5%), it requires extensive practice, is mentally exhausting, and casinos actively counter it by using multiple decks, shuffling frequently, and banning suspected counters. This simulator does NOT teach card counting.
+          </p>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">Variance & Bankroll</h3>
+          <p class="text-sm" style="color: var(--text-secondary);">
+            Even with perfect play, you can lose many hands in a row due to variance. A typical session might see 10+ losing hands consecutively. No strategy guarantees wins—basic strategy only minimizes losses over the long run. Never gamble with money you can't afford to lose.
+          </p>
+        </div>
+      </div>
     </div>
-  </main>
-</InfoLayout>
+
+    <!-- Probability Facts -->
+    <div class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated);">
+      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">🎲 Blackjack Probability Facts</h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div class="p-4 rounded-lg" style="background: var(--surface); border: 1px solid var(--border-primary);">
+          <div class="text-2xl font-bold" style="color: var(--accent-primary);">4.8%</div>
+          <div class="text-xs mt-1" style="color: var(--text-secondary);">Chance of natural blackjack</div>
+        </div>
+        <div class="p-4 rounded-lg" style="background: var(--surface); border: 1px solid var(--border-primary);">
+          <div class="text-2xl font-bold" style="color: var(--accent-primary);">28%</div>
+          <div class="text-xs mt-1" style="color: var(--text-secondary);">Dealer bust probability</div>
+        </div>
+        <div class="p-4 rounded-lg" style="background: var(--surface); border: 1px solid var(--border-primary);">
+          <div class="text-2xl font-bold" style="color: var(--accent-primary);">42%</div>
+          <div class="text-xs mt-1" style="color: var(--text-secondary);">Hands where you should hit</div>
+        </div>
+        <div class="p-4 rounded-lg" style="background: var(--surface); border: 1px solid var(--border-primary);">
+          <div class="text-2xl font-bold" style="color: var(--accent-primary);">0.5%</div>
+          <div class="text-xs mt-1" style="color: var(--text-secondary);">House edge with basic strategy</div>
+        </div>
+      </div>
+      <p class="text-xs mt-2 text-center" style="color: var(--text-muted);">
+        Statistics based on single-deck blackjack with standard rules. Multi-deck games have slightly different odds.
+      </p>
+    </div>
+
+</CasinoLayout>
 
 <script>
   import { generateStandardDeck, shuffleDeck, formatCard } from '../../utils/cardDeck';
@@ -252,19 +370,30 @@ const description = "Practice blackjack strategy with our fictional casino simul
 
   // Game state
   let deck: Card[] = [];
-  let playerHand: Card[] = [];
   let dealerHand: Card[] = [];
   let gameOver = false;
-  let isDoubledDown = false;
   let baseBet = 5; // Base CatnipCoin bet
   let currentThemeId = 'emoji-default';
-  
-  // TODO Phase 4.6: Multi-hand state for splitting
-  // let hands: Card[][] = [];
-  // let activeHandIndex = 0;
-  // let bets: number[] = [];
-  // let handResults: ('win' | 'lose' | 'push' | null)[] = [];
-  // let isSplitHand = false;
+
+  // Multi-hand state for splitting (Phase 4.6)
+  const MAX_HANDS = 4; // Standard casino max (can't split beyond 4 hands)
+  let hands: Card[][] = [[]]; // Array of hands (normally 1, up to 4 when re-splitting)
+  let bets: number[] = [baseBet]; // Bet per hand
+  let activeHandIndex = 0; // Which hand is currently being played
+  let handDoubled: boolean[] = [false]; // Track if each hand was doubled down
+  let handResults: ('win' | 'lose' | 'push' | 'blackjack' | null)[] = [null];
+  let handFromAces: boolean[] = [false]; // Track which hands came from split aces (can't re-split)
+  let isSplitGame = false; // Track if we're in a split scenario
+  let splitAces = false; // Special case: split aces get only one card each (first split only)
+
+  // Insurance state (Phase 4.6)
+  let insuranceBet = 0; // Half of base bet
+  let insuranceTaken = false; // Whether player took insurance
+  let insurancePromptActive = false; // Is the prompt showing
+
+  // Backward compatibility alias
+  let playerHand: Card[] = hands[0];
+  let isDoubledDown = false;
 
   // Load saved theme
   const savedTheme = localStorage.getItem('casino-deck-theme');
@@ -278,12 +407,12 @@ const description = "Practice blackjack strategy with our fictional casino simul
     renderHands();
   }) as EventListener);
 
-  // Update CatnipCoin balance display
+  // Update CatnipCoin balance display (in header via CasinoLayout)
   function updateBalanceDisplay() {
     const balance = getCatnipBalance();
-    const balanceEl = document.getElementById('catnip-balance');
+    const balanceEl = document.getElementById('header-balance-value');
     if (balanceEl) {
-      balanceEl.textContent = formatCatnip(balance);
+      balanceEl.textContent = balance.toLocaleString();
     }
   }
 
@@ -411,27 +540,69 @@ const description = "Practice blackjack strategy with our fictional casino simul
     `;
   }
 
-  // Render hands
+  // Render hands (supports multiple hands for splitting)
   function renderHands() {
-    const playerHandEl = document.getElementById('player-hand');
     const dealerHandEl = document.getElementById('dealer-hand');
-    const playerTotalEl = document.getElementById('player-total');
     const dealerTotalEl = document.getElementById('dealer-total');
 
-    if (playerHandEl && dealerHandEl && playerTotalEl && dealerTotalEl) {
-      // Render player hand
-      playerHandEl.innerHTML = playerHand.map(card => renderCard(card)).join('');
-      playerTotalEl.textContent = calculateTotal(playerHand).toString();
-
-      // Render dealer hand (first card face down if game in progress)
+    // Render dealer hand
+    if (dealerHandEl && dealerTotalEl) {
       if (dealerHand.length > 0 && !gameOver) {
         dealerHandEl.innerHTML = renderCard(dealerHand[0], true) + dealerHand.slice(1).map(card => renderCard(card)).join('');
-        // Show only visible card total
         const visibleTotal = calculateTotal(dealerHand.slice(1));
         dealerTotalEl.textContent = visibleTotal.toString();
       } else {
         dealerHandEl.innerHTML = dealerHand.map(card => renderCard(card)).join('');
         dealerTotalEl.textContent = calculateTotal(dealerHand).toString();
+      }
+    }
+
+    // Render player hand(s)
+    for (let i = 0; i < hands.length; i++) {
+      const handEl = document.getElementById(i === 0 ? 'player-hand' : `player-hand-${i}`);
+      const totalEl = document.getElementById(i === 0 ? 'player-total' : `player-total-${i}`);
+      const containerEl = document.getElementById(`player-hand-${i}-container`);
+      const activeEl = document.getElementById(`player-hand-${i}-active`);
+      const resultEl = document.getElementById(`player-hand-${i}-result`);
+      const labelEl = document.getElementById(`player-hand-${i}-label`);
+
+      if (handEl && totalEl) {
+        handEl.innerHTML = hands[i].map(card => renderCard(card)).join('');
+        totalEl.textContent = calculateTotal(hands[i]).toString();
+      }
+
+      // Show/hide container for split hands
+      if (containerEl) {
+        containerEl.classList.toggle('hidden', i > 0 && !isSplitGame);
+
+        // Update border for active hand
+        if (isSplitGame && !gameOver) {
+          containerEl.style.borderColor = i === activeHandIndex ? 'var(--accent-primary)' : 'var(--border-primary)';
+        }
+      }
+
+      // Show active indicator
+      if (activeEl) {
+        activeEl.classList.toggle('hidden', !isSplitGame || i !== activeHandIndex || gameOver);
+      }
+
+      // Update label for split hands
+      if (labelEl && isSplitGame) {
+        labelEl.textContent = `Hand ${i + 1}`;
+      } else if (labelEl) {
+        labelEl.textContent = 'You';
+      }
+
+      // Show result for completed hands
+      if (resultEl && handResults[i]) {
+        resultEl.classList.remove('hidden');
+        resultEl.textContent = handResults[i] === 'win' ? '✓ Won' :
+                               handResults[i] === 'blackjack' ? '🎰 BJ!' :
+                               handResults[i] === 'lose' ? '✗ Lost' : '↔ Push';
+        resultEl.style.color = handResults[i] === 'win' || handResults[i] === 'blackjack' ? 'var(--accent-success)' :
+                               handResults[i] === 'lose' ? 'var(--accent-danger)' : 'var(--accent-warning)';
+      } else if (resultEl) {
+        resultEl.classList.add('hidden');
       }
     }
   }
@@ -476,25 +647,33 @@ const description = "Practice blackjack strategy with our fictional casino simul
     return calculateTotal(hand) > 21;
   }
   
-  // Check if player can split (Phase 4.5 stub + 4.6 full implementation)
+  // Check if current active hand can split (Phase 4.6 - full re-split support)
   function canSplit(): boolean {
+    const currentHand = hands[activeHandIndex];
+
     // Must have exactly 2 cards
-    if (playerHand.length !== 2) return false;
-    
+    if (!currentHand || currentHand.length !== 2) return false;
+
+    // Can't split beyond MAX_HANDS (standard casino rule: 4 hands max)
+    if (hands.length >= MAX_HANDS) return false;
+
+    // Can't re-split aces (standard casino rule)
+    if (handFromAces[activeHandIndex]) return false;
+
     // Must have matching values (rank for non-faces, value for faces)
-    const card1 = playerHand[0];
-    const card2 = playerHand[1];
-    
+    const card1 = currentHand[0];
+    const card2 = currentHand[1];
+
     // Same rank (e.g., 7-7, A-A)
     if (card1.rank === card2.rank) return true;
-    
+
     // Both are 10-value cards (10, J, Q, K)
     const tenValues = ['10', 'J', 'Q', 'K'];
     if (tenValues.includes(card1.rank) && tenValues.includes(card2.rank)) return true;
-    
+
     return false;
   }
-  
+
   // Check if player has enough balance to split
   function canAffordSplit(): boolean {
     return getCatnipBalance() >= baseBet;
@@ -522,63 +701,139 @@ const description = "Practice blackjack strategy with our fictional casino simul
     hitDealer();
   }
 
+  // Settle a single hand against dealer
+  function settleHand(handIndex: number, dealerTotal: number): { result: 'win' | 'lose' | 'push' | 'blackjack', payout: number } {
+    const hand = hands[handIndex];
+    const handTotal = calculateTotal(hand);
+    const bet = bets[handIndex] * (handDoubled[handIndex] ? 2 : 1);
+
+    // Already busted during play (for split hands)
+    if (handResults[handIndex] === 'lose') {
+      return { result: 'lose', payout: 0 };
+    }
+
+    const dealerBusted = dealerTotal > 21;
+
+    // Note: Natural blackjack (3:2) is NOT available after split
+    if (handTotal > 21) {
+      // Player busted
+      return { result: 'lose', payout: 0 };
+    } else if (dealerBusted) {
+      // Dealer busted, player wins 1:1
+      return { result: 'win', payout: bet * 2 };
+    } else if (handTotal > dealerTotal) {
+      // Player wins 1:1
+      return { result: 'win', payout: bet * 2 };
+    } else if (dealerTotal > handTotal) {
+      // Dealer wins
+      return { result: 'lose', payout: 0 };
+    } else {
+      // Push
+      return { result: 'push', payout: bet };
+    }
+  }
+
   // Settlement - Centralized payout logic
   function checkWinner() {
-    const playerTotal = calculateTotal(playerHand);
     const dealerTotal = calculateTotal(dealerHand);
-    const playerNatural = hasNaturalBlackjack(playerHand);
-    const dealerNatural = hasNaturalBlackjack(dealerHand);
-    
-    // Current bet (may be doubled)
-    const currentBet = baseBet * (isDoubledDown ? 2 : 1);
-    
-    // Settlement outcomes:
-    // - Player bust: lose bet
-    // - Dealer bust: win 1:1 (return bet + winnings)
-    // - Natural BJ vs non-BJ: win 3:2 (return bet + 1.5x winnings)
-    // - Both natural BJ: push (return bet)
-    // - Compare totals: win 1:1, lose bet, or push
 
-    if (playerTotal > 21) {
-      // Player busted - lose bet
-      showStatus('Bust! 💥', `You went over 21 with ${playerTotal}.`, 'lose');
-      showCatnipChange(-currentBet, 'Bust');
-    } else if (dealerTotal > 21) {
-      // Dealer busted - win 1:1
-      const payout = currentBet * 2; // Return bet + winnings
-      showStatus('You Win! 🎉', `Dealer busted with ${dealerTotal}.`, 'win');
-      addCatnip(payout, isDoubledDown ? 'Blackjack doubled down win' : 'Blackjack win');
-      showCatnipChange(+payout, isDoubledDown ? 'Doubled Win!' : 'Win');
-    } else if (playerNatural && !dealerNatural) {
-      // Natural blackjack pays 3:2 (only on base bet, not doubled)
-      const payout = Math.floor(baseBet * 2.5); // Bet + 1.5x winnings
-      showStatus('Blackjack! 🎰', 'Natural 21 pays 3:2!', 'win');
-      addCatnip(payout, 'Blackjack natural 21');
-      showCatnipChange(+payout, 'Blackjack!');
-    } else if (dealerNatural && !playerNatural) {
-      // Dealer has natural BJ - lose bet
-      showStatus('Dealer Blackjack 🎩', 'Dealer has natural 21.', 'lose');
-      showCatnipChange(-currentBet, 'Loss');
-    } else if (playerNatural && dealerNatural) {
-      // Both have natural BJ - push
-      showStatus('Push 🤝', 'Both have Blackjack!', 'push');
-      addCatnip(currentBet, 'Blackjack push');
-      showCatnipChange(0, 'Push');
-    } else if (playerTotal > dealerTotal) {
-      // Player wins - 1:1 payout
-      const payout = currentBet * 2; // Return bet + winnings
-      showStatus('You Win! 🎉', `${playerTotal} beats ${dealerTotal}.`, 'win');
-      addCatnip(payout, isDoubledDown ? 'Blackjack doubled down win' : 'Blackjack win');
-      showCatnipChange(+payout, isDoubledDown ? 'Doubled Win!' : 'Win');
-    } else if (dealerTotal > playerTotal) {
-      // Dealer wins - lose bet
-      showStatus('Dealer Wins 🎩', `${dealerTotal} beats ${playerTotal}.`, 'lose');
-      showCatnipChange(-currentBet, 'Loss');
+    if (isSplitGame) {
+      // Multi-hand settlement
+      let totalPayout = 0;
+      let wins = 0;
+      let losses = 0;
+      let pushes = 0;
+
+      for (let i = 0; i < hands.length; i++) {
+        const { result, payout } = settleHand(i, dealerTotal);
+        handResults[i] = result;
+        totalPayout += payout;
+
+        if (result === 'win' || result === 'blackjack') wins++;
+        else if (result === 'lose') losses++;
+        else pushes++;
+      }
+
+      // Update hand result displays
+      renderHands();
+
+      // Calculate net result (total payout minus total wagered)
+      const totalWagered = bets.reduce((sum, b, i) => sum + b * (handDoubled[i] ? 2 : 1), 0);
+      const netChange = totalPayout - totalWagered;
+
+      // Pay out winnings
+      if (totalPayout > 0) {
+        addCatnip(totalPayout, 'Blackjack split payout');
+      }
+
+      // Show summary status
+      if (wins > losses) {
+        showStatus(`Won ${wins}/${hands.length} hands! 🎉`, `Net: ${netChange >= 0 ? '+' : ''}${netChange} CC`, 'win');
+        showCatnipChange(netChange, 'Split Result');
+      } else if (losses > wins) {
+        showStatus(`Lost ${losses}/${hands.length} hands 😔`, `Net: ${netChange >= 0 ? '+' : ''}${netChange} CC`, 'lose');
+        showCatnipChange(netChange, 'Split Result');
+      } else {
+        showStatus(`Split result: ${wins}W/${losses}L/${pushes}P`, `Net: ${netChange >= 0 ? '+' : ''}${netChange} CC`, 'push');
+        showCatnipChange(netChange, 'Split Result');
+      }
     } else {
-      // Tie - push (return bet)
-      showStatus('Push 🤝', `Both have ${playerTotal}. It's a tie!`, 'push');
-      addCatnip(currentBet, 'Blackjack push');
-      showCatnipChange(0, 'Push');
+      // Single hand settlement (original logic)
+      const playerTotal = calculateTotal(playerHand);
+      const playerNatural = hasNaturalBlackjack(playerHand);
+      const dealerNatural = hasNaturalBlackjack(dealerHand);
+
+      // Current bet (may be doubled)
+      const currentBet = baseBet * (isDoubledDown ? 2 : 1);
+
+      // Settlement outcomes:
+      // - Player bust: lose bet
+      // - Dealer bust: win 1:1 (return bet + winnings)
+      // - Natural BJ vs non-BJ: win 3:2 (return bet + 1.5x winnings)
+      // - Both natural BJ: push (return bet)
+      // - Compare totals: win 1:1, lose bet, or push
+
+      if (playerTotal > 21) {
+        // Player busted - lose bet
+        showStatus('Bust! 💥', `You went over 21 with ${playerTotal}.`, 'lose');
+        showCatnipChange(-currentBet, 'Bust');
+      } else if (dealerTotal > 21) {
+        // Dealer busted - win 1:1
+        const payout = currentBet * 2; // Return bet + winnings
+        showStatus('You Win! 🎉', `Dealer busted with ${dealerTotal}.`, 'win');
+        addCatnip(payout, isDoubledDown ? 'Blackjack doubled down win' : 'Blackjack win');
+        showCatnipChange(+payout, isDoubledDown ? 'Doubled Win!' : 'Win');
+      } else if (playerNatural && !dealerNatural) {
+        // Natural blackjack pays 3:2 (only on base bet, not doubled)
+        const payout = Math.floor(baseBet * 2.5); // Bet + 1.5x winnings
+        showStatus('Blackjack! 🎰', 'Natural 21 pays 3:2!', 'win');
+        addCatnip(payout, 'Blackjack natural 21');
+        showCatnipChange(+payout, 'Blackjack!');
+      } else if (dealerNatural && !playerNatural) {
+        // Dealer has natural BJ - lose bet
+        showStatus('Dealer Blackjack 🎩', 'Dealer has natural 21.', 'lose');
+        showCatnipChange(-currentBet, 'Loss');
+      } else if (playerNatural && dealerNatural) {
+        // Both have natural BJ - push
+        showStatus('Push 🤝', 'Both have Blackjack!', 'push');
+        addCatnip(currentBet, 'Blackjack push');
+        showCatnipChange(0, 'Push');
+      } else if (playerTotal > dealerTotal) {
+        // Player wins - 1:1 payout
+        const payout = currentBet * 2; // Return bet + winnings
+        showStatus('You Win! 🎉', `${playerTotal} beats ${dealerTotal}.`, 'win');
+        addCatnip(payout, isDoubledDown ? 'Blackjack doubled down win' : 'Blackjack win');
+        showCatnipChange(+payout, isDoubledDown ? 'Doubled Win!' : 'Win');
+      } else if (dealerTotal > playerTotal) {
+        // Dealer wins - lose bet
+        showStatus('Dealer Wins 🎩', `${dealerTotal} beats ${playerTotal}.`, 'lose');
+        showCatnipChange(-currentBet, 'Loss');
+      } else {
+        // Tie - push (return bet)
+        showStatus('Push 🤝', `Both have ${playerTotal}. It's a tie!`, 'push');
+        addCatnip(currentBet, 'Blackjack push');
+        showCatnipChange(0, 'Push');
+      }
     }
 
     updateButtons(false, false, false, true);
@@ -592,14 +847,19 @@ const description = "Practice blackjack strategy with our fictional casino simul
     const splitBtn = document.getElementById('split-btn') as HTMLButtonElement;
     const dealBtn = document.getElementById('deal-btn') as HTMLButtonElement;
     const dealAgainBtn = document.getElementById('deal-again-btn') as HTMLButtonElement;
+    const betSelect = document.getElementById('betSelect') as HTMLSelectElement;
 
     if (hitBtn) hitBtn.disabled = !hit;
     if (standBtn) standBtn.disabled = !stand;
     if (doubleBtn) doubleBtn.disabled = !doubleDown;
+
+    // Re-enable bet selector when game is over (deal button is shown)
+    if (betSelect) betSelect.disabled = !deal;
     
-    // Split button logic (Phase 4.5 - shown when eligible)
+    // Split button logic (Phase 4.6 - supports re-splitting up to 4 hands)
     if (splitBtn) {
-      const canSplitNow = canSplit() && canAffordSplit() && !gameOver && playerHand.length === 2;
+      const currentHand = hands[activeHandIndex];
+      const canSplitNow = canSplit() && canAffordSplit() && !gameOver && currentHand?.length === 2;
       splitBtn.classList.toggle('hidden', !canSplitNow);
       splitBtn.disabled = !canSplitNow;
     }
@@ -621,22 +881,81 @@ const description = "Practice blackjack strategy with our fictional casino simul
     hideStatus();
     gameOver = false;
     isDoubledDown = false;
-    
+
+    // Get bet value from dropdown
+    const betSelect = document.getElementById('betSelect') as HTMLSelectElement;
+    baseBet = parseInt(betSelect?.value || '5', 10);
+
+    // Disable bet selector during game
+    if (betSelect) betSelect.disabled = true;
+
+    // Reset split state for new hand
+    hands = [[]];
+    bets = [baseBet];
+    activeHandIndex = 0;
+    handDoubled = [false];
+    handResults = [null];
+    handFromAces = [false];
+    isSplitGame = false;
+    splitAces = false;
+
+    // Hide all split hand containers from previous game
+    for (let i = 1; i < 4; i++) {
+      const container = document.getElementById(`player-hand-${i}-container`);
+      if (container) {
+        container.classList.add('hidden');
+        container.style.borderColor = 'var(--border-primary)';
+      }
+      const handEl = document.getElementById(`player-hand-${i}`);
+      if (handEl) handEl.innerHTML = '';
+      const resultEl = document.getElementById(`player-hand-${i}-result`);
+      if (resultEl) {
+        resultEl.classList.add('hidden');
+        resultEl.textContent = '';
+      }
+      const activeEl = document.getElementById(`player-hand-${i}-active`);
+      if (activeEl) activeEl.classList.add('hidden');
+    }
+    // Reset primary hand label and result
+    const hand0Label = document.getElementById('player-hand-0-label');
+    if (hand0Label) hand0Label.textContent = 'You';
+    const hand0Result = document.getElementById('player-hand-0-result');
+    if (hand0Result) {
+      hand0Result.classList.add('hidden');
+      hand0Result.textContent = '';
+    }
+    const hand0Active = document.getElementById('player-hand-0-active');
+    if (hand0Active) hand0Active.classList.add('hidden');
+
+    // Reset insurance state
+    insuranceBet = 0;
+    insuranceTaken = false;
+    insurancePromptActive = false;
+    hideInsurancePrompt();
+
     // Deduct bet at deal time
     subtractCatnip(baseBet, 'Blackjack bet');
-    
+
     deck = shuffleDeck(generateStandardDeck());
-    playerHand = [deck.pop()!, deck.pop()!];
+    hands[0] = [deck.pop()!, deck.pop()!];
+    playerHand = hands[0]; // Update alias
     dealerHand = [deck.pop()!, deck.pop()!];
     renderHands();
 
-    // TODO Phase 4.6: Insurance side bet
+    // Phase 4.6: Insurance side bet
     // If dealer shows Ace, offer insurance (half of original bet)
     // Insurance pays 2:1 if dealer has blackjack
-    // if (dealerHand[0].rank === 'A') {
-    //   showInsurancePrompt();
-    // }
+    if (dealerHand[0].rank === 'A' && !hasNaturalBlackjack(playerHand)) {
+      showInsurancePrompt();
+      return; // Wait for insurance decision before continuing
+    }
 
+    // Continue with normal play (called after insurance decision or if no ace)
+    continueAfterInsurance();
+  }
+
+  // Continue game after insurance decision (or if no insurance offered)
+  function continueAfterInsurance() {
     // Check for immediate natural blackjacks
     if (hasNaturalBlackjack(playerHand) || hasNaturalBlackjack(dealerHand)) {
       gameOver = true;
@@ -650,26 +969,144 @@ const description = "Practice blackjack strategy with our fictional casino simul
     }
   }
 
-  // Hit
-  function hit() {
-    playerHand.push(deck.pop()!);
-    renderHands();
+  // Show insurance prompt
+  function showInsurancePrompt() {
+    insurancePromptActive = true;
+    const insuranceCost = Math.floor(baseBet / 2);
 
-    const playerTotal = calculateTotal(playerHand);
-    if (playerTotal > 21) {
+    const promptEl = document.getElementById('insurance-prompt');
+    const costEl = document.getElementById('insurance-cost');
+
+    if (costEl) {
+      costEl.textContent = `${insuranceCost} CC`;
+    }
+
+    if (promptEl) {
+      promptEl.classList.remove('hidden');
+    }
+
+    // Disable game buttons while insurance prompt is active
+    updateButtons(false, false, false, false);
+  }
+
+  // Hide insurance prompt
+  function hideInsurancePrompt() {
+    insurancePromptActive = false;
+    const promptEl = document.getElementById('insurance-prompt');
+    if (promptEl) {
+      promptEl.classList.add('hidden');
+    }
+  }
+
+  // Player takes insurance
+  function takeInsurance() {
+    const insuranceCost = Math.floor(baseBet / 2);
+
+    // Check if player can afford insurance
+    if (getCatnipBalance() < insuranceCost) {
+      showStatus('Cannot Afford 💸', 'Not enough CatnipCoin for insurance.', 'lose');
+      setTimeout(() => {
+        hideStatus();
+        hideInsurancePrompt();
+        continueAfterInsurance();
+      }, 1500);
+      return;
+    }
+
+    // Deduct insurance bet
+    subtractCatnip(insuranceCost, 'Blackjack insurance');
+    showCatnipChange(-insuranceCost, 'Insurance');
+
+    insuranceBet = insuranceCost;
+    insuranceTaken = true;
+
+    hideInsurancePrompt();
+
+    // Check if dealer has blackjack immediately
+    if (hasNaturalBlackjack(dealerHand)) {
+      // Dealer has blackjack - insurance pays 2:1
+      const insurancePayout = insuranceBet * 3; // Original bet + 2:1 winnings
+      addCatnip(insurancePayout, 'Insurance payout');
+      showCatnipChange(insurancePayout, 'Insurance wins!');
+      showStatus('Insurance Pays! 🛡️', `Dealer has Blackjack. Insurance pays ${insurancePayout} CC.`, 'win');
+
+      setTimeout(() => {
+        hideStatus();
+        gameOver = true;
+        renderHands();
+        checkWinner();
+        updateButtons(false, false, false, true);
+      }, 2000);
+    } else {
+      // Dealer doesn't have blackjack - insurance lost
+      showStatus('No Blackjack', 'Dealer does not have Blackjack. Insurance lost.', 'lose');
+      setTimeout(() => {
+        hideStatus();
+        continueAfterInsurance();
+      }, 1500);
+    }
+  }
+
+  // Player declines insurance
+  function declineInsurance() {
+    insuranceTaken = false;
+    insuranceBet = 0;
+
+    hideInsurancePrompt();
+
+    // Check if dealer has blackjack (even insurance, game could end)
+    if (hasNaturalBlackjack(dealerHand)) {
       gameOver = true;
       renderHands();
       checkWinner();
-    } else if (playerTotal === 21) {
+      updateButtons(false, false, false, true);
+    } else {
+      continueAfterInsurance();
+    }
+  }
+
+  // Hit
+  function hit() {
+    // Add card to current active hand
+    hands[activeHandIndex].push(deck.pop()!);
+    playerHand = hands[activeHandIndex]; // Keep alias in sync
+    renderHands();
+
+    const handTotal = calculateTotal(hands[activeHandIndex]);
+
+    if (handTotal > 21) {
+      // Bust on this hand
+      if (isSplitGame) {
+        // In split game, mark this hand as lost and move to next
+        handResults[activeHandIndex] = 'lose';
+        renderHands();
+        setTimeout(() => moveToNextHand(), 500);
+      } else {
+        // Single hand game - game over
+        gameOver = true;
+        renderHands();
+        checkWinner();
+      }
+    } else if (handTotal === 21) {
       // Auto-stand on 21
-      stand();
+      if (isSplitGame) {
+        moveToNextHand();
+      } else {
+        stand();
+      }
     }
   }
 
   // Stand
   function stand() {
     updateButtons(false, false, false, false);
-    dealerPlay();
+
+    if (isSplitGame) {
+      // Move to next hand in split game
+      moveToNextHand();
+    } else {
+      dealerPlay();
+    }
   }
 
   // Double Down
@@ -704,48 +1141,117 @@ const description = "Practice blackjack strategy with our fictional casino simul
     }
   }
   
-  // Split (Phase 4.5 stub / Phase 4.6 full implementation)
+  // Split - Full implementation (Phase 4.6) with re-splitting support
   function split() {
-    // TODO Phase 4.6: Full multi-hand implementation
-    // For now, show a message explaining the feature is coming soon
-    
     if (!canSplit() || !canAffordSplit() || gameOver) {
       return;
     }
-    
-    alert('✂️ Split feature coming in Phase 4.6!\n\nSplitting will allow you to:\n• Split matching pairs into two hands\n• Play each hand independently\n• Double your bet automatically\n\nStay tuned!');
-    
-    /* Phase 4.6 implementation plan:
-    
-    // Deduct additional bet
+
+    // Deduct additional bet for new hand
     subtractCatnip(baseBet, 'Blackjack split');
-    showCatnipChange(-baseBet, 'Split');
-    
-    // Split the hand
-    const secondCard = playerHand.pop()!;
-    hands = [playerHand, [secondCard]];
-    bets = [baseBet, baseBet];
-    activeHandIndex = 0;
-    handResults = [null, null];
-    isSplitHand = true;
-    
-    // Deal one card to each hand
-    hands[0].push(deck.pop()!);
-    hands[1].push(deck.pop()!);
-    
-    // Special case: Split aces
-    if (hands[0][0].rank === 'A') {
-      isSplitAces = true;
-      // Split aces get one card each, then auto-stand
-      gameOver = true;
-      dealerPlay();
+    showCatnipChange(-baseBet, 'Split bet');
+
+    // Get the current hand being split
+    const currentHand = hands[activeHandIndex];
+    const firstCard = currentHand[0];
+    const secondCard = currentHand[1];
+
+    // Check if splitting aces
+    const isSplittingAces = firstCard.rank === 'A';
+    if (isSplittingAces) {
+      splitAces = true; // Track that we have split aces this game
+    }
+
+    // Replace current hand with first card only
+    hands[activeHandIndex] = [firstCard];
+
+    // Insert new hand right after current (for proper play order)
+    const newHandIndex = activeHandIndex + 1;
+    hands.splice(newHandIndex, 0, [secondCard]);
+    bets.splice(newHandIndex, 0, baseBet);
+    handDoubled.splice(newHandIndex, 0, false);
+    handResults.splice(newHandIndex, 0, null);
+    handFromAces.splice(newHandIndex, 0, isSplittingAces);
+
+    // Mark current hand as from aces too if splitting aces
+    if (isSplittingAces) {
+      handFromAces[activeHandIndex] = true;
+    }
+
+    isSplitGame = true;
+
+    // Deal one card to each of the two hands that were just split
+    hands[activeHandIndex].push(deck.pop()!);
+    hands[newHandIndex].push(deck.pop()!);
+
+    // Update playerHand alias
+    playerHand = hands[activeHandIndex];
+
+    renderHands();
+
+    // Special case: Split aces get only one card each, then auto-stand both
+    if (isSplittingAces) {
+      showStatus('Split Aces ♠♥', 'Split aces receive one card each and automatically stand.', 'push');
+
+      // Move past both ace hands to either next non-ace hand or dealer
+      setTimeout(() => {
+        hideStatus();
+        // Skip all hands that are from ace splits (they auto-stand)
+        while (activeHandIndex < hands.length - 1 && handFromAces[activeHandIndex]) {
+          activeHandIndex++;
+        }
+        // If the next hand is also from aces, move to dealer
+        if (handFromAces[activeHandIndex] || activeHandIndex >= hands.length - 1) {
+          dealerPlay();
+        } else {
+          // There's a non-ace hand to play
+          playerHand = hands[activeHandIndex];
+          renderHands();
+          updateButtons(true, true, canSplit() && canAffordSplit(), false);
+        }
+      }, 1500);
       return;
     }
-    
-    // Render and enable play on first hand
-    renderHands();
-    updateButtons(true, true, false, false);
-    */
+
+    // Check for 21 on current hand (not natural blackjack after split)
+    if (calculateTotal(hands[activeHandIndex]) === 21) {
+      // Auto-move to next hand
+      moveToNextHand();
+    } else {
+      // Enable play on current hand
+      // Allow re-split if we got another pair and haven't hit max hands
+      const canReSplit = canSplit() && canAffordSplit();
+      updateButtons(true, true, canReSplit, false);
+    }
+  }
+
+  // Move to next hand after current hand is done
+  function moveToNextHand() {
+    activeHandIndex++;
+
+    if (activeHandIndex >= hands.length) {
+      // All hands played, dealer's turn
+      dealerPlay();
+    } else {
+      // Skip hands from ace splits (they auto-stand with 1 card dealt)
+      if (handFromAces[activeHandIndex] && hands[activeHandIndex].length === 2) {
+        setTimeout(() => moveToNextHand(), 300);
+        return;
+      }
+
+      // Update playerHand alias
+      playerHand = hands[activeHandIndex];
+      renderHands();
+
+      // Check for 21 on this hand
+      if (calculateTotal(hands[activeHandIndex]) === 21) {
+        setTimeout(() => moveToNextHand(), 500);
+      } else {
+        // Check if this hand can be re-split (got another pair)
+        const canReSplit = canSplit() && canAffordSplit();
+        updateButtons(true, true, canReSplit, false);
+      }
+    }
   }
 
   // Initialize
@@ -763,6 +1269,12 @@ const description = "Practice blackjack strategy with our fictional casino simul
     if (standBtn) standBtn.addEventListener('click', stand);
     if (splitBtn) splitBtn.addEventListener('click', split);
     if (doubleBtn) doubleBtn.addEventListener('click', doubleDown);
+
+    // Insurance buttons
+    const insuranceYesBtn = document.getElementById('insurance-yes-btn');
+    const insuranceNoBtn = document.getElementById('insurance-no-btn');
+    if (insuranceYesBtn) insuranceYesBtn.addEventListener('click', takeInsurance);
+    if (insuranceNoBtn) insuranceNoBtn.addEventListener('click', declineInsurance);
 
     // Initialize balance display
     updateBalanceDisplay();

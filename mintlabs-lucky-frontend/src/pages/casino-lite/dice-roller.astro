@@ -1,205 +1,214 @@
 ---
-// Dice Roller 2.0 - Casino-Lite D6 Mode
-// Phase 4.3 - Casino-Lite Dice System
+// Dice Roller - Casino-Lite D6 Game
+// Phase 4.6 - CasinoLayout integration
 
-import InfoLayout from "../../components/InfoLayout.astro";
-import TrackLink from "../../components/TrackLink.astro";
+import CasinoLayout from "../../components/CasinoLayout.astro";
 
-const title = "Dice Roller | Casino-Style D6";
+const title = "Dice Roller";
 const description = "Roll casino-quality six-sided dice with true random results. Learn about dice probability, independence, and streaks.";
 ---
 
-<InfoLayout title={title} description={description}>
-  <main class="mx-auto max-w-5xl p-6 space-y-8">
-    <!-- Header -->
-    <header class="text-center space-y-4">
-      <h1 class="text-4xl font-bold" style="color: var(--text-primary);">
-        🎲 Casino Dice Roller
-      </h1>
-      <p class="text-lg max-w-2xl mx-auto" style="color: var(--text-secondary);">
-        Roll up to 6 dice with cryptographically secure randomness. Perfect for learning probability and dice mechanics.
-      </p>
-    </header>
-
-    <!-- Casino-Lite Disclaimer -->
-    <div class="p-6 rounded-xl" style="background: var(--surface-elevated); border-left: 4px solid var(--accent-warning);">
-      <h2 class="text-lg font-bold mb-2" style="color: var(--text-primary);">⚠️ Fictional Simulation Only</h2>
-      <p class="text-sm" style="color: var(--text-secondary);">
-        This tool is for entertainment and education. No real gambling, no predictions, no improved odds. All rolls use crypto-grade randomness.
-      </p>
+<CasinoLayout title={title} description={description} showBalance={false}>
+  <!-- Controls Row -->
+  <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl" style="background: var(--surface-elevated);">
+    <div class="flex items-center gap-3">
+      <label for="diceCount" class="font-semibold text-sm" style="color: var(--text-primary);">
+        Number of Dice:
+      </label>
+      <select
+        id="diceCount"
+        class="px-3 py-2 rounded-lg font-medium text-sm"
+        style="background: var(--surface); color: var(--text-primary); border: 1px solid var(--border-primary);"
+      >
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+      </select>
     </div>
 
-    <!-- Controls -->
-    <div class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated);">
-      <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div class="flex items-center gap-4">
-          <label for="diceCount" class="font-semibold" style="color: var(--text-primary);">
-            Number of Dice:
-          </label>
-          <select
-            id="diceCount"
-            class="px-4 py-2 rounded-lg font-medium"
-            style="background: var(--surface-base); color: var(--text-primary); border: 1px solid var(--border-primary);"
-          >
-            <option value="1">1 Die</option>
-            <option value="2" selected>2 Dice</option>
-            <option value="3">3 Dice</option>
-            <option value="4">4 Dice</option>
-            <option value="5">5 Dice</option>
-            <option value="6">6 Dice</option>
-          </select>
-        </div>
-        
-        <button
-          id="rollButton"
-          class="px-8 py-3 rounded-lg font-bold text-lg transition-all"
-          style="background: var(--accent-primary); color: var(--text-on-accent);"
-        >
-          🎲 Roll Dice
-        </button>
+    <button
+      id="rollButton"
+      class="px-6 py-2.5 rounded-lg font-bold text-sm transition-all hover:scale-105"
+      style="background: var(--accent-primary); color: var(--text-on-accent);"
+    >
+      🎲 Roll Dice
+    </button>
+  </div>
+
+  <!-- Dice Display Area -->
+  <div id="diceDisplay" class="p-8 rounded-xl min-h-[180px] flex flex-wrap gap-6 items-center justify-center" style="background: var(--surface-elevated);">
+    <p class="text-center" style="color: var(--text-muted);">
+      Click "Roll Dice" to begin
+    </p>
+  </div>
+
+  <!-- Results Panel -->
+  <div id="resultsPanel" class="p-4 rounded-xl hidden" style="background: var(--surface-elevated); border: 2px solid var(--accent-primary);">
+    <div class="flex items-center justify-between">
+      <div class="text-sm" style="color: var(--text-secondary);">
+        Roll: <span id="diceValues" class="font-mono font-bold" style="color: var(--text-primary);">[--]</span>
+      </div>
+      <div id="totalDisplay" class="text-2xl font-bold" style="color: var(--accent-primary);">
+        Total: 0
       </div>
     </div>
+  </div>
 
-    <!-- Dice Display -->
-    <div id="diceDisplay" class="p-8 rounded-xl min-h-[200px] flex flex-wrap gap-6 items-center justify-center" style="background: var(--surface-elevated);">
-      <p class="text-center w-full" style="color: var(--text-muted);">
-        Click "Roll Dice" to begin
-      </p>
-    </div>
-
-    <!-- Results Panel -->
-    <div id="resultsPanel" class="p-6 rounded-xl hidden" style="background: var(--surface-elevated); border: 2px solid var(--accent-primary);">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl font-bold" style="color: var(--text-primary);">Results</h3>
-        <div id="totalDisplay" class="text-3xl font-bold" style="color: var(--accent-primary);">
-          <!-- Total shown here -->
-        </div>
-      </div>
-      <div id="resultsBreakdown" class="text-sm space-y-1" style="color: var(--text-secondary);">
-        <!-- Individual die results shown here -->
-      </div>
-    </div>
-
-    <!-- Roll History -->
-    <div class="p-6 rounded-xl" style="background: var(--surface-elevated);">
-      <h3 class="text-lg font-bold mb-3" style="color: var(--text-primary);">Last 10 Rolls</h3>
-      <div id="rollHistory" class="space-y-2 text-sm" style="color: var(--text-secondary);">
-        <p style="color: var(--text-muted);">No rolls yet</p>
-      </div>
+  <!-- Roll History -->
+  <div class="p-4 rounded-xl" style="background: var(--surface-elevated);">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-bold" style="color: var(--text-primary);">Recent Rolls</h3>
       <button
         id="clearHistory"
-        class="mt-4 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-        style="background: var(--surface-base); color: var(--text-primary); border: 1px solid var(--border-primary);"
+        class="px-3 py-1 rounded text-xs font-semibold transition-all"
+        style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border-primary);"
       >
-        Clear History
+        Clear
       </button>
     </div>
+    <div id="rollHistory" class="space-y-1 text-sm max-h-32 overflow-y-auto" style="color: var(--text-secondary);">
+      <p style="color: var(--text-muted);">No rolls yet</p>
+    </div>
+  </div>
 
-    <!-- Quick Odds Reference -->
-    <div class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated);">
-      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">🎯 D6 Probability Quick Reference</h2>
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="space-y-2">
-          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">Single Die (1d6)</h3>
-          <ul class="text-sm space-y-1" style="color: var(--text-secondary);">
-            <li>• Each face: <strong>1/6 probability (16.67%)</strong></li>
-            <li>• Average roll: <strong>3.5</strong></li>
-            <li>• Range: 1-6</li>
-            <li>• All outcomes equally likely</li>
-          </ul>
-        </div>
-        <div class="space-y-2">
-          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">Two Dice (2d6)</h3>
-          <ul class="text-sm space-y-1" style="color: var(--text-secondary);">
-            <li>• Most common: <strong>7 (16.67%)</strong></li>
-            <li>• Average roll: <strong>7</strong></li>
-            <li>• Range: 2-12</li>
-            <li>• Bell curve distribution</li>
-          </ul>
-        </div>
-        <div class="space-y-2">
-          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">Independence</h3>
-          <p class="text-sm" style="color: var(--text-secondary);">
-            Each die roll is <strong>independent</strong>. Past results don't affect future rolls. No "hot streaks" or "due numbers."
-          </p>
-        </div>
-        <div class="space-y-2">
-          <h3 class="text-lg font-semibold" style="color: var(--accent-primary);">Crypto RNG</h3>
-          <p class="text-sm" style="color: var(--text-secondary);">
-            Uses <code>crypto.getRandomValues()</code> for true randomness. Same quality as casino dice, but virtual.
-          </p>
-        </div>
+  <!-- Quick Reference -->
+  <div class="p-4 rounded-xl" style="background: var(--surface-elevated);">
+    <h3 class="text-sm font-bold mb-3" style="color: var(--text-primary);">🎯 D6 Probability</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+      <div class="p-3 rounded-lg text-center" style="background: var(--surface); border: 1px solid var(--border-primary);">
+        <div class="text-lg font-bold" style="color: var(--accent-primary);">16.7%</div>
+        <div style="color: var(--text-muted);">Each face (1d6)</div>
+      </div>
+      <div class="p-3 rounded-lg text-center" style="background: var(--surface); border: 1px solid var(--border-primary);">
+        <div class="text-lg font-bold" style="color: var(--accent-primary);">7</div>
+        <div style="color: var(--text-muted);">Most common (2d6)</div>
+      </div>
+      <div class="p-3 rounded-lg text-center" style="background: var(--surface); border: 1px solid var(--border-primary);">
+        <div class="text-lg font-bold" style="color: var(--accent-primary);">2.78%</div>
+        <div style="color: var(--text-muted);">Snake eyes (1+1)</div>
+      </div>
+      <div class="p-3 rounded-lg text-center" style="background: var(--surface); border: 1px solid var(--border-primary);">
+        <div class="text-lg font-bold" style="color: var(--accent-primary);">16.7%</div>
+        <div style="color: var(--text-muted);">Roll a 7 (2d6)</div>
       </div>
     </div>
+    <p class="text-xs mt-3 text-center" style="color: var(--text-muted);">
+      Each roll is independent. Past results don't affect future rolls.
+    </p>
+  </div>
+</CasinoLayout>
 
-    <!-- Educational Content -->
-    <div class="p-6 rounded-xl space-y-4" style="background: var(--surface-elevated);">
-      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">📚 Why Roll Dice?</h2>
-      <div class="space-y-3 text-sm" style="color: var(--text-secondary);">
-        <p>
-          <strong style="color: var(--text-primary);">Learn Probability:</strong> Dice are perfect for understanding independent events, distributions, and the law of large numbers.
-        </p>
-        <p>
-          <strong style="color: var(--text-primary);">Test Patterns:</strong> Roll hundreds of times to see that streaks and patterns emerge from pure randomness—no conspiracy needed!
-        </p>
-        <p>
-          <strong style="color: var(--text-primary);">Game Mechanics:</strong> Many casino games (Craps, Sic Bo) use dice. Understanding D6 probability is foundational.
-        </p>
-        <p>
-          <strong style="color: var(--text-primary);">No Gambler's Fallacy:</strong> If you roll five 6s in a row, the sixth roll is still 1/6 for each face. Dice have no memory.
-        </p>
-      </div>
-    </div>
+<style is:global>
+  /* Dice Styles - must be global for dynamically generated content */
+  .dice-view {
+    width: 4rem;
+    height: 4rem;
+    position: relative;
+    border-radius: 12%;
+    background: linear-gradient(145deg, #ffffff 0%, #e8e8e8 100%);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    box-shadow:
+      0 4px 8px rgba(0, 0, 0, 0.15),
+      inset 0 2px 4px rgba(255, 255, 255, 0.9),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
 
-    <!-- Navigation -->
-    <div class="flex gap-4 flex-wrap justify-center pt-4">
-      <TrackLink
-        href="/casino-lite"
-        label="Back to Casino-Lite Hub"
-        trackName="dice-to-casino-hub"
-        class="px-6 py-3 rounded-lg font-semibold transition-all"
-        style="background: var(--accent-primary); color: var(--text-on-accent);"
-      >
-        🎰 Casino-Lite Hub
-      </TrackLink>
-      <TrackLink
-        href="/casino-lite/blackjack"
-        label="Try Blackjack"
-        trackName="dice-to-blackjack"
-        class="px-6 py-3 rounded-lg font-semibold transition-all"
-        style="background: var(--surface-elevated); color: var(--text-primary); border: 2px solid var(--border-primary);"
-      >
-        🃏 Blackjack
-      </TrackLink>
-      <TrackLink
-        href="/tools/coin-flip"
-        label="Coin Flip"
-        trackName="dice-to-coin"
-        class="px-6 py-3 rounded-lg font-semibold transition-all"
-        style="background: var(--surface-elevated); color: var(--text-primary); border: 2px solid var(--border-primary);"
-      >
-        🪙 Coin Flip
-      </TrackLink>
-    </div>
-  </main>
-</InfoLayout>
+  .dice-view:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow:
+      0 8px 16px rgba(0, 0, 0, 0.2),
+      inset 0 2px 4px rgba(255, 255, 255, 0.9),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .dice-face {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .pip {
+    background: radial-gradient(circle, #1a1a1a 0%, #333 100%);
+    border-radius: 50%;
+    box-shadow:
+      inset 0 2px 3px rgba(0, 0, 0, 0.4),
+      0 1px 1px rgba(255, 255, 255, 0.3);
+    position: absolute;
+    width: 0.65rem;
+    height: 0.65rem;
+  }
+
+  /* Pip positioning */
+  .pip.center { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .pip.top-left { top: 18%; left: 18%; }
+  .pip.top-right { top: 18%; right: 18%; }
+  .pip.middle-left { top: 50%; left: 18%; transform: translateY(-50%); }
+  .pip.middle-right { top: 50%; right: 18%; transform: translateY(-50%); }
+  .pip.bottom-left { bottom: 18%; left: 18%; }
+  .pip.bottom-right { bottom: 18%; right: 18%; }
+
+  /* Rolling animation */
+  .dice-view.rolling {
+    animation: dice-roll 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  @keyframes dice-roll {
+    0% { transform: rotate(0deg) scale(1); }
+    15% { transform: rotate(-15deg) scale(1.1) translateY(-8px); }
+    30% { transform: rotate(12deg) scale(1.05) translateX(4px); }
+    45% { transform: rotate(-8deg) scale(1.08) translateY(-4px); }
+    60% { transform: rotate(6deg) scale(1.03) translateX(-2px); }
+    75% { transform: rotate(-3deg) scale(1.01); }
+    90% { transform: rotate(1deg) scale(1); }
+    100% { transform: rotate(0deg) scale(1); }
+  }
+
+  .dice-view.rolling .pip {
+    animation: pip-flash 0.15s infinite;
+  }
+
+  @keyframes pip-flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Larger dice on bigger screens */
+  @media (min-width: 640px) {
+    .dice-view {
+      width: 5rem;
+      height: 5rem;
+    }
+    .pip {
+      width: 0.8rem;
+      height: 0.8rem;
+    }
+  }
+</style>
 
 <script>
-  // Roll history storage
-  let rollHistory: Array<{ dice: number[], total: number, timestamp: number }> = [];
+  // Roll history
+  let rollHistory: Array<{ dice: number[], total: number }> = [];
 
-  // Generate dice HTML with DiceView styling
+  // Pip layouts for each face
+  const pipLayouts: Record<number, string[]> = {
+    1: ['center'],
+    2: ['top-left', 'bottom-right'],
+    3: ['top-left', 'center', 'bottom-right'],
+    4: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+    5: ['top-left', 'top-right', 'center', 'bottom-left', 'bottom-right'],
+    6: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right'],
+  };
+
+  // Generate dice HTML
   function generateDiceHTML(values: number[], isRolling: boolean = false): string {
     return values.map(value => {
-      const pipLayouts: Record<number, string[]> = {
-        1: ['center'],
-        2: ['top-left', 'bottom-right'],
-        3: ['top-left', 'center', 'bottom-right'],
-        4: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
-        5: ['top-left', 'top-right', 'center', 'bottom-left', 'bottom-right'],
-        6: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right'],
-      };
-
       const pips = pipLayouts[value] || [];
       const pipHTML = pips.map(pos => `<div class="pip ${pos}"></div>`).join('');
 
@@ -226,28 +235,26 @@ const description = "Roll casino-quality six-sided dice with true random results
     return results;
   }
 
-  // Render results
+  // Display results
   function displayResults(dice: number[]) {
     const total = dice.reduce((sum, val) => sum + val, 0);
     const diceDisplay = document.getElementById('diceDisplay');
     const resultsPanel = document.getElementById('resultsPanel');
     const totalDisplay = document.getElementById('totalDisplay');
-    const resultsBreakdown = document.getElementById('resultsBreakdown');
+    const diceValues = document.getElementById('diceValues');
 
     if (diceDisplay) {
       diceDisplay.innerHTML = generateDiceHTML(dice, false);
     }
 
-    if (resultsPanel && totalDisplay && resultsBreakdown) {
+    if (resultsPanel && totalDisplay && diceValues) {
       resultsPanel.classList.remove('hidden');
       totalDisplay.textContent = `Total: ${total}`;
-      resultsBreakdown.innerHTML = dice.map((val, idx) => 
-        `<div>Die ${idx + 1}: <strong>${val}</strong></div>`
-      ).join('');
+      diceValues.textContent = `[${dice.join(', ')}]`;
     }
 
     // Update history
-    rollHistory.unshift({ dice, total, timestamp: Date.now() });
+    rollHistory.unshift({ dice: [...dice], total });
     if (rollHistory.length > 10) rollHistory.pop();
     updateHistory();
   }
@@ -263,11 +270,11 @@ const description = "Roll casino-quality six-sided dice with true random results
     }
 
     historyEl.innerHTML = rollHistory.map((roll, idx) => {
-      const time = new Date(roll.timestamp).toLocaleTimeString();
-      const diceStr = roll.dice.join(', ');
-      return `<div class="flex justify-between items-center p-2 rounded" style="background: var(--surface-base);">
-        <span><strong>${roll.dice.length}</strong> dice: [${diceStr}]</span>
-        <span><strong>Total: ${roll.total}</strong></span>
+      const bg = idx === 0 ? 'var(--accent-primary)' : 'var(--surface)';
+      const textColor = idx === 0 ? 'var(--text-on-accent)' : 'var(--text-secondary)';
+      return `<div class="flex justify-between items-center px-3 py-1.5 rounded" style="background: ${bg}; color: ${textColor};">
+        <span>${roll.dice.length}d6: [${roll.dice.join(', ')}]</span>
+        <span class="font-bold">= ${roll.total}</span>
       </div>`;
     }).join('');
   }
@@ -282,16 +289,16 @@ const description = "Roll casino-quality six-sided dice with true random results
     if (rollButton && diceCountSelect && diceDisplay) {
       rollButton.addEventListener('click', () => {
         const count = parseInt(diceCountSelect.value, 10);
-        
-        // Show rolling animation
-        const tempDice = Array(count).fill(1);
+
+        // Show rolling animation with random faces
+        const tempDice = Array(count).fill(0).map(() => Math.floor(Math.random() * 6) + 1);
         diceDisplay.innerHTML = generateDiceHTML(tempDice, true);
 
-        // Wait for animation, then show results
+        // Wait for animation, then show actual results
         setTimeout(() => {
           const results = rollDice(count);
           displayResults(results);
-        }, 500);
+        }, 600);
       });
     }
 
@@ -303,137 +310,3 @@ const description = "Roll casino-quality six-sided dice with true random results
     }
   });
 </script>
-
-<style>
-  /* DiceView component styles (inlined for this page) */
-  .dice-view {
-    width: 4rem;
-    height: 4rem;
-    position: relative;
-    border-radius: 12%;
-    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
-    border: 2px solid rgba(0, 0, 0, 0.15);
-    box-shadow: 
-      0 2px 4px rgba(0, 0, 0, 0.1),
-      inset 0 1px 2px rgba(255, 255, 255, 0.8),
-      inset 0 -1px 2px rgba(0, 0, 0, 0.05);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
-  }
-
-  .dice-view:hover {
-    transform: scale(1.05);
-  }
-
-  .dice-face {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-    padding: 12%;
-    gap: 8%;
-  }
-
-  .pip {
-    background: #1a1a1a;
-    border-radius: 50%;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
-    position: absolute;
-    width: 0.5rem;
-    height: 0.5rem;
-  }
-
-  /* Pip positioning */
-  .pip.center {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .pip.top-left {
-    top: 15%;
-    left: 15%;
-  }
-
-  .pip.top-right {
-    top: 15%;
-    right: 15%;
-  }
-
-  .pip.middle-left {
-    top: 50%;
-    left: 15%;
-    transform: translateY(-50%);
-  }
-
-  .pip.middle-right {
-    top: 50%;
-    right: 15%;
-    transform: translateY(-50%);
-  }
-
-  .pip.bottom-left {
-    bottom: 15%;
-    left: 15%;
-  }
-
-  .pip.bottom-right {
-    bottom: 15%;
-    right: 15%;
-  }
-
-  /* Rolling animation */
-  .dice-view.rolling {
-    animation: dice-shake 0.5s ease-in-out;
-  }
-
-  @keyframes dice-shake {
-    0%, 100% {
-      transform: rotate(0deg);
-    }
-    10% {
-      transform: rotate(-10deg) translateX(-2px);
-    }
-    20% {
-      transform: rotate(10deg) translateX(2px);
-    }
-    30% {
-      transform: rotate(-8deg) translateY(-2px);
-    }
-    40% {
-      transform: rotate(8deg) translateY(2px);
-    }
-    50% {
-      transform: rotate(-5deg) translateX(-1px);
-    }
-    60% {
-      transform: rotate(5deg) translateX(1px);
-    }
-    70% {
-      transform: rotate(-3deg) translateY(-1px);
-    }
-    80% {
-      transform: rotate(3deg) translateY(1px);
-    }
-    90% {
-      transform: rotate(-1deg);
-    }
-  }
-
-  .rolling .pip {
-    animation: pip-blink 0.1s infinite;
-  }
-
-  @keyframes pip-blink {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.3;
-    }
-  }
-</style>

@@ -4,7 +4,7 @@
 
 import { safeGetItem, safeSetItem, safeGetJSON, safeSetJSON, safeRemoveItem, isBrowser } from './ssr';
 
-export const CATNIP_INITIAL_BALANCE = 100;
+export const CATNIP_INITIAL_BALANCE = 1000;
 export const CATNIP_STORAGE_KEY = 'catnip-coin-balance';
 
 export interface CatnipTransaction {

@@ -1,72 +1,579 @@
 ---
-// War - Casino-Lite Card Game (Phase 4.6 Stub)
-// Classic card game - battle the dealer, go to war on ties
+// War - Casino-Lite Card Game
+// Phase 4.6 - Classic card battle game
 
-import InfoLayout from "../../components/InfoLayout.astro";
+import CasinoLayout from "../../components/CasinoLayout.astro";
+import DeckSelector from "../../components/casino/DeckSelector.astro";
+import { DECK_THEMES } from "../../config/decks";
 
-const title = "War (Coming Soon)";
-const description = "Play the classic card game War. Battle the dealer, double down on ties, and watch the drama unfold.";
+const title = "War";
+const description = "Play the classic card game War. Battle the dealer - highest card wins! Go to war on ties for double stakes.";
 ---
 
-<InfoLayout title={title} description={description}>
-  <main class="mx-auto max-w-4xl p-6 space-y-8">
-    <header class="text-center space-y-4">
-      <h1 class="text-4xl font-bold" style="color: var(--text-primary);">
-        ⚔️ War
-      </h1>
-      <p class="text-lg" style="color: var(--text-secondary);">
-        Coming in Phase 4.6
-      </p>
-    </header>
+<CasinoLayout title={title} description={description}>
+  <!-- Game Controls Row: Deck Selector + Bet -->
+  <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl" style="background: var(--surface-elevated);">
+    <DeckSelector themes={DECK_THEMES} selectedId="emoji-default" />
+    <div class="flex items-center gap-4">
+      <label for="betSelect" class="text-sm" style="color: var(--text-secondary);">Bet:</label>
+      <select
+        id="betSelect"
+        class="px-3 py-2 rounded-lg font-bold text-sm"
+        style="background: var(--surface); color: var(--accent-primary); border: 1px solid var(--border-primary);"
+      >
+        <option value="5">5 CC</option>
+        <option value="10">10 CC</option>
+        <option value="25">25 CC</option>
+        <option value="50">50 CC</option>
+      </select>
+    </div>
+  </div>
 
-    <div class="p-8 rounded-xl text-center space-y-4" style="background: var(--surface-elevated);">
-      <div class="text-6xl mb-4">🚧</div>
-      <h2 class="text-2xl font-bold" style="color: var(--text-primary);">Under Construction</h2>
-      <p style="color: var(--text-secondary);">
-        War is a classic card game where ties lead to dramatic "war" showdowns with higher stakes!
-      </p>
-      
-      <div class="mt-8 space-y-3 text-left max-w-md mx-auto">
-        <h3 class="font-bold" style="color: var(--text-primary);">Planned Features:</h3>
-        <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
-          <li>• Classic War gameplay: highest card wins</li>
-          <li>• "War" on ties: burn 3 cards, flip 4th to decide</li>
-          <li>• Escalating bets during war (double stakes)</li>
-          <li>• CatnipCoin wagering system</li>
-          <li>• Animated card reveals</li>
-          <li>• Win/loss statistics</li>
-        </ul>
+  <!-- Game Area -->
+  <div class="space-y-4">
+    <!-- Cards Display -->
+    <div class="grid grid-cols-2 gap-4">
+      <!-- Dealer Card -->
+      <div class="p-6 rounded-xl text-center" style="background: var(--surface-elevated);">
+        <h2 class="text-lg font-bold mb-4" style="color: var(--text-primary);">🎩 Dealer</h2>
+        <div id="dealer-card" class="flex justify-center items-center min-h-[140px]">
+          <div id="dealer-placeholder" class="card-back-placeholder"></div>
+        </div>
+        <div id="dealer-value" class="mt-3 text-lg font-bold hidden" style="color: var(--text-primary);">--</div>
       </div>
-      
-      <div class="pt-6">
-        <a
-          href="/casino-lite"
-          class="inline-block px-6 py-3 rounded-lg font-semibold"
-          style="background: var(--accent-primary); color: var(--text-on-accent);"
-        >
-          ← Back to Casino-Lite
-        </a>
+
+      <!-- Player Card -->
+      <div class="p-6 rounded-xl text-center" style="background: var(--surface-elevated); border: 2px solid var(--accent-primary);">
+        <h2 class="text-lg font-bold mb-4" style="color: var(--text-primary);">🎮 You</h2>
+        <div id="player-card" class="flex justify-center items-center min-h-[140px]">
+          <div id="player-placeholder" class="card-back-placeholder"></div>
+        </div>
+        <div id="player-value" class="mt-3 text-lg font-bold hidden" style="color: var(--text-primary);">--</div>
       </div>
     </div>
-  </main>
-</InfoLayout>
+
+    <!-- War Zone (for tie battles) -->
+    <div id="war-zone" class="p-6 rounded-xl hidden" style="background: var(--surface-elevated); border: 2px dashed var(--accent-danger, #ef4444);">
+      <div class="text-center mb-4">
+        <span class="text-2xl">⚔️</span>
+        <span class="text-xl font-bold ml-2" style="color: var(--accent-danger, #ef4444);">WAR!</span>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <div class="text-sm mb-2 text-center" style="color: var(--text-muted);">Dealer's War Card</div>
+          <div id="dealer-war-card" class="flex justify-center items-center min-h-[100px]">
+            <div class="text-3xl opacity-30">🎴</div>
+          </div>
+        </div>
+        <div>
+          <div class="text-sm mb-2 text-center" style="color: var(--text-muted);">Your War Card</div>
+          <div id="player-war-card" class="flex justify-center items-center min-h-[100px]">
+            <div class="text-3xl opacity-30">🎴</div>
+          </div>
+        </div>
+      </div>
+      <div id="burned-cards" class="mt-4 text-center text-xs" style="color: var(--text-muted);">
+        <span id="burn-count">0</span> cards burned
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-center gap-4">
+      <button
+        id="battle-btn"
+        class="px-8 py-3 rounded-lg font-bold text-lg transition-all hover:scale-105"
+        style="background: var(--accent-primary); color: var(--text-on-accent);"
+      >
+        ⚔️ Battle!
+      </button>
+      <button
+        id="play-again-btn"
+        class="px-8 py-3 rounded-lg font-bold text-lg transition-all hover:scale-105 hidden"
+        style="background: var(--accent-primary); color: var(--text-on-accent);"
+      >
+        🔄 Play Again
+      </button>
+    </div>
+
+    <!-- War Choice (shown on tie) -->
+    <div id="war-choice" class="p-4 rounded-xl text-center hidden" style="background: var(--surface-elevated); border: 2px solid var(--accent-warning);">
+      <p class="text-xl font-bold mb-3" style="color: var(--accent-warning);">⚔️ TIE! Go to War?</p>
+      <p class="text-sm mb-4" style="color: var(--text-secondary);">
+        Match your bet to go to War, or surrender and lose half.
+      </p>
+      <div class="flex gap-3 justify-center">
+        <button
+          id="go-to-war-btn"
+          class="px-6 py-2 rounded-lg font-bold text-sm transition-all hover:scale-105"
+          style="background: var(--accent-danger, #ef4444); color: white;"
+        >
+          ⚔️ Go to War (+<span id="war-bet-cost">5</span> CC)
+        </button>
+        <button
+          id="surrender-btn"
+          class="px-6 py-2 rounded-lg font-bold text-sm transition-all hover:scale-105"
+          style="background: var(--surface); color: var(--text-primary); border: 2px solid var(--border-primary);"
+        >
+          🏳️ Surrender (-<span id="surrender-cost">2.5</span> CC)
+        </button>
+      </div>
+    </div>
+
+    <!-- Result Display -->
+    <div id="result-panel" class="p-4 rounded-xl text-center hidden" style="background: var(--surface-elevated);">
+      <p id="result-message" class="text-2xl font-bold mb-2" style="color: var(--text-primary);"></p>
+      <p id="result-detail" class="text-sm" style="color: var(--text-secondary);"></p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="p-4 rounded-xl" style="background: var(--surface-elevated);">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-bold" style="color: var(--text-primary);">Session Stats</h3>
+      <button
+        id="reset-stats"
+        class="px-3 py-1 rounded text-xs font-semibold transition-all"
+        style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border-primary);"
+      >
+        Reset
+      </button>
+    </div>
+    <div class="grid grid-cols-5 gap-2 text-center text-xs">
+      <div class="p-2 rounded-lg" style="background: var(--surface);">
+        <div id="stat-battles" class="text-lg font-bold" style="color: var(--accent-primary);">0</div>
+        <div style="color: var(--text-muted);">Battles</div>
+      </div>
+      <div class="p-2 rounded-lg" style="background: var(--surface);">
+        <div id="stat-wins" class="text-lg font-bold" style="color: var(--accent-success, #22c55e);">0</div>
+        <div style="color: var(--text-muted);">Wins</div>
+      </div>
+      <div class="p-2 rounded-lg" style="background: var(--surface);">
+        <div id="stat-losses" class="text-lg font-bold" style="color: var(--accent-danger, #ef4444);">0</div>
+        <div style="color: var(--text-muted);">Losses</div>
+      </div>
+      <div class="p-2 rounded-lg" style="background: var(--surface);">
+        <div id="stat-wars" class="text-lg font-bold" style="color: var(--accent-warning, #f59e0b);">0</div>
+        <div style="color: var(--text-muted);">Wars</div>
+      </div>
+      <div class="p-2 rounded-lg" style="background: var(--surface);">
+        <div id="stat-surrenders" class="text-lg font-bold" style="color: var(--text-muted);">0</div>
+        <div style="color: var(--text-muted);">Surrenders</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How to Play -->
+  <div class="p-4 rounded-xl" style="background: var(--surface-elevated);">
+    <h3 class="text-sm font-bold mb-3" style="color: var(--text-primary);">🎯 How to Play</h3>
+    <div class="grid sm:grid-cols-2 gap-4 text-xs" style="color: var(--text-secondary);">
+      <div>
+        <strong style="color: var(--text-primary);">Basic Rules</strong>
+        <p class="mt-1">Both you and the dealer draw one card. Highest card wins (Aces high). Winner gets 2x their bet.</p>
+      </div>
+      <div>
+        <strong style="color: var(--text-primary);">War on Ties</strong>
+        <p class="mt-1">When cards tie, you can "Go to War" (match your bet) or "Surrender" (lose half). In war, 3 cards are burned, then another is drawn.</p>
+      </div>
+      <div>
+        <strong style="color: var(--text-primary);">War Payouts</strong>
+        <p class="mt-1">Win a war = 2x your total bet. Surrender = lose half original bet. Ties in war trigger another war.</p>
+      </div>
+      <div>
+        <strong style="color: var(--text-primary);">Probability</strong>
+        <p class="mt-1">Chance of war (tie) ≈ 7.7%. House edge ≈ 2.9% with standard rules.</p>
+      </div>
+    </div>
+  </div>
+</CasinoLayout>
 
 <script>
-  // TODO Phase 4.6: War implementation
-  // 
-  // Game logic:
-  // 1. Player and dealer each flip top card
-  // 2. Higher card wins the round (2x bet)
-  // 3. On tie:
-  //    a. Player chooses: Surrender (lose half bet) or War (double bet)
-  //    b. If War: burn 3 cards, flip 4th card
-  //    c. Higher 4th card wins all stakes (4x original bet)
-  //    d. If tie again: repeat war or allow surrender
-  //
-  // Features to add:
-  // - Deck depletion handling (reshuffle when < 10 cards)
-  // - War animation (card burn sequence)
-  // - Bet amount selector
-  // - Educational: "Probability of war" indicator (~7.7%)
-  // - Sound effects (optional, with mute toggle)
+  import { generateStandardDeck, shuffleDeck, formatCard } from '../../utils/cardDeck';
+  import { getDeckTheme, getSuitSet } from '../../config/decks';
+  import type { Card } from '../../types/cards';
+  import {
+    getCatnipBalance,
+    addCatnip,
+    subtractCatnip,
+  } from '../../utils/catnipCoin';
+
+  // Game state
+  let deck: Card[] = [];
+  let currentThemeId = 'emoji-default';
+  let stats = { battles: 0, wins: 0, losses: 0, wars: 0, surrenders: 0 };
+  let currentBet = 5;
+  let totalStakes = 0; // Total bet including war escalations
+  let isInWar = false;
+  let burnedCardCount = 0;
+
+  // Load saved theme
+  const savedTheme = localStorage.getItem('casino-deck-theme');
+  if (savedTheme) currentThemeId = savedTheme;
+
+  // Listen for theme changes
+  window.addEventListener('deckThemeChange', ((e: CustomEvent) => {
+    currentThemeId = e.detail;
+  }) as EventListener);
+
+  // Card value calculation (A=14 high)
+  function getCardValue(card: Card): number {
+    const values: Record<string, number> = {
+      'A': 14, 'K': 13, 'Q': 12, 'J': 11,
+      '10': 10, '9': 9, '8': 8, '7': 7,
+      '6': 6, '5': 5, '4': 4, '3': 3, '2': 2
+    };
+    return values[card.rank] || 0;
+  }
+
+  // Asset resolver
+  function resolveAsset(src: string | undefined): string | null {
+    if (!src) return null;
+    return src.replace('.webp', '.jpeg').replace('.jpg', '.jpeg').replace('.svg', '.jpeg');
+  }
+
+  // Render a card (supports face-down)
+  function renderCard(card: Card, size: 'normal' | 'small' = 'normal', faceDown = false): string {
+    const theme = getDeckTheme(currentThemeId);
+    const suitSet = getSuitSet(theme.suitSetId);
+    const suitIcon = suitSet.icons[card.suit];
+    const isEmoji = !suitIcon.startsWith('/');
+    const cardColor = (card.suit === 'hearts' || card.suit === 'diamonds') ? 'text-red-600' : 'text-slate-900';
+
+    const frontSrc = resolveAsset((theme as any).frontBySuit?.[card.suit] ?? (theme as any).frontImage);
+    const backSrc = resolveAsset((theme as any).backImage);
+    const cardImageSrc = faceDown ? backSrc : frontSrc;
+
+    const sizeClass = size === 'small' ? 'w-[70px] sm:w-[80px]' : 'w-[90px] sm:w-[100px]';
+
+    let innerContent = '';
+    if (cardImageSrc) {
+      innerContent = `<div class="absolute inset-0 p-[2%]"><div class="w-full h-full bg-cover bg-center" style="background-image: url('${cardImageSrc}')"></div></div>`;
+    } else if (faceDown) {
+      innerContent = `<div class="absolute inset-0 ${theme.backPattern || 'bg-emerald-700'} flex items-center justify-center"><div class="text-white text-2xl opacity-20">🎴</div></div>`;
+    } else {
+      innerContent = `<div class="absolute inset-0 bg-white"></div>`;
+    }
+
+    let overlayContent = '';
+    if (!faceDown) {
+      overlayContent = `
+        <div class="absolute inset-0 pointer-events-none">
+          <div class="absolute top-[6%] left-[7%]">
+            <div class="flex flex-col items-center justify-center leading-none text-[0.8rem] sm:text-[0.9rem] drop-shadow-[0_0_3px_rgba(0,0,0,0.5)] ${cardColor}">
+              <span class="${theme.rankFontClass}">${card.rank}</span>
+              <span>${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-4 h-4"/>`}</span>
+            </div>
+          </div>
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <span class="text-[2rem] sm:text-[2.5rem] opacity-80 drop-shadow-[0_0_4px_rgba(0,0,0,0.6)] ${cardColor}">
+              ${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-12 h-12 opacity-80"/>`}
+            </span>
+          </div>
+          <div class="absolute bottom-[6%] right-[7%] rotate-180">
+            <div class="flex flex-col items-center justify-center leading-none text-[0.8rem] sm:text-[0.9rem] drop-shadow-[0_0_3px_rgba(0,0,0,0.5)] ${cardColor}">
+              <span class="${theme.rankFontClass}">${card.rank}</span>
+              <span>${isEmoji ? suitIcon : `<img src="${suitIcon}" alt="${card.suit}" class="w-4 h-4"/>`}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="relative ${sizeClass} aspect-[3/4] ${theme.cardFrameClass} transition-transform duration-200" role="img" aria-label="${faceDown ? 'Face down card' : formatCard(card)}">
+        <div class="absolute inset-0 rounded-xl overflow-hidden">
+          ${innerContent}
+        </div>
+        ${overlayContent}
+      </div>
+    `;
+  }
+
+  // Render a face-down card placeholder
+  function renderCardBack(size: 'normal' | 'small' = 'normal'): string {
+    const theme = getDeckTheme(currentThemeId);
+    const backSrc = resolveAsset((theme as any).backImage);
+    const sizeClass = size === 'small' ? 'w-[70px] sm:w-[80px]' : 'w-[90px] sm:w-[100px]';
+
+    let innerContent = '';
+    if (backSrc) {
+      innerContent = `<div class="absolute inset-0 p-[2%]"><div class="w-full h-full bg-cover bg-center" style="background-image: url('${backSrc}')"></div></div>`;
+    } else {
+      innerContent = `<div class="absolute inset-0 ${theme.backPattern || 'bg-emerald-700'} flex items-center justify-center"><div class="text-white text-2xl opacity-20">🎴</div></div>`;
+    }
+
+    return `
+      <div class="relative ${sizeClass} aspect-[3/4] ${theme.cardFrameClass} transition-transform duration-200" role="img" aria-label="Face down card">
+        <div class="absolute inset-0 rounded-xl overflow-hidden">
+          ${innerContent}
+        </div>
+      </div>
+    `;
+  }
+
+  // Format card value for display
+  function formatValue(card: Card): string {
+    const val = getCardValue(card);
+    return `${card.rank} (${val})`;
+  }
+
+  // Update stats display
+  function updateStats() {
+    const els = {
+      battles: document.getElementById('stat-battles'),
+      wins: document.getElementById('stat-wins'),
+      losses: document.getElementById('stat-losses'),
+      wars: document.getElementById('stat-wars'),
+      surrenders: document.getElementById('stat-surrenders'),
+    };
+
+    if (els.battles) els.battles.textContent = stats.battles.toString();
+    if (els.wins) els.wins.textContent = stats.wins.toString();
+    if (els.losses) els.losses.textContent = stats.losses.toString();
+    if (els.wars) els.wars.textContent = stats.wars.toString();
+    if (els.surrenders) els.surrenders.textContent = stats.surrenders.toString();
+  }
+
+  // Show result
+  function showResult(message: string, detail: string, isWin: boolean) {
+    const panel = document.getElementById('result-panel');
+    const msgEl = document.getElementById('result-message');
+    const detailEl = document.getElementById('result-detail');
+
+    if (panel && msgEl && detailEl) {
+      panel.classList.remove('hidden');
+      msgEl.textContent = message;
+      msgEl.style.color = isWin ? 'var(--accent-success, #22c55e)' : 'var(--accent-danger, #ef4444)';
+      detailEl.textContent = detail;
+    }
+  }
+
+  // Hide UI elements
+  function hideElements(...ids: string[]) {
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    });
+  }
+
+  // Show UI elements
+  function showElements(...ids: string[]) {
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('hidden');
+    });
+  }
+
+  // Reset for new battle
+  function resetBattle() {
+    hideElements('result-panel', 'war-zone', 'war-choice', 'play-again-btn');
+    showElements('battle-btn');
+
+    const playerCardEl = document.getElementById('player-card');
+    const dealerCardEl = document.getElementById('dealer-card');
+    const playerValueEl = document.getElementById('player-value');
+    const dealerValueEl = document.getElementById('dealer-value');
+
+    // Show card backs instead of emoji placeholder
+    if (playerCardEl) playerCardEl.innerHTML = renderCardBack();
+    if (dealerCardEl) dealerCardEl.innerHTML = renderCardBack();
+    if (playerValueEl) playerValueEl.classList.add('hidden');
+    if (dealerValueEl) dealerValueEl.classList.add('hidden');
+
+    isInWar = false;
+    totalStakes = 0;
+    burnedCardCount = 0;
+  }
+
+  // Main battle function
+  function battle() {
+    const betSelect = document.getElementById('betSelect') as HTMLSelectElement;
+    currentBet = parseInt(betSelect?.value || '5', 10);
+
+    // Check balance
+    if (getCatnipBalance() < currentBet) {
+      showResult('Insufficient Balance! 💸', 'Visit the Casino-Lite hub to reset your balance.', false);
+      return;
+    }
+
+    // Deduct bet
+    subtractCatnip(currentBet, 'War bet');
+    totalStakes = currentBet;
+
+    // Shuffle if deck is low
+    if (deck.length < 10) {
+      deck = shuffleDeck(generateStandardDeck());
+    }
+
+    // Draw cards
+    const playerCard = deck.pop()!;
+    const dealerCard = deck.pop()!;
+
+    // Display cards
+    const playerCardEl = document.getElementById('player-card');
+    const dealerCardEl = document.getElementById('dealer-card');
+    const playerValueEl = document.getElementById('player-value');
+    const dealerValueEl = document.getElementById('dealer-value');
+
+    if (playerCardEl) playerCardEl.innerHTML = renderCard(playerCard);
+    if (dealerCardEl) dealerCardEl.innerHTML = renderCard(dealerCard);
+    if (playerValueEl) {
+      playerValueEl.textContent = formatValue(playerCard);
+      playerValueEl.classList.remove('hidden');
+    }
+    if (dealerValueEl) {
+      dealerValueEl.textContent = formatValue(dealerCard);
+      dealerValueEl.classList.remove('hidden');
+    }
+
+    hideElements('battle-btn');
+
+    // Compare cards
+    const playerVal = getCardValue(playerCard);
+    const dealerVal = getCardValue(dealerCard);
+
+    stats.battles++;
+
+    if (playerVal > dealerVal) {
+      // Player wins
+      const winnings = currentBet * 2;
+      addCatnip(winnings, 'War win');
+      stats.wins++;
+      showResult('You Win! ⚔️', `${formatCard(playerCard)} beats ${formatCard(dealerCard)}. +${winnings} CC`, true);
+      showElements('play-again-btn');
+    } else if (dealerVal > playerVal) {
+      // Dealer wins
+      stats.losses++;
+      showResult('Dealer Wins 🎩', `${formatCard(dealerCard)} beats ${formatCard(playerCard)}. -${currentBet} CC`, false);
+      showElements('play-again-btn');
+    } else {
+      // TIE - offer war choice
+      const warCostEl = document.getElementById('war-bet-cost');
+      const surrenderCostEl = document.getElementById('surrender-cost');
+      if (warCostEl) warCostEl.textContent = currentBet.toString();
+      if (surrenderCostEl) surrenderCostEl.textContent = Math.floor(currentBet / 2).toString();
+      showElements('war-choice');
+    }
+
+    updateStats();
+  }
+
+  // Go to war
+  function goToWar() {
+    // Check if player can afford war bet
+    if (getCatnipBalance() < currentBet) {
+      showResult('Cannot Afford War! 💸', 'Not enough CC to match the war bet. Surrendering...', false);
+      surrender();
+      return;
+    }
+
+    // Deduct war bet (match original)
+    subtractCatnip(currentBet, 'War escalation');
+    totalStakes += currentBet;
+    stats.wars++;
+    isInWar = true;
+
+    hideElements('war-choice');
+    showElements('war-zone');
+
+    // Burn 3 cards
+    burnedCardCount = 0;
+    for (let i = 0; i < 3 && deck.length > 2; i++) {
+      deck.pop();
+      burnedCardCount++;
+    }
+    const burnCountEl = document.getElementById('burn-count');
+    if (burnCountEl) burnCountEl.textContent = burnedCardCount.toString();
+
+    // Draw war cards
+    setTimeout(() => {
+      if (deck.length < 2) {
+        deck = shuffleDeck(generateStandardDeck());
+      }
+
+      const playerWarCard = deck.pop()!;
+      const dealerWarCard = deck.pop()!;
+
+      const playerWarCardEl = document.getElementById('player-war-card');
+      const dealerWarCardEl = document.getElementById('dealer-war-card');
+
+      if (playerWarCardEl) playerWarCardEl.innerHTML = renderCard(playerWarCard, 'small');
+      if (dealerWarCardEl) dealerWarCardEl.innerHTML = renderCard(dealerWarCard, 'small');
+
+      // Compare war cards
+      const playerVal = getCardValue(playerWarCard);
+      const dealerVal = getCardValue(dealerWarCard);
+
+      setTimeout(() => {
+        if (playerVal > dealerVal) {
+          // Player wins war
+          const winnings = totalStakes * 2;
+          addCatnip(winnings, 'War victory');
+          stats.wins++;
+          showResult('War Won! ⚔️🎉', `${formatCard(playerWarCard)} beats ${formatCard(dealerWarCard)}. +${winnings} CC`, true);
+          showElements('play-again-btn');
+        } else if (dealerVal > playerVal) {
+          // Dealer wins war
+          stats.losses++;
+          showResult('War Lost 💀', `${formatCard(dealerWarCard)} beats ${formatCard(playerWarCard)}. -${totalStakes} CC total`, false);
+          showElements('play-again-btn');
+        } else {
+          // Another tie in war - offer another war
+          const warCostEl = document.getElementById('war-bet-cost');
+          const surrenderCostEl = document.getElementById('surrender-cost');
+          if (warCostEl) warCostEl.textContent = currentBet.toString();
+          if (surrenderCostEl) surrenderCostEl.textContent = Math.floor(totalStakes / 2).toString();
+          showElements('war-choice');
+        }
+
+        updateStats();
+      }, 800);
+    }, 600);
+  }
+
+  // Surrender
+  function surrender() {
+    const lostAmount = Math.floor(totalStakes / 2);
+    // Already lost the bet, return half
+    const returned = totalStakes - lostAmount;
+    if (returned > 0) {
+      addCatnip(returned, 'War surrender return');
+    }
+
+    stats.surrenders++;
+    hideElements('war-choice');
+    showResult('Surrendered 🏳️', `Lost ${lostAmount} CC. Returned ${returned} CC.`, false);
+    showElements('play-again-btn');
+    updateStats();
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    deck = shuffleDeck(generateStandardDeck());
+
+    // Render initial card backs
+    const playerCardEl = document.getElementById('player-card');
+    const dealerCardEl = document.getElementById('dealer-card');
+    if (playerCardEl) playerCardEl.innerHTML = renderCardBack();
+    if (dealerCardEl) dealerCardEl.innerHTML = renderCardBack();
+
+    const battleBtn = document.getElementById('battle-btn');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const goToWarBtn = document.getElementById('go-to-war-btn');
+    const surrenderBtn = document.getElementById('surrender-btn');
+    const resetStatsBtn = document.getElementById('reset-stats');
+
+    if (battleBtn) battleBtn.addEventListener('click', battle);
+    if (playAgainBtn) playAgainBtn.addEventListener('click', () => {
+      resetBattle();
+      battle();
+    });
+    if (goToWarBtn) goToWarBtn.addEventListener('click', goToWar);
+    if (surrenderBtn) surrenderBtn.addEventListener('click', surrender);
+    if (resetStatsBtn) resetStatsBtn.addEventListener('click', () => {
+      stats = { battles: 0, wins: 0, losses: 0, wars: 0, surrenders: 0 };
+      updateStats();
+    });
+
+    updateStats();
+  });
 </script>
