@@ -190,7 +190,7 @@
   --surface-page: var(--bg-surface-elevated);
   --text-strong: var(--text-primary);
   --text-body: var(--text-primary);
-  --text-muted: var(--text-muted);
+  /* --text-muted intentionally NOT redefined here to avoid circular reference */
   --text-link: var(--accent-primary);
   --accent-primary-rgb: 16,185,129; /* 16,185,129 => #10b981 - used as optional rgb helper for fallbacks */
    --border-subtle: rgba(0,0,0,0.06);
@@ -293,7 +293,7 @@
   --surface-results: var(--bg-card);
   --text-strong: var(--text-primary);
   --text-body: var(--text-primary);
-  --text-muted: var(--text-muted);
+  /* --text-muted intentionally NOT redefined here to avoid circular reference */
   --text-link: var(--accent-primary);
   --border-subtle: color-mix(in srgb, var(--border-primary) 85%, transparent 15%);
   --border-generator: var(--border-primary);
@@ -353,6 +353,66 @@
   --page-padding-bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom) + var(--space-md));
 }
 
+/* Demo lottery ball styles */
+:root {
+  --ln-ball-bg: color-mix(in srgb, #ffffff 92%, var(--bg-card) 8%);
+  --ln-ball-border: color-mix(in srgb, #0f172a 12%, var(--border-primary, #cbd5e1) 88%);
+  --ln-ball-bonus-bg: linear-gradient(135deg, var(--accent-secondary, #f59e0b) 0%, var(--accent-primary, #10b981) 100%);
+}
+
+.ln-ballRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.38rem, 0.9vw, 0.82rem);
+  flex-wrap: wrap;
+  margin: 0.1rem 0.1rem 0.2rem;
+}
+
+.ln-ball {
+  --ln-ball-size: clamp(36px, 2.2vw + 32px, 58px);
+  width: var(--ln-ball-size);
+  height: var(--ln-ball-size);
+  border-radius: 9999px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: clamp(0.85rem, 0.3vw + 0.8rem, 1.05rem);
+  letter-spacing: 0.01em;
+  color: #0f172a;
+  background: var(--ln-ball-bg);
+  border: 1px solid var(--ln-ball-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    0 6px 12px rgba(15, 23, 42, 0.14);
+}
+
+.ln-ball--bonus {
+  color: #ffffff;
+  background: var(--ln-ball-bonus-bg);
+  border: 1px solid color-mix(in srgb, #ffffff 55%, rgba(239, 68, 68, 0.65) 45%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 10px 20px rgba(239, 68, 68, 0.25),
+    0 6px 10px rgba(16, 24, 40, 0.18);
+}
+
+.ln-ball--empty {
+  color: var(--text-muted);
+  background: color-mix(in srgb, #ffffff 85%, var(--bg-card) 15%);
+  border-style: dashed;
+}
+
+.ln-ballRow--animate .ln-ball {
+  animation: lnBallPop 300ms ease var(--delay, 0ms) both;
+  will-change: transform, opacity;
+}
+
+@keyframes lnBallPop {
+  0% { opacity: 0; transform: translateY(6px) scale(0.94); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* Mobile-first media query tokens */
 @media (max-width: 767px) {
   :root {
@@ -397,5 +457,11 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .ln-ballRow--animate .ln-ball {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
