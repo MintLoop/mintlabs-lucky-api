@@ -1,0 +1,283 @@
+---
+/**
+ * HomeAccordions - Three collapsible sections for homepage
+ * 1. Casino-Lite (games)
+ * 2. Tools (featured tools)
+ * 3. Learn More (education)
+ */
+import { HOME_CASINO_FEATURED, HOME_TOOLS_FEATURED, LEARN_MORE_ITEMS } from '../../data/hubs';
+---
+
+<div class="space-y-3 mt-6">
+  <!-- Casino-Lite Accordion -->
+  <details class="accordion-section">
+    <summary class="accordion-header">
+      <span class="accordion-chevron">&#9654;</span>
+      <span class="accordion-icon">🎰</span>
+      <span class="accordion-title">Casino-Lite</span>
+      <span class="accordion-count">{HOME_CASINO_FEATURED.length} games</span>
+    </summary>
+    <div class="accordion-content">
+      <div class="accordion-grid">
+        {HOME_CASINO_FEATURED.map((item) => (
+          <a href={item.href} class="accordion-item">
+            <span class="accordion-item-icon">{item.icon}</span>
+            <div class="accordion-item-text">
+              <span class="accordion-item-title">{item.title}</span>
+              <span class="accordion-item-desc">{item.description}</span>
+            </div>
+            <span class="accordion-item-arrow">→</span>
+          </a>
+        ))}
+      </div>
+      <a href="/casino-lite" class="accordion-view-all">
+        View all casino games →
+      </a>
+    </div>
+  </details>
+
+  <!-- Tools Accordion -->
+  <details class="accordion-section">
+    <summary class="accordion-header">
+      <span class="accordion-chevron">&#9654;</span>
+      <span class="accordion-icon">🔧</span>
+      <span class="accordion-title">Tools</span>
+      <span class="accordion-count">{HOME_TOOLS_FEATURED.length} featured</span>
+    </summary>
+    <div class="accordion-content">
+      <div class="accordion-grid">
+        {HOME_TOOLS_FEATURED.map((item) => (
+          <a href={item.href} class="accordion-item">
+            <span class="accordion-item-icon">{item.icon}</span>
+            <div class="accordion-item-text">
+              <span class="accordion-item-title">{item.title}</span>
+              <span class="accordion-item-desc">{item.description}</span>
+            </div>
+            <span class="accordion-item-arrow">→</span>
+          </a>
+        ))}
+      </div>
+      <a href="/tools" class="accordion-view-all">
+        Browse all tools →
+      </a>
+    </div>
+  </details>
+
+  <!-- Learn More Accordion -->
+  <details class="accordion-section">
+    <summary class="accordion-header">
+      <span class="accordion-chevron">&#9654;</span>
+      <span class="accordion-icon">📚</span>
+      <span class="accordion-title">Learn More</span>
+      <span class="accordion-count">{LEARN_MORE_ITEMS.length} topics</span>
+    </summary>
+    <div class="accordion-content">
+      <div class="accordion-grid accordion-grid--edu">
+        {LEARN_MORE_ITEMS.map((item) => (
+          <a href={item.href} class="accordion-item accordion-item--edu">
+            <div class="accordion-item-text">
+              <span class="accordion-item-title" style="color: var(--accent-primary)">{item.title}</span>
+              <span class="accordion-item-desc">{item.description}</span>
+            </div>
+            <span class="accordion-item-arrow">→</span>
+          </a>
+        ))}
+      </div>
+      <div class="accordion-edu-links">
+        <a href="/lottery-odds" class="accordion-edu-link">Lottery Odds</a>
+        <a href="/lottery-math" class="accordion-edu-link">The Math</a>
+        <a href="/faq" class="accordion-edu-link">FAQ</a>
+      </div>
+    </div>
+  </details>
+</div>
+
+<style>
+  .accordion-section {
+    border: 1px solid var(--border-primary);
+    border-radius: var(--card-radius, 0.75rem);
+    background: var(--bg-card, rgba(30, 41, 59, 0.6));
+    overflow: hidden;
+  }
+
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color 0.15s ease;
+  }
+
+  .accordion-header:hover {
+    background: var(--surface-hover, rgba(255, 255, 255, 0.05));
+  }
+
+  .accordion-header::-webkit-details-marker {
+    display: none;
+  }
+
+  .accordion-chevron {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+  }
+
+  details[open] .accordion-chevron {
+    transform: rotate(90deg);
+  }
+
+  .accordion-icon {
+    font-size: 1.1rem;
+  }
+
+  .accordion-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+  }
+
+  .accordion-count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding: 0.125rem 0.5rem;
+    background: var(--surface, rgba(255, 255, 255, 0.05));
+    border-radius: 9999px;
+  }
+
+  .accordion-content {
+    padding: 0 1rem 1rem;
+  }
+
+  .accordion-grid {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .accordion-grid--edu {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .accordion-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .accordion-grid--edu {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .accordion-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.5rem;
+    background: var(--surface, rgba(255, 255, 255, 0.02));
+    border: 1px solid transparent;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .accordion-item:hover {
+    background: var(--surface-hover, rgba(255, 255, 255, 0.08));
+    border-color: var(--border-primary);
+  }
+
+  .accordion-item--edu {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .accordion-item-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .accordion-item-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .accordion-item-title {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+  }
+
+  .accordion-item-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .accordion-item-arrow {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .accordion-item:hover .accordion-item-arrow {
+    opacity: 1;
+  }
+
+  .accordion-view-all {
+    display: block;
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    text-align: center;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--accent-primary);
+    border: 1px solid var(--accent-primary);
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .accordion-view-all:hover {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+  }
+
+  .accordion-edu-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-primary);
+  }
+
+  .accordion-edu-link {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    background: var(--surface, rgba(255, 255, 255, 0.02));
+    border: 1px solid var(--border-primary);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .accordion-edu-link:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .accordion-chevron {
+      transition: none;
+    }
+  }
+</style>

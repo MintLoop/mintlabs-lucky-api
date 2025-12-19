@@ -1,0 +1,88 @@
+---
+/**
+ * ThemeSelector - Compact theme dropdown for hub pages
+ */
+interface Props {
+  id?: string;
+  class?: string;
+}
+
+const { id = 'themeSelect', class: className = '' } = Astro.props;
+---
+
+<select
+  id={id}
+  class:list={['theme-selector', className]}
+>
+  <option value="blue-dark">Classic</option>
+  <option value="green-dark">Alpine</option>
+  <option value="purple-dark">Perilla</option>
+  <option value="amber-dark">Eau de Cologne</option>
+  <option value="red-dark">Red</option>
+  <option value="teal-dark">Teal</option>
+  <option value="bw-dark">Monochrome</option>
+  <option value="blue-light">Classic Light</option>
+  <option value="green-light">Alpine Light</option>
+  <option value="purple-light">Perilla Light</option>
+  <option value="amber-light">Eau de Cologne Light</option>
+  <option value="red-light">Red Light</option>
+  <option value="teal-light">Teal Light</option>
+  <option value="bw-light">Monochrome Light</option>
+</select>
+
+<style>
+  .theme-selector {
+    appearance: none;
+    background: var(--bg-card, rgba(30, 41, 59, 0.6));
+    border: 1px solid var(--border-primary);
+    border-radius: 0.5rem;
+    padding: 0.375rem 2rem 0.375rem 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1rem;
+  }
+
+  .theme-selector:hover {
+    border-color: var(--accent-primary);
+  }
+
+  .theme-selector:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb, 16, 185, 129), 0.2);
+  }
+</style>
+
+<script>
+  function initThemeSelector() {
+    const selectors = document.querySelectorAll('.theme-selector') as NodeListOf<HTMLSelectElement>;
+
+    const apply = (theme: string) => {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('selectedTheme', theme);
+      selectors.forEach(sel => sel.value = theme);
+    };
+
+    // Set initial value
+    const saved = document.documentElement.getAttribute('data-theme') ||
+                  localStorage.getItem('selectedTheme') ||
+                  'blue-dark';
+    apply(saved);
+
+    // Listen for changes
+    selectors.forEach(sel => {
+      sel.addEventListener('change', (e) => {
+        apply((e.target as HTMLSelectElement).value);
+      });
+    });
+  }
+
+  // Run on load and on Astro navigation
+  initThemeSelector();
+  document.addEventListener('astro:page-load', initThemeSelector);
+</script>

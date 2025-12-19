@@ -1,16 +1,17 @@
 ---
-import "../styles/global.css"; // bundle Tailwind + your theme tokens
+/**
+ * MintLabs Lucky Numbers - Homepage
+ * Polished ball-based layout with theme switching and 3 accordions
+ */
+import Layout from '../layouts/Layout.astro';
+import GeneratorFormPolished from '../components/demo/GeneratorFormPolished.astro';
+import GameFacts from '../components/GameFacts.astro';
+import HomeAccordions from '../components/home/HomeAccordions.astro';
+import TermsModal from '../components/TermsModal.astro';
+import PrivacyModal from '../components/PrivacyModal.astro';
+import NewsletterModal from '../components/NewsletterModal.astro';
+import demoEntry from '../scripts/entry.demo-balls.js?url';
 
-import SiteHeader from "../components/SiteHeader.astro";
-import TrackLink from "../components/TrackLink.astro";
-import ThemeToolbar from "../components/ThemeToolBar.astro";
-import GeneratorForm from "../components/GeneratorForm.astro";
-import EduGrid from "../components/EduGrid.astro";
-import NewsletterModal from "../components/NewsletterModal.astro";
-import GameFacts from "../components/GameFacts.astro";
-import TermsModal from "../components/TermsModal.astro";
-import PrivacyModal from "../components/PrivacyModal.astro";
-// env + API
 const API = import.meta.env.PUBLIC_API_BASE || 'http://localhost:8000';
 const ADS = import.meta.env.PUBLIC_ADSENSE_CLIENT;
 const IS_PROD = import.meta.env.PROD;
@@ -21,248 +22,294 @@ const jsonGames = Array.isArray(games) ? JSON.stringify(games).replaceAll('`', '
 const current = Array.isArray(games) && games.length > 0 ? games[0] : null;
 const apiBase = API ? String(API).replace(/\/$/, '') : '';
 ---
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/clover.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/clover.png" />
-    <meta name="theme-color" content="#0f766e" />
-    <title>MintLabs Lucky Numbers</title>
 
-    <!-- apply saved theme before paint -->
-    <script is:inline>
-      document.documentElement.setAttribute(
-        'data-theme',
-        localStorage.getItem('selectedTheme') || 'green-dark'
-      );
-    </script>
-  </head>
+<Layout title="MintLabs Lucky Numbers" description="Generate random lottery numbers for education and entertainment. Explore probability tools, casino simulators, and lottery math.">
+  {jsonGames && jsonGames !== '[]' && (
+    <script type="application/json" id="initial-games" set:html={jsonGames} />
+  )}
 
-  <body class="min-h-screen theme-bg-primary theme-text-primary">
-    {jsonGames && jsonGames !== '[]' && (
-      <script type="application/json" id="initial-games">{jsonGames}</script>
+  <main class="mx-auto max-w-[var(--content-max-width)] px-4 sm:px-6 space-y-6">
+    <header class="pt-3">
+      <div class="flex items-center justify-center gap-3 md:gap-4">
+        <a href="/" class="flex items-center gap-3 md:gap-4 hover:opacity-90 transition-opacity">
+          <img src="/clover.png" alt="Lucky Clover" class="w-12 h-12 md:w-14 md:h-14 shrink-0" />
+          <h1 class="text-3xl md:text-4xl font-bold leading-tight whitespace-nowrap">
+            MintLabs Lucky Numbers
+          </h1>
+        </a>
+      </div>
+      <p class="hidden sm:block mt-1 text-center theme-text-secondary text-sm">
+        For education and entertainment only. Play responsibly.
+      </p>
+
+      <nav class="mt-4 flex flex-wrap justify-center gap-2 md:gap-4">
+        <a href="/tools" class="nav-pill">Tools</a>
+        <a href="/casino-lite" class="nav-pill">Casino-Lite</a>
+        <a href="/lottery-odds" class="nav-pill">Odds</a>
+        <a href="/lottery-math" class="nav-pill">Math</a>
+        <a href="/faq" class="nav-pill">FAQ</a>
+      </nav>
+    </header>
+
+    <!-- Theme selector (desktop) -->
+    <div class="hidden sm:flex flex-col sm:flex-row sm:items-center justify-center gap-2 mt-2 mb-2">
+      <label for="themeSelectDesktop" class="sr-only">Theme</label>
+      <select id="themeSelectDesktop"
+        class="w-full sm:w-auto shrink-0 theme-bg-card theme-text-primary theme-border-primary border
+               rounded-lg h-9 px-3 pr-8 bg-clip-padding backdrop-blur-sm text-sm focus:outline-none
+               focus:ring-2 focus:ring-[var(--accent-primary)]">
+        <option value="blue-dark">Classic</option>
+        <option value="green-dark">Alpine</option>
+        <option value="purple-dark">Perilla</option>
+        <option value="amber-dark">Eau de Cologne</option>
+        <option value="red-dark">Red</option>
+        <option value="teal-dark">Teal</option>
+        <option value="bw-dark">Monochrome</option>
+        <option value="blue-light">Classic Light</option>
+        <option value="green-light">Alpine Light</option>
+        <option value="purple-light">Perilla Light</option>
+        <option value="amber-light">Eau de Cologne Light</option>
+        <option value="red-light">Red Light</option>
+        <option value="teal-light">Teal Light</option>
+        <option value="bw-light">Monochrome Light</option>
+      </select>
+    </div>
+
+    <!-- Generator Form -->
+    <div class="my-8">
+      <GeneratorFormPolished games={Array.isArray(games) ? games : []} />
+    </div>
+
+    <!-- Results Section -->
+    <section id="results" class="space-y-3"></section>
+
+    <!-- Contextual discovery link (shown after results) -->
+    <div id="contextual-discovery" class="hidden">
+      <a href="/lottery-odds" class="text-sm underline theme-text-muted hover:theme-text-secondary transition-colors">
+        Why these odds? &rarr;
+      </a>
+    </div>
+
+    <!-- Game Facts -->
+    <div id="facts" class="mt-3">
+      {current && <GameFacts game={current} />}
+    </div>
+
+    {IS_PROD && ADS && (
+      <>
+        <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS}`} crossorigin="anonymous"></script>
+        <ins class="adsbygoogle block h-[90px]" data-ad-client={ADS} data-ad-slot="0000000001" data-full-width-responsive="true"></ins>
+        <script is:inline>try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}</script>
+      </>
     )}
-    <main class="mx-auto max-w-xl sm:max-w-2xl p-6 space-y-6">
-      <SiteHeader />
 
-      <!-- selector lives above the card; transparency preserved -->
-      <ThemeToolbar />
+    <!-- Three Accordions: Casino-Lite, Tools, Learn More -->
+    <HomeAccordions />
 
-      <!-- form component: markup unchanged; gets games from API -->
-      <GeneratorForm games={Array.isArray(games) ? games : []} />
-
-      <!-- Lucky Profile Feature (moved down the page) - kept same id/anchor semantics when needed -->
-
-      <section id="results" class="space-y-3"></section>
-
-      <div id="facts" class="mt-3">
-        {current && <GameFacts game={current} />}
+    <!-- Footer -->
+    <footer class="mt-12 pb-8 border-t border-slate-700/50 pt-8">
+      <div class="grid gap-6 grid-cols-2 md:grid-cols-3 mb-6 text-sm">
+        <div>
+          <h4 class="font-semibold theme-text-secondary mb-2">Education</h4>
+          <ul class="space-y-1.5 theme-text-muted">
+            <li><a href="/lottery-odds" class="hover:text-emerald-400 transition-colors">Lottery Odds</a></li>
+            <li><a href="/lottery-math" class="hover:text-emerald-400 transition-colors">The Math</a></li>
+            <li><a href="/faq" class="hover:text-emerald-400 transition-colors">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold theme-text-secondary mb-2">Tools</h4>
+          <ul class="space-y-1.5 theme-text-muted">
+            <li><a href="/tools" class="hover:text-emerald-400 transition-colors">All Tools</a></li>
+            <li><a href="/tools/payout-calculator" class="hover:text-emerald-400 transition-colors">Payout Calculator</a></li>
+            <li><a href="/tools/lottery-budget" class="hover:text-emerald-400 transition-colors">Budget Planner</a></li>
+          </ul>
+        </div>
+        <div class="col-span-2 md:col-span-1">
+          <h4 class="font-semibold theme-text-secondary mb-2">Legal</h4>
+          <ul class="space-y-1.5 theme-text-muted">
+            <li><a href="/terms" class="hover:text-emerald-400 transition-colors">Terms & Conditions</a></li>
+            <li><a href="/privacy" class="hover:text-emerald-400 transition-colors">Privacy Policy</a></li>
+          </ul>
+        </div>
       </div>
 
-      <!-- quick tools carousel moved below results for better UX flow -->
-      <section id="tools-quick" class="mt-6">
-        <h3 class="text-lg font-semibold mb-2">Explore our tools</h3>
-        <div class="tools-carousel" aria-label="Featured tools carousel">
-          <div class="carousel-track" role="list" id="carousel-track">
-            <!-- Core tools (stable ordering) -->
-            <TrackLink class="tool-card" href="/tools/probability-visualizer" event="carousel_click" props={{ tool: 'probability-visualizer' }}>📉 Probability Visualizer</TrackLink>
-            <TrackLink class="tool-card" href="/tools/ticket-beautifier" event="carousel_click" props={{ tool: 'ticket-beautifier' }}>✨ Ticket Beautifier</TrackLink>
-            <TrackLink class="tool-card" href="/tools/quick-draw-simulator" event="carousel_click" props={{ tool: 'quick-draw-simulator' }}>🎲 Quick Draw Simulator</TrackLink>
-            <TrackLink class="tool-card" href="/tools/combination-calculator" event="carousel_click" props={{ tool: 'combination-calculator' }}>🔢 Combination Calculator</TrackLink>
-            <!-- Placeholder slots that will be filled by session-randomized secondary tools (client-side) -->
-            <div id="random-slot-1" class="tool-card tool-placeholder" role="listitem" aria-hidden="true">🔄 Loading…</div>
-            <div id="random-slot-2" class="tool-card tool-placeholder" role="listitem" aria-hidden="true">🔄 Loading…</div>
-            <!-- duplicate set for smooth looping -->
-            <TrackLink class="tool-card" href="/tools/combination-calculator" event="carousel_click" props={{ tool: 'combination-calculator' }}>🔢 Combination Calculator</TrackLink>
-            <TrackLink class="tool-card" href="/tools/expected-value-calculator" event="carousel_click" props={{ tool: 'expected-value-calculator' }}>🧮 Expected Value Calculator</TrackLink>
-            <TrackLink class="tool-card" href="/tools/most-drawn-numbers" event="carousel_click" props={{ tool: 'most-drawn-numbers' }}>🔥 Top 10 Most Drawn</TrackLink>
-            <TrackLink class="tool-card" href="/tools/least-drawn-numbers" event="carousel_click" props={{ tool: 'least-drawn-numbers' }}>❄️ Top 10 Least Drawn</TrackLink>
-            <TrackLink class="tool-card" href="/tools/why-odds-dont-change" event="carousel_click" props={{ tool: 'why-odds-dont-change' }}>🎲 Why Odds Don't Change</TrackLink>
-            <TrackLink class="tool-card" href="/tools/quick-draw-simulator" event="carousel_click" props={{ tool: 'quick-draw-simulator' }}>🎲 Quick Draw Simulator</TrackLink>
-            <TrackLink class="tool-card" href="/tools/lottery-math-quiz" event="carousel_click" props={{ tool: 'lottery-math-quiz' }}>🧠 Lottery Math Quiz</TrackLink>
-            <TrackLink class="tool-card" href="/tools/ticket-beautifier" event="carousel_click" props={{ tool: 'ticket-beautifier' }}>✨ Ticket Beautifier</TrackLink>
-            <TrackLink class="tool-card" href="/tools/probability-visualizer" event="carousel_click" props={{ tool: 'probability-visualizer' }}>📉 Probability Visualizer</TrackLink>
-            <TrackLink class="tool-card" href="/tools/annuity-breakdown" event="carousel_click" props={{ tool: 'annuity-breakdown' }}>📆 Annuity Visualizer</TrackLink>
-            <TrackLink class="tool-card" href="/tools/number-trend-graph" event="carousel_click" props={{ tool: 'number-trend-graph' }}>📈 Number Trend Graph</TrackLink>
-            <TrackLink class="tool-card" href="/tools/ticket-variance" event="carousel_click" props={{ tool: 'ticket-variance' }}>📈 Ticket Variance</TrackLink>
-          </div>
+      <!-- Mobile theme selector -->
+      <div class="sm:hidden mb-6">
+        <label for="themeSelectMobile" class="text-xs theme-text-muted mb-1 block">Theme</label>
+        <select id="themeSelectMobile"
+          class="w-full theme-bg-card theme-text-primary theme-border-primary border
+                 rounded-lg h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]">
+          <option value="blue-dark">Classic</option>
+          <option value="green-dark">Alpine</option>
+          <option value="purple-dark">Perilla</option>
+          <option value="amber-dark">Eau de Cologne</option>
+          <option value="red-dark">Red</option>
+          <option value="teal-dark">Teal</option>
+          <option value="bw-dark">Monochrome</option>
+          <option value="blue-light">Classic Light</option>
+          <option value="green-light">Alpine Light</option>
+          <option value="purple-light">Perilla Light</option>
+          <option value="amber-light">Eau de Cologne Light</option>
+          <option value="red-light">Red Light</option>
+          <option value="teal-light">Teal Light</option>
+          <option value="bw-light">Monochrome Light</option>
+        </select>
+      </div>
+
+      <div class="text-center text-sm theme-text-muted border-t border-slate-700/50 pt-4">
+        <p>&copy; 2025 MintLabs. All rights reserved.</p>
+        <div class="mt-2 flex items-center justify-center gap-2 text-xs theme-text-muted">
+          <img src="/mintlab.png" alt="MintLabs" class="w-4 h-4 opacity-70" />
+          <span>Powered by MintLabs</span>
         </div>
-      </section>
+        <p class="mt-2 text-xs theme-text-muted max-w-sm mx-auto">
+          For entertainment and education only. We do not predict lottery numbers. Play responsibly.
+        </p>
+      </div>
+    </footer>
 
-      {IS_PROD && ADS && (
-        <>
-          <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS}`} crossorigin="anonymous"></script>
-          <ins class="adsbygoogle block h-[90px]" data-ad-client={ADS} data-ad-slot="0000000001" data-full-width-responsive="true"></ins>
-          <script is:inline>try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){console.warn('AdSense failed:',e);}</script>
-        </>
-      )}
+    {IS_PROD && ADS && (
+      <>
+        <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS}`} crossorigin="anonymous"></script>
+        <ins class="adsbygoogle block h-[90px]" data-ad-client={ADS} data-ad-slot="0000000002" data-full-width-responsive="true"></ins>
+        <script is:inline>try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}</script>
+      </>
+    )}
+  </main>
 
-      <!-- core tools now appear earlier; place Lucky Profile lower in the page as a deeper feature -->
-        <section id="lucky-profile-feature" class="card-elevated mt-8">
-        <div class="flex gap-4 items-start">
-          <div class="text-4xl">✨</div>
-          <div class="flex-1 space-y-3">
-            <h3 class="text-xl font-semibold readable-text">✨ Lucky Profile Generator</h3>
-            <p class="theme-text-secondary">
-              Discover your personalized lucky numbers based on birthstone, Indian zodiac (Rashi), and color psychology.
-            </p>
-            <a href="/lucky-profile" class="inline-block px-6 py-3 theme-accent-primary theme-accent-hover readable-text font-semibold rounded-lg transition-colors mt-2">
-              Create Your Lucky Profile →
-            </a>
-          </div>
-        </div>
-      </section>
+  <TermsModal />
+  <PrivacyModal />
+  <NewsletterModal />
 
-      <!-- Casino-Lite Feature Card -->
-      <section class="card-elevated mt-8">
-        <div class="flex gap-4 items-start">
-          <div class="text-4xl">🎰</div>
-          <div class="flex-1 space-y-3">
-            <h3 class="text-xl font-semibold readable-text">🎰 Casino-Lite Simulators</h3>
-            <p class="theme-text-secondary">
-              Learn probability, card strategy, and expected value through our fictional casino games and RNG tools. Entertainment only—no real money, no predictions, zero risk.
-            </p>
-            <div class="flex flex-wrap gap-2 text-sm theme-text-muted">
-              <span class="px-3 py-1 rounded-full" style="background: var(--surface-elevated); border: 1px solid var(--border-primary);">
-                🃏 Blackjack
-              </span>
-              <span class="px-3 py-1 rounded-full" style="background: var(--surface-elevated); border: 1px solid var(--border-primary);">
-                🎡 Wheel Spinner
-              </span>
-              <span class="px-3 py-1 rounded-full" style="background: var(--surface-elevated); border: 1px solid var(--border-primary);">
-                🎫 Raffle Picker
-              </span>
-              <span class="px-3 py-1 rounded-full" style="background: var(--surface-elevated); border: 1px solid var(--border-primary);">
-                🎲 Dice & More
-              </span>
-            </div>
-            <a href="/casino-lite" class="inline-block px-6 py-3 theme-accent-primary theme-accent-hover readable-text font-semibold rounded-lg transition-colors mt-2">
-              Explore Casino-Lite Hub →
-            </a>
-          </div>
-        </div>
-      </section>
+  <script is:inline define:vars={{ apiBase }}>
+    window.__LUCKY_API_BASE = apiBase;
+  </script>
+  <script type="module" src={demoEntry}></script>
+</Layout>
 
-      <EduGrid />
+<style>
+  :root {
+    --content-max-width: 36rem;
+  }
+  :root {
+    --bg-card-solid: #1e293b;
+  }
+  [data-theme="green-dark"] {
+    --bg-card-solid: #065f46;
+  }
+  [data-theme="blue-dark"] {
+    --bg-card-solid: #1e293b;
+  }
+  [data-theme="purple-dark"] {
+    --bg-card-solid: #3b2d7a;
+  }
+  [data-theme$="-light"] {
+    --bg-card-solid: #f1f5f9;
+  }
 
-      <style is:inline>
-        .tools-carousel { overflow: hidden; border-radius: 12px; border:1px solid rgba(255,255,255,0.04); background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005)); }
-        .carousel-track { display:flex; gap:1rem; padding:0.75rem; align-items:center; animation: scroll-left 20s linear infinite; }
-        .tool-card { display:inline-block; padding:var(--card-padding,0.6rem 1rem); border-radius:var(--card-radius,8px); background:var(--surface-elevated); color:var(--text-primary); text-decoration:none; font-weight:600; border:1px solid var(--border-primary-darker); white-space:nowrap; box-shadow: var(--card-shadow); }
-        .tool-card:hover { background: var(--surface-hover); }
-        .tool-placeholder { opacity: .6; font-weight: 600; }
-        .tools-carousel:hover .carousel-track { animation-play-state: paused; }
-        @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-      </style>
+  .nav-pill {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 9999px;
+    border: 1px solid var(--border-primary);
+    background: var(--surface, rgba(255, 255, 255, 0.02));
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
 
-      <script is:inline>
-        // session-stable random picks for carousel secondary slots
-        (function(){
-          try {
-            const pool = [
-              {href:'/tools/expected-value-calculator', label:'🧮 Expected Value Calculator'},
-              {href:'/tools/most-drawn-numbers', label:'🔥 Most Drawn'},
-              {href:'/tools/least-drawn-numbers', label:'❄️ Least Drawn'},
-              {href:'/tools/number-trend-graph', label:'📈 Number Trend'},
-              {href:'/tools/lottery-math-quiz', label:'🧠 Math Quiz'},
-              {href:'/tools/pattern-analyzer', label:'🔍 Pattern Analyzer'},
-              {href:'/tools/ticket-variance', label:'📊 Ticket Variance'},
-            ];
+  .nav-pill:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+  }
 
-            const getSessionPick = (key, count) => {
-              try {
-                const existing = window.sessionStorage.getItem(key);
-                if (existing) return JSON.parse(existing);
-                const picks = [];
-                const copy = [...pool];
-                for (let i=0;i<count;i++){
-                  if (!copy.length) break;
-                  const idx = Math.floor(Math.random()*copy.length);
-                  picks.push(copy.splice(idx,1)[0]);
-                }
-                window.sessionStorage.setItem(key, JSON.stringify(picks));
-                return picks;
-              } catch(e) { return []; }
-            };
+  #contextual-discovery { text-align: center; padding: 0.5rem 0; }
 
-            const picks = getSessionPick('carousel_secondary', 2);
-            const slot1 = document.getElementById('random-slot-1');
-            const slot2 = document.getElementById('random-slot-2');
-            const makeNode = (o) => {
-              const a = document.createElement('a');
-              a.className = 'tool-card';
-              a.href = o.href;
-              a.textContent = o.label;
-              a.setAttribute('role','listitem');
-              return a;
-            };
-            if (slot1 && picks[0]) slot1.replaceWith(makeNode(picks[0]));
-            if (slot2 && picks[1]) slot2.replaceWith(makeNode(picks[1]));
-          } catch(e){console.warn('carousel session picks failed', e)}
-        })();
-      </script>
+  /* Four-corner layout + ball row styling */
+  .ln-resultCard { position: relative; overflow: hidden; padding: clamp(0.85rem, 1vw + 0.5rem, 1.15rem); width: 100%; }
+  .ln-cardInner { width: 100%; display: grid; grid-template-rows: auto 1fr auto; gap: 0.35rem; align-self: stretch; align-items: stretch; }
+  .ln-cardHeader,
+  .ln-cardFooter {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .ln-cardFooter { align-items: end; }
+  .ln-hLeft,
+  .ln-fLeft { min-width: 0; }
+  .ln-hRight,
+  .ln-fRight { justify-self: end; text-align: right; white-space: nowrap; }
+  .ln-cardCenter { display: flex; align-items: center; justify-content: center; padding: 0.15rem 0.25rem; width: 100%; }
 
-      <footer class="mt-12 pb-8 border-t border-slate-700/50 pt-8">
-        {/* Footer Navigation */}
-        <div class="grid gap-6 grid-cols-2 md:grid-cols-3 mb-6 text-sm">
-          <div>
-            <h4 class="font-semibold theme-text-secondary mb-2">Education</h4>
-            <ul class="space-y-1.5 theme-text-muted">
-              <li><a href="/lottery-odds" class="hover:text-emerald-400 transition-colors">Lottery Odds</a></li>
-              <li><a href="/lottery-math" class="hover:text-emerald-400 transition-colors">The Math</a></li>
-              <li><a href="/faq" class="hover:text-emerald-400 transition-colors">FAQ</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-semibold theme-text-secondary mb-2">Tools</h4>
-            <ul class="space-y-1.5 theme-text-muted">
-              <li><a href="/tools/payout-calculator" class="hover:text-emerald-400 transition-colors">Payout Calculator</a></li>
-              <li><a href="/tools/lottery-budget" class="hover:text-emerald-400 transition-colors">Budget Planner</a></li>
-              <li><a href="/archive" class="hover:text-emerald-400 transition-colors">Past Results</a></li>
-            </ul>
-          </div>
-          <div class="col-span-2 md:col-span-1">
-            <h4 class="font-semibold theme-text-secondary mb-2">Legal</h4>
-            <ul class="space-y-1.5 theme-text-muted">
-              <li><a href="/terms" class="hover:text-emerald-400 transition-colors">Terms & Conditions</a></li>
-              <li><a href="/privacy" class="hover:text-emerald-400 transition-colors">Privacy Policy</a></li>
-            </ul>
-          </div>
-        </div>
-        
-        {/* Copyright */}
-        <div class="text-center text-sm theme-text-muted border-t border-slate-700/50 pt-4">
-          <p>© 2025 MintLabs. All rights reserved.</p>
-          <div class="mt-2 flex items-center justify-center gap-2 text-xs theme-text-muted">
-            <img src="/mintlab.png" alt="MintLabs" class="w-4 h-4 opacity-70" />
-            <span>Powered by MintLabs</span>
-          </div>
-          <p class="mt-2 text-xs theme-text-muted max-w-sm mx-auto">
-            For entertainment and education only. We do not predict lottery numbers. Play responsibly.
-          </p>
-        </div>
-      </footer>
+  @media (max-width: 640px) {
+    .ln-cardGrid { gap: 0.3rem 0.5rem; }
+    .ln-cardCorner { font-size: 0.88rem; }
+  }
+</style>
 
-      {IS_PROD && ADS && (
-        <>
-          <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS}`} crossorigin="anonymous"></script>
-          <ins class="adsbygoogle block h-[90px]" data-ad-client={ADS} data-ad-slot="0000000002" data-full-width-responsive="true"></ins>
-          <script is:inline>try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){console.warn('AdSense failed:',e);}</script>
-        </>
-      )}
-    </main>
+<style is:global>
+  /* Enforce 4-corner grid for result cards */
+  .result-card.ln-resultCard .ln-cardInner {
+    display: grid !important;
+    grid-template-rows: auto 1fr auto !important;
+    width: 100% !important;
+  }
+  .result-card.ln-resultCard .ln-cardHeader,
+  .result-card.ln-resultCard .ln-cardFooter {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    width: 100% !important;
+    align-items: end !important;
+  }
+  .result-card.ln-resultCard .ln-hLeft,
+  .result-card.ln-resultCard .ln-fLeft {
+    min-width: 0 !important;
+  }
+  .result-card.ln-resultCard .ln-hRight,
+  .result-card.ln-resultCard .ln-fRight {
+    justify-self: end !important;
+    text-align: right !important;
+    white-space: nowrap;
+    align-self: end !important;
+  }
+</style>
 
-    <TermsModal />
-    <PrivacyModal />
-    <NewsletterModal />
-    
+<script is:inline>
+  (function() {
+    const selDesktop = document.getElementById('themeSelectDesktop');
+    const selMobile = document.getElementById('themeSelectMobile');
+    const apply = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('selectedTheme', t);
+      if (selDesktop) selDesktop.value = t;
+      if (selMobile) selMobile.value = t;
+    };
 
-    <!-- your generator logic -->
-    <script is:inline>
-      window.__LUCKY_API_BASE = "http://localhost:8000";
-    </script>
-    <script type="module" src="/scripts/entry.js"></script>
+    const saved = document.documentElement.getAttribute('data-theme') || localStorage.getItem('selectedTheme') || 'blue-dark';
+    apply(saved);
 
-  </body>
-</html>
+    if (selDesktop) selDesktop.addEventListener('change', (e) => apply(e.target.value));
+    if (selMobile) selMobile.addEventListener('change', (e) => apply(e.target.value));
+  })();
+
+  (function() {
+    const resultsEl = document.getElementById('results');
+    const discoveryEl = document.getElementById('contextual-discovery');
+
+    if (!resultsEl || !discoveryEl) return;
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.addedNodes.length > 0) {
+          discoveryEl.classList.remove('hidden');
+          break;
+        }
+      }
+    });
+
+    observer.observe(resultsEl, { childList: true });
+  })();
+</script>
