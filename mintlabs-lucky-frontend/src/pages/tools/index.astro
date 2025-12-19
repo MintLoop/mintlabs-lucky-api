@@ -1,0 +1,151 @@
+---
+/**
+ * Tools Hub - Central index for all lottery tools
+ * SEO-optimized landing page with grouped tool categories
+ */
+import Layout from '../../layouts/Layout.astro';
+import HubSearch from '../../components/HubSearch.astro';
+import ThemeSelector from '../../components/ThemeSelector.astro';
+import { HOME_TOOLS_FEATURED, TOOLS_GROUPS } from '../../data/hubs';
+import '../../styles/hub.css';
+---
+
+<Layout
+  title="Lottery Tools | MintLabs Lucky Numbers"
+  description="Explore our collection of free lottery tools: probability calculators, budget planners, simulators, visualizers, and more. All tools are for education and entertainment."
+>
+  <main class="mx-auto max-w-3xl px-4 sm:px-6 py-8">
+    <!-- Top bar: Breadcrumb + Theme -->
+    <div class="flex items-center justify-between mb-6">
+      <nav class="text-sm" aria-label="Breadcrumb">
+        <ol class="flex items-center gap-2 theme-text-muted">
+          <li><a href="/" class="hover:text-[var(--accent-primary)] transition-colors">Home</a></li>
+          <li><span class="opacity-50">/</span></li>
+          <li class="theme-text-primary font-medium">Tools</li>
+        </ol>
+      </nav>
+      <ThemeSelector id="toolsThemeSelect" />
+    </div>
+
+    <!-- Hero -->
+    <header class="mb-6">
+      <h1 class="text-3xl md:text-4xl font-bold theme-text-primary mb-3">
+        🔧 Lottery Tools
+      </h1>
+      <p class="theme-text-secondary text-base leading-relaxed">
+        Free calculators, simulators, and visualizers to help you understand lottery odds and probability.
+      </p>
+    </header>
+
+    <!-- Search -->
+    <div class="mb-8">
+      <HubSearch placeholder="Search tools..." hubType="tools" />
+    </div>
+
+    <!-- Featured Tools -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold theme-text-primary mb-4 flex items-center gap-2">
+        <span>⭐</span> Featured Tools
+      </h2>
+      <div class="grid gap-3 sm:grid-cols-2">
+        {HOME_TOOLS_FEATURED.map((tool) => (
+          <a href={tool.href} class="hub-card hub-card--featured">
+            <span class="hub-card-icon">{tool.icon}</span>
+            <div class="hub-card-content">
+              <span class="hub-card-title">{tool.title}</span>
+              <span class="hub-card-desc">{tool.description}</span>
+            </div>
+            <span class="hub-card-arrow">→</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Tool Groups -->
+    {TOOLS_GROUPS.map((group) => (
+      <section class="mb-8">
+        <h2 class="text-lg font-semibold theme-text-primary mb-3">{group.name}</h2>
+        <div class="grid gap-2 sm:grid-cols-2">
+          {group.items.map((tool) => (
+            <a href={tool.href} class="hub-card">
+              <span class="hub-card-icon">{tool.icon}</span>
+              <div class="hub-card-content">
+                <span class="hub-card-title">{tool.title}</span>
+                <span class="hub-card-desc">{tool.description}</span>
+              </div>
+              <span class="hub-card-arrow">→</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <!-- Cross-links -->
+    <section class="mt-12 pt-8 border-t border-[var(--border-primary)]">
+      <h2 class="text-lg font-semibold theme-text-primary mb-4">Explore More</h2>
+      <div class="flex flex-wrap gap-3">
+        <a href="/" class="hub-link">
+          <span>🍀</span> Generate Numbers
+        </a>
+        <a href="/casino-lite" class="hub-link">
+          <span>🎰</span> Casino-Lite Games
+        </a>
+        <a href="/lottery-odds" class="hub-link">
+          <span>📊</span> Lottery Odds
+        </a>
+        <a href="/lottery-math" class="hub-link">
+          <span>🧮</span> The Math
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-8 pt-8 border-t border-[var(--border-primary)]">
+      <!-- Footer Navigation -->
+      <div class="grid gap-8 md:grid-cols-3 mb-8 text-sm">
+        <div>
+          <h4 class="font-semibold mb-3" style="color: var(--text-secondary);">Education</h4>
+          <ul class="space-y-2" style="color: var(--text-muted);">
+            <li><a href="/lottery-odds" class="hover:text-[var(--accent-primary)] transition-colors">Lottery Odds</a></li>
+            <li><a href="/lottery-math" class="hover:text-[var(--accent-primary)] transition-colors">The Math</a></li>
+            <li><a href="/faq" class="hover:text-[var(--accent-primary)] transition-colors">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3" style="color: var(--text-secondary);">Tools</h4>
+          <ul class="space-y-2" style="color: var(--text-muted);">
+            <li><a href="/tools" class="hover:text-[var(--accent-primary)] transition-colors">All Tools</a></li>
+            <li><a href="/casino-lite" class="hover:text-[var(--accent-primary)] transition-colors">Casino-Lite</a></li>
+            <li><a href="/tools/payout-calculator" class="hover:text-[var(--accent-primary)] transition-colors">Payout Calculator</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3" style="color: var(--text-secondary);">Legal</h4>
+          <ul class="space-y-2" style="color: var(--text-muted);">
+            <li><a href="/terms" class="hover:text-[var(--accent-primary)] transition-colors">Terms & Conditions</a></li>
+            <li><a href="/privacy" class="hover:text-[var(--accent-primary)] transition-colors">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Copyright and branding -->
+      <div class="text-center text-sm border-t border-[var(--border-primary)] pt-6" style="color: var(--text-muted);">
+        <p>© 2025 MintLabs. All rights reserved.</p>
+        <div class="mt-3 flex items-center justify-center gap-2 text-xs">
+          <img src="/mintlab.png" alt="MintLabs" class="h-4 w-4 opacity-70" />
+          <span>Powered by MintLabs</span>
+        </div>
+        <p class="mt-4 text-xs max-w-lg mx-auto" style="color: var(--text-muted);">
+          All tools are for entertainment and educational purposes only. We do not guarantee accuracy or predict lottery outcomes. No real money is won or lost. Please gamble responsibly.
+        </p>
+        <p class="mt-3 text-xs">
+          If you or someone you know has a gambling problem, visit
+          <a href="https://www.ncpgambling.org" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--accent-primary)]">ncpgambling.org</a>
+          or call <strong>1-800-522-4700</strong>.
+        </p>
+      </div>
+    </footer>
+  </main>
+</Layout>
+
+<!-- Styles imported from hub.css -->

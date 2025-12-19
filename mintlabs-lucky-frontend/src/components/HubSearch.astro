@@ -1,0 +1,314 @@
+---
+/**
+ * HubSearch - Search bar for hub pages
+ * Filters items on current page + shows site-wide results
+ */
+interface Props {
+  placeholder?: string;
+  hubType: 'tools' | 'casino';
+}
+
+const { placeholder = 'Search...', hubType } = Astro.props;
+---
+
+<div class="hub-search-wrapper">
+  <div class="hub-search">
+    <svg class="hub-search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+    </svg>
+    <input
+      type="search"
+      id="hubSearchInput"
+      class="hub-search-input"
+      placeholder={placeholder}
+      autocomplete="off"
+      data-hub-type={hubType}
+    />
+    <kbd class="hub-search-kbd">⌘K</kbd>
+  </div>
+
+  <!-- Site-wide results dropdown -->
+  <div id="hubSearchResults" class="hub-search-results hidden">
+    <div class="hub-search-results-inner"></div>
+  </div>
+</div>
+
+<style>
+  .hub-search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 24rem;
+  }
+
+  .hub-search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.75rem;
+    background: var(--bg-card, rgba(30, 41, 59, 0.6));
+    border: 1px solid var(--border-primary);
+    transition: all 0.15s ease;
+  }
+
+  .hub-search:focus-within {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb, 16, 185, 129), 0.2);
+  }
+
+  .hub-search-icon {
+    width: 1rem;
+    height: 1rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .hub-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+  }
+
+  .hub-search-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .hub-search-kbd {
+    display: none;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    background: var(--surface, rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--border-primary);
+    font-size: 0.625rem;
+    color: var(--text-muted);
+    font-family: inherit;
+  }
+
+  @media (min-width: 640px) {
+    .hub-search-kbd {
+      display: block;
+    }
+  }
+
+  .hub-search-results {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--bg-card, rgba(30, 41, 59, 0.98));
+    border: 1px solid var(--border-primary);
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-height: 20rem;
+    overflow-y: auto;
+  }
+
+  .hub-search-results.hidden {
+    display: none;
+  }
+
+  .hub-search-results-inner {
+    padding: 0.5rem;
+  }
+
+  :global(.hub-result-item) {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background 0.1s ease;
+  }
+
+  :global(.hub-result-item:hover) {
+    background: var(--surface-hover, rgba(255, 255, 255, 0.08));
+  }
+
+  :global(.hub-result-icon) {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  :global(.hub-result-text) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  :global(.hub-result-title) {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    display: block;
+  }
+
+  :global(.hub-result-desc) {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :global(.hub-result-badge) {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: 9999px;
+    background: var(--surface, rgba(255, 255, 255, 0.05));
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  :global(.hub-no-results) {
+    padding: 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  :global(.hub-result-section) {
+    padding: 0.375rem 0.75rem 0.25rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+</style>
+
+<script>
+  import { HOME_TOOLS_FEATURED, TOOLS_GROUPS, HOME_CASINO_FEATURED, CASINO_GROUPS } from '../data/hubs';
+
+  // Build search index
+  const allItems = [
+    ...HOME_TOOLS_FEATURED.map(t => ({ ...t, section: 'Tools' })),
+    ...TOOLS_GROUPS.flatMap(g => g.items.map(t => ({ ...t, section: g.name }))),
+    ...HOME_CASINO_FEATURED.map(g => ({ ...g, section: 'Casino Games' })),
+    ...CASINO_GROUPS.flatMap(g => g.items.map(t => ({ ...t, section: g.name }))),
+  ];
+
+  // Deduplicate by key
+  const searchIndex = Array.from(new Map(allItems.map(item => [item.key, item])).values());
+
+  const input = document.getElementById('hubSearchInput') as HTMLInputElement;
+  const resultsContainer = document.getElementById('hubSearchResults');
+  const resultsInner = resultsContainer?.querySelector('.hub-search-results-inner');
+  const hubType = input?.dataset.hubType;
+
+  function search(query: string) {
+    if (!query.trim()) {
+      resultsContainer?.classList.add('hidden');
+      showAllCards();
+      return;
+    }
+
+    const q = query.toLowerCase();
+    const matches = searchIndex.filter(item =>
+      item.title.toLowerCase().includes(q) ||
+      item.description.toLowerCase().includes(q) ||
+      item.section.toLowerCase().includes(q)
+    );
+
+    // Filter page cards
+    filterPageCards(q);
+
+    // Show dropdown with site-wide results
+    if (resultsInner) {
+      if (matches.length === 0) {
+        resultsInner.innerHTML = '<div class="hub-no-results">No results found</div>';
+      } else {
+        // Group by section
+        const grouped = matches.reduce((acc, item) => {
+          if (!acc[item.section]) acc[item.section] = [];
+          acc[item.section].push(item);
+          return acc;
+        }, {} as Record<string, typeof matches>);
+
+        resultsInner.innerHTML = Object.entries(grouped).map(([section, items]) => `
+          <div class="hub-result-section">${section}</div>
+          ${items.map(item => `
+            <a href="${item.href}" class="hub-result-item">
+              <span class="hub-result-icon">${item.icon || ''}</span>
+              <span class="hub-result-text">
+                <span class="hub-result-title">${highlightMatch(item.title, q)}</span>
+                <span class="hub-result-desc">${item.description}</span>
+              </span>
+              <span class="hub-result-badge">${item.kind}</span>
+            </a>
+          `).join('')}
+        `).join('');
+      }
+      resultsContainer?.classList.remove('hidden');
+    }
+  }
+
+  function highlightMatch(text: string, query: string): string {
+    const idx = text.toLowerCase().indexOf(query);
+    if (idx === -1) return text;
+    return text.slice(0, idx) + '<mark style="background: var(--accent-primary); color: var(--bg-primary); padding: 0 2px; border-radius: 2px;">' + text.slice(idx, idx + query.length) + '</mark>' + text.slice(idx + query.length);
+  }
+
+  function filterPageCards(query: string) {
+    const cards = document.querySelectorAll('.hub-card');
+    cards.forEach(card => {
+      const title = card.querySelector('.hub-card-title')?.textContent || '';
+      const desc = card.querySelector('.hub-card-desc')?.textContent || '';
+      const match = title.toLowerCase().includes(query) || desc.toLowerCase().includes(query);
+      (card as HTMLElement).style.display = match ? '' : 'none';
+    });
+
+    // Hide empty sections
+    const sections = document.querySelectorAll('main > section');
+    sections.forEach(section => {
+      const visibleCards = section.querySelectorAll('.hub-card:not([style*="display: none"])');
+      (section as HTMLElement).style.display = visibleCards.length > 0 ? '' : 'none';
+    });
+  }
+
+  function showAllCards() {
+    const cards = document.querySelectorAll('.hub-card');
+    cards.forEach(card => {
+      (card as HTMLElement).style.display = '';
+    });
+    const sections = document.querySelectorAll('main > section');
+    sections.forEach(section => {
+      (section as HTMLElement).style.display = '';
+    });
+  }
+
+  // Event listeners
+  input?.addEventListener('input', (e) => {
+    search((e.target as HTMLInputElement).value);
+  });
+
+  // Close on click outside
+  document.addEventListener('click', (e) => {
+    if (!resultsContainer?.contains(e.target as Node) && e.target !== input) {
+      resultsContainer?.classList.add('hidden');
+    }
+  });
+
+  // Keyboard shortcut
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      input?.focus();
+    }
+    if (e.key === 'Escape') {
+      resultsContainer?.classList.add('hidden');
+      input?.blur();
+    }
+  });
+
+  // Re-show results on focus if there's a query
+  input?.addEventListener('focus', () => {
+    if (input.value.trim()) {
+      search(input.value);
+    }
+  });
+</script>
