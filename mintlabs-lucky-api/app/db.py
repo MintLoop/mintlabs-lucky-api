@@ -5,10 +5,8 @@ from contextlib import contextmanager
 from typing import Any, Optional
 
 try:
-    import psycopg
     from psycopg_pool import ConnectionPool
 except Exception:  # pragma: no cover - optional dependency for tests/local dev
-    psycopg = None
     ConnectionPool = None
 
 from .config import settings
