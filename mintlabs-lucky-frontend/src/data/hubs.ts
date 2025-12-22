@@ -170,7 +170,8 @@ export const CASINO_GROUPS: HubGroup[] = [
     name: 'Chance & RNG',
     items: [
       { key: 'coin-flip', title: 'Coin Flip', href: '/tools/coin-flip', description: 'Fair 50/50 flip with streak tracking.', kind: 'game', icon: '🪙' },
-      { key: 'dice-roller', title: 'Dice Roller', href: '/casino-lite/dice-roller', description: 'Roll d4, d6, d8, d10, d12, d20 dice.', kind: 'game', icon: '🎲' },
+      { key: 'keno', title: 'Keno', href: '/casino-lite/keno', description: 'Pick numbers on an 80-ball keno board and watch draws.', kind: 'game', icon: '🎯' },
+      { key: 'dice-roller', title: 'Dice Roller', href: '/casino-lite/dice-roller', description: 'Simulate rolls of up to six standard 6-sided dice (d6) and analyze totals.', kind: 'game', icon: '🎲' },
     ],
   },
 ];
