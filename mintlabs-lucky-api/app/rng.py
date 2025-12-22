@@ -252,7 +252,7 @@ def draw_personalized(
     import hashlib
 
     # Hash the seed_value to obtain a predictable integer
-    seed_hash = hashlib.sha256(seed_value.encode('utf-8')).hexdigest()
+    seed_hash = hashlib.sha256(seed_value.encode("utf-8")).hexdigest()
     seed_int = int(seed_hash[:16], 16)
 
     # Use a local deterministic RNG so we don't interfere with SecureRng state

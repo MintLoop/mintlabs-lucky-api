@@ -50,21 +50,15 @@ async def security_headers(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    response.headers["Permissions-Policy"] = (
-        "camera=(), microphone=(), geolocation=(), payment=()"
-    )
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()"
 
     # HSTS only in production with HTTPS
     if settings.ENFORCE_HTTPS:
         proto = (
-            request.headers.get("x-forwarded-proto")
-            if settings.TRUST_PROXY
-            else request.url.scheme
+            request.headers.get("x-forwarded-proto") if settings.TRUST_PROXY else request.url.scheme
         )
         if proto == "https":
-            response.headers["Strict-Transport-Security"] = (
-                "max-age=31536000; includeSubDomains"
-            )
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 
     # Basic CSP - restrictive default, allow API connections
     # Note: This is an API, not serving HTML, so CSP is mostly for defense-in-depth
@@ -105,7 +99,6 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
 )
-
 
 
 # ---------------------------------------------------------------------------
@@ -233,14 +226,14 @@ def _validate_game_config(
     # Basic range validation
     if wmin >= wmax:
         raise HTTPException(400, detail="invalid_config: white_min must be less than white_max")
-    
+
     pool_size = wmax - wmin + 1
     if wcount > pool_size:
         raise HTTPException(
             400,
             detail=f"invalid_config: cannot pick {wcount} unique from pool of {pool_size}",
         )
-    
+
     if wcount <= 0:
         raise HTTPException(400, detail="invalid_config: white_count must be positive")
 
@@ -269,7 +262,7 @@ def _validate_game_config(
             if n < wmin or n > wmax:
                 raise HTTPException(
                     400,
-                    detail=f"invalid_config: lucky number {n} outside valid range ({wmin}-{wmax})"
+                    detail=f"invalid_config: lucky number {n} outside valid range ({wmin}-{wmax})",
                 )
 
 
@@ -279,8 +272,8 @@ def _validate_game_config(
 # ---------------------------------------------------------------------------
 _analytics_lock = Lock()
 _analytics: dict[str, dict[str, int]] = {
-    "by_game": {},   # game_code -> count
-    "by_mode": {},   # mode -> count
+    "by_game": {},  # game_code -> count
+    "by_mode": {},  # mode -> count
     "total": 0,
 }
 
@@ -415,7 +408,7 @@ def readyz():
 @app.get("/stats")
 def stats(request: Request):
     """Return generation analytics (in-memory, resets on restart).
-    
+
     In production, gate with ADMIN_TOKEN via Authorization header.
     Returns 404 on auth failure to avoid revealing admin endpoints exist.
     """
@@ -488,18 +481,19 @@ def generate(req: GenerateReq, request: Request):
             # statistics uniform.
             try:
                 from .mode_config import MODE_CONFIG
+
                 mode_map = MODE_CONFIG.get(req.mode, {})
-                items = mode_map.get('items', [])
+                items = mode_map.get("items", [])
                 # find the configured seed for the provided mode_key
-                seed = ''
+                seed = ""
                 if req.mode_key:
                     for it in items:
-                        if it.get('key') == req.mode_key:
-                            seed = it.get('seed', '')
+                        if it.get("key") == req.mode_key:
+                            seed = it.get("seed", "")
                             break
                 # fallback empty seed -> behave like random
             except Exception:
-                seed = ''
+                seed = ""
             whites = draw_personalized(wmin, wmax, wcount, rng, seed)
         elif req.mode == "hot":
             whites = draw_hot_cold(wmin, wmax, wcount, rng, "hot")
