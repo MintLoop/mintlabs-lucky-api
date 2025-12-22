@@ -28,10 +28,14 @@ from .rng import (
     get_last_number_probability,
     spaced_draw,
 )
+from .routes import lucky_profiles
 from .security import SimpleRateLimitMiddleware
 from .utils import hmac_commitment, new_request_id, sha256_hex
 
 app = FastAPI(title="MintLabs Lucky API")
+
+# Register API routers
+app.include_router(lucky_profiles.router)
 
 
 # ---------------------------------------------------------------------------
@@ -102,9 +106,6 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
-# Register API routers
-from .routes import lucky_profiles
-app.include_router(lucky_profiles.router)
 
 
 # ---------------------------------------------------------------------------

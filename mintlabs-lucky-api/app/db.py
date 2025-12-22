@@ -2,7 +2,7 @@
 
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Optional, Any
+from typing import Any, Optional
 
 try:
     import psycopg
