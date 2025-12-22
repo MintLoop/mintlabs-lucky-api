@@ -3,19 +3,18 @@ Lucky Profile Generator Route
 Birthstone × Rashi × Color Wheel synthesis API
 """
 import json
-import os
 from pathlib import Path
 from typing import Any, Optional
 
 from fastapi import APIRouter, HTTPException
 
 from app.lucky_profile_models import (
-    LuckyProfileRequest,
-    LuckyProfileResponse,
     BirthstoneProfile,
-    RashiProfile,
     ColorProfile,
     LuckyFocus,
+    LuckyProfileRequest,
+    LuckyProfileResponse,
+    RashiProfile,
 )
 
 router = APIRouter(prefix="/v1/lucky", tags=["lucky-profiles"])
@@ -37,7 +36,7 @@ def load_json_data(filename: str) -> dict[str, Any]:
             f"DATA_DIR: {DATA_DIR}\n"
             f"DATA_DIR exists: {DATA_DIR.exists()}"
         )
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -171,26 +170,29 @@ async def generate_lucky_profile(req: LuckyProfileRequest) -> LuckyProfileRespon
     # Find birthstone
     birthstone_data = find_birthstone(req.birth_month)
     if not birthstone_data:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid birth month: {req.birth_month}. Must be full month name (e.g., 'January')",
+        detail = (
+            f"Invalid birth month: {req.birth_month}. Must be full month name "
+            "(e.g., 'January')"
         )
+        raise HTTPException(status_code=400, detail=detail)
     
     # Find rashi
     rashi_data = find_rashi(req.rashi)
     if not rashi_data:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid rashi: {req.rashi}. Must be rashi name (e.g., 'Mesha') or English name (e.g., 'Aries')",
+        detail = (
+            f"Invalid rashi: {req.rashi}. Must be rashi name (e.g., 'Mesha') "
+            "or English name (e.g., 'Aries')"
         )
+        raise HTTPException(status_code=400, detail=detail)
     
     # Find color
     color_data = find_color(req.color)
     if not color_data:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid color: {req.color}. Must match color wheel names (e.g., 'Blue', 'Red-Orange')",
+        detail = (
+            f"Invalid color: {req.color}. Must match color wheel names "
+            "(e.g., 'Blue', 'Red-Orange')"
         )
+        raise HTTPException(status_code=400, detail=detail)
     
     # Parse filters
     filters = req.filters or {}

@@ -231,7 +231,13 @@ def draw_lucky(
     return picks
 
 
-def draw_personalized(minv: int, maxv: int, count: int, rng: SecureRng, seed_value: str = None) -> list[int]:
+def draw_personalized(
+    minv: int,
+    maxv: int,
+    count: int,
+    rng: SecureRng,
+    seed_value: str = None,
+) -> list[int]:
     """Generate deterministic-looking numbers derived from a user-provided seed string.
 
     This is useful for modes like `zodiac`, `gemstone`, `favorite_color` where the
@@ -250,8 +256,7 @@ def draw_personalized(minv: int, maxv: int, count: int, rng: SecureRng, seed_val
     seed_int = int(seed_hash[:16], 16)
 
     # Use a local deterministic RNG so we don't interfere with SecureRng state
-    local = random.Random(seed_int)
-
+    local = random.Random(seed_int)  # noqa: S311
     pool = list(range(minv, maxv + 1))
     if count >= len(pool):
         return sorted(pool)

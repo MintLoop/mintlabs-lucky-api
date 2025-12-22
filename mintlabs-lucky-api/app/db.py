@@ -2,10 +2,14 @@
 
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Optional
+from typing import Optional, Any
 
-import psycopg
-from psycopg_pool import ConnectionPool
+try:
+    import psycopg
+    from psycopg_pool import ConnectionPool
+except Exception:  # pragma: no cover - optional dependency for tests/local dev
+    psycopg = None
+    ConnectionPool = None
 
 from .config import settings
 
@@ -43,7 +47,11 @@ def get_pool() -> ConnectionPool:
 
 
 @contextmanager
-def get_conn() -> Generator[psycopg.Connection, None, None]:
+def get_conn() -> Generator[Any, None, None]:
     pool = get_pool()
+    if pool is None:
+        # Connection pool unavailable (e.g., optional dependency not installed)
+        # Tests monkeypatch this function, so returning yields a dummy connection.
+        raise RuntimeError("ConnectionPool is not available")
     with pool.connection() as conn:
         yield conn

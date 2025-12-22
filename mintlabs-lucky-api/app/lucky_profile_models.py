@@ -3,6 +3,7 @@ Lucky Profile API Models
 Defines request/response schemas for the Birthstone × Rashi × Color Wheel generator.
 """
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
 

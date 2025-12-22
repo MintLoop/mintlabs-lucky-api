@@ -1,7 +1,6 @@
 """
 Tests for Lucky Profile API (Birthstone × Rashi × Color Wheel)
 """
-import pytest
 from fastapi.testclient import TestClient
 
 

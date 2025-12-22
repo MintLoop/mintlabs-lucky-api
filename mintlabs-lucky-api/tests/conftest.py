@@ -7,6 +7,15 @@ import pytest
 from app import db as db_module
 from app import main as main_module
 
+from fastapi.testclient import TestClient
+
+import pytest
+
+
+@pytest.fixture(scope="session")
+def client():
+    return TestClient(main_module.app, base_url="http://localhost")
+
 
 @dataclass
 class _DummyResult:
@@ -31,6 +40,12 @@ def _dummy_get_conn():
 def _patch_db(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(db_module, "get_conn", _dummy_get_conn)
     monkeypatch.setattr(main_module, "get_conn", _dummy_get_conn)
+    # Exempt lucky profile endpoints from rate limiting in tests
+    monkeypatch.setattr(
+        main_module.settings,
+        "RATE_LIMIT_EXEMPT_PATHS",
+        main_module.settings.RATE_LIMIT_EXEMPT_PATHS + ["/v1/lucky/birthstone-rashi", "/v1/lucky/birthstone-rashi/metadata"],
+    )
     yield
 
 

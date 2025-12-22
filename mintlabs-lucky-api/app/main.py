@@ -20,9 +20,9 @@ from .rng import (
     draw_birthday,
     draw_hot_cold,
     draw_lucky,
-    draw_personalized,
     draw_odd_even_mix,
     draw_pattern_avoid,
+    draw_personalized,
     draw_sum_target,
     draw_wheel,
     get_last_number_probability,
@@ -102,6 +102,10 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
+# Register API routers
+from .routes import lucky_profiles
+app.include_router(lucky_profiles.router)
+
 
 # ---------------------------------------------------------------------------
 # Request tracing & logging middleware
@@ -175,14 +179,16 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     # Log with error code: [ERR] {request_id} {status} {full_error}
     print(f"[ERR] {request_id} {exc.status_code} {full_error}")
 
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "error": full_error,
-            "request_id": request_id,
-            "status": exc.status_code,
-        },
-    )
+    content = {
+        "error": full_error,
+        "request_id": request_id,
+        "status": exc.status_code,
+    }
+    # Preserve original detail for client-side testing and helpful feedback
+    if isinstance(exc.detail, (str, dict)):
+        content["detail"] = exc.detail
+
+    return JSONResponse(status_code=exc.status_code, content=content)
 
 
 @app.exception_handler(Exception)
@@ -467,7 +473,14 @@ def generate(req: GenerateReq, request: Request):
             whites = draw_odd_even_mix(wmin, wmax, wcount, rng)
         elif req.mode == "pattern_avoid":
             whites = draw_pattern_avoid(wmin, wmax, wcount, rng)
-        elif req.mode in ("zodiac", "gemstone", "star_sign", "jyotish", "chinese_zodiac", "favorite_color"):
+        elif req.mode in (
+            "zodiac",
+            "gemstone",
+            "star_sign",
+            "jyotish",
+            "chinese_zodiac",
+            "favorite_color",
+        ):
             # Themed / personality modes are selected via a `mode_key` which
             # maps to a stable seed profile. This prevents free-form inputs and
             # makes behavior deterministically reproducible while keeping
@@ -531,7 +544,11 @@ def generate(req: GenerateReq, request: Request):
         # Record analytics (in-memory counters)
         _record_generation(req.game_code, req.mode)
         try:
-            print(f"[GEN] {request_id} game={req.game_code} mode={req.mode} mode_key={req.mode_key or ''} latency={latency}ms")
+            msg = f"[GEN] {request_id} game={req.game_code} mode={req.mode}"
+            if req.mode_key:
+                msg += f" mode_key={req.mode_key}"
+            msg += f" latency={latency}ms"
+            print(msg)
         except Exception:
             print(f"[GEN] {request_id} game={req.game_code} mode={req.mode} latency={latency}ms")
 

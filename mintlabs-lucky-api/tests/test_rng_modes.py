@@ -11,9 +11,9 @@ from app.rng import (
     draw_lucky,
     draw_odd_even_mix,
     draw_pattern_avoid,
+    draw_personalized,
     draw_sum_target,
     draw_wheel,
-    draw_personalized,
 )
 
 

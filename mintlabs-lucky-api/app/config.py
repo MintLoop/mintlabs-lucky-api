@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     # can start without setting environment variables. **Do not** use these
     # defaults in production — set real secrets via environment or .env.
     DATABASE_URL: str = "sqlite:///./dev.db"
-    HMAC_SECRET: str = "dev-secret"
+    HMAC_SECRET: str = "dev-secret"  # noqa: S105
 
     ALLOWED_ORIGINS: list[str] = Field(
         default_factory=lambda: [
