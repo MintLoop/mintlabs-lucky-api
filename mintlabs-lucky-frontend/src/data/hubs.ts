@@ -47,6 +47,14 @@ export const HOME_CASINO_FEATURED: HubItem[] = [
     kind: 'game',
     icon: '🪙',
   },
+  {
+    key: 'keno',
+    title: 'Keno',
+    href: '/casino-lite/keno',
+    description: 'Pick numbers on an 80-ball keno board and watch draws.',
+    kind: 'game',
+    icon: '🎯',
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
