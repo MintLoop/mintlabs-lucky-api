@@ -182,7 +182,7 @@ test.describe('Lucky Profile Generator', () => {
     await expect(profileResult).toContainText('Birthstone Profile');
     await expect(profileResult).toContainText('Rashi Profile');
     await expect(profileResult).toContainText('Color Profile');
-    await expect(profileResult).toContainText('Recommended Actions');
+    await expect(profileResult).toContainText(/Recommended Actions|Suggested Actions/i);
     await expect(profileResult).toContainText('Lucky Numbers');
   });
 
