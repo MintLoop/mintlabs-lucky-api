@@ -8,7 +8,8 @@ test.describe('Why Odds Don\'t Change Demo', () => {
   test('page loads with correct title and description', async ({ page }) => {
     await expect(page).toHaveTitle(/Why Lottery Odds Don't Change/);
     
-    const heading = page.locator('h1');
+    // More specific: target the main H1 heading by role and pick the first match
+    const heading = page.getByRole('heading', { name: /Why Lottery Odds Don't Change/, level: 1 }).first();
     await expect(heading).toContainText('Why Lottery Odds Don\'t Change');
     
     const description = page.locator('text=Interactive demonstration proving past results have zero effect');
@@ -98,8 +99,8 @@ test.describe('Why Odds Don\'t Change Demo', () => {
     const highlightedBalls = page.locator('.bg-emerald-500.text-white');
     const count = await highlightedBalls.count();
     
-    // Count should match appearance count
-    const appearanceCount = page.locator('#appearance-count');
+    // Count should match appearance count (use .first() to avoid multiple matches)
+    const appearanceCount = page.locator('#appearance-count').first();
     const displayedCount = await appearanceCount.textContent();
     expect(count).toBe(parseInt(displayedCount || '0'));
   });
@@ -113,8 +114,8 @@ test.describe('Why Odds Don\'t Change Demo', () => {
     await expect(page.locator('text=Expected Appearances')).toBeVisible();
     await expect(page.locator('text=Probability Each Draw')).toBeVisible();
     
-    // Expected appearances should be 0.72
-    await expect(page.locator('text=0.72')).toBeVisible();
+    // Expected appearances should be 0.72 (use exact match to avoid substring matches)
+    await expect(page.getByText('0.72', { exact: true })).toBeVisible();
     
     // Probability should be 7.2%
     await expect(page.locator('text=7.2%')).toBeVisible();
@@ -144,12 +145,14 @@ test.describe('Why Odds Don\'t Change Demo', () => {
 
   test('displays "Why This Matters" section', async ({ page }) => {
     await expect(page.locator('text=Why This Matters')).toBeVisible();
-    await expect(page.locator('text=gambler\'s fallacy')).toBeVisible();
+    // Use exact match and pick the first occurrence to avoid matching link titles or other copies
+    await expect(page.getByText('gambler\'s fallacy', { exact: true }).first()).toBeVisible();
     await expect(page.locator('text=You won\'t waste money chasing "due" numbers')).toBeVisible();
   });
 
   test('displays mathematical proof', async ({ page }) => {
-    await expect(page.locator('text=The Math')).toBeVisible();
+    // Use heading role (with emoji) to target the math section heading precisely
+    await expect(page.getByRole('heading', { name: '📐 The Math' })).toBeVisible();
     await expect(page.locator('text=P(specific number appears) = 5/69')).toBeVisible();
     await expect(page.locator('text=Each draw is a fresh, independent event')).toBeVisible();
   });
