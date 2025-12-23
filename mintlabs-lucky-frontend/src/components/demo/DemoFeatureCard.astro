@@ -9,10 +9,10 @@ export interface Props {
   variant?: 'accent' | 'elevated' | 'glow';
 }
 
-const { icon = '✨', title, description, href, badge, variant = 'accent' } = Astro.props;
+const { icon = '✨', title, description, href, badge, _variant = 'accent' } = Astro.props;
 ---
 
-<SoftCard variant="default" padding="md" radius="xl" className="demo-card demo-feature-card">
+<SoftCard variant={_variant} padding="md" radius="xl" className="demo-card demo-feature-card">
   <div class="flex items-start gap-4">
     <div class="text-4xl sm:text-5xl flex-shrink-0 demo-feature-icon">{icon}</div>
     <div class="flex-1 flex flex-col">

@@ -147,10 +147,10 @@ export function initLuckyDemoBalls() {
     };
     function updateConditionalFields() {
       try {
-        Object.values(map).forEach(id => { document.querySelectorAll('#' + id).forEach(el=>{ el.classList.add('hidden'); try { (el as HTMLElement).style.display='none'; } catch(e){} }); });
+        Object.values(map).forEach(id => { document.querySelectorAll('#' + id).forEach(el=>{ el.classList.add('hidden'); try { (el as HTMLElement).style.display='none'; } catch(e){ console.debug(e); } }); });
         const key = (modeSelect instanceof HTMLSelectElement) ? modeSelect.value : undefined;
         if (key && map[key]) {
-          document.querySelectorAll('#' + map[key]).forEach(el=>{ el.classList.remove('hidden'); try { (el as HTMLElement).style.display='block'; } catch(e){} });
+          document.querySelectorAll('#' + map[key]).forEach(el=>{ el.classList.remove('hidden'); try { (el as HTMLElement).style.display='block'; } catch(e){ console.debug(e); } });
 
           if (map[key] === 'modeKeyContainer') {
             try {
@@ -172,9 +172,9 @@ export function initLuckyDemoBalls() {
                   opt.textContent = `${it.emoji ? it.emoji + ' ' : ''}${it.label}`;
                   select.appendChild(opt);
                 });
-                try { select.removeAttribute('disabled'); } catch(e){}
-                try { select.setAttribute('required','required'); } catch(e){}
-                try { select.setAttribute('data-populated', '1'); } catch(e){}
+                try { select.removeAttribute('disabled'); } catch(e){ console.debug(e); }
+                try { select.setAttribute('required','required'); } catch(e){ console.debug(e); }
+                try { select.setAttribute('data-populated', '1'); } catch(e){ console.debug(e); }
                 
                 select.addEventListener('change', () => {
                   const educationContainer = document.getElementById('themeEducation');
@@ -192,17 +192,17 @@ export function initLuckyDemoBalls() {
                   }
                 });
               }
-            } catch(e){}
+            } catch(e){ console.debug(e); }
           }
         }
         return true;
-      } catch (err) { return false; }
+      } catch (err) { console.debug(err); return false; }
     }
-    try { if (modeSelect) modeSelect.addEventListener('change', updateConditionalFields); } catch(e){}
-    try { (window as any)._genFormUpdate = updateConditionalFields; } catch(e){}
-    try { (window as any).__GENFORM_READY = true; } catch(e){}
-    try { updateConditionalFields(); } catch(e){}
-  } catch (err) { try { (window as any).__GENFORM_ERROR = String(err); } catch(e){} }
+    try { if (modeSelect) modeSelect.addEventListener('change', updateConditionalFields); } catch(e) { console.debug(e); }
+    try { (window as any)._genFormUpdate = updateConditionalFields; } catch(e) { console.debug(e); }
+    try { (window as any).__GENFORM_READY = true; } catch(e) { console.debug(e); }
+    try { updateConditionalFields(); } catch(e) { console.debug(e); }
+  } catch (err) { try { (window as any).__GENFORM_ERROR = String(err); } catch(e) { console.debug(e); } }
 
   const _form = form;
   const _out = out;
@@ -348,7 +348,7 @@ export function initLuckyDemoBalls() {
               if (found) modeBadgeText = `${found.emoji ? found.emoji + ' ' : ''}${found.label}`;
             }
           }
-        } catch (e) {}
+        } catch (e) { console.debug(e); }
 
         const ballRowHtml = buildBallRow(d.numbers, d.bonus);
 
@@ -421,9 +421,7 @@ export function initLuckyDemoBalls() {
 
     try {
       (_form as any).__handledByLucky = true;
-    } catch {
-      /* noop */
-    }
+    } catch (e) { console.debug(e); }
   })();
 }
 

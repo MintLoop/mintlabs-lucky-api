@@ -9,7 +9,7 @@ export function track(event: string, props: Props = {}) {
       (window as any).__LUCKY_EVENTS = (window as any).__LUCKY_EVENTS || [];
       (window as any).__LUCKY_EVENTS.push({ event, props, ts: Date.now() });
     } catch (err) {
-      // ignore
+      console.debug(err);
     }
     // Plausible
     if (typeof (window as any).plausible === "function") {
