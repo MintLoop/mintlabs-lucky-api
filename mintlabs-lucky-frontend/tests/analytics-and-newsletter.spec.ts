@@ -7,7 +7,8 @@ test.describe('Analytics and Newsletter (client-side)', () => {
     await page.evaluate(() => ((window as any).__LUCKY_EVENTS = []));
   });
 
-  test('carousel click pushes carousel_click event', async ({ page }) => {
+  // Skipped: Homepage redesigned to use HomeAccordions instead of tools-carousel
+  test.skip('carousel click pushes carousel_click event', async ({ page }) => {
     // prevent navigation from link clicks while we measure events
     await page.evaluate(() => {
       function preventNav(e: Event) {

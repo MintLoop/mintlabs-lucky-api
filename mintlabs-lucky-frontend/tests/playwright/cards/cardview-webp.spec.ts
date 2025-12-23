@@ -10,9 +10,9 @@ test.describe('CardView WebP Support (Phase 4.5)', () => {
   });
 
   test('page loads without errors', async ({ page }) => {
-    // Basic smoke test
-    const heading = page.locator('h1');
-    await expect(heading).toContainText('Blackjack');
+    // Basic smoke test - page uses breadcrumb nav instead of h1
+    const breadcrumb = page.locator('nav[aria-label="Breadcrumb"]');
+    await expect(breadcrumb).toContainText('Blackjack');
   });
 
   test('cards render with proper structure', async ({ page }) => {

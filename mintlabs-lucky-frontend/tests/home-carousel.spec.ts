@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-test('Home page tools carousel exists and links present', async ({ page }) => {
+// Skipped: Homepage redesigned to use HomeAccordions instead of tools-carousel
+test.skip('Home page tools carousel exists and links present', async ({ page }) => {
   await page.goto('/');
   const carousel = page.locator('.tools-carousel');
   await expect(carousel).toBeVisible();
