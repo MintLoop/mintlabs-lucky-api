@@ -3,6 +3,7 @@
 | Phase | Owner | Branch | Status | Notes |
 | ----- | ----- | ------ | ------ | ----- |
 | 11 – Deployment / CI fixes | **GitHub Copilot** | `fix/ruff-lint` | 🔁 Ready for PR | Fixed frontend ESLint & .astro parse errors, restored raffle/wheel tool styles to `src/styles/hub.css`, updated docs for Vercel secret `api_base_url`. Local lint clean; needs remote CI run after PR push. |
+| Demo tests — skip for CI | **GitHub Copilot** | `chore/skip-demo-tests-ci` | 🔁 PR open | Skipped `tests/demo/*` that depend on `/demo/home-v2-polish` (page removed/ignored). Tests can be restored when demo page returns; components remain in production. |
 | Tooling – Lockfile | **GitHub Copilot** | `chore/update-frontend-lockfile` | 🔁 In Progress | Update `package-lock.json` to match `package.json` and fix CI `npm ci` build. |
 | 1 – Automation Gatekeeper | Claude 4.5 | main | ✅ Done | Fixed 500s (psycopg3 prepare=False), token bucket rate limiter, request tracing, frontend 429 UX, analytics. |
 | 2 – Reliability Ops | Claude 4.5 | phase-2-reliability | ✅ Done | Game config validation (400s), /health + /readyz split, /stats gated with ADMIN_TOKEN, DB tests, log format frozen. |
