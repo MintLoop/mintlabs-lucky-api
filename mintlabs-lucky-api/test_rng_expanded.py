@@ -35,6 +35,7 @@ def test_mode(name, func, *args):
         print(f"Error: {e}")
         return False
 
+
 def main():
     rng = SecureRng()
 
@@ -72,6 +73,7 @@ def main():
         print("✅ All RNG modes working correctly!")
     else:
         print("❌ Some tests failed")
+
 
 if __name__ == "__main__":
     main()

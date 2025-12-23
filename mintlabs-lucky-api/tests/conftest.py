@@ -3,11 +3,11 @@ from dataclasses import dataclass
 from typing import Any
 
 import pytest
+from fastapi.testclient import TestClient
 
 from app import db as db_module
 from app import main as main_module
 
-from fastapi.testclient import TestClient
 
 @pytest.fixture(scope="session")
 def client():
@@ -41,7 +41,8 @@ def _patch_db(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(
         main_module.settings,
         "RATE_LIMIT_EXEMPT_PATHS",
-        main_module.settings.RATE_LIMIT_EXEMPT_PATHS + ["/v1/lucky/birthstone-rashi", "/v1/lucky/birthstone-rashi/metadata"],
+        main_module.settings.RATE_LIMIT_EXEMPT_PATHS
+        + ["/v1/lucky/birthstone-rashi", "/v1/lucky/birthstone-rashi/metadata"],
     )
     yield
 

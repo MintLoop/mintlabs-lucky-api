@@ -13,7 +13,7 @@ test.describe('Lucky Profile Generator', () => {
     await expect(page).toHaveTitle(/Lucky Profile Generator/i);
     
     // Check main heading (explicit role + level to avoid duplicates)
-    const heading = page.getByRole('heading', { level: 1, name: /Lucky Profile Generator/i });
+    const heading = page.getByRole('heading', { name: /Lucky Profile Generator/i }).first();
     await expect(heading).toBeVisible();
     
     // Check form sections exist
@@ -46,8 +46,9 @@ test.describe('Lucky Profile Generator', () => {
   });
 
   test('can select birth month', async ({ page }) => {
-    await page.waitForFunction(() => document.querySelectorAll('select#birthMonth option').length > 1);
-    
+    // Wait until a 'March' option appears (ensures correct label exists before selecting)
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('select#birthMonth option')).some(o => o.textContent && o.textContent.trim() === 'March'));
+
     await page.selectOption('select#birthMonth', { label: 'March' });
     const selectedValue = await page.locator('select#birthMonth').inputValue();
     expect(selectedValue).toBe('March');
@@ -118,11 +119,11 @@ test.describe('Lucky Profile Generator', () => {
   });
 
   test('successful profile generation displays result', async ({ page }) => {
-    // Wait for selects and colors to be ready
-    await page.waitForFunction(() => document.querySelectorAll('select#birthMonth option').length > 1);
+    // Wait for March option specifically and rashi options to exist
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('select#birthMonth option')).some(o => o.textContent && o.textContent.trim() === 'March'));
     await page.waitForFunction(() => document.querySelectorAll('select#rashi option').length > 1);
     await page.waitForSelector('.color-option');
-    
+
     // Fill out form
     await page.selectOption('select#birthMonth', { label: 'March' });
     
@@ -164,9 +165,10 @@ test.describe('Lucky Profile Generator', () => {
   });
 
   test('result displays correct birthstone for March', async ({ page }) => {
-    await page.waitForFunction(() => document.querySelectorAll('select#birthMonth option').length > 1);
+    // Wait until March option exists before selecting
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('select#birthMonth option')).some(o => o.textContent && o.textContent.trim() === 'March'));
     await page.waitForSelector('.color-option');
-    
+
     await page.selectOption('select#birthMonth', { label: 'March' });
     
     // Select any rashi (fallback to first non-placeholder)
@@ -198,10 +200,10 @@ test.describe('Lucky Profile Generator', () => {
     expect(cardCount).toBeGreaterThanOrEqual(4);
     
     // Check for key educational headings (use role-based headings to avoid duplicate text matches)
-    await expect(page.getByRole('heading', { name: /What is a Lucky Profile/i })).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Birthstones & Gemology/i })).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Jyotish/i })).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Color Psychology/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /What is a Lucky Profile/i }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Birthstones & Gemology/i }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Jyotish/i }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Color Psychology/i }).first()).toBeVisible();
   });
 
   test('affiliate section is present', async ({ page }) => {

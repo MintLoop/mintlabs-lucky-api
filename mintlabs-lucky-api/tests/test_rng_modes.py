@@ -89,14 +89,14 @@ def test_wheel_modes(rng):
 def test_apply_filters_allows_repeat_flags(rng):
     numbers = [1, 5, 9, 13]
     result = apply_filters(
-    rng,
-    1,
-    20,
-    len(numbers),
-    allow_repeats=True,
-    allow_consecutive=True,
-    recent_numbers=numbers,
-)
+        rng,
+        1,
+        20,
+        len(numbers),
+        allow_repeats=True,
+        allow_consecutive=True,
+        recent_numbers=numbers,
+    )
     assert len(result) == len(numbers)
     assert all(1 <= value <= 20 for value in result)
 

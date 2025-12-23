@@ -1,5 +1,3 @@
-
-
 import pytest
 from fastapi.testclient import TestClient
 
@@ -28,12 +26,12 @@ def test_games_endpoint_uses_cache(client):
         "birthday",
         "lucky",
         "wheel",
-            "zodiac",
-            "gemstone",
-            "star_sign",
-            "jyotish",
-            "chinese_zodiac",
-            "favorite_color",
+        "zodiac",
+        "gemstone",
+        "star_sign",
+        "jyotish",
+        "chinese_zodiac",
+        "favorite_color",
     ],
 )
 def test_generate_valid_modes(client, mode):

@@ -19,6 +19,7 @@ function track(event, props = {}) {
       window.__LUCKY_EVENTS = window.__LUCKY_EVENTS || [];
       window.__LUCKY_EVENTS.push({ event, props, ts: Date.now() });
     } catch (err) {
+      console.debug(err);
     }
     if (typeof window.plausible === "function") {
       window.plausible(event, { props });
@@ -443,7 +444,6 @@ function readInitialGames() {
   const el = document.getElementById("initial-games");
   if (!el || !(el instanceof HTMLScriptElement)) return [];
   try {
-    const cfgAny = modeConfig_default;
     const parsed = JSON.parse(el.textContent || "[]");
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -481,6 +481,7 @@ function initLucky() {
             try {
               el.style.display = "none";
             } catch (e) {
+              console.debug(e);
             }
           });
         });
@@ -491,6 +492,7 @@ function initLucky() {
             try {
               el.style.display = "block";
             } catch (e) {
+              console.debug(e);
             }
           });
           if (map[key] === "modeKeyContainer") {
@@ -515,14 +517,17 @@ function initLucky() {
                 try {
                   select.removeAttribute("disabled");
                 } catch (e) {
+                  console.debug(e);
                 }
                 try {
                   select.setAttribute("required", "required");
                 } catch (e) {
+                  console.debug(e);
                 }
                 try {
                   select.setAttribute("data-populated", "1");
                 } catch (e) {
+                  console.debug(e);
                 }
                 select.addEventListener("change", () => {
                   const educationContainer = document.getElementById("themeEducation");
@@ -541,11 +546,13 @@ function initLucky() {
                 });
               }
             } catch (e) {
+              console.debug(e);
             }
           }
         }
         return true;
       } catch (err) {
+        console.debug(err);
         return false;
       }
     };
@@ -567,23 +574,28 @@ function initLucky() {
     try {
       if (modeSelect) modeSelect.addEventListener("change", updateConditionalFields2);
     } catch (e) {
+      console.debug(e);
     }
     try {
       window._genFormUpdate = updateConditionalFields2;
     } catch (e) {
+      console.debug(e);
     }
     try {
       window.__GENFORM_READY = true;
     } catch (e) {
+      console.debug(e);
     }
     try {
       updateConditionalFields2();
     } catch (e) {
+      console.debug(e);
     }
   } catch (err) {
     try {
       window.__GENFORM_ERROR = String(err);
     } catch (e) {
+      console.debug(e);
     }
   }
   const _form = form;
@@ -713,6 +725,7 @@ function initLucky() {
             }
           }
         } catch (e2) {
+          console.debug(e2);
         }
         const numbersHtml = Array.isArray(d.numbers) ? d.numbers.map((n) => `<span class="result-chip text-emerald-400 font-semibold">${n}</span>`).join(", ") : d.numbers || "\u2014";
         const bonusHtml = d.bonus ? `<span class="result-chip text-emerald-400 font-semibold">${d.bonus}</span>` : "";
@@ -766,7 +779,8 @@ function initLucky() {
     });
     try {
       _form.__handledByLucky = true;
-    } catch {
+    } catch (e) {
+      console.debug(e);
     }
   })();
 }
@@ -827,6 +841,7 @@ try {
               try {
                 props = JSON.parse(el.dataset.trackProps);
               } catch (e) {
+                console.debug(e);
                 props = {};
               }
             }
@@ -834,17 +849,18 @@ try {
               try {
                 window.track(eventName, { href: el.getAttribute && el.getAttribute("href"), ...props });
               } catch (e) {
+                console.debug(e);
               }
             }
-          } catch (err) {
+          } catch {
           }
         }, false);
-      } catch (err) {
+      } catch {
       }
     }
   }).catch(() => {
   });
-} catch (err) {
+} catch {
 }
 export {
   initLucky

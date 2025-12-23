@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import urllib.request
 import json
+import urllib.request
 
 # Test the API endpoint with different sets
 test_cases = [
@@ -16,7 +16,7 @@ for i, data in enumerate(test_cases):
         req = urllib.request.Request("http://localhost:8000/generate",
                                    json.dumps(data).encode('utf-8'),
                                    headers={'Content-Type': 'application/json'})
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req) as response:  # noqa: S310
             result = json.loads(response.read().decode('utf-8'))
             print("Numbers:", result['numbers'])
             print("Bonus:", result.get('bonus', 'N/A'))
@@ -25,7 +25,9 @@ for i, data in enumerate(test_cases):
 
             if 'combined_sets_odds' in result and result['combined_sets_odds']:
                 print("Combined sets odds:", result['combined_sets_odds'])
-                print("Combined sets probability:", f"{result['combined_sets_probability_percent']:.4f}%")
+                # keep the line short to satisfy E501
+                combined_prob = f"{result['combined_sets_probability_percent']:.4f}%"
+                print("Combined sets probability:", combined_prob)
 
             print("Last number info:", result.get('last_number_info', 'N/A'))
 
