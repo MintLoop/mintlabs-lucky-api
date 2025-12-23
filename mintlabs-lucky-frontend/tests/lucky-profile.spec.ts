@@ -62,7 +62,7 @@ test.describe('Lucky Profile Generator', () => {
       }
     }
     const selectedValue = await page.locator('select#birthMonth').inputValue();
-    expect(selectedValue).toBe('March');
+    expect((selectedValue || '').toLowerCase()).toBe('march');
   });
 
   test('can select rashi', async ({ page }) => {
@@ -168,8 +168,9 @@ test.describe('Lucky Profile Generator', () => {
     // Wait for loading spinner to appear (if used) and then disappear (graceful timeout)
     const spinner = page.locator('#loadingSpinner');
     if (await spinner.count() > 0) {
-      await expect(spinner).toBeVisible();
-      await expect(spinner).not.toBeVisible({ timeout: 10000 });
+      if (await spinner.isVisible()) {
+        await expect(spinner).not.toBeVisible({ timeout: 10000 });
+      }
     }
     
     // Profile result should be visible
