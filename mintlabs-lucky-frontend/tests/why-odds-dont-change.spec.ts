@@ -95,8 +95,8 @@ test.describe('Why Odds Don\'t Change Demo', () => {
     // Wait for results
     await page.waitForSelector('#demo-results:not(.hidden)');
     
-    // Check if any draws highlight the chosen number (emerald color)
-    const highlightedBalls = page.locator('.bg-emerald-500.text-white');
+    // Check if any draws highlight the chosen number (emerald color) within the draw list only
+    const highlightedBalls = page.locator('#draw-list .bg-emerald-500.text-white');
     const count = await highlightedBalls.count();
     
     // Count should match appearance count (use .first() to avoid multiple matches)
@@ -117,8 +117,8 @@ test.describe('Why Odds Don\'t Change Demo', () => {
     // Expected appearances should be 0.72 (use exact match to avoid substring matches)
     await expect(page.getByText('0.72', { exact: true })).toBeVisible();
     
-    // Probability should be 7.2%
-    await expect(page.locator('text=7.2%')).toBeVisible();
+    // Probability should be 7.2% (target the exact percentage, choose the first match to avoid non-visual copies)
+    await expect(page.getByText('7.2%', { exact: true }).first()).toBeVisible();
   });
 
   test('displays key insight with correct count', async ({ page }) => {
@@ -137,10 +137,10 @@ test.describe('Why Odds Don\'t Change Demo', () => {
   test('displays common misconceptions', async ({ page }) => {
     await expect(page.locator('text=Common Misconceptions')).toBeVisible();
     
-    // Check for three misconceptions
-    await expect(page.locator('text="Number 7 hasn\'t appeared in 20 draws — it\'s due!"')).toBeVisible();
-    await expect(page.locator('text="Number 42 appeared twice this week — it\'s hot!"')).toBeVisible();
-    await expect(page.locator('text="If I keep playing 1-2-3-4-5, it\'ll eventually hit"')).toBeVisible();
+    // Check for three misconceptions (use regex + .first() to avoid matching other copies or decorated text)
+    await expect(page.getByText(/Number 7 hasn(?:'|’)?t appeared in 20 draws/i).first()).toBeVisible();
+    await expect(page.getByText(/Number 42 appeared twice this week/i).first()).toBeVisible();
+    await expect(page.getByText(/If I keep playing 1-2-3-4-5, it(?:'|’)?ll eventually hit/i).first()).toBeVisible();
   });
 
   test('displays "Why This Matters" section', async ({ page }) => {
