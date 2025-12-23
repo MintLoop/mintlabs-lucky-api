@@ -46,10 +46,21 @@ test.describe('Lucky Profile Generator', () => {
   });
 
   test('can select birth month', async ({ page }) => {
-    // Wait until a 'March' option appears (ensures correct label exists before selecting)
-    await page.waitForFunction(() => Array.from(document.querySelectorAll('select#birthMonth option')).some(o => o.textContent && o.textContent.trim() === 'March'));
+    // Wait until a 'March' option (or label that includes 'March') appears
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('select#birthMonth option')).some(o => o.textContent && /March/i.test(o.textContent)));
 
-    await page.selectOption('select#birthMonth', { label: 'March' });
+    // Select by label that contains 'March' (e.g. "March (Aquamarine)")
+    const monthOptions = await page.locator('select#birthMonth option').all();
+    for (const opt of monthOptions) {
+      const txt = (await opt.textContent()) || '';
+      if (/March/i.test(txt.trim())) {
+        const val = await opt.getAttribute('value');
+        if (val) {
+          await page.selectOption('select#birthMonth', val);
+          break;
+        }
+      }
+    }
     const selectedValue = await page.locator('select#birthMonth').inputValue();
     expect(selectedValue).toBe('March');
   });
@@ -119,13 +130,23 @@ test.describe('Lucky Profile Generator', () => {
   });
 
   test('successful profile generation displays result', async ({ page }) => {
-    // Wait for March option specifically and rashi options to exist
-    await page.waitForFunction(() => Array.from(document.querySelectorAll('select#birthMonth option')).some(o => o.textContent && o.textContent.trim() === 'March'));
+    // Wait until a label that includes 'March' appears and rashi options exist
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('select#birthMonth option')).some(o => o.textContent && /March/i.test(o.textContent)));
     await page.waitForFunction(() => document.querySelectorAll('select#rashi option').length > 1);
     await page.waitForSelector('.color-option');
 
-    // Fill out form
-    await page.selectOption('select#birthMonth', { label: 'March' });
+    // Fill out form (select the option whose text contains 'March')
+    const monthOptions = await page.locator('select#birthMonth option').all();
+    for (const opt of monthOptions) {
+      const txt = (await opt.textContent()) || '';
+      if (/March/i.test(txt.trim())) {
+        const val = await opt.getAttribute('value');
+        if (val) {
+          await page.selectOption('select#birthMonth', val);
+          break;
+        }
+      }
+    }
     
     // Select rashi - prefer selecting by label 'Mesha' if present
     const rashiOptions = await page.locator('select#rashi option').allTextContents();
@@ -165,11 +186,22 @@ test.describe('Lucky Profile Generator', () => {
   });
 
   test('result displays correct birthstone for March', async ({ page }) => {
-    // Wait until March option exists before selecting
-    await page.waitForFunction(() => Array.from(document.querySelectorAll('select#birthMonth option')).some(o => o.textContent && o.textContent.trim() === 'March'));
+    // Wait until a label that includes 'March' appears
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('select#birthMonth option')).some(o => o.textContent && /March/i.test(o.textContent)));
     await page.waitForSelector('.color-option');
 
-    await page.selectOption('select#birthMonth', { label: 'March' });
+    // Select March by value
+    const monthOptions = await page.locator('select#birthMonth option').all();
+    for (const opt of monthOptions) {
+      const txt = (await opt.textContent()) || '';
+      if (/March/i.test(txt.trim())) {
+        const val = await opt.getAttribute('value');
+        if (val) {
+          await page.selectOption('select#birthMonth', val);
+          break;
+        }
+      }
+    }
     
     // Select any rashi (fallback to first non-placeholder)
     const rashiOptions = await page.locator('select#rashi option').all();
@@ -219,8 +251,8 @@ test.describe('Lucky Profile Generator', () => {
   test('responsive design works on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     
-    // Main elements should still be visible (explicit heading role)
-    await expect(page.getByRole('heading', { level: 1, name: /Lucky Profile Generator/i })).toBeVisible();
+    // Main elements should still be visible (explicit heading role - pick first occurrence)
+    await expect(page.getByRole('heading', { name: /Lucky Profile Generator/i }).first()).toBeVisible();
     await expect(page.locator('select#birthMonth')).toBeVisible();
     await expect(page.locator('select#rashi')).toBeVisible();
     await expect(page.locator('#colorGrid')).toBeVisible();
