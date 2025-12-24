@@ -17,7 +17,7 @@ def test_mode_config_has_expected_categories():
 
 
 def test_each_item_has_seed_and_key():
-    for k, v in MODE_CONFIG.items():
+    for _k, v in MODE_CONFIG.items():
         for it in v.get("items", []):
             assert "key" in it and isinstance(it["key"], str) and it["key"]
             assert "seed" in it and isinstance(it["seed"], str) and it["seed"]

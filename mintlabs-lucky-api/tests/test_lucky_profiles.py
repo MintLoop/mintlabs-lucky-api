@@ -114,7 +114,7 @@ def test_generate_lucky_profile_invalid_month(client: TestClient):
 
     resp = client.post("/v1/lucky/birthstone-rashi", json=payload)
     assert resp.status_code == 400
-    assert "Invalid birth month" in resp.json()["detail"]
+    assert "Invalid birth month" in resp.json()["error"]
 
 
 def test_generate_lucky_profile_invalid_rashi(client: TestClient):
@@ -127,7 +127,7 @@ def test_generate_lucky_profile_invalid_rashi(client: TestClient):
 
     resp = client.post("/v1/lucky/birthstone-rashi", json=payload)
     assert resp.status_code == 400
-    assert "Invalid rashi" in resp.json()["detail"]
+    assert "Invalid rashi" in resp.json()["error"]
 
 
 def test_generate_lucky_profile_invalid_color(client: TestClient):
@@ -140,7 +140,7 @@ def test_generate_lucky_profile_invalid_color(client: TestClient):
 
     resp = client.post("/v1/lucky/birthstone-rashi", json=payload)
     assert resp.status_code == 400
-    assert "Invalid color" in resp.json()["detail"]
+    assert "Invalid color" in resp.json()["error"]
 
 
 def test_get_metadata(client: TestClient):

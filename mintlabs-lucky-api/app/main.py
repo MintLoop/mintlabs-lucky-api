@@ -28,6 +28,7 @@ from .rng import (
     get_last_number_probability,
     spaced_draw,
 )
+from .routes.lucky_profiles import router as lucky_profiles_router
 from .security import SimpleRateLimitMiddleware
 from .utils import hmac_commitment, new_request_id, sha256_hex
 
@@ -95,6 +96,9 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+# Include routers
+app.include_router(lucky_profiles_router)
 
 
 # ---------------------------------------------------------------------------
