@@ -58,9 +58,9 @@ class TestConnectionPool:
 
     def test_get_conn_propagates_pool_error(self):
         """Connection errors should propagate to caller.
-        
+
         Note: This test verifies the error propagation logic in get_conn.
-        The conftest autouse fixture patches get_conn, so we test the 
+        The conftest autouse fixture patches get_conn, so we test the
         underlying pool.connection behavior directly.
         """
         from app import db as db_module
@@ -69,7 +69,7 @@ class TestConnectionPool:
         with patch.object(db_module, "_POOL", None):
             with patch.object(db_module, "_build_pool") as mock_build:
                 mock_build.side_effect = Exception("connection failed")
-                
+
                 with pytest.raises(Exception, match="connection failed"):
                     db_module.get_pool()
 

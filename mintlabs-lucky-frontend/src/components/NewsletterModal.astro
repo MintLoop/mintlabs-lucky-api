@@ -79,12 +79,12 @@
       }
 
       // Track an anonymous subscribe intent — do NOT send user input to analytics
-      try { if (typeof window.track === 'function') window.track('newsletter_submitted', { method: 'frontend_local' }); } catch(e) {}
+      try { if (typeof window.track === 'function') window.track('newsletter_submitted', { method: 'frontend_local' }); } catch(e) { void e; }
 
       const success = enqueue(email);
       if (success) {
         if (msg) { msg.classList.remove('hidden'); msg.textContent = 'Thanks — your email is queued. We will add backend delivery in Phase 5.'; }
-        try { if (typeof window.track === 'function') window.track('newsletter_queued', { }); } catch(e) {}
+        try { if (typeof window.track === 'function') window.track('newsletter_queued', { }); } catch(e) { void e; }
         setTimeout(hide, 1200);
       } else {
         if (msg) { msg.classList.remove('hidden'); msg.textContent = 'Failed to queue your email — try again later.'; }

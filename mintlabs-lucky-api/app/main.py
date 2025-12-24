@@ -28,7 +28,7 @@ from .rng import (
     get_last_number_probability,
     spaced_draw,
 )
-from .routes import lucky_profiles
+from .routes.lucky_profiles import router as lucky_profiles_router
 from .security import SimpleRateLimitMiddleware
 from .utils import hmac_commitment, new_request_id, sha256_hex
 
@@ -99,6 +99,9 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+# Include routers
+app.include_router(lucky_profiles_router)
 
 
 # ---------------------------------------------------------------------------
@@ -216,7 +219,10 @@ def _validate_game_config(
     target_sum: Optional[int] = None,
     lucky_numbers: Optional[list[int]] = None,
 ) -> None:
-    """Validate game configuration before generation. Raises HTTPException(400) on failure."""
+    """Validate game configuration before generation.
+
+    Raises HTTPException(400) on failure.
+    """
     wmin = game_meta["white_min"]
     wmax = game_meta["white_max"]
     wcount = game_meta["white_count"]
@@ -231,7 +237,7 @@ def _validate_game_config(
     if wcount > pool_size:
         raise HTTPException(
             400,
-            detail=f"invalid_config: cannot pick {wcount} unique from pool of {pool_size}",
+            detail=(f"invalid_config: cannot pick {wcount} unique " f"from pool of {pool_size}"),
         )
 
     if wcount <= 0:
@@ -262,7 +268,9 @@ def _validate_game_config(
             if n < wmin or n > wmax:
                 raise HTTPException(
                     400,
-                    detail=f"invalid_config: lucky number {n} outside valid range ({wmin}-{wmax})",
+                    detail=(
+                        f"invalid_config: lucky number {n} outside valid " f"range ({wmin}-{wmax})"
+                    ),
                 )
 
 
@@ -532,20 +540,30 @@ def generate(req: GenerateReq, request: Request):
                 )
                 values (%s,%s,%s,%s,%s,%s,%s,%s)
                 """,
-                (session_id, req.game_code, req.mode, whites, bonus, nhash, commit, latency),
+                (
+                    session_id,
+                    req.game_code,
+                    req.mode,
+                    whites,
+                    bonus,
+                    nhash,
+                    commit,
+                    latency,
+                ),
                 prepare=False,
             )
 
         # Record analytics (in-memory counters)
         _record_generation(req.game_code, req.mode)
         try:
-            msg = f"[GEN] {request_id} game={req.game_code} mode={req.mode}"
-            if req.mode_key:
-                msg += f" mode_key={req.mode_key}"
-            msg += f" latency={latency}ms"
-            print(msg)
+            print(
+                f"[GEN] {request_id} game={req.game_code} mode={req.mode} "
+                f"mode_key={req.mode_key or ''} latency={latency}ms"
+            )
         except Exception:
-            print(f"[GEN] {request_id} game={req.game_code} mode={req.mode} latency={latency}ms")
+            print(
+                f"[GEN] {request_id} game={req.game_code} mode={req.mode} " f"latency={latency}ms"
+            )
 
         # Calculate probabilities for the generated set
         try:

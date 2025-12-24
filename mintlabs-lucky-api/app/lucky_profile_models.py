@@ -15,7 +15,8 @@ class LuckyProfileRequest(BaseModel):
     rashi: str = Field(..., description="Indian zodiac sign (e.g., 'Mesha', 'Karka')")
     color: str = Field(..., description="Preferred color energy (e.g., 'Blue', 'Red-Orange')")
     filters: Optional[dict] = Field(
-        default_factory=dict, description="Optional filters for numerology and spiritual traditions"
+        default_factory=dict,
+        description="Optional filters for numerology and spiritual traditions",
     )
 
 

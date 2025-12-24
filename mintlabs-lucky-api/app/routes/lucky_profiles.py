@@ -175,28 +175,35 @@ async def generate_lucky_profile(req: LuckyProfileRequest) -> LuckyProfileRespon
     # Find birthstone
     birthstone_data = find_birthstone(req.birth_month)
     if not birthstone_data:
-        detail = (
-            f"Invalid birth month: {req.birth_month}. Must be full month name " "(e.g., 'January')"
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Invalid birth month: {req.birth_month}. "
+                "Must be full month name (e.g., 'January')"
+            ),
         )
-        raise HTTPException(status_code=400, detail=detail)
 
     # Find rashi
     rashi_data = find_rashi(req.rashi)
     if not rashi_data:
-        detail = (
-            f"Invalid rashi: {req.rashi}. Must be rashi name (e.g., 'Mesha') "
-            "or English name (e.g., 'Aries')"
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Invalid rashi: {req.rashi}. "
+                "Must be rashi name (e.g., 'Mesha') or English name (e.g., 'Aries')"
+            ),
         )
-        raise HTTPException(status_code=400, detail=detail)
 
     # Find color
     color_data = find_color(req.color)
     if not color_data:
-        detail = (
-            f"Invalid color: {req.color}. Must match color wheel names "
-            "(e.g., 'Blue', 'Red-Orange')"
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Invalid color: {req.color}. "
+                "Must match color wheel names (e.g., 'Blue', 'Red-Orange')"
+            ),
         )
-        raise HTTPException(status_code=400, detail=detail)
 
     # Parse filters
     filters = req.filters or {}
