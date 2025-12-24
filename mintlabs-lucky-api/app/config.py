@@ -1,3 +1,4 @@
+import os
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -9,7 +10,7 @@ class Settings(BaseSettings):
     # can start without setting environment variables. **Do not** use these
     # defaults in production — set real secrets via environment or .env.
     DATABASE_URL: str = "sqlite:///./dev.db"
-    HMAC_SECRET: str = "dev-secret"  # noqa: S105
+    HMAC_SECRET: str = os.environ.get("HMAC_SECRET", "dev-secret")  # noqa: S105
 
     ALLOWED_ORIGINS: list[str] = Field(
         default_factory=lambda: [
