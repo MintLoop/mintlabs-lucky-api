@@ -74,7 +74,9 @@ def find_color(color_name: str) -> Optional[dict]:
     return None
 
 
-def synthesize_lucky_focus(birthstone: dict, rashi: dict, color: dict, filters: dict) -> LuckyFocus:
+def synthesize_lucky_focus(
+    birthstone: dict, rashi: dict, color: dict, filters: dict
+) -> LuckyFocus:
     """
     Synthesize a unified lucky focus from birthstone, rashi, and color profiles.
     Combines traits, generates recommendations, and creates actionable insights.
@@ -176,7 +178,8 @@ async def generate_lucky_profile(req: LuckyProfileRequest) -> LuckyProfileRespon
     birthstone_data = find_birthstone(req.birth_month)
     if not birthstone_data:
         detail = (
-            f"Invalid birth month: {req.birth_month}. Must be full month name " "(e.g., 'January')"
+            f"Invalid birth month: {req.birth_month}. Must be full month name "
+            "(e.g., 'January')"
         )
         raise HTTPException(status_code=400, detail=detail)
 
@@ -214,7 +217,9 @@ async def generate_lucky_profile(req: LuckyProfileRequest) -> LuckyProfileRespon
     color_profile = ColorProfile(**color_data)
 
     # Synthesize lucky focus
-    lucky_focus = synthesize_lucky_focus(birthstone_data, rashi_data, color_data, filters_applied)
+    lucky_focus = synthesize_lucky_focus(
+        birthstone_data, rashi_data, color_data, filters_applied
+    )
 
     return LuckyProfileResponse(
         birthstone_profile=birthstone_profile,

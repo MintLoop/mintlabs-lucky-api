@@ -32,7 +32,9 @@ class Settings(BaseSettings):
     )
     RATE_LIMIT_PER_MINUTE: int = 120
     RATE_LIMIT_BURST: int = 20
-    RATE_LIMIT_EXEMPT_PATHS: list[str] = Field(default_factory=lambda: ["/", "/health", "/games"])
+    RATE_LIMIT_EXEMPT_PATHS: list[str] = Field(
+        default_factory=lambda: ["/", "/health", "/games"]
+    )
     # Admin paths get stricter rate limiting (10/min, burst 3)
     RATE_LIMIT_ADMIN_PATHS: list[str] = Field(default_factory=lambda: ["/stats"])
     RATE_LIMIT_ADMIN_PER_MINUTE: int = 10
