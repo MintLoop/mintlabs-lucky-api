@@ -6,8 +6,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     # For local development it's convenient to provide safe defaults so the app
-    # can start without setting environment variables. **Do not** use these
-    # defaults in production — set real secrets via environment or .env.
+    # can start without setting environment variables.
+    # SECURITY: These are development-only defaults. **Do not use in production** — set real secrets via environment or .env.
     DATABASE_URL: str = "sqlite:///./dev.db"
     HMAC_SECRET: str = "dev-secret"  # noqa: S105
 

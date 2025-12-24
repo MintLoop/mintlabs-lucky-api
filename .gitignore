@@ -119,3 +119,5 @@ jspm_packages/
 # Embedded Git repositories
 .github/copilot-instructions.md
 mintlabs-lucky-frontend/test-results/
+.vercel
+.env*.local

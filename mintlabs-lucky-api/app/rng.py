@@ -255,7 +255,11 @@ def draw_personalized(
     seed_hash = hashlib.sha256(seed_value.encode("utf-8")).hexdigest()
     seed_int = int(seed_hash[:16], 16)
 
-    # Use a local deterministic RNG so we don't interfere with SecureRng state
+    # Use a local deterministic RNG so we don't interfere with SecureRng state.
+    # SECURITY NOTE: This RNG is deterministic (seed derived from a hash of the provided
+    # seed_value) and is used for reproducible, non-cryptographic behavior only — not for
+    # secrets or any cryptographic purpose. The use of `random.Random` here is deliberate
+    # to keep the SecureRng entropy separate.
     local = random.Random(seed_int)  # noqa: S311
     pool = list(range(minv, maxv + 1))
     if count >= len(pool):
