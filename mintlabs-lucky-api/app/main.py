@@ -46,21 +46,15 @@ async def security_headers(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    response.headers["Permissions-Policy"] = (
-        "camera=(), microphone=(), geolocation=(), payment=()"
-    )
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()"
 
     # HSTS only in production with HTTPS
     if settings.ENFORCE_HTTPS:
         proto = (
-            request.headers.get("x-forwarded-proto")
-            if settings.TRUST_PROXY
-            else request.url.scheme
+            request.headers.get("x-forwarded-proto") if settings.TRUST_PROXY else request.url.scheme
         )
         if proto == "https":
-            response.headers["Strict-Transport-Security"] = (
-                "max-age=31536000; includeSubDomains"
-            )
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 
     # Basic CSP - restrictive default, allow API connections
     # Note: This is an API, not serving HTML, so CSP is mostly for defense-in-depth
@@ -228,18 +222,13 @@ def _validate_game_config(
 
     # Basic range validation
     if wmin >= wmax:
-        raise HTTPException(
-            400, detail="invalid_config: white_min must be less than white_max"
-        )
+        raise HTTPException(400, detail="invalid_config: white_min must be less than white_max")
 
     pool_size = wmax - wmin + 1
     if wcount > pool_size:
         raise HTTPException(
             400,
-            detail=(
-                f"invalid_config: cannot pick {wcount} unique "
-                f"from pool of {pool_size}"
-            ),
+            detail=(f"invalid_config: cannot pick {wcount} unique " f"from pool of {pool_size}"),
         )
 
     if wcount <= 0:
@@ -248,9 +237,7 @@ def _validate_game_config(
     # Bonus validation (if present)
     if bmin is not None and bmax is not None:
         if bmin >= bmax:
-            raise HTTPException(
-                400, detail="invalid_config: bonus_min must be less than bonus_max"
-            )
+            raise HTTPException(400, detail="invalid_config: bonus_min must be less than bonus_max")
 
     # Mode-specific validation
     if mode == "sum_target" and target_sum is not None:
@@ -273,8 +260,7 @@ def _validate_game_config(
                 raise HTTPException(
                     400,
                     detail=(
-                        f"invalid_config: lucky number {n} outside valid "
-                        f"range ({wmin}-{wmax})"
+                        f"invalid_config: lucky number {n} outside valid " f"range ({wmin}-{wmax})"
                     ),
                 )
 
@@ -567,8 +553,7 @@ def generate(req: GenerateReq, request: Request):
             )
         except Exception:
             print(
-                f"[GEN] {request_id} game={req.game_code} mode={req.mode} "
-                f"latency={latency}ms"
+                f"[GEN] {request_id} game={req.game_code} mode={req.mode} " f"latency={latency}ms"
             )
 
         # Calculate probabilities for the generated set
@@ -598,9 +583,7 @@ def generate(req: GenerateReq, request: Request):
             odds_display = f"1 in {int(prob['combined_odds']):,}"
         else:
             odds_display = (
-                f"1 in {int(prob.get('main_odds', 0)):,}"
-                if prob.get("main_odds")
-                else None
+                f"1 in {int(prob.get('main_odds', 0)):,}" if prob.get("main_odds") else None
             )
 
         # Build a single-draw result entry so the response aligns with the
@@ -618,9 +601,7 @@ def generate(req: GenerateReq, request: Request):
 
         # Ensure combined_sets_odds is a string (Pydantic expects Optional[str])
         combined_sets_odds_val = prob.get("combined_sets_odds")
-        if combined_sets_odds_val is not None and not isinstance(
-            combined_sets_odds_val, str
-        ):
+        if combined_sets_odds_val is not None and not isinstance(combined_sets_odds_val, str):
             try:
                 combined_sets_odds_val = str(combined_sets_odds_val)
             except Exception:
@@ -639,9 +620,7 @@ def generate(req: GenerateReq, request: Request):
             probability_percent=prob.get("combined_probability_percent")
             or prob.get("main_probability_percent"),
             combined_sets_odds=combined_sets_odds_val,
-            combined_sets_probability_percent=prob.get(
-                "combined_sets_probability_percent"
-            ),
+            combined_sets_probability_percent=prob.get("combined_sets_probability_percent"),
             last_number_info=last_info,
             total_sets=req.sets or 1,
             results=[single_result],

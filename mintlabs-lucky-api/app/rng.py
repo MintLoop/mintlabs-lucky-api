@@ -5,9 +5,7 @@ import secrets
 class SecureRng:
     def randint(self, a: int, b: int) -> int:
         if a > b:
-            raise ValueError(
-                "Lower bound 'a' must not be greater than upper bound 'b'."
-            )
+            raise ValueError("Lower bound 'a' must not be greater than upper bound 'b'.")
         return a + secrets.randbelow(b - a + 1)
 
     def sample_unique(self, low: int, high: int, k: int) -> list[int]:
@@ -23,9 +21,7 @@ def spaced_draw(low: int, high: int, k: int, rng: SecureRng) -> list[int]:
     if k <= 0:
         raise ValueError("Number of samples 'k' must be greater than 0.")
     if low > high:
-        raise ValueError(
-            "Lower bound 'low' must not be greater than upper bound 'high'."
-        )
+        raise ValueError("Lower bound 'low' must not be greater than upper bound 'high'.")
 
     width = (high - low + 1) / k
     picks = []
@@ -49,11 +45,7 @@ def draw_balanced(minv, maxv, count, rng):
         a = int(minv + i * step)
         b = int(min(maxv, minv + (i + 1) * step - 1))
         picks.append(rng.randint(a, b))
-    return (
-        sorted(set(picks))
-        if len(set(picks)) == count
-        else rng.sample_unique(minv, maxv, count)
-    )
+    return sorted(set(picks)) if len(set(picks)) == count else rng.sample_unique(minv, maxv, count)
 
 
 def draw_sum_target(
@@ -85,8 +77,7 @@ def draw_pattern_avoid(minv: int, maxv: int, count: int, rng: SecureRng) -> list
 
         # Check for consecutive numbers
         has_consecutive = any(
-            sorted_picks[i + 1] - sorted_picks[i] == 1
-            for i in range(len(sorted_picks) - 1)
+            sorted_picks[i + 1] - sorted_picks[i] == 1 for i in range(len(sorted_picks) - 1)
         )
 
         # Check for too many multiples of same number
@@ -230,9 +221,7 @@ def draw_lucky(
     picks: list[int]
     if lucky_nums:
         valid_lucky = [n for n in lucky_nums if minv <= n <= maxv]
-        unique_lucky = list(
-            dict.fromkeys(valid_lucky)
-        )  # preserve order, drop duplicates
+        unique_lucky = list(dict.fromkeys(valid_lucky))  # preserve order, drop duplicates
         picks = unique_lucky[:count]
         while len(picks) < count:
             candidate = rng.sample_unique(minv, maxv, 1)[0]
