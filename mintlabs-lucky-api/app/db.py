@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 try:
     from psycopg_pool import ConnectionPool
-except Exception:  # pragma: no cover - optional dependency for tests/local dev
+except (ImportError, ModuleNotFoundError):  # pragma: no cover - optional dependency for tests/local dev
     ConnectionPool = None
 
 from .config import settings
