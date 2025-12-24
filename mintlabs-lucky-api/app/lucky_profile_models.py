@@ -2,23 +2,29 @@
 Lucky Profile API Models
 Defines request/response schemas for the Birthstone × Rashi × Color Wheel generator.
 """
+
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
 class LuckyProfileRequest(BaseModel):
     """Request for generating a personalized lucky profile."""
+
     birth_month: str = Field(..., description="Birth month (e.g., 'January', 'March')")
     rashi: str = Field(..., description="Indian zodiac sign (e.g., 'Mesha', 'Karka')")
-    color: str = Field(..., description="Preferred color energy (e.g., 'Blue', 'Red-Orange')")
+    color: str = Field(
+        ..., description="Preferred color energy (e.g., 'Blue', 'Red-Orange')"
+    )
     filters: Optional[dict] = Field(
         default_factory=dict,
-        description="Optional filters for numerology and spiritual traditions"
+        description="Optional filters for numerology and spiritual traditions",
     )
 
 
 class BirthstoneProfile(BaseModel):
     """Birthstone profile data."""
+
     month: str
     name_primary: str
     name_alternatives: list[str]
@@ -34,6 +40,7 @@ class BirthstoneProfile(BaseModel):
 
 class RashiProfile(BaseModel):
     """Rashi (Indian zodiac) profile data."""
+
     rashi: str
     english: str
     symbol: str
@@ -54,6 +61,7 @@ class RashiProfile(BaseModel):
 
 class ColorProfile(BaseModel):
     """Color wheel profile data."""
+
     name: str
     type: str
     hex: str
@@ -70,6 +78,7 @@ class ColorProfile(BaseModel):
 
 class LuckyFocus(BaseModel):
     """Combined lucky focus and recommendations."""
+
     focus_traits: list[str]
     primary_color: str
     primary_color_hex: str
@@ -84,6 +93,7 @@ class LuckyFocus(BaseModel):
 
 class LuckyProfileResponse(BaseModel):
     """Complete lucky profile response."""
+
     birthstone_profile: BirthstoneProfile
     rashi_profile: RashiProfile
     color_profile: ColorProfile
