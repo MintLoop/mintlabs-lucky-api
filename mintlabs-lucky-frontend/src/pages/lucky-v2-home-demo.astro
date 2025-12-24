@@ -1,0 +1,385 @@
+---
+// Lucky v2 Home Demo - Main Page with Design System Components
+// Preserves all functionality from index.astro while using Lucky v2 UI primitives
+
+import Layout from '../layouts/Layout.astro';
+import SiteHeader from "../components/SiteHeader.astro";
+import TrackLink from "../components/TrackLink.astro";
+import GeneratorForm from "../components/GeneratorForm.astro";
+import EduGrid from "../components/EduGrid.astro";
+import GameFacts from "../components/GameFacts.astro";
+import TermsModal from "../components/TermsModal.astro";
+import PrivacyModal from "../components/PrivacyModal.astro";
+
+// Lucky v2 Design System Components
+import PageHero from '../components/ui/PageHero.astro';
+import SoftCard from '../components/ui/SoftCard.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import ThemePicker from '../components/ui/ThemePicker.astro';
+import InfoBlurb from '../components/ui/InfoBlurb.astro';
+
+// env + API
+const API = import.meta.env.PUBLIC_API_BASE || 'http://localhost:8000';
+const ADS = import.meta.env.PUBLIC_ADSENSE_CLIENT;
+const IS_PROD = import.meta.env.PROD;
+
+const gamesEndpoint = API ? `${String(API).replace(/\/$/, '')}/games` : '/games';
+const games = await fetch(gamesEndpoint).then(r => r.json()).catch(() => []);
+const jsonGames = Array.isArray(games) ? JSON.stringify(games).replaceAll('`', '\\`') : '[]';
+const current = Array.isArray(games) && games.length > 0 ? games[0] : null;
+const apiBase = API ? String(API).replace(/\/$/, '') : '';
+---
+
+<Layout title="Lucky v2 Home Demo" description="Lucky Numbers Home with Design System Components" demo>
+  {jsonGames && jsonGames !== '[]' && (
+    <script type="application/json" id="initial-games" set:html={jsonGames} />
+  )}
+
+  <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    
+    <!-- Site Header -->
+    <div class="mb-6">
+      <SiteHeader />
+    </div>
+
+    <!-- Hero Section with Theme Picker -->
+    <div class="mb-8">
+      <PageHero
+        title="MintLabs Lucky Numbers"
+        subtitle="Generate random lottery numbers with transparent RNG. Educational tools for understanding probability. Entertainment only—we never predict winners."
+        variant="gradient"
+        size="lg"
+      >
+        <div class="mt-6">
+          <ThemePicker variant="compact" showLabels={false} />
+        </div>
+      </PageHero>
+    </div>
+
+    <!-- Generator Form Section -->
+    <SoftCard variant="elevated" padding="lg" radius="2xl" gradient="hero" className="mb-8">
+      <GeneratorForm games={Array.isArray(games) ? games : []} />
+    </SoftCard>
+
+    <!-- Results Section -->
+    <section id="results" class="space-y-4 mb-8"></section>
+
+    <!-- Game Facts Section -->
+    <div id="facts" class="mb-8">
+      {current && (
+        <SoftCard variant="default" padding="lg" radius="2xl">
+          <SectionHeader
+            title="Game Facts & Odds"
+            subtitle="Understanding the numbers behind the game"
+            size="sm"
+          />
+          <div class="mt-4">
+            <GameFacts game={current} />
+          </div>
+        </SoftCard>
+      )}
+    </div>
+
+    <!-- Explore Tools Section -->
+    <section id="tools-quick" class="mb-8">
+      <SectionHeader
+        title="Explore Our Tools"
+        subtitle="High-value tools for odds calculation, expected value, and probability visualization"
+        actionText="View All Tools"
+        actionHref="/tools"
+        size="md"
+      />
+      
+      <SoftCard variant="default" padding="md" radius="2xl" className="mt-4">
+        <div class="tools-carousel" aria-label="Featured tools carousel">
+          <div class="carousel-track" role="list" id="carousel-track">
+            <!-- Core tools (stable ordering) -->
+            <TrackLink class="tool-card" href="/tools/probability-visualizer" event="carousel_click" props={{ tool: 'probability-visualizer' }}>📉 Probability Visualizer</TrackLink>
+            <TrackLink class="tool-card" href="/tools/ticket-beautifier" event="carousel_click" props={{ tool: 'ticket-beautifier' }}>✨ Ticket Beautifier</TrackLink>
+            <TrackLink class="tool-card" href="/tools/quick-draw-simulator" event="carousel_click" props={{ tool: 'quick-draw-simulator' }}>🎲 Quick Draw Simulator</TrackLink>
+            <TrackLink class="tool-card" href="/tools/combination-calculator" event="carousel_click" props={{ tool: 'combination-calculator' }}>🔢 Combination Calculator</TrackLink>
+            <!-- Placeholder slots that will be filled by session-randomized secondary tools (client-side) -->
+            <div id="random-slot-1" class="tool-card tool-placeholder" role="listitem" aria-hidden="true">🔄 Loading…</div>
+            <div id="random-slot-2" class="tool-card tool-placeholder" role="listitem" aria-hidden="true">🔄 Loading…</div>
+            <!-- duplicate set for smooth looping -->
+            <TrackLink class="tool-card" href="/tools/combination-calculator" event="carousel_click" props={{ tool: 'combination-calculator' }}>🔢 Combination Calculator</TrackLink>
+            <TrackLink class="tool-card" href="/tools/expected-value-calculator" event="carousel_click" props={{ tool: 'expected-value-calculator' }}>🧮 Expected Value Calculator</TrackLink>
+            <TrackLink class="tool-card" href="/tools/most-drawn-numbers" event="carousel_click" props={{ tool: 'most-drawn-numbers' }}>🔥 Top 10 Most Drawn</TrackLink>
+            <TrackLink class="tool-card" href="/tools/least-drawn-numbers" event="carousel_click" props={{ tool: 'least-drawn-numbers' }}>❄️ Top 10 Least Drawn</TrackLink>
+            <TrackLink class="tool-card" href="/tools/why-odds-dont-change" event="carousel_click" props={{ tool: 'why-odds-dont-change' }}>🎲 Why Odds Don't Change</TrackLink>
+            <TrackLink class="tool-card" href="/tools/quick-draw-simulator" event="carousel_click" props={{ tool: 'quick-draw-simulator' }}>🎲 Quick Draw Simulator</TrackLink>
+            <TrackLink class="tool-card" href="/tools/lottery-math-quiz" event="carousel_click" props={{ tool: 'lottery-math-quiz' }}>🧠 Lottery Math Quiz</TrackLink>
+            <TrackLink class="tool-card" href="/tools/ticket-beautifier" event="carousel_click" props={{ tool: 'ticket-beautifier' }}>✨ Ticket Beautifier</TrackLink>
+            <TrackLink class="tool-card" href="/tools/probability-visualizer" event="carousel_click" props={{ tool: 'probability-visualizer' }}>📉 Probability Visualizer</TrackLink>
+            <TrackLink class="tool-card" href="/tools/annuity-breakdown" event="carousel_click" props={{ tool: 'annuity-breakdown' }}>📆 Annuity Visualizer</TrackLink>
+            <TrackLink class="tool-card" href="/tools/number-trend-graph" event="carousel_click" props={{ tool: 'number-trend-graph' }}>📈 Number Trend Graph</TrackLink>
+            <TrackLink class="tool-card" href="/tools/ticket-variance" event="carousel_click" props={{ tool: 'ticket-variance' }}>📈 Ticket Variance</TrackLink>
+          </div>
+        </div>
+      </SoftCard>
+    </section>
+
+    <!-- AdSense Block 1 -->
+    {IS_PROD && ADS && (
+      <>
+        <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS}`} crossorigin="anonymous"></script>
+        <ins class="adsbygoogle block h-[90px]" data-ad-client={ADS} data-ad-slot="0000000001" data-full-width-responsive="true"></ins>
+        <script is:inline>try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){console.warn('AdSense failed:',e);}</script>
+      </>
+    )}
+
+    <!-- Lucky Profile Feature -->
+    <section id="lucky-profile-feature" class="mb-8">
+      <SoftCard variant="glow" padding="lg" radius="2xl" gradient="accent" hasAnimation={true}>
+        <div class="flex gap-4 sm:gap-6 items-start">
+          <div class="text-4xl sm:text-5xl flex-shrink-0">✨</div>
+          <div class="flex-1 space-y-3">
+            <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Lucky Profile Generator</h3>
+            <p class="text-sm sm:text-base text-gray-700">
+              Discover your personalized lucky numbers based on birthstone, Indian zodiac (Rashi), and color psychology. Pure client-side synthesis—instant results, zero tracking.
+            </p>
+            <a 
+              href="/lucky-profile" 
+              class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all shadow-soft-sm hover:shadow-soft-md"
+              style="background: var(--accent-primary); color: white;"
+            >
+              Create Your Lucky Profile
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </SoftCard>
+    </section>
+
+    <!-- Casino-Lite Feature -->
+    <section id="casino-lite-feature" class="mb-8">
+      <SoftCard variant="elevated" padding="lg" radius="2xl" gradient="subtle">
+        <div class="flex gap-4 sm:gap-6 items-start">
+          <div class="text-4xl sm:text-5xl flex-shrink-0">🎰</div>
+          <div class="flex-1 space-y-4">
+            <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Casino-Lite Simulators</h3>
+            <p class="text-sm sm:text-base text-gray-700">
+              Learn probability, card strategy, and expected value through our fictional casino games and RNG tools. Entertainment only—no real money, no predictions, zero risk.
+            </p>
+            
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1.5 text-sm rounded-full bg-white/80 border-2 border-gray-200 text-gray-700 font-medium">
+                🃏 Blackjack
+              </span>
+              <span class="px-3 py-1.5 text-sm rounded-full bg-white/80 border-2 border-gray-200 text-gray-700 font-medium">
+                🎡 Wheel Spinner
+              </span>
+              <span class="px-3 py-1.5 text-sm rounded-full bg-white/80 border-2 border-gray-200 text-gray-700 font-medium">
+                🎫 Raffle Picker
+              </span>
+              <span class="px-3 py-1.5 text-sm rounded-full bg-white/80 border-2 border-gray-200 text-gray-700 font-medium">
+                🎲 Dice & More
+              </span>
+            </div>
+            
+            <a 
+              href="/casino-lite" 
+              class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all shadow-soft-sm hover:shadow-soft-md"
+              style="background: var(--accent-primary); color: white;"
+            >
+              Explore Casino-Lite Hub
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </SoftCard>
+    </section>
+
+    <!-- Educational Grid -->
+    <section class="mb-8">
+      <SoftCard variant="default" padding="lg" radius="2xl">
+        <SectionHeader
+          title="Learn the Math"
+          subtitle="Educational resources about lottery probability and responsible play"
+          size="md"
+        />
+        <div class="mt-6">
+          <EduGrid />
+        </div>
+      </SoftCard>
+    </section>
+
+    <!-- Info Blurbs -->
+    <div class="grid sm:grid-cols-2 gap-4 mb-8">
+      <InfoBlurb variant="educational" title="Transparency First">
+        All our tools use cryptographically secure random number generation. View our open-source RNG implementation and verify fairness yourself.
+      </InfoBlurb>
+      
+      <InfoBlurb variant="warning" title="Entertainment Only">
+        We do not predict lottery winners. Past draws have zero influence on future results. Play responsibly and never spend more than you can afford to lose.
+      </InfoBlurb>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 pb-8 border-t pt-8" style="border-color: var(--border-primary);">
+      {/* Footer Navigation */}
+      <div class="grid gap-6 grid-cols-2 md:grid-cols-3 mb-6 text-sm">
+        <div>
+          <h4 class="font-semibold mb-2" style="color: var(--text-secondary);">Education</h4>
+          <ul class="space-y-1.5" style="color: var(--text-muted);">
+            <li><a href="/lottery-odds" class="hover:underline demo-link transition-colors">Lottery Odds</a></li>
+            <li><a href="/lottery-math" class="hover:underline demo-link transition-colors">The Math</a></li>
+            <li><a href="/faq" class="hover:underline demo-link transition-colors">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2" style="color: var(--text-secondary);">Tools</h4>
+          <ul class="space-y-1.5" style="color: var(--text-muted);">
+            <li><a href="/tools/payout-calculator" class="hover:underline demo-link transition-colors">Payout Calculator</a></li>
+            <li><a href="/tools/lottery-budget" class="hover:underline demo-link transition-colors">Budget Planner</a></li>
+            <li><a href="/archive" class="hover:underline demo-link transition-colors">Past Results</a></li>
+          </ul>
+        </div>
+        <div class="col-span-2 md:col-span-1">
+          <h4 class="font-semibold mb-2" style="color: var(--text-secondary);">Legal</h4>
+          <ul class="space-y-1.5" style="color: var(--text-muted);">
+            <li><a href="/terms" class="hover:underline demo-link transition-colors">Terms & Conditions</a></li>
+            <li><a href="/privacy" class="hover:underline demo-link transition-colors">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      {/* Copyright */}
+      <div class="text-center text-sm border-t pt-4" style="color: var(--text-muted); border-color: var(--border-primary);">
+        <p>© 2025 MintLabs. All rights reserved.</p>
+        <div class="mt-2 flex items-center justify-center gap-2 text-xs">
+          <img src="/mintlab.png" alt="MintLabs" class="w-4 h-4 opacity-70" />
+          <span>Powered by MintLabs</span>
+        </div>
+        <p class="mt-2 text-xs max-w-sm mx-auto">
+          For entertainment and education only. We do not predict lottery numbers. Play responsibly.
+        </p>
+      </div>
+    </footer>
+
+    <!-- AdSense Block 2 -->
+    {IS_PROD && ADS && (
+      <>
+        <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS}`} crossorigin="anonymous"></script>
+        <ins class="adsbygoogle block h-[90px]" data-ad-client={ADS} data-ad-slot="0000000002" data-full-width-responsive="true"></ins>
+        <script is:inline>try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){console.warn('AdSense failed:',e);}</script>
+      </>
+    )}
+  </main>
+
+  <TermsModal />
+  <PrivacyModal />
+
+  <style>
+    .tools-carousel { 
+      overflow: hidden; 
+      border-radius: 12px; 
+      background: rgba(255,255,255,0.02);
+    }
+    .carousel-track { 
+      display: flex; 
+      gap: 1rem; 
+      padding: 0.75rem; 
+      align-items: center; 
+      animation: scroll-left 20s linear infinite; 
+    }
+    .tool-card { 
+      display: inline-block; 
+      padding: 0.6rem 1rem; 
+      border-radius: 8px; 
+      background: var(--bg-surface-elevated, #f8fafc); 
+      color: var(--text-primary, #0f172a); 
+      text-decoration: none; 
+      font-weight: 600; 
+      border: 1px solid var(--border-primary, #e2e8f0); 
+      white-space: nowrap; 
+      box-shadow: var(--shadow-soft-sm);
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+    .tool-card:hover { 
+      background: var(--bg-surface-2, #e2e8f0); 
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-soft-md);
+    }
+    .tool-placeholder { 
+      opacity: 0.6; 
+      font-weight: 600; 
+    }
+    .tools-carousel:hover .carousel-track { 
+      animation-play-state: paused; 
+    }
+    @keyframes scroll-left { 
+      0% { transform: translateX(0); } 
+      100% { transform: translateX(-50%); } 
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .carousel-track {
+        animation: none;
+      }
+    }
+  </style>
+
+  <script is:inline>
+    // session-stable random picks for carousel secondary slots
+    (function(){
+      try {
+        const pool = [
+          {href:'/tools/expected-value-calculator', label:'🧮 Expected Value Calculator'},
+          {href:'/tools/most-drawn-numbers', label:'🔥 Most Drawn'},
+          {href:'/tools/least-drawn-numbers', label:'❄️ Least Drawn'},
+          {href:'/tools/number-trend-graph', label:'📈 Number Trend'},
+          {href:'/tools/lottery-math-quiz', label:'🧠 Math Quiz'},
+          {href:'/tools/pattern-analyzer', label:'🔍 Pattern Analyzer'},
+          {href:'/tools/ticket-variance', label:'📊 Ticket Variance'},
+        ];
+
+        const getSessionPick = (key, count) => {
+          try {
+            const existing = window.sessionStorage.getItem(key);
+            if (existing) return JSON.parse(existing);
+            const picks = [];
+            const copy = [...pool];
+            for (let i=0;i<count;i++){
+              if (!copy.length) break;
+              const idx = Math.floor(Math.random()*copy.length);
+              picks.push(copy.splice(idx,1)[0]);
+            }
+            window.sessionStorage.setItem(key, JSON.stringify(picks));
+            return picks;
+          } catch(e) { return []; }
+        };
+
+        const picks = getSessionPick('carousel_secondary', 2);
+        const slot1 = document.getElementById('random-slot-1');
+        const slot2 = document.getElementById('random-slot-2');
+        const makeNode = (o) => {
+          const a = document.createElement('a');
+          a.className = 'tool-card';
+          a.href = o.href;
+          a.textContent = o.label;
+          a.setAttribute('role','listitem');
+          return a;
+        };
+        if (slot1 && picks[0]) slot1.replaceWith(makeNode(picks[0]));
+        if (slot2 && picks[1]) slot2.replaceWith(makeNode(picks[1]));
+      } catch(e){console.warn('carousel session picks failed', e)}
+    })();
+  </script>
+
+  <!-- Generator logic -->
+  <script is:inline define:vars={{ apiBase }}>
+    window.__LUCKY_API_BASE = apiBase;
+  </script>
+  <script type="module" src="/scripts/entry.js"></script>
+</Layout>
+
+<style>
+  /* Demo link tokens for Lucky v2 home demo */
+  .demo-link { color: var(--text-link); transition: color .15s ease; }
+  .demo-link:hover { color: var(--accent-primary); text-decoration: underline; }
+</style>

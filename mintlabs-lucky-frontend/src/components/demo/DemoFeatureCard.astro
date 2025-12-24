@@ -9,7 +9,7 @@ export interface Props {
   variant?: 'accent' | 'elevated' | 'glow';
 }
 
-const { icon = '✨', title, description, href, badge } = Astro.props;
+const { icon = '✨', title, description, href, badge, _variant = 'accent' } = Astro.props;
 ---
 
 <SoftCard variant={_variant} padding="md" radius="xl" className="demo-card demo-feature-card">

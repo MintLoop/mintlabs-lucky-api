@@ -34,9 +34,6 @@ from .utils import hmac_commitment, new_request_id, sha256_hex
 
 app = FastAPI(title="MintLabs Lucky API")
 
-# Register API routers
-app.include_router(lucky_profiles.router)
-
 
 # ---------------------------------------------------------------------------
 # Security Headers Middleware (always active)
