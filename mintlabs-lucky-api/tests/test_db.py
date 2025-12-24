@@ -73,6 +73,16 @@ class TestConnectionPool:
                 with pytest.raises(Exception, match="connection failed"):
                     db_module.get_pool()
 
+    def test_get_pool_raises_when_connectionpool_unavailable(self):
+        """get_pool should raise clear error when psycopg_pool is not available."""
+        from app import db as db_module
+
+        # Simulate the case where psycopg_pool import fails
+        with patch.object(db_module, "_POOL", None):
+            with patch.object(db_module, "ConnectionPool", None):
+                with pytest.raises(RuntimeError, match="psycopg_pool is not available"):
+                    db_module.get_pool()
+
 
 class TestBuildPool:
     """Test pool construction with various settings."""

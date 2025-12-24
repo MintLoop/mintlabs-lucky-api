@@ -40,6 +40,11 @@ def _build_pool() -> ConnectionPool:
 def get_pool() -> ConnectionPool:
     global _POOL
     if _POOL is None:
+        if ConnectionPool is None:
+            raise RuntimeError(
+                "psycopg_pool is not available. "
+                "Install it with: pip install psycopg[pool]"
+            )
         _POOL = _build_pool()
     return _POOL
 
@@ -47,9 +52,5 @@ def get_pool() -> ConnectionPool:
 @contextmanager
 def get_conn() -> Generator[Any, None, None]:
     pool = get_pool()
-    if pool is None:
-        # Connection pool unavailable (e.g., optional dependency not installed)
-        # Tests monkeypatch this function, so returning yields a dummy connection.
-        raise RuntimeError("ConnectionPool is not available")
     with pool.connection() as conn:
         yield conn
