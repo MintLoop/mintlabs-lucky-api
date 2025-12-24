@@ -2,6 +2,7 @@
 
 | Phase | Owner | Branch | Status | Notes |
 | ----- | ----- | ------ | ------ | ----- |
+| Tooling – Lockfile | **GitHub Copilot** | `chore/update-frontend-lockfile` | 🔁 In Progress | Update `package-lock.json` to match `package.json` and fix CI `npm ci` build. |
 | 1 – Automation Gatekeeper | Claude 4.5 | main | ✅ Done | Fixed 500s (psycopg3 prepare=False), token bucket rate limiter, request tracing, frontend 429 UX, analytics. |
 | 2 – Reliability Ops | Claude 4.5 | phase-2-reliability | ✅ Done | Game config validation (400s), /health + /readyz split, /stats gated with ADMIN_TOKEN, DB tests, log format frozen. |
 | 3 – Security Hardening | Claude 4.5 | phase-2-reliability | ✅ Done | Security headers, error shape freeze, admin endpoint hardening, rate limit tiers, RUNBOOK security docs. |

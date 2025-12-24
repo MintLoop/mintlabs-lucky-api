@@ -123,10 +123,10 @@ export function initLucky() {
     };
     function updateConditionalFields() {
       try {
-        Object.values(map).forEach(id => { document.querySelectorAll('#' + id).forEach(el=>{ el.classList.add('hidden'); try { (el as HTMLElement).style.display='none'; } catch(e){} }); });
+        Object.values(map).forEach(id => { document.querySelectorAll('#' + id).forEach(el=>{ el.classList.add('hidden'); try { (el as HTMLElement).style.display='none'; } catch(e){ void e; } }); });
         const key = (modeSelect instanceof HTMLSelectElement) ? modeSelect.value : undefined;
         if (key && map[key]) {
-          document.querySelectorAll('#' + map[key]).forEach(el=>{ el.classList.remove('hidden'); try { (el as HTMLElement).style.display='block'; } catch(e){} });
+          document.querySelectorAll('#' + map[key]).forEach(el=>{ el.classList.remove('hidden'); try { (el as HTMLElement).style.display='block'; } catch(e){ void e; } });
 
           // if we're requesting a themed mode, populate the modeKey select
           if (map[key] === 'modeKeyContainer') {
@@ -153,9 +153,9 @@ export function initLucky() {
                   select.appendChild(opt);
                 });
                 // ensure the select is enabled and required; tests choose options programmatically
-                try { select.removeAttribute('disabled'); } catch(e){}
-                try { select.setAttribute('required','required'); } catch(e){}
-                try { select.setAttribute('data-populated', '1'); } catch(e){}
+                try { select.removeAttribute('disabled'); } catch(e){ void e; }
+                try { select.setAttribute('required','required'); } catch(e){ void e; }
+                try { select.setAttribute('data-populated', '1'); } catch(e){ void e; }
                 
                 // Add event listener to show educational text when option selected
                 select.addEventListener('change', () => {
@@ -174,17 +174,17 @@ export function initLucky() {
                   }
                 });
               }
-            } catch(e){}
+            } catch(e){ void e; }
           }
         }
         return true;
       } catch (err) { return false; }
     }
-    try { if (modeSelect) modeSelect.addEventListener('change', updateConditionalFields); } catch(e){}
-    try { (window as any)._genFormUpdate = updateConditionalFields; } catch(e){}
-    try { (window as any).__GENFORM_READY = true; } catch(e){}
-    try { updateConditionalFields(); } catch(e){}
-  } catch (err) { try { (window as any).__GENFORM_ERROR = String(err); } catch(e){} }
+    try { if (modeSelect) modeSelect.addEventListener('change', updateConditionalFields); } catch(e){ void e; }
+    try { (window as any)._genFormUpdate = updateConditionalFields; } catch(e){ void e; }
+    try { (window as any).__GENFORM_READY = true; } catch(e){ void e; }
+    try { updateConditionalFields(); } catch(e){ void e; }
+  } catch (err) { try { (window as any).__GENFORM_ERROR = String(err); } catch(e){ void e; } }
 
   const _form = form;
   const _out = out;
@@ -332,15 +332,15 @@ export function initLucky() {
             const cfg = (MODE_CONFIG as any)[actualMode];
             if (cfg && cfg.items) {
               const found = cfg.items.find((it: any) => String(it.key) === String(key));
-              if (found) modeBadgeHtml = `<div class=\"text-xs mt-1\">Mode: <span class=\"font-semibold\">${found.emoji ? found.emoji+' ' : ''}${found.label}</span></div>`;
+              if (found) modeBadgeHtml = `<div class="text-xs mt-1">Mode: <span class="font-semibold">${found.emoji ? found.emoji+' ' : ''}${found.label}</span></div>`;
             }
           }
-        } catch (e) {}
+} catch (e) { void e; }
 
         const numbersHtml = Array.isArray(d.numbers)
-          ? d.numbers.map((n: any) => `<span class=\"result-chip text-emerald-400 font-semibold\">${n}</span>`).join(', ')
+          ? d.numbers.map((n: any) => `<span class="result-chip text-emerald-400 font-semibold">${n}</span>`).join(', ')
           : (d.numbers || '—');
-        const bonusHtml = d.bonus ? `<span class=\"result-chip text-emerald-400 font-semibold\">${d.bonus}</span>` : '';
+        const bonusHtml = d.bonus ? `<span class="result-chip text-emerald-400 font-semibold">${d.bonus}</span>` : '';
 
         let lastInfoHtml = '';
         if (d.last_number_info) {
@@ -465,7 +465,7 @@ mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data
 try {
   // lazy-import tracking so tests don't break if module isn't present during SSR
   // (esbuild bundles this file into public/scripts/lucky.js during build).
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+   
   import('./tracking').then(({ track }) => {
     if (typeof window !== 'undefined') {
       try {

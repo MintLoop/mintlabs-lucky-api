@@ -2,20 +2,20 @@
 Lucky Profile Generator Route
 Birthstone × Rashi × Color Wheel synthesis API
 """
+
 import json
-import os
 from pathlib import Path
 from typing import Any, Optional
 
 from fastapi import APIRouter, HTTPException
 
 from app.lucky_profile_models import (
-    LuckyProfileRequest,
-    LuckyProfileResponse,
     BirthstoneProfile,
-    RashiProfile,
     ColorProfile,
     LuckyFocus,
+    LuckyProfileRequest,
+    LuckyProfileResponse,
+    RashiProfile,
 )
 
 router = APIRouter(prefix="/v1/lucky", tags=["lucky-profiles"])
@@ -37,7 +37,7 @@ def load_json_data(filename: str) -> dict[str, Any]:
             f"DATA_DIR: {DATA_DIR}\n"
             f"DATA_DIR exists: {DATA_DIR.exists()}"
         )
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -74,9 +74,7 @@ def find_color(color_name: str) -> Optional[dict]:
     return None
 
 
-def synthesize_lucky_focus(
-    birthstone: dict, rashi: dict, color: dict, filters: dict
-) -> LuckyFocus:
+def synthesize_lucky_focus(birthstone: dict, rashi: dict, color: dict, filters: dict) -> LuckyFocus:
     """
     Synthesize a unified lucky focus from birthstone, rashi, and color profiles.
     Combines traits, generates recommendations, and creates actionable insights.
@@ -86,29 +84,29 @@ def synthesize_lucky_focus(
     combined_traits.extend(birthstone.get("traits", []))
     combined_traits.extend(rashi.get("qualities", []))
     combined_traits.extend(color.get("associated_traits", []))
-    
+
     # Deduplicate and take top traits
     unique_traits = list(dict.fromkeys(combined_traits))[:5]
-    
+
     # Generate recommended actions
     actions = []
-    
+
     # Birthstone action
     stone_name = birthstone.get("name_primary", "")
     favorable_days = rashi.get("favorable_days", [])
     if favorable_days:
         day = favorable_days[0]
         actions.append(f"Wear {stone_name.lower()} or related stones on {day}s")
-    
+
     # Color action
     color_name = color.get("name", "")
     actions.append(f"Use {color_name.lower()} accents in your workspace or attire")
-    
+
     # Complementary color
     complement = color.get("complement", "")
     if complement:
         actions.append(f"Balance with {complement.lower()} for momentum and harmony")
-    
+
     # Numerology action
     num = birthstone.get("numerology_number", 1)
     num_meaning = {
@@ -123,27 +121,33 @@ def synthesize_lucky_focus(
         9: "completion → release",
     }
     actions.append(f"Numerology cycle: {num} → {num_meaning.get(num, 'transform')}")
-    
+
     # Spiritual practice if filters enabled
     if filters.get("hindu"):
         mantra = rashi.get("mantra", "")
         if mantra:
             actions.append(f"Chant: {mantra}")
-    
+
     # Lucky numbers (derived from numerology)
     base_num = birthstone.get("numerology_number", 1)
     rashi_num = rashi.get("numerology_alignment", 1)
     color_num = color.get("numerology_color_map", 1)
-    
-    lucky_nums = sorted(list(set([
-        base_num,
-        rashi_num,
-        color_num,
-        (base_num + rashi_num) % 9 or 9,
-        (base_num * color_num) % 9 or 9,
-        (rashi_num + color_num) % 9 or 9,
-    ])))[:6]
-    
+
+    lucky_nums = sorted(
+        list(
+            set(
+                [
+                    base_num,
+                    rashi_num,
+                    color_num,
+                    (base_num + rashi_num) % 9 or 9,
+                    (base_num * color_num) % 9 or 9,
+                    (rashi_num + color_num) % 9 or 9,
+                ]
+            )
+        )
+    )[:6]
+
     return LuckyFocus(
         focus_traits=unique_traits,
         primary_color=color_name,
@@ -165,7 +169,7 @@ async def generate_lucky_profile(req: LuckyProfileRequest) -> LuckyProfileRespon
     - Birthstone energy
     - Indian zodiac (Rashi) influence
     - Color wheel psychology
-    
+
     Returns unified profile with actionable recommendations.
     """
     # Find birthstone
@@ -173,25 +177,34 @@ async def generate_lucky_profile(req: LuckyProfileRequest) -> LuckyProfileRespon
     if not birthstone_data:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid birth month: {req.birth_month}. Must be full month name (e.g., 'January')",
+            detail=(
+                f"Invalid birth month: {req.birth_month}. "
+                "Must be full month name (e.g., 'January')"
+            ),
         )
-    
+
     # Find rashi
     rashi_data = find_rashi(req.rashi)
     if not rashi_data:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid rashi: {req.rashi}. Must be rashi name (e.g., 'Mesha') or English name (e.g., 'Aries')",
+            detail=(
+                f"Invalid rashi: {req.rashi}. "
+                "Must be rashi name (e.g., 'Mesha') or English name (e.g., 'Aries')"
+            ),
         )
-    
+
     # Find color
     color_data = find_color(req.color)
     if not color_data:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid color: {req.color}. Must match color wheel names (e.g., 'Blue', 'Red-Orange')",
+            detail=(
+                f"Invalid color: {req.color}. "
+                "Must match color wheel names (e.g., 'Blue', 'Red-Orange')"
+            ),
         )
-    
+
     # Parse filters
     filters = req.filters or {}
     filters_applied = {
@@ -201,17 +214,15 @@ async def generate_lucky_profile(req: LuckyProfileRequest) -> LuckyProfileRespon
         "buddhist": filters.get("buddhist", False),
         "christian": filters.get("christian", False),
     }
-    
+
     # Build response models
     birthstone_profile = BirthstoneProfile(**birthstone_data)
     rashi_profile = RashiProfile(**rashi_data)
     color_profile = ColorProfile(**color_data)
-    
+
     # Synthesize lucky focus
-    lucky_focus = synthesize_lucky_focus(
-        birthstone_data, rashi_data, color_data, filters_applied
-    )
-    
+    lucky_focus = synthesize_lucky_focus(birthstone_data, rashi_data, color_data, filters_applied)
+
     return LuckyProfileResponse(
         birthstone_profile=birthstone_profile,
         rashi_profile=rashi_profile,
@@ -233,7 +244,7 @@ async def get_metadata():
         for sign in RASHIS_DATA.get("signs", [])
     ]
     colors = [color.get("name") for color in COLOR_WHEEL_DATA.get("colors", [])]
-    
+
     return {
         "months": months,
         "rashis": rashis,

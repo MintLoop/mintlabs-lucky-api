@@ -214,7 +214,10 @@ def draw_birthday(
 def draw_lucky(
     minv: int, maxv: int, count: int, rng: "SecureRng", lucky_nums: list[int] = None
 ) -> list[int]:
-    """Incorporate user-defined lucky numbers, ensure we always return `count` values."""
+    """Incorporate user-defined lucky numbers.
+
+    Ensure we always return `count` values.
+    """
     picks: list[int]
     if lucky_nums:
         valid_lucky = [n for n in lucky_nums if minv <= n <= maxv]
@@ -231,7 +234,9 @@ def draw_lucky(
     return picks
 
 
-def draw_personalized(minv: int, maxv: int, count: int, rng: SecureRng, seed_value: str = None) -> list[int]:
+def draw_personalized(
+    minv: int, maxv: int, count: int, rng: SecureRng, seed_value: str = None
+) -> list[int]:
     """Generate deterministic-looking numbers derived from a user-provided seed string.
 
     This is useful for modes like `zodiac`, `gemstone`, `favorite_color` where the
@@ -246,11 +251,15 @@ def draw_personalized(minv: int, maxv: int, count: int, rng: SecureRng, seed_val
     import hashlib
 
     # Hash the seed_value to obtain a predictable integer
-    seed_hash = hashlib.sha256(seed_value.encode('utf-8')).hexdigest()
+    seed_hash = hashlib.sha256(seed_value.encode("utf-8")).hexdigest()
     seed_int = int(seed_hash[:16], 16)
 
-    # Use a local deterministic RNG so we don't interfere with SecureRng state
-    local = random.Random(seed_int)
+    # Use a local deterministic RNG so we don't interfere with SecureRng state.
+    # SECURITY: This RNG is deterministic (seed derived from a hash of the provided
+    # seed_value) and is used for reproducible, non-cryptographic behavior only — not
+    # for secrets or any cryptographic purpose. The use of `random.Random` here is
+    # deliberate to keep the SecureRng entropy separate.
+    local = random.Random(seed_int)  # noqa: S311
 
     pool = list(range(minv, maxv + 1))
     if count >= len(pool):
@@ -474,7 +483,10 @@ def format_probability_display(prob_data: dict) -> str:
 def get_last_number_probability(
     numbers: list[int], bonus: int = None, white_max: int = None, bonus_max: int = None
 ) -> str:
-    """Get probability information for the last number (bonus or highest main number)."""
+    """Get probability information for the last number.
+
+    Returns information about bonus number or highest main number probability.
+    """
     if bonus is not None and bonus_max is not None:
         # Show bonus number probability
         bonus_prob = 1 / bonus_max
