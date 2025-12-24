@@ -38,6 +38,11 @@ def _build_pool() -> ConnectionPool:
 
 
 def get_pool() -> ConnectionPool:
+    if ConnectionPool is None:
+        raise RuntimeError(
+            "ConnectionPool is not available. "
+            "psycopg_pool must be installed to use database connections."
+        )
     global _POOL
     if _POOL is None:
         if ConnectionPool is None:
