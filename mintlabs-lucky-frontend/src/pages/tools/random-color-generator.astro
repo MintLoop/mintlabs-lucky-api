@@ -19,16 +19,7 @@ const jsonLd = {
   }
 };
 
-// Color meanings database
-const colorMeanings = {
-  red: { range: [0, 30, 330, 360], meaning: "Passion, energy, excitement, and strength" },
-  orange: { range: [30, 60], meaning: "Creativity, enthusiasm, warmth, and adventure" },
-  yellow: { range: [60, 90], meaning: "Joy, optimism, intelligence, and clarity" },
-  green: { range: [90, 150], meaning: "Growth, harmony, balance, and renewal" },
-  cyan: { range: [150, 210], meaning: "Calm, clarity, communication, and freshness" },
-  blue: { range: [210, 270], meaning: "Trust, stability, wisdom, and serenity" },
-  purple: { range: [270, 330], meaning: "Creativity, spirituality, luxury, and mystery" }
-};
+// Color meanings database handled by getColorMeaning(hue) helper function
 ---
 
 <InfoLayout

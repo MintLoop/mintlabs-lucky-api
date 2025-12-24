@@ -11,11 +11,19 @@ declare module 'dom-to-image-more' {
     filter?: (node: Node) => boolean;
   }
 
-  export default {
-    toPng: (node: HTMLElement, options?: Options) => Promise<string>;
-    toJpeg: (node: HTMLElement, options?: Options) => Promise<string>;
-    toSvg: (node: HTMLElement, options?: Options) => Promise<string>;
-    toBlob: (node: HTMLElement, options?: Options) => Promise<Blob>;
-    toPixelData: (node: HTMLElement, options?: Options) => Promise<Uint8ClampedArray>;
+  export function toPng(node: HTMLElement, options?: Options): Promise<string>;
+  export function toJpeg(node: HTMLElement, options?: Options): Promise<string>;
+  export function toSvg(node: HTMLElement, options?: Options): Promise<string>;
+  export function toBlob(node: HTMLElement, options?: Options): Promise<Blob>;
+  export function toPixelData(node: HTMLElement, options?: Options): Promise<Uint8ClampedArray>;
+
+  const domToImage: {
+    toPng: typeof toPng;
+    toJpeg: typeof toJpeg;
+    toSvg: typeof toSvg;
+    toBlob: typeof toBlob;
+    toPixelData: typeof toPixelData;
   };
+
+  export default domToImage;
 }

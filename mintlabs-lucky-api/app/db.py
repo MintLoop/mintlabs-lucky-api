@@ -45,6 +45,11 @@ def get_pool() -> ConnectionPool:
         )
     global _POOL
     if _POOL is None:
+        if ConnectionPool is None:
+            raise RuntimeError(
+                "psycopg_pool is not available. "
+                "Install it with: pip install psycopg[pool]"
+            )
         _POOL = _build_pool()
     return _POOL
 

@@ -3,7 +3,7 @@
  * A fun, educational number-matching game with no money semantics
  */
 
-import { cryptoRandomInt, shuffleInPlace } from '../rng/shuffle';
+import { cryptoRandomInt } from '../rng/shuffle';
 
 // Game constants
 export const KENO_MAX = 80;        // Numbers 1-80

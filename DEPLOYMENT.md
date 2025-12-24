@@ -94,6 +94,9 @@ vercel --prod
    - `DATABASE_URL`: Your Supabase connection string
    - `SUPABASE_URL`: Your Supabase project URL
    - `SUPABASE_ANON_KEY`: Your Supabase anon key
+   - `API_ALLOWED_ORIGINS`: Comma-separated list of allowed origins for the API (e.g., `https://lucky.mintloop.dev, https://mintlabs-lucky-frontend.vercel.app, http://localhost:4321`)
+
+   After adding your frontend custom domain (for example `lucky.mintloop.dev`) in Vercel, also add it to `API_ALLOWED_ORIGINS` so the backend allows requests from that origin.
 
 4. Note the deployment URL (e.g., `https://mintlabs-lucky-api.vercel.app`)
 
@@ -108,6 +111,16 @@ vercel --prod
 2. Set environment variables:
    - `PUBLIC_API_BASE`: Your API deployment URL (e.g., `https://mintlabs-lucky-api.vercel.app`)
    - `PUBLIC_ADSENSE_CLIENT`: Your AdSense client ID (optional)
+
+Team secret (recommended for preview builds):
+- Create a Vercel team secret named `api_base_url` with the API URL as the value, then reference it in the frontend project by setting `PUBLIC_API_BASE` to `@api_base_url` for Preview and Production environments. This keeps preview builds consistent without hardcoding URLs in the repo.
+
+CLI example:
+```bash
+vercel secrets add api_base_url https://mintlabs-lucky-api.vercel.app
+```
+
+If preview builds fail with a missing API base, verify the secret exists (`vercel secrets ls`) and that `PUBLIC_API_BASE` in the project references `@api_base_url` (the repo already references this in `vercel.json`).
 
 3. Note the frontend deployment URL
 

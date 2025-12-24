@@ -146,3 +146,99 @@
   color: var(--text-muted);
   font-size: 0.75rem;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tool Page Styles (Wheel Spinner, Raffle Picker)
+   These were moved from inline page styles to this shared stylesheet so pages
+   remain linter-clean while preserving layout.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.tool-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.tool-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.tool-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tool-tagline {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.tool-controls {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-primary);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.control-section {
+  margin-bottom: 1.5rem;
+}
+
+.segment-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.action-button {
+  width: 100%;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: 1rem;
+}
+
+.action-button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+.secondary-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 2px solid var(--border-primary);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.wheel-container { display:flex; justify-content:center; align-items:center; margin:2rem 0; padding:2rem; background:var(--surface-elevated); }
+.wheel-wrapper { position:relative; display:flex; justify-content:center; }
+.wheel-pointer { position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-size:2rem; color:var(--accent); z-index:10; text-shadow:0 2px 4px rgba(0,0,0,0.3); }
+
+#wheelCanvas { border-radius:50%; box-shadow: 0 0 0 8px var(--surface-2), 0 0 0 12px var(--accent), 0 8px 32px rgba(0,0,0,0.3); max-width:100%; height:auto; transition: transform 3s cubic-bezier(0.17,0.67,0.12,0.99); transform-origin: 50% 50%; display:block; }
+
+.result-display { background:var(--surface-elevated); border:2px solid var(--accent-primary); border-radius:1rem; padding:2rem; text-align:center; margin-bottom:2rem; }
+.result-text { font-size:2rem; font-weight:bold; color:var(--accent-primary); margin-top:1rem; }
+
+.winner-card { background:var(--surface); border:2px solid var(--border-primary); border-radius:0.75rem; padding:1.5rem; display:flex; align-items:center; gap:1rem; }
+.winner-rank { font-size:2rem; font-weight:bold; color:var(--accent-primary); min-width:60px; text-align:center; }
+.winner-name { flex:1; font-size:1.5rem; font-weight:600; color:var(--text-primary); }
+
+@media (max-width:768px) {
+  .segment-inputs { grid-template-columns:1fr; }
+  .wheel-header h1 { font-size:2rem; }
+  .winner-name { font-size:1.2rem; }
+  .winner-rank { font-size:1.5rem; min-width:50px; }
+}
