@@ -13,7 +13,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,js,astro,css}\"",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
-    "pretest:e2e": "npm run build:lucky && PUBLIC_API_BASE= npm run build",
+    "pretest:e2e": "npm run build:lucky && BACKEND_ORIGIN=http://localhost:8000 npm run build",
     "build:lucky": "esbuild src/scripts/lucky.ts --bundle --format=esm --platform=browser --outfile=public/scripts/lucky.js",
     "prebuild": "npm run build:lucky"
   },

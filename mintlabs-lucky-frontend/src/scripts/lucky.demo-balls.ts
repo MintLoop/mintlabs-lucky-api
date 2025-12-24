@@ -1,16 +1,9 @@
 import MODE_CONFIG from '../data/modeConfig';
 import MODE_EDUCATION from '../data/modeEducation';
 
-const metaEnv = (import.meta as any)?.env ?? {};
-const globalApi = typeof window !== 'undefined' ? (window as any).__LUCKY_API_BASE : undefined;
-const API_ENV = metaEnv.PUBLIC_API_BASE ?? globalApi ?? '';
-const API = (API_ENV && String(API_ENV).trim() !== '')
-  ? String(API_ENV).replace(/\/$/, '')
-  : (typeof location !== 'undefined' && location.hostname === 'localhost')
-    ? `${location.protocol}//localhost:8000`
-    : '';
-const GAMES_ENDPOINT = API ? `${API}/games` : '/games';
-const GENERATE_ENDPOINT = API ? `${API}/generate` : '/generate';
+import { API_BASE } from './api-base';
+const GAMES_ENDPOINT = `${API_BASE}/games`;
+const GENERATE_ENDPOINT = `${API_BASE}/generate`;
 
 let mounted = false;
 let form: HTMLFormElement | null = null;

@@ -19,15 +19,17 @@ import ThemePicker from '../components/ui/ThemePicker.astro';
 import InfoBlurb from '../components/ui/InfoBlurb.astro';
 
 // env + API
-const API = import.meta.env.PUBLIC_API_BASE || 'http://localhost:8000';
+import { apiUrl, API_BASE } from '../lib/api/base';
 const ADS = import.meta.env.PUBLIC_ADSENSE_CLIENT;
 const IS_PROD = import.meta.env.PROD;
 
-const gamesEndpoint = API ? `${String(API).replace(/\/$/, '')}/games` : '/games';
+// Build-time/SSR uses BACKEND_ORIGIN (absolute), browser uses /api (relative)
+const gamesEndpoint = apiUrl('/games');
 const games = await fetch(gamesEndpoint).then(r => r.json()).catch(() => []);
 const jsonGames = Array.isArray(games) ? JSON.stringify(games).replaceAll('`', '\\`') : '[]';
 const current = Array.isArray(games) && games.length > 0 ? games[0] : null;
-const apiBase = API ? String(API).replace(/\/$/, '') : '';
+// Client-side uses API_BASE (/api proxy)
+const apiBase = API_BASE;
 ---
 
 <Layout title="Lucky v2 Home Demo" description="Lucky Numbers Home with Design System Components" demo>

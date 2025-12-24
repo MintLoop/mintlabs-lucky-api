@@ -1,9 +1,10 @@
 ---
-const API = import.meta.env.PUBLIC_API_BASE;
+import { apiUrl } from '../../lib/api/base';
 const ADS = import.meta.env.PUBLIC_ADSENSE_CLIENT;
 const IS_PROD = import.meta.env.PROD;
 
-const gamesEndpoint = API ? `${String(API).replace(/\/$/, '')}/games` : '/games';
+// Build-time/SSR uses BACKEND_ORIGIN (absolute), browser uses /api (relative)
+const gamesEndpoint = apiUrl('/games');
 const games = await fetch(gamesEndpoint).then((r) => r.json()).catch(() => []);
 ---
 <html lang="en">

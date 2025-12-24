@@ -6,7 +6,6 @@
   "framework": null,
   "ignoreCommand": "git diff --quiet HEAD^ HEAD -- mintlabs-lucky-frontend/",
   "env": {
-    "PUBLIC_API_BASE": "@api_base_url",
     "PUBLIC_ADSENSE_CLIENT": "@adsense_client"
   }
 }
