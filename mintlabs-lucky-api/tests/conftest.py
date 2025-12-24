@@ -3,9 +3,16 @@ from dataclasses import dataclass
 from typing import Any
 
 import pytest
+from fastapi.testclient import TestClient
 
 from app import db as db_module
 from app import main as main_module
+
+
+@pytest.fixture(scope="session")
+def client():
+    """Shared TestClient fixture for API tests."""
+    return TestClient(main_module.app, base_url="http://localhost")
 
 
 @dataclass
@@ -48,7 +55,9 @@ def _prime_game_cache():
             "bonus_count": 1,
         }
     ]
-    main_module._games_cache["index"] = {"powerball": main_module._games_cache["data"][0]}
+    main_module._games_cache["index"] = {
+        "powerball": main_module._games_cache["data"][0]
+    }
     main_module._games_cache["expires"] = 1e12
     yield
 
