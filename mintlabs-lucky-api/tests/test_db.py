@@ -80,7 +80,7 @@ class TestConnectionPool:
         # Simulate the case where psycopg_pool import fails
         with patch.object(db_module, "_POOL", None):
             with patch.object(db_module, "ConnectionPool", None):
-                with pytest.raises(RuntimeError, match="psycopg_pool is not available"):
+                with pytest.raises(RuntimeError, match="ConnectionPool is not available"):
                     db_module.get_pool()
 
 
