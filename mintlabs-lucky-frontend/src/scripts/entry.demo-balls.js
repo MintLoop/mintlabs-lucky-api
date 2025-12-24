@@ -15,9 +15,7 @@ if (typeof document !== 'undefined') {
 if (typeof window !== 'undefined') {
   try {
     window.track = track;
-  } catch (err) {
-    void err; // intentionally ignore
-  }
+  } catch (err) { console.debug(err); }
 }
 
 if (typeof window !== 'undefined') {
@@ -32,14 +30,10 @@ if (typeof window !== 'undefined') {
         const eventName = el.dataset.trackEvent || 'link_click';
         let props = {};
         if (el.dataset.trackProps) {
-          try { props = JSON.parse(el.dataset.trackProps || '{}'); } catch (err) { void err; props = {}; }
+          try { props = JSON.parse(el.dataset.trackProps || '{}'); } catch (err) { console.debug(err); props = {}; }
         }
         if (typeof track === 'function') track(eventName, { href: el.getAttribute && el.getAttribute('href'), ...props });
-      } catch (err) {
-        void err; // swallow
-      }
+      } catch (err) { console.debug(err); }
     }, { passive: true });
-  } catch (err) {
-    void err; // intentionally ignore
-  }
+  } catch (err) { console.debug(err); }
 }

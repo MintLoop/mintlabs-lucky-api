@@ -426,12 +426,22 @@ html[data-theme="bw-light"] #generateBtn {
   opacity: 1;
 }
 .toast.toast-warning {
-  background-color: #f59e0b;
-  color: #000;
+  background-color: var(--accent-warning, #f59e0b);
+  color: var(--text-on-accent, #000);
 }
 .toast.toast-error {
-  background-color: #ef4444;
-  color: #fff;
+  background-color: var(--accent-danger, #ef4444);
+  color: var(--text-on-error, #fff);
+}
+
+/* Theme fallbacks: ensure toast remains legible in dark themes */
+html[data-theme$="-dark"] .toast.toast-warning {
+  background-color: var(--accent-warning, #f59e0b);
+  color: var(--text-on-accent, #000);
+}
+html[data-theme$="-dark"] .toast.toast-error {
+  background-color: var(--accent-danger, #ef4444);
+  color: var(--text-on-error, #fff);
 }
 
 /* Odds link on result cards */
