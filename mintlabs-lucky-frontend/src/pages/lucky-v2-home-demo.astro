@@ -16,7 +16,6 @@ import PageHero from '../components/ui/PageHero.astro';
 import SoftCard from '../components/ui/SoftCard.astro';
 import SectionHeader from '../components/ui/SectionHeader.astro';
 import ThemePicker from '../components/ui/ThemePicker.astro';
-import ToolCard from '../components/ui/ToolCard.astro';
 import InfoBlurb from '../components/ui/InfoBlurb.astro';
 
 // env + API
@@ -31,7 +30,8 @@ const current = Array.isArray(games) && games.length > 0 ? games[0] : null;
 const apiBase = API ? String(API).replace(/\/$/, '') : '';
 ---
 
-</Layout>
+<Layout title="Lucky v2 Home Demo" description="Lucky Numbers Home with Design System Components" demo>
+  {jsonGames && jsonGames !== '[]' && (
     <script type="application/json" id="initial-games" set:html={jsonGames} />
   )}
 
@@ -52,10 +52,7 @@ const apiBase = API ? String(API).replace(/\/$/, '') : '';
       >
         <div class="mt-6">
           <ThemePicker variant="compact" showLabels={false} />
-        <Layout demo
-          title="Lucky v2 Home Demo | MintLabs"
-          description="Lucky v2 Design System — Home demo showing v2 UI primitives and tokens."
-        >
+        </div>
       </PageHero>
     </div>
 
