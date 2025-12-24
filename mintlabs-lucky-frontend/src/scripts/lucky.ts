@@ -63,8 +63,6 @@ function readInitialGames(): any[] {
   const el = document.getElementById('initial-games');
   if (!el || !(el instanceof HTMLScriptElement)) return [];
   try {
-    // client-side config for themed modes (imported statically at module top)
-    const cfgAny: any = MODE_CONFIG as any;
     const parsed = JSON.parse(el.textContent || '[]');
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -123,10 +121,10 @@ export function initLucky() {
     };
     function updateConditionalFields() {
       try {
-        Object.values(map).forEach(id => { document.querySelectorAll('#' + id).forEach(el=>{ el.classList.add('hidden'); try { (el as HTMLElement).style.display='none'; } catch(e){ void e; } }); });
+        Object.values(map).forEach(id => { document.querySelectorAll('#' + id).forEach(el=>{ el.classList.add('hidden'); try { (el as HTMLElement).style.display='none'; } catch(e){ console.debug(e); } }); });
         const key = (modeSelect instanceof HTMLSelectElement) ? modeSelect.value : undefined;
         if (key && map[key]) {
-          document.querySelectorAll('#' + map[key]).forEach(el=>{ el.classList.remove('hidden'); try { (el as HTMLElement).style.display='block'; } catch(e){ void e; } });
+          document.querySelectorAll('#' + map[key]).forEach(el=>{ el.classList.remove('hidden'); try { (el as HTMLElement).style.display='block'; } catch(e){ console.debug(e); } });
 
           // if we're requesting a themed mode, populate the modeKey select
           if (map[key] === 'modeKeyContainer') {
@@ -153,9 +151,9 @@ export function initLucky() {
                   select.appendChild(opt);
                 });
                 // ensure the select is enabled and required; tests choose options programmatically
-                try { select.removeAttribute('disabled'); } catch(e){ void e; }
-                try { select.setAttribute('required','required'); } catch(e){ void e; }
-                try { select.setAttribute('data-populated', '1'); } catch(e){ void e; }
+                try { select.removeAttribute('disabled'); } catch(e){ console.debug(e); }
+                try { select.setAttribute('required','required'); } catch(e){ console.debug(e); }
+                try { select.setAttribute('data-populated', '1'); } catch(e){ console.debug(e); }
                 
                 // Add event listener to show educational text when option selected
                 select.addEventListener('change', () => {
@@ -174,17 +172,17 @@ export function initLucky() {
                   }
                 });
               }
-            } catch(e){ void e; }
+            } catch(e){ console.debug(e); }
           }
         }
         return true;
-      } catch (err) { return false; }
+      } catch (err) { console.debug(err); return false; }
     }
-    try { if (modeSelect) modeSelect.addEventListener('change', updateConditionalFields); } catch(e){ void e; }
-    try { (window as any)._genFormUpdate = updateConditionalFields; } catch(e){ void e; }
-    try { (window as any).__GENFORM_READY = true; } catch(e){ void e; }
-    try { updateConditionalFields(); } catch(e){ void e; }
-  } catch (err) { try { (window as any).__GENFORM_ERROR = String(err); } catch(e){ void e; } }
+    try { if (modeSelect) modeSelect.addEventListener('change', updateConditionalFields); } catch(e){ console.debug(e); }
+    try { (window as any)._genFormUpdate = updateConditionalFields; } catch(e){ console.debug(e); }
+    try { (window as any).__GENFORM_READY = true; } catch(e){ console.debug(e); }
+    try { updateConditionalFields(); } catch(e){ console.debug(e); }
+  } catch (err) { try { (window as any).__GENFORM_ERROR = String(err); } catch(e) { console.debug(e); } }
 
   const _form = form;
   const _out = out;
@@ -335,12 +333,12 @@ export function initLucky() {
               if (found) modeBadgeHtml = `<div class="text-xs mt-1">Mode: <span class="font-semibold">${found.emoji ? found.emoji+' ' : ''}${found.label}</span></div>`;
             }
           }
-} catch (e) { void e; }
+        } catch (e) { console.debug(e); }
 
         const numbersHtml = Array.isArray(d.numbers)
           ? d.numbers.map((n: any) => `<span class="result-chip text-emerald-400 font-semibold">${n}</span>`).join(', ')
           : (d.numbers || '—');
-        const bonusHtml = d.bonus ? `<span class="result-chip text-emerald-400 font-semibold">${d.bonus}</span>` : '';
+        const bonusHtml = d.bonus ? `<span class="result-chip text-emerald-400 font-semibold">${d.bonus}</span>` : ''; 
 
         let lastInfoHtml = '';
         if (d.last_number_info) {
@@ -407,9 +405,7 @@ export function initLucky() {
 
     try {
       (_form as any).__handledByLucky = true;
-    } catch {
-      /* noop */
-    }
+    } catch (e) { console.debug(e); }
   })();
 }
 
@@ -465,7 +461,7 @@ mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data
 try {
   // lazy-import tracking so tests don't break if module isn't present during SSR
   // (esbuild bundles this file into public/scripts/lucky.js during build).
-   
+
   import('./tracking').then(({ track }) => {
     if (typeof window !== 'undefined') {
       try {
@@ -483,20 +479,20 @@ try {
             const eventName = el.dataset.trackEvent || 'link_click';
             let props: Record<string, any> = {};
             if (el.dataset.trackProps) {
-              try { props = JSON.parse(el.dataset.trackProps); } catch (e) { props = {}; }
+              try { props = JSON.parse(el.dataset.trackProps); } catch (e) { console.debug(e); props = {}; }
             }
             if (typeof (window as any).track === 'function') {
-              try { (window as any).track(eventName, { href: el.getAttribute && el.getAttribute('href'), ...props }); } catch (e) { /* swallow */ }
+              try { (window as any).track(eventName, { href: el.getAttribute && el.getAttribute('href'), ...props }); } catch (e) { console.debug(e); }
             }
-          } catch (err) {
+          } catch {
             // swallow
           }
         }, false);
-      } catch (err) {
+      } catch {
         // ignore
       }
     }
   }).catch(() => {});
-} catch (err) {
+} catch {
   // ignore import failures during SSR
 }

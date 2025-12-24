@@ -10,7 +10,9 @@ const SIZES = [
   { name: 'mobile', width: 390, height: 844 }
 ];
 
-test.describe('Demo — visual snapshots across themes & sizes', () => {
+// Skipped: demo home (v2) removed/ignored — visual snapshots for demo pages are disabled.
+// See `docs/AGENT_TRACKER.md` entry and branch `chore/skip-demo-tests-ci` for details.
+test.describe.skip('Demo — visual snapshots across themes & sizes (skipped: demo removed/ignored)', () => {
   for (const theme of THEMES) {
     for (const size of SIZES) {
       test(`demo-home-v2 — theme=${theme} size=${size.name}`, async ({ page }) => {
