@@ -2,10 +2,12 @@
 
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Optional
+from typing import Any, Optional
 
-import psycopg
-from psycopg_pool import ConnectionPool
+try:
+    from psycopg_pool import ConnectionPool
+except Exception:  # pragma: no cover - optional dependency for tests/local dev
+    ConnectionPool = None
 
 from .config import settings
 
@@ -36,14 +38,23 @@ def _build_pool() -> ConnectionPool:
 
 
 def get_pool() -> ConnectionPool:
+    if ConnectionPool is None:
+        raise RuntimeError(
+            "ConnectionPool is not available. "
+            "psycopg_pool must be installed to use database connections."
+        )
     global _POOL
     if _POOL is None:
+        if ConnectionPool is None:
+            raise RuntimeError(
+                "psycopg_pool is not available. " "Install it with: pip install psycopg[pool]"
+            )
         _POOL = _build_pool()
     return _POOL
 
 
 @contextmanager
-def get_conn() -> Generator[psycopg.Connection, None, None]:
+def get_conn() -> Generator[Any, None, None]:
     pool = get_pool()
     with pool.connection() as conn:
         yield conn

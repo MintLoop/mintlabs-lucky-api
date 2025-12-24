@@ -52,8 +52,10 @@ class SimpleRateLimitMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         # Skip rate limiting for exempt paths (health checks, static info)
-        if request.url.path in self.exempt_paths:
-            return await call_next(request)
+        # Allow prefix matches so '/v1/lucky' exempts '/v1/lucky/*'
+        for p in self.exempt_paths:
+            if request.url.path == p or request.url.path.startswith(p.rstrip("/") + "/"):
+                return await call_next(request)
 
         client = _get_client_ip(request, self.trust_proxy)
         now = time.time()

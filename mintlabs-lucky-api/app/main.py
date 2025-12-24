@@ -173,14 +173,16 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     # Log with error code: [ERR] {request_id} {status} {full_error}
     print(f"[ERR] {request_id} {exc.status_code} {full_error}")
 
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "error": full_error,
-            "request_id": request_id,
-            "status": exc.status_code,
-        },
-    )
+    content = {
+        "error": full_error,
+        "request_id": request_id,
+        "status": exc.status_code,
+    }
+    # Preserve original detail for client-side testing and helpful feedback
+    if isinstance(exc.detail, (str, dict)):
+        content["detail"] = exc.detail
+
+    return JSONResponse(status_code=exc.status_code, content=content)
 
 
 @app.exception_handler(Exception)
