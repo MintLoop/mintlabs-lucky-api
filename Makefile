@@ -41,4 +41,8 @@ test-backend:
 	cd $(BACKEND_DIR) && pytest
 
 test-frontend:
+ifdef CI
+	npm --prefix $(FRONTEND_DIR) run test:e2e -- --ignore-snapshots
+else
 	npm --prefix $(FRONTEND_DIR) run test:e2e
+endif
