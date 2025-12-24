@@ -20,9 +20,9 @@ from .rng import (
     draw_birthday,
     draw_hot_cold,
     draw_lucky,
-    draw_personalized,
     draw_odd_even_mix,
     draw_pattern_avoid,
+    draw_personalized,
     draw_sum_target,
     draw_wheel,
     get_last_number_probability,
@@ -216,7 +216,10 @@ def _validate_game_config(
     target_sum: Optional[int] = None,
     lucky_numbers: Optional[list[int]] = None,
 ) -> None:
-    """Validate game configuration before generation. Raises HTTPException(400) on failure."""
+    """Validate game configuration before generation.
+
+    Raises HTTPException(400) on failure.
+    """
     wmin = game_meta["white_min"]
     wmax = game_meta["white_max"]
     wcount = game_meta["white_count"]
@@ -225,22 +228,29 @@ def _validate_game_config(
 
     # Basic range validation
     if wmin >= wmax:
-        raise HTTPException(400, detail="invalid_config: white_min must be less than white_max")
-    
+        raise HTTPException(
+            400, detail="invalid_config: white_min must be less than white_max"
+        )
+
     pool_size = wmax - wmin + 1
     if wcount > pool_size:
         raise HTTPException(
             400,
-            detail=f"invalid_config: cannot pick {wcount} unique from pool of {pool_size}",
+            detail=(
+                f"invalid_config: cannot pick {wcount} unique "
+                f"from pool of {pool_size}"
+            ),
         )
-    
+
     if wcount <= 0:
         raise HTTPException(400, detail="invalid_config: white_count must be positive")
 
     # Bonus validation (if present)
     if bmin is not None and bmax is not None:
         if bmin >= bmax:
-            raise HTTPException(400, detail="invalid_config: bonus_min must be less than bonus_max")
+            raise HTTPException(
+                400, detail="invalid_config: bonus_min must be less than bonus_max"
+            )
 
     # Mode-specific validation
     if mode == "sum_target" and target_sum is not None:
@@ -262,7 +272,10 @@ def _validate_game_config(
             if n < wmin or n > wmax:
                 raise HTTPException(
                     400,
-                    detail=f"invalid_config: lucky number {n} outside valid range ({wmin}-{wmax})"
+                    detail=(
+                        f"invalid_config: lucky number {n} outside valid "
+                        f"range ({wmin}-{wmax})"
+                    ),
                 )
 
 
@@ -272,8 +285,8 @@ def _validate_game_config(
 # ---------------------------------------------------------------------------
 _analytics_lock = Lock()
 _analytics: dict[str, dict[str, int]] = {
-    "by_game": {},   # game_code -> count
-    "by_mode": {},   # mode -> count
+    "by_game": {},  # game_code -> count
+    "by_mode": {},  # mode -> count
     "total": 0,
 }
 
@@ -408,7 +421,7 @@ def readyz():
 @app.get("/stats")
 def stats(request: Request):
     """Return generation analytics (in-memory, resets on restart).
-    
+
     In production, gate with ADMIN_TOKEN via Authorization header.
     Returns 404 on auth failure to avoid revealing admin endpoints exist.
     """
@@ -467,25 +480,33 @@ def generate(req: GenerateReq, request: Request):
             whites = draw_odd_even_mix(wmin, wmax, wcount, rng)
         elif req.mode == "pattern_avoid":
             whites = draw_pattern_avoid(wmin, wmax, wcount, rng)
-        elif req.mode in ("zodiac", "gemstone", "star_sign", "jyotish", "chinese_zodiac", "favorite_color"):
+        elif req.mode in (
+            "zodiac",
+            "gemstone",
+            "star_sign",
+            "jyotish",
+            "chinese_zodiac",
+            "favorite_color",
+        ):
             # Themed / personality modes are selected via a `mode_key` which
             # maps to a stable seed profile. This prevents free-form inputs and
             # makes behavior deterministically reproducible while keeping
             # statistics uniform.
             try:
                 from .mode_config import MODE_CONFIG
+
                 mode_map = MODE_CONFIG.get(req.mode, {})
-                items = mode_map.get('items', [])
+                items = mode_map.get("items", [])
                 # find the configured seed for the provided mode_key
-                seed = ''
+                seed = ""
                 if req.mode_key:
                     for it in items:
-                        if it.get('key') == req.mode_key:
-                            seed = it.get('seed', '')
+                        if it.get("key") == req.mode_key:
+                            seed = it.get("seed", "")
                             break
                 # fallback empty seed -> behave like random
             except Exception:
-                seed = ''
+                seed = ""
             whites = draw_personalized(wmin, wmax, wcount, rng, seed)
         elif req.mode == "hot":
             whites = draw_hot_cold(wmin, wmax, wcount, rng, "hot")
@@ -524,16 +545,31 @@ def generate(req: GenerateReq, request: Request):
                 )
                 values (%s,%s,%s,%s,%s,%s,%s,%s)
                 """,
-                (session_id, req.game_code, req.mode, whites, bonus, nhash, commit, latency),
+                (
+                    session_id,
+                    req.game_code,
+                    req.mode,
+                    whites,
+                    bonus,
+                    nhash,
+                    commit,
+                    latency,
+                ),
                 prepare=False,
             )
 
         # Record analytics (in-memory counters)
         _record_generation(req.game_code, req.mode)
         try:
-            print(f"[GEN] {request_id} game={req.game_code} mode={req.mode} mode_key={req.mode_key or ''} latency={latency}ms")
+            print(
+                f"[GEN] {request_id} game={req.game_code} mode={req.mode} "
+                f"mode_key={req.mode_key or ''} latency={latency}ms"
+            )
         except Exception:
-            print(f"[GEN] {request_id} game={req.game_code} mode={req.mode} latency={latency}ms")
+            print(
+                f"[GEN] {request_id} game={req.game_code} mode={req.mode} "
+                f"latency={latency}ms"
+            )
 
         # Calculate probabilities for the generated set
         try:
@@ -562,7 +598,9 @@ def generate(req: GenerateReq, request: Request):
             odds_display = f"1 in {int(prob['combined_odds']):,}"
         else:
             odds_display = (
-                f"1 in {int(prob.get('main_odds', 0)):,}" if prob.get("main_odds") else None
+                f"1 in {int(prob.get('main_odds', 0)):,}"
+                if prob.get("main_odds")
+                else None
             )
 
         # Build a single-draw result entry so the response aligns with the
@@ -580,7 +618,9 @@ def generate(req: GenerateReq, request: Request):
 
         # Ensure combined_sets_odds is a string (Pydantic expects Optional[str])
         combined_sets_odds_val = prob.get("combined_sets_odds")
-        if combined_sets_odds_val is not None and not isinstance(combined_sets_odds_val, str):
+        if combined_sets_odds_val is not None and not isinstance(
+            combined_sets_odds_val, str
+        ):
             try:
                 combined_sets_odds_val = str(combined_sets_odds_val)
             except Exception:
@@ -599,7 +639,9 @@ def generate(req: GenerateReq, request: Request):
             probability_percent=prob.get("combined_probability_percent")
             or prob.get("main_probability_percent"),
             combined_sets_odds=combined_sets_odds_val,
-            combined_sets_probability_percent=prob.get("combined_sets_probability_percent"),
+            combined_sets_probability_percent=prob.get(
+                "combined_sets_probability_percent"
+            ),
             last_number_info=last_info,
             total_sets=req.sets or 1,
             results=[single_result],
