@@ -3,10 +3,6 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "framework": "astro",
-  "env": {
-    "PUBLIC_ADSENSE_CLIENT": "@adsense_client",
-    "BACKEND_ORIGIN": "https://mintlabs-lucky-api.vercel.app"
-  },
   "rewrites": [
     {
       "source": "/api/:path*",

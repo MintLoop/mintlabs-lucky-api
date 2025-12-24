@@ -4,8 +4,6 @@
   "outputDirectory": "mintlabs-lucky-frontend/dist",
   "installCommand": "cd mintlabs-lucky-frontend && npm install",
   "framework": null,
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- mintlabs-lucky-frontend/",
-  "env": {
-    "PUBLIC_ADSENSE_CLIENT": "@adsense_client"
-  }
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- mintlabs-lucky-frontend/"
+
 }
