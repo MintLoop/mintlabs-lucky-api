@@ -1,9 +1,8 @@
-const API_ENV = import.meta.env.PUBLIC_API_BASE;
+import { API_BASE } from '../scripts/api-base';
+const API_ENV = API_BASE;
 const API = (API_ENV && String(API_ENV).trim() !== '')
     ? String(API_ENV).replace(/\/$/, '')
-    : (typeof location !== 'undefined' && location.hostname === 'localhost')
-        ? `${location.protocol}//localhost:8000`
-        : '';
+    : '';
 const GAMES_ENDPOINT = API ? `${API}/games` : '/games';
 const GENERATE_ENDPOINT = API ? `${API}/generate` : '/generate';
 let mounted = false;

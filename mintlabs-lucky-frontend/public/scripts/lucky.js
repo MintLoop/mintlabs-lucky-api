@@ -392,13 +392,14 @@ var MODE_EDUCATION = {
 };
 var modeEducation_default = MODE_EDUCATION;
 
+// src/lib/api/base.ts
+var isServer = import.meta.env.SSR;
+var serverBase = isServer ? process.env.BACKEND_ORIGIN ?? "http://localhost:8000" : "";
+var API_BASE = "/api";
+
 // src/scripts/lucky.ts
-var metaEnv = import.meta?.env ?? {};
-var globalApi = typeof window !== "undefined" ? window.__LUCKY_API_BASE : void 0;
-var API_ENV = metaEnv.PUBLIC_API_BASE ?? globalApi ?? "";
-var API = API_ENV && String(API_ENV).trim() !== "" ? String(API_ENV).replace(/\/$/, "") : typeof location !== "undefined" && location.hostname === "localhost" ? `${location.protocol}//localhost:8000` : "";
-var GAMES_ENDPOINT = API ? `${API}/games` : "/games";
-var GENERATE_ENDPOINT = API ? `${API}/generate` : "/generate";
+var GAMES_ENDPOINT = `${API_BASE}/games`;
+var GENERATE_ENDPOINT = `${API_BASE}/generate`;
 var mounted = false;
 var form = null;
 var out = null;
