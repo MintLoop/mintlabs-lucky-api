@@ -35,6 +35,7 @@ def test_mode(name, func, *args):
         print(f"Error: {e}")
         return False
 
+
 def main():
     rng = SecureRng()
 
@@ -57,7 +58,10 @@ def main():
         ("Birthday", lambda: draw_birthday(minv, maxv, count, rng, "1990-05-15")),
         ("Lucky Numbers", lambda: draw_lucky(minv, maxv, count, rng, [7, 13, 21, 42])),
         ("Wheel - Key", lambda: draw_wheel(minv, maxv, count, rng, "key")),
-        ("Wheel - Abbreviated", lambda: draw_wheel(minv, maxv, count, rng, "abbreviated")),
+        (
+            "Wheel - Abbreviated",
+            lambda: draw_wheel(minv, maxv, count, rng, "abbreviated"),
+        ),
     ]
 
     passed = 0
@@ -72,6 +76,7 @@ def main():
         print("✅ All RNG modes working correctly!")
     else:
         print("❌ Some tests failed")
+
 
 if __name__ == "__main__":
     main()

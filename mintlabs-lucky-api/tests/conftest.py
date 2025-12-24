@@ -48,7 +48,9 @@ def _prime_game_cache():
             "bonus_count": 1,
         }
     ]
-    main_module._games_cache["index"] = {"powerball": main_module._games_cache["data"][0]}
+    main_module._games_cache["index"] = {
+        "powerball": main_module._games_cache["data"][0]
+    }
     main_module._games_cache["expires"] = 1e12
     yield
 
