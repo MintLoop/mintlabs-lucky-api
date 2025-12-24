@@ -545,7 +545,7 @@ In the repo’s GitHub settings → Secrets & variables → Actions, expect valu
 - `VERCEL_PROJECT_ID` (for Lucky frontend)
 - Optional: backend deploy token / URL
 
-Tip: If preview builds fail with a missing API base URL, verify a Vercel team secret named `api_base_url` exists (you can add it with `vercel secrets add api_base_url <https://your-api-url>`), and that `PUBLIC_API_BASE` is set to reference the secret as `@api_base_url` in the project's Preview/Production environment variables.
+Tip: If preview builds fail with a missing API base URL, set `PUBLIC_API_BASE` directly in the **Project → Settings → Environment Variables** for the frontend project (Preview/Production). Avoid legacy team-level `@secret` references.
 
 Do not commit any of these to the repo.
 
