@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd mintlabs-lucky-frontend && npm run build",
+  "buildCommand": "npm --prefix mintlabs-lucky-frontend run build",
   "outputDirectory": "mintlabs-lucky-frontend/dist",
-  "installCommand": "npm install && cd mintlabs-lucky-frontend && npm install",
+  "installCommand": "npm install && npm --prefix mintlabs-lucky-frontend install",
   "framework": null,
   "ignoreCommand": "git diff --quiet HEAD^ HEAD -- mintlabs-lucky-frontend/",
   "functions": {
