@@ -2,7 +2,28 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "cd mintlabs-lucky-frontend && npm run build",
   "outputDirectory": "mintlabs-lucky-frontend/dist",
-  "installCommand": "cd mintlabs-lucky-frontend && npm install",
+  "installCommand": "npm install && cd mintlabs-lucky-frontend && npm install",
   "framework": null,
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- mintlabs-lucky-frontend/"
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- mintlabs-lucky-frontend/",
+  "functions": {
+    "api/*.ts": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+      ]
+    }
+  ]
 }

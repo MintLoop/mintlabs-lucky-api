@@ -1,24 +1,19 @@
 {
-  "name": "mintlabs-lucky-frontend",
+  "name": "mintlabs-lucky-monorepo",
   "type": "module",
   "version": "0.0.1",
+  "private": true,
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "dev": "cd mintlabs-lucky-frontend && npm run dev",
+    "build": "cd mintlabs-lucky-frontend && npm run build",
+    "preview": "cd mintlabs-lucky-frontend && npm run preview"
   },
   "dependencies": {
-    "@astrojs/markdown-remark": "^6.3.6",
-    "@tailwindcss/vite": "^4.1.13",
-    "astro": "^5.13.5",
-    "katex": "^0.16.22",
-    "rehype-katex": "^7.0.1",
-    "remark-math": "^6.0.0"
+    "@supabase/supabase-js": "^2.45.0",
+    "@vercel/node": "^3.2.0"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.13"
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.0"
   }
 }
