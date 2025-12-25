@@ -2,7 +2,7 @@
 
 | Phase | Owner | Branch | Status | Notes |
 | ----- | ----- | ------ | ------ | ----- |
-| Misc – API infra & build env | **GitHub Copilot** | `feature/api-backend-origin` | 🔁 In Progress | Add `src/lib/api/base.ts` (`apiUrl()`), re-export scripts, update build-time pages to use `BACKEND_ORIGIN`, update Vercel and `.env.example`, add docs (`docs/LUCKY/WORKFLOWS/api-proxying.md`). |
+| Misc – API infra & build env | **GitHub Copilot** | `feature/api-backend-origin` | 📝 PR open | Add `src/lib/api/base.ts` (`apiUrl()`), re-export scripts, update build-time pages to use `BACKEND_ORIGIN`, update Vercel and `.env.example`, add docs (`docs/LUCKY/WORKFLOWS/api-proxying.md`). PR: https://github.com/MintLoop/mintlabs-lucky-api/pull/19 |
 
 | 11 – Deployment / CI fixes | **GitHub Copilot** | `fix/ruff-lint` | 🔁 Ready for PR | Fixed frontend ESLint & .astro parse errors, restored raffle/wheel tool styles to `src/styles/hub.css`, updated docs for Vercel secret `api_base_url`. Local lint clean; needs remote CI run after PR push. |
 | Tooling – Lockfile | **GitHub Copilot** | `chore/update-frontend-lockfile` | 🔁 In Progress | Update `package-lock.json` to match `package.json` and fix CI `npm ci` build. |

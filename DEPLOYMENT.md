@@ -112,15 +112,10 @@ vercel --prod
    - `PUBLIC_API_BASE`: Your API deployment URL (e.g., `https://mintlabs-lucky-api.vercel.app`)
    - `PUBLIC_ADSENSE_CLIENT`: Your AdSense client ID (optional)
 
-Team secret (recommended for preview builds):
-- Create a Vercel team secret named `api_base_url` with the API URL as the value, then reference it in the frontend project by setting `PUBLIC_API_BASE` to `@api_base_url` for Preview and Production environments. This keeps preview builds consistent without hardcoding URLs in the repo.
+Note about environment variables and secrets:
+- Vercel has deprecated team-level `@secret` references for project build validation in favor of configuring environment variables directly on each **Project** per environment (Production/Preview/Development). In practice: set `PUBLIC_API_BASE` and `PUBLIC_ADSENSE_CLIENT` directly in the **frontend project** settings (Project → Settings → Environment Variables) and mark values as **Sensitive**/hidden if appropriate.
 
-CLI example:
-```bash
-vercel secrets add api_base_url https://mintlabs-lucky-api.vercel.app
-```
-
-If preview builds fail with a missing API base, verify the secret exists (`vercel secrets ls`) and that `PUBLIC_API_BASE` in the project references `@api_base_url` (the repo already references this in `vercel.json`).
+- If your deployment fails with a missing variable error, add the required env var directly in the Vercel Project settings rather than relying on a team secret reference. Using the Dashboard is the most reliable approach for monorepos and avoids CLI quirks.
 
 3. Note the frontend deployment URL
 
