@@ -2,7 +2,7 @@
 
 | Phase | Owner | Branch | Status | Notes |
 | ----- | ----- | ------ | ------ | ----- |
-| Bugfix – Mobile header overflow | Codex (GPT-5) | `feature/frontend-rate-limit-toasts` | 🔄 In Progress | Restore frontend rate-limit toast/throttle (client + 429 handling), add dev-only request logging, harden header overflow and keep "Lucky Number Today" title. |
+| Bugfix – Mobile header overflow | Codex (GPT-5) | `feature/frontend-rate-limit-toasts` | 📝 PR open | Restore frontend rate-limit toast/throttle (client + 429 handling), add dev-only request logging, harden header overflow and keep "Lucky Number Today" title. PR: https://github.com/MintLoop/mintlabs-lucky-api/pull/26 |
 | Misc – API infra & build env | **GitHub Copilot** | `feature/api-backend-origin` | 📝 PR open | Add `src/lib/api/base.ts` (`apiUrl()`), re-export scripts, update build-time pages to use `BACKEND_ORIGIN`, update Vercel and `.env.example`, add docs (`docs/LUCKY/WORKFLOWS/api-proxying.md`). PR: https://github.com/MintLoop/mintlabs-lucky-api/pull/19 |
 
 | 11 – Deployment / CI fixes | **GitHub Copilot** | `fix/ruff-lint` | 🔁 Ready for PR | Fixed frontend ESLint & .astro parse errors, restored raffle/wheel tool styles to `src/styles/hub.css`, updated docs for Vercel secret `api_base_url`. Local lint clean; needs remote CI run after PR push. |
