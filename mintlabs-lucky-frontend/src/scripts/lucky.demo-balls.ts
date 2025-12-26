@@ -4,6 +4,7 @@ import MODE_EDUCATION from '../data/modeEducation';
 import { API_BASE } from './api-base';
 const GAMES_ENDPOINT = `${API_BASE}/games`;
 const GENERATE_ENDPOINT = `${API_BASE}/generate`;
+const IS_DEV = import.meta.env.DEV;
 
 let mounted = false;
 let form: HTMLFormElement | null = null;
@@ -13,6 +14,9 @@ let factsEl: HTMLElement | null = null;
 let games: any[] = [];
 let submitBtn: HTMLButtonElement | null = null;
 let isRateLimited = false;
+let isClientCooldown = false;
+let recentClicks: number[] = [];
+const CLIENT_RATE_LIMIT = { max: 3, windowMs: 2000 };
 
 // Toast notification helper (copied from lucky.ts)
 function showToast(message: string, type: 'warning' | 'error' = 'warning', durationMs = 3000): void {
@@ -50,6 +54,24 @@ function handleRateLimitCooldown(retryAfterSec: number): void {
       isRateLimited = false;
     }
   }, 1000);
+}
+
+function isClientRateLimited(): boolean {
+  const now = Date.now();
+  recentClicks = recentClicks.filter((t) => now - t < CLIENT_RATE_LIMIT.windowMs);
+  if (recentClicks.length >= CLIENT_RATE_LIMIT.max) return true;
+  recentClicks.push(now);
+  return false;
+}
+
+function handleClientCooldown(durationMs = 1000): void {
+  if (!submitBtn || isRateLimited || isClientCooldown) return;
+  isClientCooldown = true;
+  submitBtn.disabled = true;
+  setTimeout(() => {
+    isClientCooldown = false;
+    if (!isRateLimited) submitBtn!.disabled = false;
+  }, durationMs);
 }
 
 function readInitialGames(): any[] {
@@ -236,6 +258,15 @@ export function initLuckyDemoBalls() {
       e.preventDefault();
       _out.innerHTML = '';
 
+      if (isClientRateLimited()) {
+        showToast('Easy tiger… try again in a sec.', 'warning', 2200);
+        handleClientCooldown(1000);
+        if (IS_DEV) {
+          console.info('[Lucky] client rate-limit: blocked generate request');
+        }
+        return;
+      }
+
       const fd = new FormData(_form);
       const game = String(fd.get('game') || '');
       const mode = String(fd.get('mode') || 'uniform');
@@ -288,6 +319,9 @@ export function initLuckyDemoBalls() {
           body: JSON.stringify(payload),
         })
           .then(async (res) => {
+            if (IS_DEV) {
+              console.info(`[Lucky] ${GENERATE_ENDPOINT} -> ${res.status}`);
+            }
             const text = await res.text();
             if (!res.ok) {
               let msg: string = text || res.statusText || 'Unknown error';
@@ -319,7 +353,7 @@ export function initLuckyDemoBalls() {
         if (!result.ok) {
           if (result.status === 429) {
             const retryAfter = (result as any).retryAfter || 2;
-            showToast(`Slow down! Try again in ${retryAfter}s`, 'warning', 2500);
+            showToast('Rate limited — try again in a moment.', 'warning', 2600);
             handleRateLimitCooldown(retryAfter);
             return;
           }
