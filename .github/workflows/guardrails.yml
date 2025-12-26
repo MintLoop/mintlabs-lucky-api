@@ -92,7 +92,7 @@ jobs:
 
       - name: Check no legacy @secret references in vercel.json files
         run: |
-          LEGACY=$(grep -rn '@[a-z_]*"' --include="vercel.json" . 2>/dev/null | grep -v 'schema' || true)
+          LEGACY=$(grep -rn '"@[a-z_]*"' --include="vercel.json" . 2>/dev/null | grep -v 'schema' || true)
           if [ -n "$LEGACY" ]; then
             echo "❌ FAIL: Found legacy @secret references:"
             echo "$LEGACY"
@@ -162,10 +162,10 @@ jobs:
         run: |
           CACHE=$(curl -sI http://127.0.0.1:8000/games | grep -i "cache-control" || true)
           if [ -z "$CACHE" ]; then
-            echo "⚠️ WARN: GET /games missing Cache-Control header"
-          else
-            echo "✅ PASS: Cache-Control header present: $CACHE"
+            echo "❌ FAIL: GET /games missing Cache-Control header"
+            exit 1
           fi
+          echo "✅ PASS: Cache-Control header present: $CACHE"
 
       - name: Test POST /generate returns 200
         if: steps.check-db.outputs.skip != 'true'
@@ -173,7 +173,7 @@ jobs:
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             -X POST http://127.0.0.1:8000/generate \
             -H "Content-Type: application/json" \
-            -d '{"game_code": "powerball", "mode": "default"}')
+            -d '{"game_code": "powerball", "mode": "random"}')
           if [ "$STATUS" != "200" ]; then
             echo "❌ FAIL: POST /generate returned $STATUS"
             exit 1
@@ -185,7 +185,7 @@ jobs:
         run: |
           RESP=$(curl -s -X POST http://127.0.0.1:8000/generate \
             -H "Content-Type: application/json" \
-            -d '{"game_code": "powerball", "mode": "default"}')
+            -d '{"game_code": "powerball", "mode": "random"}')
           SIZE=${#RESP}
           MAX_SIZE=2048  # 2KB max response
           echo "Response size: $SIZE bytes"
