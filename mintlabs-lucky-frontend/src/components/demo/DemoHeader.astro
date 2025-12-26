@@ -8,8 +8,8 @@ const { className = '' } = Astro.props;
   <div class="demo-header-inner">
     <div class="flex items-start gap-3">
       <img src="/clover.png" alt="Lucky" class="w-9 h-9 sm:w-10 sm:h-10 max-h-10 object-contain" />
-      <div class="flex-1">
-        <h1 class="text-xl sm:text-2xl font-bold tracking-tight leading-tight">MintLabs Lucky Numbers</h1>
+      <div class="min-w-0 flex-1">
+        <h1 class="min-w-0 max-w-full text-xl sm:text-2xl font-bold tracking-tight leading-tight">MintLabs Lucky Numbers</h1>
         <p class="text-sm theme-text-secondary" style="color:var(--text-muted)">For education and entertainment only. Play responsibly.</p>
       </div>
     </div>
@@ -24,7 +24,7 @@ const { className = '' } = Astro.props;
 
 <style>
 .demo-header { margin-bottom: 0.5rem; }
-.demo-header-inner { width: 100%; max-width: 960px; margin: 0 auto; padding: 0 var(--space-md); display: flex; flex-direction: column; gap: var(--space-sm); }
+.demo-header-inner { width: 100%; max-width: 960px; margin: 0 auto; padding: 0 calc(var(--space-md) + env(safe-area-inset-right)) 0 calc(var(--space-md) + env(safe-area-inset-left)); display: flex; flex-direction: column; gap: var(--space-sm); }
 .demo-chip { padding: 0.5rem 0.9rem; border-radius: 9999px; border: 1px solid var(--border-subtle); background: color-mix(in srgb, var(--surface-card) 60%, var(--surface-generator-outer) 40%); display: inline-flex; align-items: center; gap: 0.35rem; }
 @media (max-width: 639px) {
   .demo-header h1 { font-size: 1rem; }
