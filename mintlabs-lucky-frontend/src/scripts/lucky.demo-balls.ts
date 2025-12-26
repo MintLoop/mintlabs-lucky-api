@@ -59,9 +59,13 @@ function handleRateLimitCooldown(retryAfterSec: number): void {
 function isClientRateLimited(): boolean {
   const now = Date.now();
   recentClicks = recentClicks.filter((t) => now - t < CLIENT_RATE_LIMIT.windowMs);
-  if (recentClicks.length >= CLIENT_RATE_LIMIT.max) return true;
+  return recentClicks.length >= CLIENT_RATE_LIMIT.max;
+}
+
+function registerClientClick(): void {
+  const now = Date.now();
+  recentClicks = recentClicks.filter((t) => now - t < CLIENT_RATE_LIMIT.windowMs);
   recentClicks.push(now);
-  return false;
 }
 
 function handleClientCooldown(durationMs = 1000): void {
@@ -266,6 +270,7 @@ export function initLuckyDemoBalls() {
         }
         return;
       }
+      registerClientClick();
 
       const fd = new FormData(_form);
       const game = String(fd.get('game') || '');
