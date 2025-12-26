@@ -4,13 +4,13 @@ This document explains how the Lucky Numbers frontend handles API calls in diffe
 
 ## Overview
 
-All browser API calls use same-origin `/api/*` paths, which are proxied to the backend:
-- **Local dev**: Vite proxies `/api/*` → `http://localhost:8000`
-- **Production**: Vercel rewrites `/api/*` → `https://mintlabs-lucky-api.vercel.app`
+All browser API calls use same-origin `/api/*` paths:
+- **Local dev**: Vite proxies `/api/*` → `http://localhost:8000` (FastAPI backend)
+- **Production**: Vercel Functions at `/api/games.ts` and `/api/generate.ts`
 
 Server-side (SSR/build-time) fetches use the `BACKEND_ORIGIN` environment variable to make absolute URL requests.
 
-## Architecture
+## Architecture (Production - Vercel Functions)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -20,13 +20,42 @@ Server-side (SSR/build-time) fetches use the `BACKEND_ORIGIN` environment variab
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Vite/Vercel Proxy                         │
-│  /api/*  →  strips /api prefix  →  backend                  │
+│                    Vercel Edge                               │
+│  /api/*  →  Serverless Functions                            │
 └─────────────────────────────┬───────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   Backend (FastAPI)                          │
+│                   Vercel Functions                           │
+│  /api/games.ts   - Returns cached game list                 │
+│  /api/generate.ts - Generates numbers, writes to Supabase   │
+└─────────────────────────────┬───────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   Supabase (PostgreSQL)                      │
+│  games table - Game configurations                          │
+│  generations table - Generation history                     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Architecture (Local Dev - FastAPI)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        Browser                               │
+│  fetch('/api/generate')  →  same-origin request              │
+└─────────────────────────────┬───────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Vite Dev Proxy                            │
+│  /api/*  →  strips /api prefix  →  localhost:8000           │
+└─────────────────────────────┬───────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   FastAPI Backend                            │
 │  Receives: POST /generate (no /api prefix)                  │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -35,10 +64,14 @@ Server-side (SSR/build-time) fetches use the `BACKEND_ORIGIN` environment variab
 
 | File | Purpose |
 |------|---------|
-| `src/lib/api/base.ts` | Unified API base resolver |
-| `src/scripts/api-base.ts` | Re-exports for backwards compatibility |
-| `astro.config.mjs` | Vite dev proxy configuration |
-| `vercel.json` | Production rewrites + `BACKEND_ORIGIN` env |
+| `/api/games.ts` | Vercel Function - Returns game list |
+| `/api/generate.ts` | Vercel Function - Generates numbers |
+| `mintlabs-lucky-frontend/src/lib/api/base.ts` | Unified API base resolver |
+| `mintlabs-lucky-frontend/src/scripts/api-base.ts` | Re-exports for backwards compatibility |
+| `mintlabs-lucky-frontend/astro.config.mjs` | Vite dev proxy configuration |
+| `/vercel.json` | Root - Functions routing + build config |
+| `/package.json` | Root - Supabase + Vercel dependencies |
+| `/tsconfig.json` | Root - TypeScript config for API functions |
 
 ## The API Base Resolver
 
@@ -80,14 +113,24 @@ The solution: use `BACKEND_ORIGIN` to construct absolute URLs during server-side
 
 ## Environment Variables
 
+### Frontend (Astro SSG/SSR)
+
 | Variable | Context | Description |
 |----------|---------|-------------|
-| `BACKEND_ORIGIN` | Server-only | Absolute URL to backend (e.g., `https://mintlabs-lucky-api.vercel.app`) |
+| `BACKEND_ORIGIN` | Server-only | Absolute URL for build-time API calls |
+
+### Vercel Functions (Production API)
+
+| Variable | Context | Description |
+|----------|---------|-------------|
+| `SUPABASE_URL` | Server-only | Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only | Supabase service role key (NOT anon key!) |
+| `HMAC_SECRET` | Server-only | Secret for commitment hashes |
 
 ### Local Development
 
 ```bash
-# .env
+# mintlabs-lucky-frontend/.env
 BACKEND_ORIGIN=http://localhost:8000
 ```
 
@@ -95,9 +138,15 @@ Or run backend on :8000 and rely on the default fallback.
 
 ### Vercel Deployment
 
-Set `BACKEND_ORIGIN` in:
-1. `vercel.json` → `env` section (for build-time)
-2. Vercel Project Settings → Environment Variables (for runtime SSR if used)
+Set these in Vercel Project Settings → Environment Variables:
+
+1. **For Frontend Build:**
+   - `BACKEND_ORIGIN` = `https://your-deployment-url.vercel.app/api`
+
+2. **For API Functions:**
+   - `SUPABASE_URL` = `https://your-project.supabase.co`
+   - `SUPABASE_SERVICE_ROLE_KEY` = (from Supabase dashboard → Settings → API)
+   - `HMAC_SECRET` = (generate a secure random string)
 
 ## Page Fetch Patterns
 
@@ -153,18 +202,61 @@ vite: {
 
 ### Vercel (Production)
 
-In `vercel.json`:
+In root `vercel.json`:
 
 ```json
 {
+  "functions": {
+    "api/*.ts": {
+      "runtime": "@vercel/node@3"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://mintlabs-lucky-api.vercel.app/:path*"
+      "destination": "/api/:path*"
     }
   ]
 }
 ```
+
+## Vercel Functions
+
+The production API is implemented as Vercel Serverless Functions at the monorepo root:
+
+### `/api/games.ts`
+
+- **Method**: GET
+- **Response**: Array of game configurations
+- **Caching**: `Cache-Control: public, max-age=300, stale-while-revalidate=60`
+- **Source**: Supabase `games` table
+
+### `/api/generate.ts`
+
+- **Method**: POST
+- **Request Body**:
+  ```json
+  {
+    "game_code": "powerball",
+    "mode": "random",
+    "sets": 1
+  }
+  ```
+- **Response**: Generated numbers with odds/probability
+- **Side Effect**: Writes to Supabase `generations` table
+
+### Supported Modes
+
+- `random` - Uniform random selection
+- `spaced` - Evenly distributed numbers
+- `sum_target` - Target a specific sum
+- `birthday` - Based on birth date
+- `lucky` - Include specific lucky numbers
+- `balanced` - Mix of strategies
+- `odd_even_mix` - Balance odd/even
+- `pattern_avoid` - Avoid common patterns
+- `hot` / `cold` - Based on historical frequency
+- Themed: `zodiac`, `gemstone`, `star_sign`, `jyotish`, `chinese_zodiac`, `favorite_color`
 
 ## Testing
 

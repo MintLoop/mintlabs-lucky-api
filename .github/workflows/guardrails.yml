@@ -1,0 +1,202 @@
+name: Guardrails
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  asset-budget:
+    name: Asset Budget Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mintlabs-lucky-frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: mintlabs-lucky-frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: mintlabs-lucky-frontend
+        env:
+          BACKEND_ORIGIN: https://mintlabs-lucky-api.vercel.app
+
+      - name: Check total dist size
+        run: |
+          TOTAL_SIZE=$(du -sb mintlabs-lucky-frontend/dist | cut -f1)
+          MAX_SIZE=$((50 * 1024 * 1024))  # 50MB threshold
+          echo "Total dist size: $TOTAL_SIZE bytes ($(numfmt --to=iec $TOTAL_SIZE))"
+          echo "Threshold: $(numfmt --to=iec $MAX_SIZE)"
+          if [ "$TOTAL_SIZE" -gt "$MAX_SIZE" ]; then
+            echo "❌ FAIL: dist/ exceeds 50MB budget"
+            exit 1
+          fi
+          echo "✅ PASS: dist/ within budget"
+
+      - name: Check for oversized assets
+        run: |
+          MAX_ASSET=$((2 * 1024 * 1024))  # 2MB per asset
+          OVERSIZED=$(find mintlabs-lucky-frontend/dist -type f -size +2M 2>/dev/null || true)
+          if [ -n "$OVERSIZED" ]; then
+            echo "❌ FAIL: Found assets over 2MB:"
+            echo "$OVERSIZED"
+            exit 1
+          fi
+          echo "✅ PASS: No oversized assets"
+
+      - name: Check SSG output (key pages are static HTML)
+        run: |
+          REQUIRED_PAGES=(
+            "mintlabs-lucky-frontend/dist/index.html"
+            "mintlabs-lucky-frontend/dist/tools/index.html"
+            "mintlabs-lucky-frontend/dist/casino-lite/index.html"
+            "mintlabs-lucky-frontend/dist/faq/index.html"
+          )
+          MISSING=""
+          for page in "${REQUIRED_PAGES[@]}"; do
+            if [ ! -f "$page" ]; then
+              MISSING="$MISSING $page"
+            fi
+          done
+          if [ -n "$MISSING" ]; then
+            echo "❌ FAIL: Missing static HTML pages:$MISSING"
+            echo "This may indicate SSR regression."
+            exit 1
+          fi
+          echo "✅ PASS: Key pages exist as static HTML"
+
+  proxy-correctness:
+    name: Proxy & Config Correctness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check frontend vercel.json has /api rewrite
+        run: |
+          if ! grep -q '"/api/:path\*"' mintlabs-lucky-frontend/vercel.json; then
+            echo "❌ FAIL: Missing /api/:path* rewrite in frontend vercel.json"
+            exit 1
+          fi
+          echo "✅ PASS: /api/:path* rewrite present"
+
+      - name: Check no legacy @secret references in vercel.json files
+        run: |
+          LEGACY=$(grep -rn '"@[a-z_]*"' --include="vercel.json" . 2>/dev/null | grep -v 'schema' || true)
+          if [ -n "$LEGACY" ]; then
+            echo "❌ FAIL: Found legacy @secret references:"
+            echo "$LEGACY"
+            exit 1
+          fi
+          echo "✅ PASS: No legacy @secret references"
+
+      - name: Check no PUBLIC_ADSENSE_CLIENT in vercel.json
+        run: |
+          ADSENSE=$(grep -rn 'PUBLIC_ADSENSE_CLIENT\|adsense_client' --include="vercel.json" . 2>/dev/null || true)
+          if [ -n "$ADSENSE" ]; then
+            echo "❌ FAIL: Found AdSense references in vercel.json:"
+            echo "$ADSENSE"
+            exit 1
+          fi
+          echo "✅ PASS: No AdSense references in vercel.json"
+
+  api-contract:
+    name: API Contract Check
+    runs-on: ubuntu-latest
+    # Skip if DATABASE_URL secret is not configured
+    if: ${{ vars.SKIP_API_CONTRACT != 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: mintlabs-lucky-api/requirements-dev.txt
+
+      - name: Check database credentials
+        id: check-db
+        run: |
+          if [ -z "${{ secrets.DATABASE_URL }}" ]; then
+            echo "⚠️ SKIP: DATABASE_URL secret not configured"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install backend dependencies
+        if: steps.check-db.outputs.skip != 'true'
+        run: pip install -r mintlabs-lucky-api/requirements-dev.txt
+
+      - name: Start API server
+        if: steps.check-db.outputs.skip != 'true'
+        run: |
+          cd mintlabs-lucky-api
+          uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          sleep 5
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Test GET /games returns 200
+        if: steps.check-db.outputs.skip != 'true'
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/games)
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ FAIL: GET /games returned $STATUS"
+            exit 1
+          fi
+          echo "✅ PASS: GET /games returns 200"
+
+      - name: Test /games has Cache-Control header
+        if: steps.check-db.outputs.skip != 'true'
+        run: |
+          CACHE=$(curl -sI http://127.0.0.1:8000/games | grep -i "cache-control" || true)
+          if [ -z "$CACHE" ]; then
+            echo "❌ FAIL: GET /games missing Cache-Control header"
+            exit 1
+          fi
+          echo "✅ PASS: Cache-Control header present: $CACHE"
+
+      - name: Test POST /generate returns 200
+        if: steps.check-db.outputs.skip != 'true'
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST http://127.0.0.1:8000/generate \
+            -H "Content-Type: application/json" \
+            -d '{"game_code": "powerball", "mode": "random"}')
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ FAIL: POST /generate returned $STATUS"
+            exit 1
+          fi
+          echo "✅ PASS: POST /generate returns 200"
+
+      - name: Test /generate response size
+        if: steps.check-db.outputs.skip != 'true'
+        run: |
+          RESP=$(curl -s -X POST http://127.0.0.1:8000/generate \
+            -H "Content-Type: application/json" \
+            -d '{"game_code": "powerball", "mode": "random"}')
+          SIZE=${#RESP}
+          MAX_SIZE=2048  # 2KB max response
+          echo "Response size: $SIZE bytes"
+          if [ "$SIZE" -gt "$MAX_SIZE" ]; then
+            echo "❌ FAIL: /generate response exceeds 2KB budget"
+            exit 1
+          fi
+          echo "✅ PASS: /generate response within budget"
+
+      - name: Report skipped
+        if: steps.check-db.outputs.skip == 'true'
+        run: |
+          echo "✅ SKIPPED: API contract tests require DATABASE_URL secret"
+          echo "To enable, add DATABASE_URL to repository secrets"

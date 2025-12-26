@@ -429,7 +429,14 @@ def stats(request: Request):
 
 @app.get("/games")
 def games():
-    return _get_games_cached()
+    """Return list of available games with cache headers."""
+    data = _get_games_cached()
+    return JSONResponse(
+        content=data,
+        headers={
+            "Cache-Control": "public, max-age=300, stale-while-revalidate=60",
+        },
+    )
 
 
 @app.post("/generate", response_model=GenerateResp)

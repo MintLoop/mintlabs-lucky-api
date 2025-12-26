@@ -10,7 +10,6 @@ import HomeAccordions from '../components/home/HomeAccordions.astro';
 import TermsModal from '../components/TermsModal.astro';
 import PrivacyModal from '../components/PrivacyModal.astro';
 import NewsletterModal from '../components/NewsletterModal.astro';
-import demoEntry from '../scripts/entry.demo-balls.js?url';
 import { apiUrl, API_BASE } from '../lib/api/base';
 
 const ADS = import.meta.env.PUBLIC_ADSENSE_CLIENT;
@@ -187,7 +186,47 @@ const apiBase = API_BASE;
   <script is:inline define:vars={{ apiBase }}>
     window.__LUCKY_API_BASE = apiBase;
   </script>
-  <script type="module" src={demoEntry}></script>
+  <script>
+    import { initLuckyDemoBalls } from '../scripts/lucky.demo-balls';
+    import { track } from '../scripts/tracking';
+
+    if (typeof document !== 'undefined') {
+      const boot = () => {
+        initLuckyDemoBalls();
+      };
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot, { once: true });
+      } else {
+        boot();
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      try {
+        (window as any).track = track;
+      } catch (err) { console.debug(err); }
+    }
+
+    if (typeof window !== 'undefined') {
+      try {
+        document.addEventListener('click', (ev) => {
+          try {
+            let tgt: EventTarget | null = ev.target;
+            if (!(tgt instanceof Element)) tgt = ((tgt as any)?.parentElement) || null;
+            if (!tgt) return;
+            const el = (tgt as Element).closest('[data-track-event]');
+            if (!el) return;
+            const eventName = (el as HTMLElement).dataset.trackEvent || 'link_click';
+            let props: Record<string, any> = {};
+            if ((el as HTMLElement).dataset.trackProps) {
+              try { props = JSON.parse((el as HTMLElement).dataset.trackProps || '{}'); } catch (err) { console.debug(err); props = {}; }
+            }
+            if (typeof track === 'function') track(eventName, { href: el.getAttribute?.('href'), ...props });
+          } catch (err) { console.debug(err); }
+        }, { passive: true });
+      } catch (err) { console.debug(err); }
+    }
+  </script>
 </Layout>
 
 <style>
