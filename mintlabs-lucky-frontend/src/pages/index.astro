@@ -24,7 +24,7 @@ const current = Array.isArray(games) && games.length > 0 ? games[0] : null;
 const apiBase = API_BASE;
 ---
 
-<Layout title="MintLabs Lucky Numbers" description="Generate random lottery numbers for education and entertainment. Explore probability tools, casino simulators, and lottery math.">
+<Layout title="Lucky Numbers" description="Generate random lottery numbers for education and entertainment. Explore probability tools, casino simulators, and lottery math.">
   {jsonGames && jsonGames !== '[]' && (
     <script type="application/json" id="initial-games" set:html={jsonGames} />
   )}
@@ -32,10 +32,10 @@ const apiBase = API_BASE;
   <main class="mx-auto max-w-[var(--content-max-width)] px-4 sm:px-6 space-y-6">
     <header class="pt-3">
       <div class="flex items-center justify-center gap-3 md:gap-4">
-        <a href="/" class="flex items-center gap-3 md:gap-4 hover:opacity-90 transition-opacity">
+        <a href="/" class="flex min-w-0 items-center gap-3 md:gap-4 hover:opacity-90 transition-opacity">
           <img src="/clover.png" alt="Lucky Clover" class="w-12 h-12 md:w-14 md:h-14 shrink-0" />
-          <h1 class="text-3xl md:text-4xl font-bold leading-tight whitespace-nowrap">
-            MintLabs Lucky Numbers
+          <h1 class="min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-3xl md:text-4xl font-bold leading-tight">
+           Lucky Number Today
           </h1>
         </a>
       </div>
