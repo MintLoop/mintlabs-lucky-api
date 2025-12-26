@@ -17,7 +17,6 @@ let isRateLimited = false;
 let isClientCooldown = false;
 let recentClicks: number[] = [];
 const CLIENT_RATE_LIMIT = { max: 3, windowMs: 2000 };
-let inFlightRequests = 0;
 
 // Toast notification helper (copied from lucky.ts)
 function showToast(message: string, type: 'warning' | 'error' = 'warning', durationMs = 3000): void {
@@ -264,7 +263,7 @@ export function initLuckyDemoBalls() {
       _out.innerHTML = '';
 
       const clientLimited = isClientRateLimited();
-      if (clientLimited && inFlightRequests > 0) {
+      if (clientLimited) {
         showToast('Easy tiger… try again in a sec.', 'warning', 2200);
         handleClientCooldown(1000);
         if (IS_DEV) {
@@ -354,13 +353,7 @@ export function initLuckyDemoBalls() {
           .catch((err) => ({ ok: false, message: String(err), status: 0 })),
       );
 
-      inFlightRequests = requests.length;
-      let results: any[] = [];
-      try {
-        results = await Promise.all(requests);
-      } finally {
-        inFlightRequests = 0;
-      }
+      const results = await Promise.all(requests);
 
       results.forEach((result, idx) => {
         if (!result.ok) {
